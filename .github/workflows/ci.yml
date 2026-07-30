@@ -1,0 +1,107 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# Новый пуш в ту же ветку отменяет предыдущий прогон.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Версия закреплена намеренно: golden-тесты сверяют отрисовку попиксельно,
+  # и смена версии Flutter меняет растеризацию. Обновлять вместе с локальной.
+  FLUTTER_VERSION: '3.41.8'
+
+jobs:
+  analyze:
+    name: Формат, анализ, тесты
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+
+      - name: Форматирование
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Анализ
+        run: flutter analyze --fatal-infos
+
+      - name: Тесты
+        # Golden'ы исключены: их растеризация зависит от платформы,
+        # они гоняются отдельной джобой на Windows.
+        run: flutter test --exclude-tags golden
+
+  goldens:
+    name: Сверка с макетами
+    # Windows, а не ubuntu: эталоны в test/**/goldens сняты на Windows, и
+    # на Linux текст со сглаживанием отрисуется иначе. Раннер дороже, но
+    # джоба короткая, а иначе сверка с design/ теряет смысл.
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+
+      - name: Golden-тесты
+        run: flutter test --tags golden
+
+      - name: Выгрузить расхождения
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: golden-failures
+          # Flutter кладёт сюда три картинки на каждый непрошедший тест:
+          # эталон, полученный результат и их разницу.
+          path: test/**/failures/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  build-android:
+    name: Сборка APK
+    needs: analyze
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          # Совпадает с sourceCompatibility в android/app/build.gradle.kts.
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+
+      - name: Debug APK
+        # Именно debug: релизная сборка сейчас подписывается debug-ключом
+        # (TODO в android/app/build.gradle.kts), выкладывать её некуда.
+        run: flutter build apk --debug
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: medix-debug-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 14
