@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/repositories/home_repository.dart';
-import '../../domain/entities/appointment.dart';
+import '../../../../shared/models/appointment.dart';
 import '../../domain/entities/doctor_specialty.dart';
 
 final homeRepositoryProvider = Provider<HomeRepository>(

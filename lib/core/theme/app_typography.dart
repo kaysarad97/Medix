@@ -137,4 +137,62 @@ abstract final class AppTypography {
   /// Мелкая надпись поверх фона. «выслать СМС-сообщение ещё раз через 00:59».
   static TextStyle get captionMuted =>
       _style(size: 13, weight: 400, color: AppColors.textMuted);
+
+  // ─── Экраны врача ────────────────────────────────────────────────────────
+  // Кегли подобраны по ширине краски строк, а не по высоте прописных: у
+  // белого текста на синем фоне широкий ореол сглаживания, и замер высоты
+  // завышает кегль на 10-15 %. Строка из макета меряется по крайним
+  // непрозрачным столбцам, тем же порогом рисуется в offscreen-картинку, и
+  // берётся кегль с наименьшим расхождением. Опорные ширины из
+  // `design/Профиль врача + запись.png`: «Имя Фамилия» — 152,
+  // «Гастроэнтеролог» — 135, «Расписание» — 107, «Июль, 2026» — 132.
+
+  /// Заголовок экрана в верхней строке. «О враче», «Ваша запись».
+  static TextStyle get screenTitle =>
+      _style(size: 19, weight: 400, color: AppColors.textOnPrimary);
+
+  /// Имя врача в шапке.
+  static TextStyle get doctorName =>
+      _style(size: 23, weight: 400, color: AppColors.textOnPrimary);
+
+  /// Специальность врача под именем.
+  static TextStyle get doctorSpecialty =>
+      _style(size: 16, weight: 500, color: AppColors.primary);
+
+  /// Строка клиники — самая мелкая в шапке.
+  static TextStyle get doctorClinic =>
+      _style(size: 11, weight: 500, color: AppColors.primary);
+
+  /// Текст чипа в шапке. «4.5», «Стаж 10 лет», «Алматы».
+  static TextStyle get chipLabel =>
+      _style(size: 14, weight: 400, color: AppColors.textPrimary);
+
+  /// Заголовок карточки расписания. «Расписание», «Перенести запись».
+  static TextStyle get cardTitleAccent =>
+      _style(size: 19, weight: 400, color: AppColors.primaryBright);
+
+  /// Заголовок карточки отзывов — мельче, чем у карточки расписания.
+  static TextStyle get cardTitleDark =>
+      _style(size: 17, weight: 400, color: AppColors.textPrimary);
+
+  /// Месяц над лентой дней. «Июль, 2026».
+  static TextStyle get monthTitle =>
+      _style(size: 24, weight: 400, color: AppColors.textPrimary);
+
+  /// Календарь: подпись дня недели, число в пилюле, время в слоте — один
+  /// кегль на все три, так и в макете (краска «18» и «12:30» одной высоты).
+  static TextStyle get calendarLabel =>
+      _style(size: 15, weight: 400, color: AppColors.textPrimary);
+
+  /// Надпись на парных кнопках. «Создать запись», «Сообщение».
+  static TextStyle get actionTitle =>
+      _style(size: 16, weight: 400, color: AppColors.textPrimary);
+
+  /// Тело отзыва — мельче основного текста и в несколько строк.
+  static TextStyle get reviewBody => _style(
+    size: 13,
+    weight: 400,
+    color: AppColors.textSecondary,
+    height: 1.45,
+  );
 }

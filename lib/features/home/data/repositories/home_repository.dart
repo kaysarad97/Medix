@@ -1,4 +1,4 @@
-import '../../domain/entities/appointment.dart';
+import '../../../../shared/models/appointment.dart';
 import '../../domain/entities/doctor_specialty.dart';
 
 abstract interface class HomeRepository {

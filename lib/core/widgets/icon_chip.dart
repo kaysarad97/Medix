@@ -33,21 +33,112 @@ enum MedixIcon {
 
   /// Реплика чата. Поле «Опишите Ваши симптомы».
   symptomSearch,
+
+  /// Закрашенная звезда. Чип рейтинга врача и оценка в отзыве.
+  star,
+
+  /// Наполовину закрашенная звезда. Рейтинг 4.5 в макете.
+  starHalf,
+
+  /// Контур звезды. Незаполненная часть оценки.
+  starOutline,
+
+  /// Метка на карте. Чип города в шапке врача.
+  locationPin,
+
+  /// Видеокамера. Экран видео-звонка.
+  ///
+  /// НЕ кнопка «Создать запись»: там в макете трубка, хотя подпись
+  /// «Видео-звонок» — см. [audioCall].
+  videoCall,
+
+  /// Телефонная трубка со звуковыми волнами. Обе кнопки звонка на экранах
+  /// врача: «Создать запись / Видео-звонок» и «Начать звонок / Аудио-звонок».
+  audioCall,
+
+  /// Конверт. Кнопка «Сообщение» в карточке расписания и строка записи.
+  mail,
+
+  /// Облачко чата. Кнопка «Сообщение» на экране записи.
+  chat,
+
+  /// Лист с карандашом. Поле «Оставьте свой отзыв».
+  reviewCompose,
+
+  /// Человечек в кружке. Автор отзыва.
+  userAvatar,
 }
 
 abstract final class MedixIcons {
-  /// TODO(design): дизайнер отдаёт SVG — сложить в assets/icons/
-  /// и проставить пути здесь. Больше нигде править не нужно.
-  static const Map<MedixIcon, String> _assets = {};
+  /// Экспорт дизайнера. Имена файлов — по значению [MedixIcon], чтобы связь
+  /// читалась без сверки со списком.
+  ///
+  /// Исходники лежат в `icons/` под своими именами из Figma; сюда они
+  /// перекладываются с ASCII-именами: путь с кириллицей и пробелами ломает
+  /// сборку Android (`non-ASCII characters` в Gradle).
+  static const Map<MedixIcon, String> _assets = {
+    MedixIcon.labTest: 'assets/icons/lab_test.svg',
+    MedixIcon.doctorCall: 'assets/icons/doctor_call.svg',
+    MedixIcon.mapSearch: 'assets/icons/map_search.svg',
+    MedixIcon.uploadAnalyses: 'assets/icons/upload_analyses.svg',
+    MedixIcon.calendar: 'assets/icons/calendar.svg',
+    MedixIcon.appointment: 'assets/icons/appointment.svg',
+    MedixIcon.notifications: 'assets/icons/notifications.svg',
+    MedixIcon.symptomSearch: 'assets/icons/symptom_search.svg',
+    MedixIcon.star: 'assets/icons/star.svg',
+    MedixIcon.starHalf: 'assets/icons/star_half.svg',
+    MedixIcon.starOutline: 'assets/icons/star_outline.svg',
+    MedixIcon.locationPin: 'assets/icons/location_pin.svg',
+    MedixIcon.videoCall: 'assets/icons/video_call.svg',
+    MedixIcon.audioCall: 'assets/icons/audio_call.svg',
+    MedixIcon.mail: 'assets/icons/mail.svg',
+    MedixIcon.chat: 'assets/icons/chat.svg',
+    MedixIcon.reviewCompose: 'assets/icons/review_compose.svg',
+    MedixIcon.userAvatar: 'assets/icons/user_avatar.svg',
+  };
 
   static String? assetOf(MedixIcon icon) => _assets[icon];
 
-  /// Все ли иконки на месте. Используется тестом, который напомнит убрать
-  /// заглушки, когда экспорт приедет.
+  /// Все ли иконки на месте. Проверяется тестом: пока карта неполная, на
+  /// месте недостающих рисуется пустота, и заметить это по макету трудно.
   static bool get allResolved => MedixIcon.values.every(_assets.containsKey);
 }
 
-/// Круглая подложка с иконкой внутри.
+/// Глиф без подложки.
+///
+/// [size] — размер самого глифа, в отличие от [AppIconChip], где это диаметр
+/// кружка. Цвет перекрашивается целиком: экспорт приходит в разных цветах
+/// (`#0E0777`, `#1719C3`, `#212528`), а на экранах иконка бывает и белой.
+class AppIcon extends StatelessWidget {
+  const AppIcon({
+    super.key,
+    required this.icon,
+    this.size = 24,
+    this.color = AppColors.brandIndigo,
+  });
+
+  final MedixIcon icon;
+  final double size;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final asset = MedixIcons.assetOf(icon);
+    if (asset == null) {
+      // Экспорт ещё не приехал — держим место, чтобы вёрстка не прыгала.
+      return SizedBox(width: size, height: size);
+    }
+
+    return SvgPicture.asset(
+      asset,
+      width: size,
+      height: size,
+      colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+    );
+  }
+}
+
+/// Круглая подложка с глифом внутри.
 ///
 /// Размеры из `design/Главная.png`: кружок 48, глиф внутри ~24.
 class AppIconChip extends StatelessWidget {
@@ -60,7 +151,10 @@ class AppIconChip extends StatelessWidget {
   });
 
   final MedixIcon icon;
+
+  /// Диаметр кружка. Глиф внутри — половина от него.
   final double size;
+
   final Color background;
   final Color foreground;
 
@@ -71,23 +165,18 @@ class AppIconChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final asset = MedixIcons.assetOf(icon);
-
     return SizedBox(
       width: size,
       height: size,
       child: DecoratedBox(
         decoration: BoxDecoration(color: background, shape: BoxShape.circle),
-        child: asset == null
-            ? const SizedBox.shrink()
-            : Center(
-                child: SvgPicture.asset(
-                  asset,
-                  width: size * _glyphRatio,
-                  height: size * _glyphRatio,
-                  colorFilter: ColorFilter.mode(foreground, BlendMode.srcIn),
-                ),
-              ),
+        child: Center(
+          child: AppIcon(
+            icon: icon,
+            size: size * _glyphRatio,
+            color: foreground,
+          ),
+        ),
       ),
     );
   }

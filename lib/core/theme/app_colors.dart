@@ -37,6 +37,16 @@ abstract final class AppColors {
   /// Голубая информационная карточка («Найти лабораторию или больницу»).
   static const Color surfaceInfo = Color(0xFFE6F3FE);
 
+  /// Подложка чипа города в шапке врача (`design/Профиль врача + запись.png`).
+  ///
+  /// Светлее [accentSofter] на 14 уровней по красному. Чип лежит на синем
+  /// градиенте — похоже на белый с прозрачностью, а не на отдельный цвет.
+  /// Уточнить у дизайнера при следующем обновлении макетов.
+  static const Color surfaceChip = Color(0xFFCEE5FD);
+
+  /// Недоступный элемент: колонка выходного дня в расписании врача.
+  static const Color surfaceDisabled = Color(0xFFC9C9CA);
+
   /// Заголовки и основной текст.
   static const Color textPrimary = Color(0xFF212528);
 
@@ -53,6 +63,9 @@ abstract final class AppColors {
 
   /// Подзаголовки поверх градиентного фона («Подтвердите личность»).
   static const Color textMuted = Color(0xFF626E7D);
+
+  /// Текст недоступного элемента: число выходного дня в расписании.
+  static const Color textDisabled = Color(0xFFA4A7A8);
 
   /// Текст на залитых кнопках.
   static const Color textOnPrimary = Color(0xFFFCFDFE);

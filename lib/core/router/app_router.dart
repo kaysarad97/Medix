@@ -8,6 +8,8 @@ import '../../features/auth/presentation/screens/policy_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/verify_code_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
+import '../../features/telemedicine/presentation/screens/appointment_screen.dart';
+import '../../features/telemedicine/presentation/screens/doctor_profile_screen.dart';
 import 'routes.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -44,6 +46,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.home,
         builder: (context, state) => const HomeScreen(),
+      ),
+      GoRoute(
+        path: Routes.doctor,
+        builder: (context, state) =>
+            DoctorProfileScreen(doctorId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: Routes.appointment,
+        builder: (context, state) =>
+            AppointmentScreen(appointmentId: state.pathParameters['id']!),
       ),
     ],
   );

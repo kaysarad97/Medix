@@ -5,7 +5,7 @@ import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/icon_chip.dart';
-import '../../domain/entities/appointment.dart';
+import '../../../../shared/models/appointment.dart';
 import 'home_metrics.dart';
 
 /// «Предстоящие записи» — заголовок с иконкой и список ближайших приёмов.

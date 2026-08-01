@@ -18,4 +18,14 @@ abstract final class Routes {
   static const String policy = '/register/policy';
 
   static const String home = '/';
+
+  /// Профиль врача с записью на приём.
+  static const String doctor = '/doctor/:id';
+
+  /// Оформленная запись к врачу.
+  static const String appointment = '/appointment/:id';
+
+  static String doctorOf(String id) => '/doctor/$id';
+
+  static String appointmentOf(String id) => '/appointment/$id';
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -53,7 +55,14 @@ class HomeScreen extends ConsumerWidget {
               const _Section(child: QuickActionsCard()),
               const SizedBox(height: HomeMetrics.cardGap),
               _Section(
-                child: DoctorsCard(specialties: specialties.value ?? const []),
+                child: DoctorsCard(
+                  specialties: specialties.value ?? const [],
+                  // TODO(telemedicine): вести на список врачей выбранной
+                  // специальности, когда он появится. Пока открываем профиль
+                  // врача из заглушки — иначе экран недостижим.
+                  onSpecialtyTap: (specialty) =>
+                      context.push(Routes.doctorOf('d1')),
+                ),
               ),
               const SizedBox(height: HomeMetrics.cardGap),
               const _Section(child: UploadAnalysesCard()),
@@ -61,6 +70,8 @@ class HomeScreen extends ConsumerWidget {
               _Section(
                 child: UpcomingAppointmentsCard(
                   appointments: appointments.value ?? const [],
+                  onAppointmentTap: (appointment) =>
+                      context.push(Routes.appointmentOf(appointment.id)),
                 ),
               ),
               const SizedBox(height: HomeMetrics.cardGap),
@@ -102,12 +113,10 @@ class _SymptomSearchField extends StatelessWidget {
           ),
           child: Row(
             children: [
-              const SizedBox(width: 14),
-              const AppIconChip(
-                icon: MedixIcon.symptomSearch,
-                size: 32,
-                background: Colors.transparent,
-              ),
+              // Замер по `design/Главная.png`: краска облачка 19×19,
+              // начинается на x 47 при поле с x 21.
+              const SizedBox(width: 26),
+              const AppIcon(icon: MedixIcon.symptomSearch, size: 20),
               const SizedBox(width: 12),
               Expanded(
                 child: Center(

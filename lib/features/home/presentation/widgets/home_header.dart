@@ -82,11 +82,7 @@ class _NotificationsChip extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const AppIconChip(
-                  icon: MedixIcon.notifications,
-                  size: 22,
-                  background: Colors.transparent,
-                ),
+                const AppIcon(icon: MedixIcon.notifications, size: 22),
                 const SizedBox(width: 6),
                 Text('$count', style: AppTypography.sectionTitle),
               ],
