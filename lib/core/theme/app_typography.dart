@@ -44,6 +44,39 @@ abstract final class AppTypography {
   static TextStyle get h2 =>
       _style(size: 24, weight: 500, color: AppColors.textPrimary);
 
+  /// Приветствие на главной. «Как Ваше здоровье сегодня?».
+  ///
+  /// Кегль восстановлен по ширине строки, а не по высоте прописных: на
+  /// синем фоне у белого текста широкий ореол сглаживания, и замер высоты
+  /// завышает результат. «Как Ваше здоровье» занимает в макете 338 —
+  /// это 37, а не 44.
+  static TextStyle get homeGreeting =>
+      _style(size: 37, weight: 400, color: AppColors.textOnPrimary);
+
+  /// Заголовок карточки на главной. «Врачи», «Предстоящие записи».
+  static TextStyle get sectionTitle =>
+      _style(size: 20, weight: 400, color: AppColors.textPrimary);
+
+  /// Заголовок плитки. «Сдать анализы», «Загрузить анализы».
+  static TextStyle get tileTitle =>
+      _style(size: 18, weight: 400, color: AppColors.textPrimary, height: 1.25);
+
+  /// Синяя подпись под заголовком плитки. «в партнерских лабораториях».
+  static TextStyle get tileSubtitle =>
+      _style(size: 12, weight: 500, color: AppColors.primary);
+
+  /// Заголовок элемента списка. «Терапевт», «Кардиолог».
+  static TextStyle get cardItemTitle =>
+      _style(size: 14, weight: 400, color: AppColors.textPrimary);
+
+  /// Приписка к элементу списка. «100 врачей».
+  static TextStyle get cardItemMeta =>
+      _style(size: 12, weight: 400, color: AppColors.textMuted);
+
+  /// Мелкая ссылка в углу карточки. «Все».
+  static TextStyle get linkSmall =>
+      _style(size: 12, weight: 500, color: AppColors.primary);
+
   /// Крупная надпись на кнопке. «Войти».
   static TextStyle get buttonLg =>
       _style(size: 20, weight: 400, color: AppColors.textOnPrimary);
