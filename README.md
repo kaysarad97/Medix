@@ -5,10 +5,62 @@
 
 Flutter, архитектура feature-first, состояние на Riverpod.
 
-## Запуск
+## Установка на новой машине
+
+Понадобится:
+
+| | Версия | Зачем |
+|---|---|---|
+| Git | любая свежая | |
+| Flutter | **ровно 3.41.8** | закреплена в CI; смена версии меняет растеризацию и ломает golden-тесты |
+| JDK | 17 | совпадает с `sourceCompatibility` в `android/app/build.gradle.kts` |
+| Android Studio | любая свежая | ради Android SDK и эмулятора |
+| Xcode | — | только на macOS, для сборки под iOS |
+
+Проверить, что всё встало: `flutter doctor`.
+
+**Клонировать в путь без кириллицы и пробелов.** Android Gradle Plugin
+отказывается собирать проект, если в пути есть не-ASCII символы, и падает
+с `Your project path contains non-ASCII characters` ещё до компиляции.
+Годится `C:\dev\medix-app` или `~/dev/medix-app`; не годится
+`C:\Users\Иван\Новая папка\medix-app`.
+
+```bash
+git clone https://github.com/Yerbol08/medix-app.git
+```
 
 ```bash
 flutter pub get
+```
+
+Чтобы git показывал кириллические имена файлов в `design/` как есть,
+а не восьмеричными кодами:
+
+```bash
+git config core.quotepath false
+```
+
+### Если машина не на Windows
+
+Эталоны golden-тестов сняты на Windows. На macOS и Linux шесть из них
+будут падать из-за различий в сглаживании — это не поломка вёрстки.
+Локально гоняй тесты без них, а источником истины считай windows-джобу
+в CI:
+
+```bash
+flutter test --exclude-tags golden
+```
+
+### Отладочные сборки с разных машин
+
+Debug-подпись генерируется на каждой машине своя, поэтому установить
+сборку с ноутбука Б поверх сборки с ноутбука А не выйдет: Android ответит
+`INSTALL_FAILED_UPDATE_INCOMPATIBLE`. Достаточно удалить приложение
+с телефона перед первой установкой с другой машины.
+
+## Запуск
+
+```bash
 flutter run
 ```
 
