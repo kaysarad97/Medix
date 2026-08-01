@@ -6,6 +6,13 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      update_goldens:
+        description: >-
+          Переснять эталоны вместо сверки. Нужно, когда вёрстка изменилась
+          осознанно, а машина разработчика не на Windows.
+        type: boolean
+        default: false
 
 # Новый пуш в ту же ветку отменяет предыдущий прогон.
 concurrency:
@@ -49,6 +56,9 @@ jobs:
     # на Linux текст со сглаживанием отрисуется иначе. Раннер дороже, но
     # джоба короткая, а иначе сверка с design/ теряет смысл.
     runs-on: windows-latest
+    # При ручном запуске «переснять эталоны» сверять нечего: эталоны там и
+    # обновляются, джоба гарантированно упала бы.
+    if: ${{ !inputs.update_goldens }}
     steps:
       - uses: actions/checkout@v4
 
@@ -104,4 +114,40 @@ jobs:
         with:
           name: medix-debug-apk
           path: build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 14
+
+  refresh-goldens:
+    name: Переснять эталоны
+    # Только вручную и только по галочке: эталоны — источник истины сверки,
+    # обновлять их на каждый push нельзя, иначе поехавшая вёрстка молча
+    # станет новым эталоном.
+    #
+    # Джоба существует, потому что эталоны привязаны к растеризации Windows,
+    # а разработка идёт и с macOS. Снятые на другой системе, они разойдутся
+    # по сглаживанию и завалят сверку — см. README, «Если машина не на
+    # Windows».
+    if: ${{ inputs.update_goldens }}
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+
+      - name: Переснять эталоны
+        run: flutter test --tags golden --update-goldens
+
+      - name: Выложить эталоны
+        uses: actions/upload-artifact@v4
+        with:
+          # Скачать, распаковать поверх test/, глазами сверить с design/
+          # и закоммитить. В репозиторий джоба ничего не пишет: коммит
+          # эталонов — осознанное действие, а не побочный эффект прогона.
+          name: goldens
+          path: test/**/goldens/
           retention-days: 14
