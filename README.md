@@ -76,11 +76,24 @@ flutter run --dart-define=MEDIX_USE_MOCKS=false --dart-define=MEDIX_API_URL=http
 
 ## Проверки
 
+Перед пушем прогони ровно то, что делает CI — иначе конвейер найдёт то,
+чего не показала локальная проверка:
+
 ```bash
-dart format .
+dart format --output=none --set-exit-if-changed .
+```
+
+```bash
 flutter analyze --fatal-infos
+```
+
+```bash
 flutter test
 ```
+
+`--fatal-infos` важен: без него анализатор не падает на подсказках уровня
+`info`, а CI на них падает. `dart format .` (без флагов) молча правит файлы
+и тоже ничего не сообщает — в конвейере же он только проверяет.
 
 ## Golden-тесты
 

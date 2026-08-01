@@ -42,8 +42,9 @@ abstract final class Validators {
     if (parts.length < 2) return 'Укажите фамилию и имя';
 
     final word = RegExp(r"^[А-Яа-яЁёA-Za-z][А-Яа-яЁёA-Za-z'-]*$");
-    if (parts.any((p) => !word.hasMatch(p)))
+    if (parts.any((p) => !word.hasMatch(p))) {
       return 'Только буквы, дефис и апостроф';
+    }
 
     return null;
   }
