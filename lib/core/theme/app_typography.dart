@@ -188,6 +188,38 @@ abstract final class AppTypography {
   static TextStyle get actionTitle =>
       _style(size: 16, weight: 400, color: AppColors.textPrimary);
 
+  // ─── Экраны профиля ──────────────────────────────────────────────────────
+
+  /// Имя в шапке профиля. В макете курсив, но в Golos Text курсивного
+  /// начертания нет — см. пояснение в ProfileHeader.
+  static TextStyle get profileName =>
+      _style(size: 34, weight: 400, color: AppColors.textOnPrimary);
+
+  /// Значение под именем: «мужчина», «6/12/1996».
+  static TextStyle get profileMetaValue =>
+      _style(size: 13, weight: 400, color: AppColors.textOnPrimary);
+
+  /// Подпись под значением: «пол», «дата рождения».
+  static TextStyle get profileMetaLabel =>
+      _style(size: 13, weight: 400, color: AppColors.surfaceChip);
+
+  /// Подпись уровня подписки под ромбом.
+  static TextStyle get goldLabel =>
+      _style(size: 15, weight: 400, color: AppColors.gold);
+
+  /// Название анализа в списке. В макете переносится на две строки.
+  static TextStyle get analysisName =>
+      _style(size: 15, weight: 400, color: AppColors.textPrimary, height: 1.3);
+
+  /// Значение анализа: «24.8 мкмоль/л».
+  static TextStyle get analysisValue =>
+      _style(size: 16, weight: 400, color: AppColors.textPrimary);
+
+  /// Референсный интервал под названием. Мельче остальных подписей:
+  /// «10.7 - 32.2 мкмоль/л» должно уместиться в колонку названия.
+  static TextStyle get analysisReference =>
+      _style(size: 11, weight: 500, color: AppColors.primaryBright);
+
   /// Тело отзыва — мельче основного текста и в несколько строк.
   static TextStyle get reviewBody => _style(
     size: 13,

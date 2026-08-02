@@ -15,9 +15,13 @@ class ScreenTopBar extends StatelessWidget {
     required this.title,
     this.onBack,
     this.trailing,
+    this.titleColor,
   });
 
   final String title;
+
+  /// Обычно белый, но на «Настройках» в макете заголовок синий.
+  final Color? titleColor;
   final VoidCallback? onBack;
 
   /// Чип города в правом углу. На экране «Ваша запись» его нет.
@@ -42,7 +46,9 @@ class ScreenTopBar extends StatelessWidget {
           Center(
             child: Text(
               title,
-              style: AppTypography.screenTitle,
+              style: titleColor == null
+                  ? AppTypography.screenTitle
+                  : AppTypography.screenTitle.copyWith(color: titleColor),
               textAlign: TextAlign.center,
             ),
           ),

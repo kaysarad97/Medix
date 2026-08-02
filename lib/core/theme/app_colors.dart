@@ -47,6 +47,26 @@ abstract final class AppColors {
   /// Недоступный элемент: колонка выходного дня в расписании врача.
   static const Color surfaceDisabled = Color(0xFFC9C9CA);
 
+  /// Подложка переключателя вкладок над списком анализов.
+  static const Color surfaceToggle = Color(0xFFCBE5FE);
+
+  /// Значок и подпись подписки Gold в шапке профиля.
+  static const Color gold = Color(0xFFE8B84B);
+
+  // Шкала анализа в `design/Профиль.png`: три равных отрезка — за нижней
+  // границей нормы, норма, за верхней. Цвета сняты пипеткой и намеренно
+  // не сведены к общей палитре: это единственное место, где смысл несёт
+  // сам цвет, и подгонять его под бренд нельзя.
+
+  /// Ниже нормы.
+  static const Color scaleLow = Color(0xFFD5AF46);
+
+  /// Норма.
+  static const Color scaleNormal = Color(0xFF449D2B);
+
+  /// Выше нормы.
+  static const Color scaleHigh = Color(0xFFCD4023);
+
   /// Заголовки и основной текст.
   static const Color textPrimary = Color(0xFF212528);
 

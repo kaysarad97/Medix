@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/core/widgets/app_checkbox.dart';
 import 'package:medix/core/widgets/primary_button.dart';
-import 'package:medix/features/auth/domain/entities/app_language.dart';
+import 'package:medix/shared/models/app_language.dart';
 import 'package:medix/features/auth/presentation/providers/registration_controller.dart';
 import 'package:medix/features/auth/presentation/screens/app_settings_screen.dart';
 import 'package:medix/features/auth/presentation/screens/policy_screen.dart';

@@ -10,7 +10,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/step_progress_bar.dart';
-import '../../domain/entities/app_language.dart';
+import '../../../../shared/models/app_language.dart';
 import '../providers/registration_controller.dart';
 import '../widgets/consent_row.dart';
 import '../widgets/registration_step_layout.dart';

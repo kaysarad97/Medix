@@ -67,6 +67,39 @@ enum MedixIcon {
 
   /// Человечек в кружке. Автор отзыва.
   userAvatar,
+
+  /// Шеврон вправо. Строки-ссылки на экранах профиля.
+  chevronRight,
+
+  /// Шестерёнка. Переход в настройки из шапки профиля.
+  settings,
+
+  /// Папка. Заголовок карточки «Мед-карта».
+  medicalCard,
+
+  /// Линейка. Плитка «Рост».
+  height,
+
+  /// Весы. Плитка «Вес».
+  weight,
+
+  /// Улыбка. Плитка «Возраст».
+  age,
+
+  /// Лист с бланком. «Предыдущие процедуры».
+  procedures,
+
+  /// Карандаш. «Ваши анализы».
+  analyses,
+
+  /// Ромб. Значок подписки Gold в шапке профиля.
+  subscriptionGold,
+
+  /// Instagram. Блок соцсетей на экране «Свяжитесь с нами».
+  instagram,
+
+  /// WhatsApp. Там же.
+  whatsapp,
 }
 
 abstract final class MedixIcons {
@@ -95,12 +128,31 @@ abstract final class MedixIcons {
     MedixIcon.chat: 'assets/icons/chat.svg',
     MedixIcon.reviewCompose: 'assets/icons/review_compose.svg',
     MedixIcon.userAvatar: 'assets/icons/user_avatar.svg',
+    MedixIcon.chevronRight: 'assets/icons/chevron_right.svg',
+  };
+
+  /// Иконки, экспорта которых ещё нет.
+  ///
+  /// Список ведётся руками и проверяется тестом: иначе недостающая иконка
+  /// не проявится ничем — на её месте просто пустота нужного размера, и по
+  /// готовому экрану пропажу не заметить. Пополнять при добавлении новых
+  /// значений [MedixIcon] и вычёркивать, когда файл приехал.
+  static const Set<MedixIcon> pending = {
+    MedixIcon.settings,
+    MedixIcon.medicalCard,
+    MedixIcon.height,
+    MedixIcon.weight,
+    MedixIcon.age,
+    MedixIcon.procedures,
+    MedixIcon.analyses,
+    MedixIcon.subscriptionGold,
+    MedixIcon.instagram,
+    MedixIcon.whatsapp,
   };
 
   static String? assetOf(MedixIcon icon) => _assets[icon];
 
-  /// Все ли иконки на месте. Проверяется тестом: пока карта неполная, на
-  /// месте недостающих рисуется пустота, и заметить это по макету трудно.
+  /// Все ли иконки на месте.
   static bool get allResolved => MedixIcon.values.every(_assets.containsKey);
 }
 

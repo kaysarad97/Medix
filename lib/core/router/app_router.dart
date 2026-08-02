@@ -8,6 +8,10 @@ import '../../features/auth/presentation/screens/policy_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/verify_code_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
+import '../../features/profile/presentation/screens/contact_screen.dart';
+import '../../features/profile/presentation/screens/medical_card_screen.dart';
+import '../../features/profile/presentation/screens/profile_settings_screen.dart';
+import '../../features/profile/presentation/screens/settings_screen.dart';
 import '../../features/telemedicine/presentation/screens/appointment_screen.dart';
 import '../../features/telemedicine/presentation/screens/doctor_profile_screen.dart';
 import 'routes.dart';
@@ -56,6 +60,25 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: Routes.appointment,
         builder: (context, state) =>
             AppointmentScreen(appointmentId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: Routes.profile,
+        builder: (context, state) => const MedicalCardScreen(),
+      ),
+      GoRoute(
+        path: Routes.settings,
+        builder: (context, state) => SettingsScreen(
+          onOpenProfileSettings: () => context.push(Routes.profileSettings),
+          onOpenContacts: () => context.push(Routes.contacts),
+        ),
+      ),
+      GoRoute(
+        path: Routes.profileSettings,
+        builder: (context, state) => const ProfileSettingsScreen(),
+      ),
+      GoRoute(
+        path: Routes.contacts,
+        builder: (context, state) => const ContactScreen(),
       ),
     ],
   );

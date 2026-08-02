@@ -41,7 +41,10 @@ class HomeScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: HomeMetrics.headerTop),
-              const HomeHeader(unreadCount: 2),
+              HomeHeader(
+                unreadCount: 2,
+                onAvatarTap: () => context.push(Routes.profile),
+              ),
               const SizedBox(height: HomeMetrics.headerToGreeting),
               _Section(
                 child: Text(

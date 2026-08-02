@@ -25,6 +25,18 @@ abstract final class Routes {
   /// Оформленная запись к врачу.
   static const String appointment = '/appointment/:id';
 
+  /// Профиль пользователя — «Ваша Мед-Карта».
+  static const String profile = '/profile';
+
+  /// Настройки приложения.
+  static const String settings = '/profile/settings';
+
+  /// Настройки профиля: имя, почта, пароль.
+  static const String profileSettings = '/profile/settings/account';
+
+  /// «Свяжитесь с нами».
+  static const String contacts = '/profile/settings/contacts';
+
   static String doctorOf(String id) => '/doctor/$id';
 
   static String appointmentOf(String id) => '/appointment/$id';

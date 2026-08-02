@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/network/api_exception.dart';
 import '../../../../core/utils/validators.dart';
-import '../../domain/entities/app_language.dart';
+import '../../../../shared/models/app_language.dart';
 import 'auth_providers.dart';
 
 /// Текстовые поля мастера регистрации.
