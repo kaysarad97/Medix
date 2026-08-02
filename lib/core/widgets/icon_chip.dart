@@ -100,6 +100,18 @@ enum MedixIcon {
 
   /// WhatsApp. Там же.
   whatsapp,
+
+  /// Логотип Kaspi.kz. Экран выбора способа оплаты.
+  paymentKaspi,
+
+  /// Логотип Halyk Bank. Там же.
+  paymentHalyk,
+
+  /// Кнопка Apple Pay. Там же.
+  paymentApplePay,
+
+  /// Банковская карта: «другие банки» и «Сохранённые карты».
+  paymentCard,
 }
 
 abstract final class MedixIcons {
@@ -139,6 +151,10 @@ abstract final class MedixIcons {
     MedixIcon.subscriptionGold: 'assets/icons/subscription_gold.svg',
     MedixIcon.instagram: 'assets/icons/instagram.svg',
     MedixIcon.whatsapp: 'assets/icons/whatsapp.svg',
+    MedixIcon.paymentKaspi: 'assets/icons/payment_kaspi.svg',
+    MedixIcon.paymentHalyk: 'assets/icons/payment_halyk.svg',
+    MedixIcon.paymentApplePay: 'assets/icons/payment_apple_pay.svg',
+    MedixIcon.paymentCard: 'assets/icons/payment_card.svg',
   };
 
   /// Иконки, экспорта которых ещё нет.
@@ -186,6 +202,25 @@ class AppIcon extends StatelessWidget {
       height: size,
       colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
     );
+  }
+}
+
+/// Иконка в исходных цветах, без перекрашивания.
+///
+/// Нужна логотипам платёжных систем: Kaspi красный, Halyk зелёно-жёлтый,
+/// Apple Pay чёрный. Заливать их одним цветом, как [AppIcon], нельзя —
+/// это фирменная символика.
+class BrandIcon extends StatelessWidget {
+  const BrandIcon({super.key, required this.icon, this.size = 24});
+
+  final MedixIcon icon;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final asset = MedixIcons.assetOf(icon);
+    if (asset == null) return SizedBox(width: size, height: size);
+    return SvgPicture.asset(asset, width: size, height: size);
   }
 }
 

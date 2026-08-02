@@ -1,3 +1,4 @@
+import '../../../../shared/models/subscription_tier.dart';
 import '../../domain/entities/app_user.dart';
 
 /// Результат успешной авторизации.

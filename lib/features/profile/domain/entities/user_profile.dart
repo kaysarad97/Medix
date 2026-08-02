@@ -1,13 +1,4 @@
-/// Уровень подписки. В шапке профиля показывается значком и подписью.
-enum SubscriptionTier {
-  free('Free'),
-  silver('Silver'),
-  gold('Gold');
-
-  const SubscriptionTier(this.label);
-
-  final String label;
-}
+import '../../../../shared/models/subscription_tier.dart';
 
 enum Gender {
   male('мужчина'),

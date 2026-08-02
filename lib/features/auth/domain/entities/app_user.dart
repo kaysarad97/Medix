@@ -1,3 +1,5 @@
+import '../../../../shared/models/subscription_tier.dart';
+
 /// Пользователь MedIx.
 class AppUser {
   const AppUser({
@@ -18,4 +20,3 @@ class AppUser {
 }
 
 /// Тариф подписки. Определяет приоритет обслуживания и семейный доступ.
-enum SubscriptionTier { free, silver, gold }

@@ -40,6 +40,21 @@ abstract final class Routes {
   /// «Свяжитесь с нами».
   static const String contacts = '/profile/settings/contacts';
 
+  /// Варианты подписки.
+  static const String subscription = '/subscription';
+
+  /// Выбор способа оплаты.
+  static const String payment = '/subscription/payment';
+
+  /// Ввод данных карты.
+  static const String cardForm = '/subscription/payment/card';
+
+  /// Итог оплаты. Параметр `outcome` — `success` или `failure`.
+  static const String paymentResult = '/subscription/payment/result/:outcome';
+
+  static String paymentResultOf(String outcome) =>
+      '/subscription/payment/result/$outcome';
+
   static String doctorOf(String id) => '/doctor/$id';
 
   static String appointmentOf(String id) => '/appointment/$id';

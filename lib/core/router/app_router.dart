@@ -13,6 +13,11 @@ import '../../features/profile/presentation/screens/medical_card_form_screen.dar
 import '../../features/profile/presentation/screens/medical_card_screen.dart';
 import '../../features/profile/presentation/screens/profile_settings_screen.dart';
 import '../../features/profile/presentation/screens/settings_screen.dart';
+import '../../features/subscriptions/data/repositories/subscriptions_repository.dart';
+import '../../features/subscriptions/presentation/screens/card_form_screen.dart';
+import '../../features/subscriptions/presentation/screens/payment_method_screen.dart';
+import '../../features/subscriptions/presentation/screens/payment_result_screen.dart';
+import '../../features/subscriptions/presentation/screens/subscription_screen.dart';
 import '../../features/telemedicine/presentation/screens/appointment_screen.dart';
 import '../../features/telemedicine/presentation/screens/doctor_profile_screen.dart';
 import 'routes.dart';
@@ -63,6 +68,41 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             AppointmentScreen(appointmentId: state.pathParameters['id']!),
       ),
       GoRoute(
+        path: Routes.subscription,
+        builder: (context, state) => SubscriptionScreen(
+          onSelectPlan: (plan) => context.push(Routes.payment),
+          onSkip: () => context.go(Routes.home),
+        ),
+      ),
+      GoRoute(
+        path: Routes.payment,
+        builder: (context, state) => PaymentMethodScreen(
+          // Kaspi, Halyk и Apple Pay проводят оплату своим интерфейсом —
+          // подключим их SDK, когда появятся договоры с провайдерами.
+          onMethodSelected: (method) {
+            if (method.needsCardForm) context.push(Routes.cardForm);
+          },
+          onSavedCards: () => context.push(Routes.cardForm),
+        ),
+      ),
+      GoRoute(
+        path: Routes.cardForm,
+        builder: (context, state) => CardFormScreen(
+          onResult: (outcome) =>
+              context.push(Routes.paymentResultOf(outcome.name)),
+        ),
+      ),
+      GoRoute(
+        path: Routes.paymentResult,
+        builder: (context, state) {
+          final failed = state.pathParameters['outcome'] == 'failure';
+          return PaymentResultScreen(
+            outcome: failed ? PaymentOutcome.failure : PaymentOutcome.success,
+            onContinue: () => failed ? context.pop() : context.go(Routes.home),
+          );
+        },
+      ),
+      GoRoute(
         path: Routes.profile,
         builder: (context, state) => const MedicalCardScreen(),
       ),
@@ -74,6 +114,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: Routes.settings,
         builder: (context, state) => SettingsScreen(
           onOpenProfileSettings: () => context.push(Routes.profileSettings),
+          onOpenPaymentDetails: () => context.push(Routes.payment),
           onOpenContacts: () => context.push(Routes.contacts),
         ),
       ),

@@ -1,6 +1,7 @@
 import '../../domain/entities/analysis_result.dart';
 import '../../domain/entities/medical_card.dart';
 import '../../../../shared/models/medix_avatars.dart';
+import '../../../../shared/models/subscription_tier.dart';
 import '../../domain/entities/user_profile.dart';
 
 abstract interface class ProfileRepository {
