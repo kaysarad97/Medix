@@ -63,6 +63,7 @@ class MedicalCardScreen extends ConsumerWidget {
                       child: MedicalCardSummary(
                         profile: profile,
                         now: now ?? DateTime.now(),
+                        onOpen: () => context.push(Routes.medicalCardForm),
                       ),
                     ),
                     const SizedBox(height: ProfileMetrics.cardGap),

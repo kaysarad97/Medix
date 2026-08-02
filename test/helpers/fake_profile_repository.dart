@@ -12,9 +12,12 @@ class FakeProfileRepository implements ProfileRepository {
   Future<UserProfile> profile() async => MockProfileRepository.mockProfile;
 
   @override
+  // Ответы «да» — как в макете `Медкарта.png`, где обе кнопки залиты.
   Future<MedicalCard> medicalCard() async => const MedicalCard(
     bloodGroup: BloodGroup.first,
     rhesus: RhesusFactor.positive,
+    hasChronicDiseases: true,
+    hasBadHabits: true,
     heightCm: 176,
     weightKg: 77,
   );

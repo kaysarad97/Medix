@@ -9,6 +9,7 @@ import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/verify_code_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/profile/presentation/screens/contact_screen.dart';
+import '../../features/profile/presentation/screens/medical_card_form_screen.dart';
 import '../../features/profile/presentation/screens/medical_card_screen.dart';
 import '../../features/profile/presentation/screens/profile_settings_screen.dart';
 import '../../features/profile/presentation/screens/settings_screen.dart';
@@ -64,6 +65,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.profile,
         builder: (context, state) => const MedicalCardScreen(),
+      ),
+      GoRoute(
+        path: Routes.medicalCardForm,
+        builder: (context, state) => const MedicalCardFormScreen(),
       ),
       GoRoute(
         path: Routes.settings,

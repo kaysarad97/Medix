@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/features/profile/presentation/providers/profile_providers.dart';
 import 'package:medix/features/profile/presentation/screens/contact_screen.dart';
+import 'package:medix/features/profile/presentation/screens/medical_card_form_screen.dart';
 import 'package:medix/features/profile/presentation/screens/medical_card_screen.dart';
 import 'package:medix/features/profile/presentation/screens/profile_settings_screen.dart';
 import 'package:medix/features/profile/presentation/screens/settings_screen.dart';
@@ -73,6 +74,20 @@ void main() {
     await expectLater(
       find.byType(MedicalCardScreen),
       matchesGoldenFile('goldens/medical_card.png'),
+    );
+  });
+
+  testWidgets('medical_card_form соответствует эталону', (tester) async {
+    // Форма длиннее экрана — рендерим во всю высоту макета плюс кнопку.
+    await pumpScreen(
+      tester,
+      const MedicalCardFormScreen(),
+      const Size(440, 1060),
+    );
+
+    await expectLater(
+      find.byType(MedicalCardFormScreen),
+      matchesGoldenFile('goldens/medical_card_form.png'),
     );
   });
 

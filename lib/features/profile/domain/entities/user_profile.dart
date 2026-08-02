@@ -34,6 +34,7 @@ class UserProfile {
     this.heightCm,
     this.weightKg,
     this.avatarUrl,
+    this.avatarAsset,
   });
 
   final String id;
@@ -52,8 +53,11 @@ class UserProfile {
   final int? heightCm;
   final int? weightKg;
 
-  /// Аватар. Приходит с бэкенда; пока пусто.
+  /// Аватар с бэкенда. Пока пусто — аватарки лежат в сборке.
   final String? avatarUrl;
+
+  /// Выбранная аватарка из набора в сборке — см. `MedixAvatars`.
+  final String? avatarAsset;
 
   /// «Имя Фамилия» — в макете в две строки, перенос делает вёрстка.
   String get fullName => '$firstName $lastName';

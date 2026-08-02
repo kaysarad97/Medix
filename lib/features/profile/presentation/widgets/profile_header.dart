@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/icon_chip.dart';
+import '../../../../core/widgets/user_avatar.dart';
 import '../../domain/entities/user_profile.dart';
 import 'profile_metrics.dart';
 
@@ -21,38 +22,18 @@ class ProfileHeader extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _Avatar(url: profile.avatarUrl, onTap: onAvatarTap),
+          UserAvatar(
+            asset: profile.avatarAsset,
+            url: profile.avatarUrl,
+            size: ProfileMetrics.avatarSize,
+            borderRadius: BorderRadius.circular(ProfileMetrics.avatarRadius),
+            onTap: onAvatarTap,
+          ),
           const SizedBox(width: ProfileMetrics.avatarToInfo),
           Expanded(child: _Info(profile: profile)),
           _GoldBadge(tier: profile.subscription),
           const SizedBox(width: ProfileMetrics.screenH),
         ],
-      ),
-    );
-  }
-}
-
-class _Avatar extends StatelessWidget {
-  const _Avatar({this.url, this.onTap});
-
-  final String? url;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: SizedBox(
-        width: ProfileMetrics.avatarSize.width,
-        height: ProfileMetrics.avatarSize.height,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(ProfileMetrics.avatarRadius),
-          child: url == null
-              ? const DecoratedBox(
-                  decoration: BoxDecoration(color: AppColors.accentSoft),
-                )
-              : Image.network(url!, fit: BoxFit.cover),
-        ),
       ),
     );
   }

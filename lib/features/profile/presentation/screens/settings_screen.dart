@@ -8,6 +8,7 @@ import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
+import '../../../../core/widgets/user_avatar.dart';
 import '../../../../shared/models/app_language.dart';
 import '../providers/profile_providers.dart';
 import '../widgets/profile_metrics.dart';
@@ -29,7 +30,7 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(appSettingsProvider);
     final notifier = ref.read(appSettingsProvider.notifier);
-    final avatarUrl = ref.watch(profileProvider).value?.avatarUrl;
+    final profile = ref.watch(profileProvider).value;
 
     return AppScaffold(
       background: AppBackgroundStyle.main,
@@ -49,7 +50,12 @@ class SettingsScreen extends ConsumerWidget {
               _Section(
                 child: _RowCard(
                   onTap: onOpenProfileSettings,
-                  leading: _MiniAvatar(url: avatarUrl),
+                  leading: UserAvatar(
+                    asset: profile?.avatarAsset,
+                    url: profile?.avatarUrl,
+                    size: const Size.square(ProfileMetrics.settingsAvatarSize),
+                    borderRadius: AppRadius.allSm,
+                  ),
                   title: 'Настройки профиля',
                 ),
               ),
@@ -143,28 +149,6 @@ class _RowCard extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _MiniAvatar extends StatelessWidget {
-  const _MiniAvatar({this.url});
-
-  final String? url;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: ProfileMetrics.settingsAvatarSize,
-      height: ProfileMetrics.settingsAvatarSize,
-      child: ClipRRect(
-        borderRadius: AppRadius.allSm,
-        child: url == null
-            ? const DecoratedBox(
-                decoration: BoxDecoration(color: AppColors.accentSofter),
-              )
-            : Image.network(url!, fit: BoxFit.cover),
       ),
     );
   }

@@ -4,9 +4,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/features/profile/presentation/providers/profile_providers.dart';
 import 'package:medix/features/profile/presentation/screens/contact_screen.dart';
+import 'package:medix/features/profile/presentation/screens/medical_card_form_screen.dart';
 import 'package:medix/features/profile/presentation/screens/medical_card_screen.dart';
 import 'package:medix/features/profile/presentation/screens/profile_settings_screen.dart';
 import 'package:medix/features/profile/presentation/screens/settings_screen.dart';
+import 'package:medix/features/profile/domain/entities/medical_card.dart';
 import 'package:medix/shared/models/app_language.dart';
 
 import '../../helpers/fake_profile_repository.dart';
@@ -129,6 +131,50 @@ void main() {
     expect(fields[1].controller?.text, 'Фамилия');
     expect(fields[2].controller?.text, 'user@medix.kz');
     expect(fields[3].controller?.text, isEmpty);
+  });
+
+  group('Форма мед-карты', () {
+    testWidgets('рисует поля из макета', (tester) async {
+      await pump(tester, const MedicalCardFormScreen());
+      await tester.pump();
+
+      expect(find.text('Группа крови:'), findsOneWidget);
+      expect(find.text('Резус-фактор:'), findsOneWidget);
+      expect(find.text('Хронические заболевания'), findsOneWidget);
+      expect(
+        find.text('Аллергии (пищевые, лекарственные, прочие)'),
+        findsOneWidget,
+      );
+      expect(find.text('Перенесенные операции'), findsOneWidget);
+      expect(find.text('Вредные привычки (курение, алкоголь)'), findsOneWidget);
+      for (final group in BloodGroup.values) {
+        expect(find.text(group.label), findsOneWidget);
+      }
+      expect(find.text('Rh+'), findsOneWidget);
+      expect(find.text('Rh-'), findsOneWidget);
+    });
+
+    testWidgets('подставляет уже заполненное', (tester) async {
+      await pump(tester, const MedicalCardFormScreen());
+      await tester.pump();
+
+      // Заглушка отдаёт I (O), Rh+, рост 176 и вес 77.
+      final fields = tester
+          .widgetList<TextField>(find.byType(TextField))
+          .toList();
+      expect(fields.any((f) => f.controller?.text == '176'), isTrue);
+      expect(fields.any((f) => f.controller?.text == '77'), isTrue);
+    });
+
+    testWidgets('выбор группы крови переключается', (tester) async {
+      await pump(tester, const MedicalCardFormScreen());
+      await tester.pump();
+
+      await tester.tap(find.text('III (B)'));
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+    });
   });
 
   testWidgets('Свяжитесь с нами показывает контакты', (tester) async {

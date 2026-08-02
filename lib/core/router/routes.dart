@@ -28,6 +28,9 @@ abstract final class Routes {
   /// Профиль пользователя — «Ваша Мед-Карта».
   static const String profile = '/profile';
 
+  /// Форма мед-карты: группа крови, аллергии, операции.
+  static const String medicalCardForm = '/profile/medical-card';
+
   /// Настройки приложения.
   static const String settings = '/profile/settings';
 

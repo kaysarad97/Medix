@@ -7,6 +7,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
+import '../../../../core/widgets/user_avatar.dart';
 import '../providers/profile_providers.dart';
 import '../widgets/profile_metrics.dart';
 
@@ -65,7 +66,17 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                 onBack: () => Navigator.of(context).maybePop(),
               ),
               const SizedBox(height: 30),
-              Center(child: _Avatar(url: profile?.avatarUrl)),
+              Center(
+                child: UserAvatar(
+                  asset: profile?.avatarAsset,
+                  url: profile?.avatarUrl,
+                  size: ProfileMetrics.profileAvatarSize,
+                  borderRadius: BorderRadius.circular(
+                    ProfileMetrics.avatarRadius,
+                  ),
+                  onTap: widget.onChangeAvatar,
+                ),
+              ),
               const SizedBox(height: ProfileMetrics.profileAvatarToCaption),
               GestureDetector(
                 onTap: widget.onChangeAvatar,
@@ -105,28 +116,6 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _Avatar extends StatelessWidget {
-  const _Avatar({this.url});
-
-  final String? url;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: ProfileMetrics.profileAvatarSize.width,
-      height: ProfileMetrics.profileAvatarSize.height,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(ProfileMetrics.avatarRadius),
-        child: url == null
-            ? const DecoratedBox(
-                decoration: BoxDecoration(color: AppColors.accentSoft),
-              )
-            : Image.network(url!, fit: BoxFit.cover),
       ),
     );
   }

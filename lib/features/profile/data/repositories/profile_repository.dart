@@ -1,5 +1,6 @@
 import '../../domain/entities/analysis_result.dart';
 import '../../domain/entities/medical_card.dart';
+import '../../../../shared/models/medix_avatars.dart';
 import '../../domain/entities/user_profile.dart';
 
 abstract interface class ProfileRepository {
@@ -69,6 +70,7 @@ class MockProfileRepository implements ProfileRepository {
     email: 'user@medix.kz',
     heightCm: 176,
     weightKg: 77,
+    avatarAsset: MedixAvatars.fallback,
   );
 
   static const List<MyDoctor> mockDoctors = [

@@ -129,6 +129,16 @@ abstract final class MedixIcons {
     MedixIcon.reviewCompose: 'assets/icons/review_compose.svg',
     MedixIcon.userAvatar: 'assets/icons/user_avatar.svg',
     MedixIcon.chevronRight: 'assets/icons/chevron_right.svg',
+    MedixIcon.settings: 'assets/icons/settings.svg',
+    MedixIcon.medicalCard: 'assets/icons/medical_card.svg',
+    MedixIcon.height: 'assets/icons/height.svg',
+    MedixIcon.weight: 'assets/icons/weight.svg',
+    MedixIcon.age: 'assets/icons/age.svg',
+    MedixIcon.procedures: 'assets/icons/procedures.svg',
+    MedixIcon.analyses: 'assets/icons/analyses.svg',
+    MedixIcon.subscriptionGold: 'assets/icons/subscription_gold.svg',
+    MedixIcon.instagram: 'assets/icons/instagram.svg',
+    MedixIcon.whatsapp: 'assets/icons/whatsapp.svg',
   };
 
   /// Иконки, экспорта которых ещё нет.
@@ -137,18 +147,7 @@ abstract final class MedixIcons {
   /// не проявится ничем — на её месте просто пустота нужного размера, и по
   /// готовому экрану пропажу не заметить. Пополнять при добавлении новых
   /// значений [MedixIcon] и вычёркивать, когда файл приехал.
-  static const Set<MedixIcon> pending = {
-    MedixIcon.settings,
-    MedixIcon.medicalCard,
-    MedixIcon.height,
-    MedixIcon.weight,
-    MedixIcon.age,
-    MedixIcon.procedures,
-    MedixIcon.analyses,
-    MedixIcon.subscriptionGold,
-    MedixIcon.instagram,
-    MedixIcon.whatsapp,
-  };
+  static const Set<MedixIcon> pending = {};
 
   static String? assetOf(MedixIcon icon) => _assets[icon];
 
