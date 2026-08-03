@@ -169,6 +169,7 @@ abstract final class MedixIcons {
     MedixIcon.paymentCard: 'assets/icons/payment_card.svg',
     MedixIcon.attachment: 'assets/icons/attachment.svg',
     MedixIcon.search: 'assets/icons/search.svg',
+    MedixIcon.hospital: 'assets/icons/hospital.svg',
   };
 
   /// Иконки, экспорта которых ещё нет.
@@ -178,9 +179,6 @@ abstract final class MedixIcons {
   /// готовому экрану пропажу не заметить. Пополнять при добавлении новых
   /// значений [MedixIcon] и вычёркивать, когда файл приехал.
   static const Set<MedixIcon> pending = {
-    // Здание с крестом — метка больницы. На макете карты есть, в экспорте
-    // дизайнера нет.
-    MedixIcon.hospital,
     // Медицинский чемоданчик — аватар бота в переписке. На макете есть,
     // в экспорте дизайнера нет.
     MedixIcon.botAvatar,
