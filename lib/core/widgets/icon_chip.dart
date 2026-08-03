@@ -118,6 +118,9 @@ enum MedixIcon {
 
   /// Медицинский чемоданчик. Аватар бота в переписке.
   botAvatar,
+
+  /// Лупа. Поиск по списку чатов.
+  search,
 }
 
 abstract final class MedixIcons {
@@ -161,6 +164,8 @@ abstract final class MedixIcons {
     MedixIcon.paymentHalyk: 'assets/icons/payment_halyk.svg',
     MedixIcon.paymentApplePay: 'assets/icons/payment_apple_pay.svg',
     MedixIcon.paymentCard: 'assets/icons/payment_card.svg',
+    MedixIcon.attachment: 'assets/icons/attachment.svg',
+    MedixIcon.search: 'assets/icons/search.svg',
   };
 
   /// Иконки, экспорта которых ещё нет.
@@ -170,9 +175,8 @@ abstract final class MedixIcons {
   /// готовому экрану пропажу не заметить. Пополнять при добавлении новых
   /// значений [MedixIcon] и вычёркивать, когда файл приехал.
   static const Set<MedixIcon> pending = {
-    // Экраны чат-бота: скрепка в поле ввода и чемоданчик-аватар бота.
-    // На макетах есть, в экспорте пока нет.
-    MedixIcon.attachment,
+    // Медицинский чемоданчик — аватар бота в переписке. На макете есть,
+    // в экспорте дизайнера нет.
     MedixIcon.botAvatar,
   };
 

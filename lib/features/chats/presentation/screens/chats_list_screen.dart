@@ -7,6 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_scaffold.dart';
+import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../domain/entities/chat_thread.dart';
 import '../providers/chats_providers.dart';
@@ -79,7 +80,7 @@ class _SearchField extends ConsumerWidget {
         child: Row(
           children: [
             const SizedBox(width: 22),
-            const Icon(Icons.search, size: 22, color: AppColors.brandIndigo),
+            const AppIcon(icon: MedixIcon.search, size: 22),
             const SizedBox(width: 12),
             Expanded(
               child: Center(
