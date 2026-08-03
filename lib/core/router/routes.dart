@@ -22,6 +22,9 @@ abstract final class Routes {
 
   static const String home = '/';
 
+  /// Лабораторный чат-бот.
+  static const String chatbot = '/chatbot';
+
   /// Профиль врача с записью на приём.
   static const String doctor = '/doctor/:id';
 

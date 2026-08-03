@@ -54,7 +54,13 @@ class HomeScreen extends ConsumerWidget {
               const SizedBox(height: HomeMetrics.greetingToSearch),
               const _SymptomSearchField(),
               const SizedBox(height: HomeMetrics.searchToActions),
-              const _Section(child: QuickActionsCard()),
+              _Section(
+                child: QuickActionsCard(
+                  // «Сдать анализы» ведёт к боту: подбор лаборатории и
+                  // сравнение цен — его работа.
+                  onLabTests: () => context.push(Routes.chatbot),
+                ),
+              ),
               const SizedBox(height: HomeMetrics.cardGap),
               _Section(
                 child: DoctorsCard(
@@ -123,6 +129,10 @@ class _SymptomSearchField extends StatelessWidget {
               Expanded(
                 child: Center(
                   child: TextField(
+                    // Здесь не печатают: плейсхолдер тот же, что у бота, и
+                    // строка работает как вход в переписку с ним.
+                    readOnly: true,
+                    onTap: () => context.push(Routes.chatbot),
                     style: AppTypography.bodyLg.copyWith(
                       color: AppColors.textPrimary,
                     ),

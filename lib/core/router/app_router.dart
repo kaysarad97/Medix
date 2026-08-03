@@ -9,6 +9,7 @@ import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/auth/presentation/screens/verify_code_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
+import '../../features/lab_chatbot/presentation/screens/chatbot_screen.dart';
 import '../../features/profile/presentation/screens/contact_screen.dart';
 import '../../features/profile/presentation/screens/medical_card_form_screen.dart';
 import '../../features/profile/presentation/screens/medical_card_screen.dart';
@@ -63,6 +64,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.home,
         builder: (context, state) => const HomeScreen(),
+      ),
+      GoRoute(
+        path: Routes.chatbot,
+        builder: (context, state) => const ChatbotScreen(),
       ),
       GoRoute(
         path: Routes.doctor,

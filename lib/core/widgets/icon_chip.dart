@@ -112,6 +112,12 @@ enum MedixIcon {
 
   /// Банковская карта: «другие банки» и «Сохранённые карты».
   paymentCard,
+
+  /// Скрепка. Прикрепить файл в переписке с ботом.
+  attachment,
+
+  /// Медицинский чемоданчик. Аватар бота в переписке.
+  botAvatar,
 }
 
 abstract final class MedixIcons {
@@ -163,7 +169,12 @@ abstract final class MedixIcons {
   /// не проявится ничем — на её месте просто пустота нужного размера, и по
   /// готовому экрану пропажу не заметить. Пополнять при добавлении новых
   /// значений [MedixIcon] и вычёркивать, когда файл приехал.
-  static const Set<MedixIcon> pending = {};
+  static const Set<MedixIcon> pending = {
+    // Экраны чат-бота: скрепка в поле ввода и чемоданчик-аватар бота.
+    // На макетах есть, в экспорте пока нет.
+    MedixIcon.attachment,
+    MedixIcon.botAvatar,
+  };
 
   static String? assetOf(MedixIcon icon) => _assets[icon];
 

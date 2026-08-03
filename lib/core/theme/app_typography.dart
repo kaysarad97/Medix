@@ -73,6 +73,13 @@ abstract final class AppTypography {
   static TextStyle get cardItemMeta =>
       _style(size: 12, weight: 400, color: AppColors.textMuted);
 
+  /// Готовый вопрос в чат-боте. «Хочу загрузить анализы».
+  ///
+  /// Кегль выведен по двум пилюлям разной длины: при отбивке p и кегле f
+  /// ширины 167 и 197 дают f ≈ 13.
+  static TextStyle get chatQuickReply =>
+      _style(size: 13, weight: 400, color: AppColors.textPrimary);
+
   /// Мелкая ссылка в углу карточки. «Все».
   static TextStyle get linkSmall =>
       _style(size: 12, weight: 500, color: AppColors.primary);
