@@ -1,0 +1,206 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../core/router/routes.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_radius.dart';
+import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/app_scaffold.dart';
+import '../../../../core/widgets/screen_top_bar.dart';
+import '../../domain/entities/chat_thread.dart';
+import '../providers/chats_providers.dart';
+
+/// Список переписок с врачами по `design/Чаты с врачами.png`.
+class ChatsListScreen extends ConsumerWidget {
+  const ChatsListScreen({super.key});
+
+  static const double _screenH = 21;
+  static const double _topBarTop = 37;
+  static const double _topBarToCard = 17;
+  static const double _searchHeight = 58;
+  static const double _rowHeight = 74;
+  static const double _rowGap = 12;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final threads = ref.watch(visibleChatThreadsProvider);
+
+    return AppScaffold(
+      background: AppBackgroundStyle.main,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: _screenH),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: _topBarTop),
+              ScreenTopBar(title: 'Все чаты', onBack: () => context.pop()),
+              const SizedBox(height: _topBarToCard),
+              const _SearchField(height: _searchHeight),
+              const SizedBox(height: 16),
+              Expanded(
+                child: ListView.separated(
+                  padding: EdgeInsets.zero,
+                  itemCount: threads.length,
+                  separatorBuilder: (_, _) => const SizedBox(height: _rowGap),
+                  itemBuilder: (context, index) {
+                    final thread = threads[index];
+                    return _ThreadRow(
+                      thread: thread,
+                      height: _rowHeight,
+                      onTap: () => context.push(Routes.chatOf(thread.id)),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SearchField extends ConsumerWidget {
+  const _SearchField({required this.height});
+
+  final double height;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return SizedBox(
+      height: height,
+      child: DecoratedBox(
+        decoration: const BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: AppRadius.allPill,
+        ),
+        child: Row(
+          children: [
+            const SizedBox(width: 22),
+            const Icon(Icons.search, size: 22, color: AppColors.brandIndigo),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Center(
+                child: TextField(
+                  onChanged: (value) =>
+                      ref.read(chatSearchQueryProvider.notifier).update(value),
+                  style: AppTypography.bodyLg.copyWith(
+                    color: AppColors.textPrimary,
+                  ),
+                  cursorColor: AppColors.accent,
+                  decoration: InputDecoration(
+                    isCollapsed: true,
+                    border: InputBorder.none,
+                    hintText: 'Поиск чата',
+                    hintStyle: AppTypography.placeholder,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 22),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ThreadRow extends StatelessWidget {
+  const _ThreadRow({
+    required this.thread,
+    required this.height,
+    required this.onTap,
+  });
+
+  final ChatThread thread;
+  final double height;
+  final VoidCallback onTap;
+
+  static const double _avatarSize = 44;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: height,
+      child: Material(
+        // Непрочитанная строка в макете подсвечена голубым.
+        color: thread.isRead ? AppColors.surface : AppColors.accentSofter,
+        borderRadius: AppRadius.allMd,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 13),
+            child: Row(
+              children: [
+                _Avatar(url: thread.doctorPhotoUrl, size: _avatarSize),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        thread.doctorName,
+                        style: AppTypography.cardItemTitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        thread.preview,
+                        style: AppTypography.tileSubtitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(thread.timeLabel, style: AppTypography.cardItemMeta),
+                    const SizedBox(height: 6),
+                    Text(
+                      thread.isRead ? 'прочитано' : 'не прочитано',
+                      style: AppTypography.cardItemMeta,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _Avatar extends StatelessWidget {
+  const _Avatar({required this.url, required this.size});
+
+  final String? url;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: size,
+      height: size,
+      child: DecoratedBox(
+        decoration: const BoxDecoration(
+          color: AppColors.accentSoft,
+          shape: BoxShape.circle,
+        ),
+        // Фото врача приходит с бэкенда; пока подложка.
+        child: url == null
+            ? null
+            : ClipOval(child: Image.network(url!, fit: BoxFit.cover)),
+      ),
+    );
+  }
+}

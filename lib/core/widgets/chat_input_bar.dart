@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_radius.dart';
-import '../../../../core/theme/app_typography.dart';
-import '../../../../core/widgets/icon_chip.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_radius.dart';
+import '../theme/app_typography.dart';
+import 'icon_chip.dart';
 
-/// Строка ввода в переписке с ботом.
+/// Строка ввода в переписке — общая для бота и для чата с врачом.
 ///
 /// Замеры по `design/Чат-бот Старт.png`: x 21…419, высота 58, полное
 /// скругление; облачко слева, скрепка справа.

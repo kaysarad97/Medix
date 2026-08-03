@@ -5,12 +5,12 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_scaffold.dart';
+import '../../../../core/widgets/chat_bubble.dart';
+import '../../../../core/widgets/chat_input_bar.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../domain/entities/chat_message.dart';
 import '../providers/chatbot_controller.dart';
-import '../widgets/chat_bubble.dart';
-import '../widgets/chat_input_bar.dart';
 
 /// Лабораторный чат-бот.
 ///
@@ -186,12 +186,22 @@ class _History extends StatelessWidget {
       itemCount: state.messages.length + (state.botIsTyping ? 1 : 0),
       separatorBuilder: (_, _) => const SizedBox(height: _messageGap),
       itemBuilder: (context, index) {
-        if (state.botIsTyping && index == 0) return const TypingIndicator();
+        if (state.botIsTyping && index == 0) {
+          return const TypingIndicator(
+            avatar: ChatAvatarIcon(icon: MedixIcon.botAvatar),
+          );
+        }
 
         final offset = state.botIsTyping ? 1 : 0;
         final message =
             state.messages[state.messages.length - 1 - index + offset];
-        return ChatBubble(message: message);
+        return ChatBubble(
+          text: message.text,
+          isOutgoing: !message.isBot,
+          avatar: ChatAvatarIcon(
+            icon: message.isBot ? MedixIcon.botAvatar : MedixIcon.userAvatar,
+          ),
+        );
       },
     );
   }

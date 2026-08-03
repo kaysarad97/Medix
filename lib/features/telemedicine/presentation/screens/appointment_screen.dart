@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/routes.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
@@ -99,7 +101,7 @@ class _Content extends ConsumerWidget {
                 icon: MedixIcon.chat,
                 title: 'Сообщение',
                 subtitle: 'Чат с врачом',
-                onTap: () {},
+                onTap: () => context.push(Routes.chats),
               ),
             ),
           ),
@@ -127,7 +129,7 @@ class _Content extends ConsumerWidget {
                   icon: MedixIcon.mail,
                   title: 'Сообщение',
                   subtitle: 'Чат с врачом',
-                  onTap: () {},
+                  onTap: () => context.push(Routes.chats),
                 ),
               ),
             ),

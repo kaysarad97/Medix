@@ -25,6 +25,14 @@ abstract final class Routes {
   /// Лабораторный чат-бот.
   static const String chatbot = '/chatbot';
 
+  /// Список переписок с врачами.
+  static const String chats = '/chats';
+
+  /// Переписка с одним врачом.
+  static const String chat = '/chats/:id';
+
+  static String chatOf(String id) => '/chats/$id';
+
   /// Профиль врача с записью на приём.
   static const String doctor = '/doctor/:id';
 
