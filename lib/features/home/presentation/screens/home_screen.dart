@@ -59,6 +59,7 @@ class HomeScreen extends ConsumerWidget {
                   // «Сдать анализы» ведёт к боту: подбор лаборатории и
                   // сравнение цен — его работа.
                   onLabTests: () => context.push(Routes.chatbot),
+                  onFindFacility: () => context.push(Routes.mapSearch),
                 ),
               ),
               const SizedBox(height: HomeMetrics.cardGap),

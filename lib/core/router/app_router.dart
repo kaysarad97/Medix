@@ -12,6 +12,7 @@ import '../../features/chats/presentation/screens/chats_list_screen.dart';
 import '../../features/chats/presentation/screens/doctor_chat_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/lab_chatbot/presentation/screens/chatbot_screen.dart';
+import '../../features/map_search/presentation/screens/map_search_screen.dart';
 import '../../features/profile/presentation/screens/contact_screen.dart';
 import '../../features/profile/presentation/screens/medical_card_form_screen.dart';
 import '../../features/profile/presentation/screens/medical_card_screen.dart';
@@ -124,6 +125,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             onContinue: () => failed ? context.pop() : context.go(Routes.home),
           );
         },
+      ),
+      GoRoute(
+        path: Routes.mapSearch,
+        builder: (context, state) => const MapSearchScreen(),
       ),
       GoRoute(
         path: Routes.profile,

@@ -39,6 +39,9 @@ abstract final class Routes {
   /// Оформленная запись к врачу.
   static const String appointment = '/appointment/:id';
 
+  /// Больницы и лаборатории на карте.
+  static const String mapSearch = '/map';
+
   /// Профиль пользователя — «Ваша Мед-Карта».
   static const String profile = '/profile';
 
