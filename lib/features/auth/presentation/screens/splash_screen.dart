@@ -1,0 +1,47 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../core/router/routes.dart';
+import '../../../../core/widgets/medix_wait_view.dart';
+import '../providers/session_providers.dart';
+
+/// Заставка запуска по `design/Загрузка.png`.
+///
+/// Пока показывается, проверяем хранилище: есть сохранённая сессия — сразу
+/// на главную, нет — на логин.
+class SplashScreen extends ConsumerStatefulWidget {
+  const SplashScreen({super.key});
+
+  /// Заставка держится не меньше этого времени.
+  ///
+  /// Проверка хранилища занимает миллисекунды, и без задержки логотип
+  /// мигнул бы одним кадром — выглядит как сбой отрисовки.
+  static const Duration minimumVisible = Duration(milliseconds: 900);
+
+  @override
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends ConsumerState<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _decide();
+  }
+
+  Future<void> _decide() async {
+    final started = DateTime.now();
+    final hasSession = await ref.read(hasStoredSessionProvider.future);
+
+    final elapsed = DateTime.now().difference(started);
+    final left = SplashScreen.minimumVisible - elapsed;
+    if (left > Duration.zero) await Future<void>.delayed(left);
+
+    if (!mounted) return;
+    context.go(hasSession ? Routes.home : Routes.login);
+  }
+
+  @override
+  Widget build(BuildContext context) => const MedixWaitView();
+}

@@ -114,6 +114,16 @@ abstract final class AppTypography {
   static TextStyle get legalBody =>
       _style(size: 14, weight: 400, color: AppColors.textPrimary, height: 1.45);
 
+  /// Крупная строка на экране ожидания. «подождите...».
+  ///
+  /// Кегль по ширине краски: в макете строка занимает 144.
+  static TextStyle get waitTitle =>
+      _style(size: 22, weight: 600, color: AppColors.primary);
+
+  /// Пояснение под ней. «проверяем данные карты...» — 248 в макете.
+  static TextStyle get waitSubtitle =>
+      _style(size: 18, weight: 400, color: AppColors.primary);
+
   /// Цифра в боксе кода из СМС.
   static TextStyle get otpDigit =>
       _style(size: 28, weight: 500, color: AppColors.accent);

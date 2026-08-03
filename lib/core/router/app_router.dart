@@ -6,6 +6,7 @@ import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/personal_data_screen.dart';
 import '../../features/auth/presentation/screens/policy_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
+import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/auth/presentation/screens/verify_code_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/profile/presentation/screens/contact_screen.dart';
@@ -24,11 +25,17 @@ import 'routes.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
-    // Пока нет восстановления сессии из secure storage — старт с логина.
-    // TODO(auth): redirect на Routes.home, если в хранилище есть валидный
-    // refresh-токен.
-    initialLocation: Routes.login,
+    // Стартуем с заставки: она проверяет сохранённую сессию и уводит на
+    // главную или на логин. Редирект живёт в самом экране, а не в
+    // `GoRouter.redirect`, потому что проверка асинхронная, а redirect
+    // синхронный — иначе пришлось бы держать статус сессии в отдельном
+    // слушателе и обновлять роутер по нему.
+    initialLocation: Routes.splash,
     routes: [
+      GoRoute(
+        path: Routes.splash,
+        builder: (context, state) => const SplashScreen(),
+      ),
       GoRoute(
         path: Routes.login,
         builder: (context, state) => const LoginScreen(),

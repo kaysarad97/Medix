@@ -1,5 +1,8 @@
 /// Пути навигации.
 abstract final class Routes {
+  /// Заставка запуска. Решает, куда вести дальше, по сохранённой сессии.
+  static const String splash = '/splash';
+
   static const String login = '/login';
 
   /// Шаг 1 мастера регистрации — почта и пароль.
