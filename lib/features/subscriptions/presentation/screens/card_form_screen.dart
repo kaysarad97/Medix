@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_scaffold.dart';
+import '../../../../core/widgets/medix_wait_view.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../profile/presentation/widgets/profile_metrics.dart';
@@ -20,9 +21,16 @@ import '../providers/subscriptions_providers.dart';
 /// логов, ни нашего бэкенда — хранение данных держателя карты требует
 /// сертификации PCI DSS.
 class CardFormScreen extends ConsumerStatefulWidget {
-  const CardFormScreen({super.key, this.onResult});
+  const CardFormScreen({super.key, this.onResult, this.animatedWait = true});
 
   final ValueChanged<PaymentOutcome>? onResult;
+
+  /// Крутить анимацию на экране ожидания.
+  ///
+  /// Выключается в тестах: анимированная гифка планирует кадры таймером,
+  /// который не останавливается, и виджет-тест не может завершиться —
+  /// падает на «A Timer is still pending».
+  final bool animatedWait;
 
   @override
   ConsumerState<CardFormScreen> createState() => _CardFormScreenState();
@@ -34,6 +42,12 @@ class _CardFormScreenState extends ConsumerState<CardFormScreen> {
   final _expiry = TextEditingController();
   final _cvv = TextEditingController();
   var _paying = false;
+
+  /// Экран ожидания держится не меньше этого времени.
+  ///
+  /// Заглушка отвечает за 300 мс, и без задержки «подождите...» мигнуло бы
+  /// и пропало — читается как сбой, а не как проверка.
+  static const Duration _minimumWait = Duration(milliseconds: 900);
 
   @override
   void initState() {
@@ -61,7 +75,13 @@ class _CardFormScreenState extends ConsumerState<CardFormScreen> {
 
   Future<void> _submit() async {
     setState(() => _paying = true);
+    final started = DateTime.now();
+
     final outcome = await ref.read(subscriptionsRepositoryProvider).pay(_card);
+
+    final left = _minimumWait - DateTime.now().difference(started);
+    if (left > Duration.zero) await Future<void>.delayed(left);
+
     if (!mounted) return;
     setState(() => _paying = false);
     widget.onResult?.call(outcome);
@@ -69,6 +89,17 @@ class _CardFormScreenState extends ConsumerState<CardFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_paying) {
+      // Экран ожидания по `design/Подождите....png`. Показываем его прямо
+      // здесь, а не отдельным маршрутом: иначе данные карты пришлось бы
+      // передавать между экранами, а им место только в этом виджете.
+      return MedixWaitView(
+        animated: widget.animatedWait,
+        title: 'подождите...',
+        subtitle: 'проверяем данные карты...',
+      );
+    }
+
     return AppScaffold(
       background: AppBackgroundStyle.main,
       child: SafeArea(

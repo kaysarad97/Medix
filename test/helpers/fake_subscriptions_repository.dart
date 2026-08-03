@@ -16,6 +16,12 @@ class FakeSubscriptionsRepository implements SubscriptionsRepository {
       MockSubscriptionsRepository.mockPlans;
 
   @override
-  Future<PaymentOutcome> pay(CardDetails card) async =>
-      const MockSubscriptionsRepository().pay(card);
+  Future<PaymentOutcome> pay(CardDetails card) async {
+    // Правило то же, что в заглушке, но без её задержки: делегировать нельзя,
+    // иначе в тест приезжает лишний таймер.
+    final digits = card.number.replaceAll(RegExp(r'\D'), '');
+    return digits.startsWith('0000')
+        ? PaymentOutcome.failure
+        : PaymentOutcome.success;
+  }
 }

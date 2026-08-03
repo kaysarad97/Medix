@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/theme/app_theme.dart';
+import 'package:medix/core/widgets/medix_wait_view.dart';
 import 'package:medix/core/widgets/primary_button.dart';
 import 'package:medix/features/subscriptions/data/repositories/subscriptions_repository.dart';
 import 'package:medix/features/subscriptions/domain/entities/payment_method.dart';
@@ -80,6 +81,33 @@ void main() {
 
       final button = tester.widget<PrimaryButton>(find.byType(PrimaryButton));
       expect(button.onPressed, isNotNull);
+    });
+
+    testWidgets('пока идёт проверка, показывается экран ожидания', (
+      tester,
+    ) async {
+      await pump(tester, const CardFormScreen(animatedWait: false));
+
+      final fields = find.byType(TextField);
+      await tester.enterText(fields.at(0), '4400430112345678');
+      await tester.enterText(fields.at(1), 'IMYA FAMILIYA');
+      await tester.enterText(fields.at(2), '0130');
+      await tester.enterText(fields.at(3), '123');
+      await tester.pump();
+
+      await tester.tap(find.byType(PrimaryButton));
+      await tester.pump();
+
+      expect(find.byType(MedixWaitView), findsOneWidget);
+      expect(find.text('подождите...'), findsOneWidget);
+      expect(find.text('проверяем данные карты...'), findsOneWidget);
+
+      // Досиживаем выдержку, иначе тест уйдёт с висящим таймером. Сначала
+      // даём разрешиться самой оплате — таймер выдержки создаётся только
+      // после неё, и прокручивать часы раньше бесполезно.
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pump();
     });
 
     testWidgets('номер карты принимает только цифры и не длиннее 16', (

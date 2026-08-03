@@ -31,17 +31,16 @@ void main() {
         const AssetImage('assets/images/auth_bg.png'),
         context,
       );
-      await precacheImage(
-        const AssetImage('assets/images/logo_medix.png'),
-        context,
-      );
+      // Гифку не греем: эталоны снимаются со статичным знаком
+      // (animated: false), а предзагрузка анимации не завершается и вешает
+      // тест.
       await Future<void>.delayed(const Duration(milliseconds: 300));
     });
     await tester.pump();
   }
 
   testWidgets('заставка запуска', (tester) async {
-    await pumpView(tester, const MedixWaitView());
+    await pumpView(tester, const MedixWaitView(animated: false));
 
     await expectLater(
       find.byType(MedixWaitView),
@@ -53,6 +52,7 @@ void main() {
     await pumpView(
       tester,
       const MedixWaitView(
+        animated: false,
         title: 'подождите...',
         subtitle: 'проверяем данные карты...',
       ),
