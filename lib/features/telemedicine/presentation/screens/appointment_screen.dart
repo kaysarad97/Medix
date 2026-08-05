@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/routes.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/ru_dates.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
@@ -123,7 +126,32 @@ class _Content extends ConsumerWidget {
                   icon: MedixIcon.audioCall,
                   title: 'Создать запись',
                   subtitle: 'Видео-звонок',
-                  onTap: () {},
+                  // Активна только после выбора нового дня и времени.
+                  // Бэкенда нет — переносом считаем показ подтверждения,
+                  // изменить дату самого приёма нечем: `appointment(id)`
+                  // в заглушке не принимает новое время.
+                  onTap: selected?.slot == null
+                      ? null
+                      : () {
+                          final slot = selected!.slot!;
+                          ScaffoldMessenger.of(context)
+                            ..hideCurrentSnackBar()
+                            ..showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Приём перенесён на '
+                                  '${RuDates.dayMonth(slot)}, '
+                                  '${RuDates.time(slot)}',
+                                  style: AppTypography.bodyMd.copyWith(
+                                    color: AppColors.textOnPrimary,
+                                  ),
+                                ),
+                                backgroundColor: AppColors.primary,
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                          Navigator.of(context).maybePop();
+                        },
                 ),
                 secondaryAction: ActionButtonData(
                   icon: MedixIcon.mail,

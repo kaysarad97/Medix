@@ -94,7 +94,13 @@ class _Content extends ConsumerWidget {
                   icon: MedixIcon.audioCall,
                   title: 'Создать запись',
                   subtitle: 'Видео-звонок',
-                  onTap: () {},
+                  // Активна только после выбора дня и времени. Настоящего
+                  // бронирования нет — заглушка `DoctorsRepository.appointment`
+                  // игнорирует id и всегда отдаёт один и тот же мок-приём,
+                  // тот же, что и в «Предстоящих записях» на главной.
+                  onTap: selected?.slot == null
+                      ? null
+                      : () => context.push(Routes.appointmentOf('a1')),
                 ),
                 secondaryAction: ActionButtonData(
                   icon: MedixIcon.mail,

@@ -57,4 +57,20 @@ void main() {
     // «Аудио-звонок» стоит и в строке записи, и подписью на кнопке звонка.
     expect(find.text('Аудио-звонок'), findsNWidgets(2));
   });
+
+  testWidgets('перенос записи показывает подтверждение с новым временем', (
+    tester,
+  ) async {
+    await pumpAppointment(tester);
+
+    await tester.tap(find.text('12:30'));
+    await tester.pump();
+    await tester.tap(find.text('Создать запись'));
+    await tester.pump();
+
+    expect(
+      find.textContaining('Приём перенесён на 20.07, 12:30'),
+      findsOneWidget,
+    );
+  });
 }

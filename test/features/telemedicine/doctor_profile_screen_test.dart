@@ -97,6 +97,21 @@ void main() {
     );
   });
 
+  testWidgets(
+    '«Создать запись» активна: по умолчанию уже выбраны день и время',
+    (tester) async {
+      await pumpProfile(tester);
+
+      final button = tester.widget<InkWell>(
+        find.ancestor(
+          of: find.text('Создать запись'),
+          matching: find.byType(InkWell),
+        ),
+      );
+      expect(button.onTap, isNotNull);
+    },
+  );
+
   testWidgets('выходной день выбрать нельзя', (tester) async {
     await pumpProfile(tester);
 
