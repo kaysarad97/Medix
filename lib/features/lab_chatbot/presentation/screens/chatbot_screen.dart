@@ -59,10 +59,7 @@ class ChatbotScreen extends ConsumerWidget {
               ChatInputBar(
                 onSend: controller.send,
                 enabled: !state.botIsTyping,
-                onAttach: () {
-                  // TODO(lab_chatbot): выбор файла и отправка на OCR, когда
-                  // появится эндпоинт распознавания направлений.
-                },
+                onAttach: controller.attachFile,
               ),
               const SizedBox(height: 20),
             ],

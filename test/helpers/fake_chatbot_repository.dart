@@ -22,4 +22,23 @@ class FakeChatbotRepository implements ChatbotRepository {
       sentAt: DateTime(2026, 8, 3),
     );
   }
+
+  @override
+  Future<List<ChatMessage>> analyzeAttachment(String fileName) async {
+    await Future<void>.delayed(delay);
+    return [
+      ChatMessage(
+        id: 'bot-test-analyzing',
+        author: ChatAuthor.bot,
+        text: 'Анализирую Ваши результаты…',
+        sentAt: DateTime(2026, 8, 3),
+      ),
+      ChatMessage(
+        id: 'bot-test-ready',
+        author: ChatAuthor.bot,
+        text: 'Ваши результаты доступны для просмотра в Вашей мед-карте',
+        sentAt: DateTime(2026, 8, 3),
+      ),
+    ];
+  }
 }

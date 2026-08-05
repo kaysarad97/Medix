@@ -74,7 +74,11 @@ class HomeScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: HomeMetrics.cardGap),
-              const _Section(child: UploadAnalysesCard()),
+              _Section(
+                child: UploadAnalysesCard(
+                  onTap: () => context.push(Routes.chatbot),
+                ),
+              ),
               const SizedBox(height: HomeMetrics.cardGap),
               _Section(
                 child: UpcomingAppointmentsCard(

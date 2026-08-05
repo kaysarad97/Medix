@@ -33,8 +33,39 @@ class ChatbotController extends Notifier<ChatbotState> {
   @override
   ChatbotState build() => const ChatbotState();
 
+  /// Заглушка вместо настоящего выбора файла — до появления эндпоинта OCR
+  /// прикреплённый файл всегда один и тот же, как в `design/Загрузка анализов.png`.
+  static const mockAttachmentName = 'BloodworkResults.pdf';
+
   List<QuickReply> get quickReplies =>
       ref.read(chatbotRepositoryProvider).quickReplies();
+
+  Future<void> attachFile() async {
+    if (state.botIsTyping) return;
+
+    final outgoing = ChatMessage(
+      id: 'user-${DateTime.now().microsecondsSinceEpoch}',
+      author: ChatAuthor.user,
+      text: mockAttachmentName,
+      sentAt: DateTime.now(),
+    );
+    state = state.copyWith(
+      messages: [...state.messages, outgoing],
+      botIsTyping: true,
+    );
+
+    final replies = await ref
+        .read(chatbotRepositoryProvider)
+        .analyzeAttachment(mockAttachmentName);
+    var messages = state.messages;
+    for (var i = 0; i < replies.length; i++) {
+      messages = [...messages, replies[i]];
+      state = state.copyWith(
+        messages: messages,
+        botIsTyping: i < replies.length - 1,
+      );
+    }
+  }
 
   Future<void> send(String text) async {
     final trimmed = text.trim();

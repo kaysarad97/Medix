@@ -6,6 +6,9 @@ abstract interface class ChatbotRepository {
 
   /// Ответ бота на реплику пользователя.
   Future<ChatMessage> reply(String prompt);
+
+  /// Разбор прикреплённого файла с анализами: статус обработки и результат.
+  Future<List<ChatMessage>> analyzeAttachment(String fileName);
 }
 
 /// Заглушка на время разработки бэкенда.
@@ -34,6 +37,25 @@ class MockChatbotRepository implements ChatbotRepository {
     );
   }
 
+  @override
+  Future<List<ChatMessage>> analyzeAttachment(String fileName) async {
+    await Future<void>.delayed(const Duration(milliseconds: 900));
+    final analyzing = ChatMessage(
+      id: 'bot-${DateTime.now().microsecondsSinceEpoch}',
+      author: ChatAuthor.bot,
+      text: 'Анализирую Ваши результаты…',
+      sentAt: DateTime.now(),
+    );
+    await Future<void>.delayed(const Duration(milliseconds: 1400));
+    final ready = ChatMessage(
+      id: 'bot-${DateTime.now().microsecondsSinceEpoch}',
+      author: ChatAuthor.bot,
+      text: 'Ваши результаты доступны для просмотра в Вашей мед-карте',
+      sentAt: DateTime.now(),
+    );
+    return [analyzing, ready];
+  }
+
   String _answerFor(String prompt) {
     final lower = prompt.toLowerCase();
     if (lower.contains('направлен')) {
@@ -45,8 +67,8 @@ class MockChatbotRepository implements ChatbotRepository {
           'в вашем городе он дешевле.';
     }
     if (lower.contains('анализ')) {
-      return 'Приложите файл или фотографию результатов — подготовлю '
-          'разбор показателей.';
+      return 'Пожалуйста, прикрепите файл в формате PDF, чтобы я смог '
+          'проанализировать его.';
     }
     return 'Отвечу, когда подключат бота. Пока это заглушка: настоящие '
         'ответы придут с сервера.';

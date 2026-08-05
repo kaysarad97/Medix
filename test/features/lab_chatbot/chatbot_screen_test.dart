@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/theme/app_theme.dart';
@@ -89,6 +89,34 @@ void main() {
     await tester.pump();
   });
 
+  testWidgets('прикрепление файла отправляет его и показывает разбор', (
+    tester,
+  ) async {
+    await pumpChatbot(tester);
+
+    await tester.tap(
+      find.descendant(
+        of: find.byType(ChatInputBar),
+        matching: find.byTooltip('Прикрепить файл'),
+      ),
+    );
+    await tester.pump();
+
+    // Имя файла ушло как реплика пользователя, бот «печатает».
+    expect(find.text('BloodworkResults.pdf'), findsOneWidget);
+    expect(find.byType(TypingIndicator), findsOneWidget);
+
+    await tester.pump(FakeChatbotRepository.delay);
+    await tester.pump();
+
+    expect(find.text('Анализирую Ваши результаты…'), findsOneWidget);
+    expect(
+      find.text('Ваши результаты доступны для просмотра в Вашей мед-карте'),
+      findsOneWidget,
+    );
+    expect(find.byType(TypingIndicator), findsNothing);
+  });
+
   group('контроллер', () {
     late ProviderContainer container;
 
@@ -130,5 +158,33 @@ void main() {
       // Должна пройти только первая пара реплик.
       expect(container.read(chatbotControllerProvider).messages, hasLength(2));
     });
+
+    test('вложение добавляет реплику пользователя и два ответа бота', () async {
+      final c = container.read(chatbotControllerProvider.notifier);
+      await c.attachFile();
+
+      final messages = container.read(chatbotControllerProvider).messages;
+      expect(messages, hasLength(3));
+      expect(messages[0].author, ChatAuthor.user);
+      expect(messages[0].text, ChatbotController.mockAttachmentName);
+      expect(messages[1].author, ChatAuthor.bot);
+      expect(messages[2].author, ChatAuthor.bot);
+      expect(container.read(chatbotControllerProvider).botIsTyping, isFalse);
+    });
+
+    test(
+      'пока бот отвечает на вложение, повторное вложение игнорируется',
+      () async {
+        final c = container.read(chatbotControllerProvider.notifier);
+        final first = c.attachFile();
+        await c.attachFile();
+        await first;
+
+        expect(
+          container.read(chatbotControllerProvider).messages,
+          hasLength(3),
+        );
+      },
+    );
   });
 }
