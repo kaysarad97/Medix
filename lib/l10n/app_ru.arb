@@ -1,0 +1,64 @@
+{
+  "@@locale": "ru",
+  "homeGreeting": "Как Ваше здоровье сегодня?",
+  "@homeGreeting": {
+    "description": "Приветствие под шапкой главного экрана."
+  },
+  "symptomSearchHint": "Опишите Ваши симптомы...",
+  "@symptomSearchHint": {
+    "description": "Плейсхолдер поля поиска симптомов на главной — ведёт в чат-бота."
+  },
+  "uploadAnalysesTitle": "Загрузить анализы",
+  "@uploadAnalysesTitle": {
+    "description": "Заголовок карточки загрузки анализов на главной."
+  },
+  "uploadAnalysesSubtitle": "ИИ-интерпретация",
+  "@uploadAnalysesSubtitle": {
+    "description": "Подзаголовок карточки загрузки анализов на главной."
+  },
+  "quickActionLabTestsTitle": "Сдать\nанализы",
+  "@quickActionLabTestsTitle": {
+    "description": "Заголовок плитки «Сдать анализы» в карточке быстрых действий."
+  },
+  "quickActionLabTestsSubtitle": "в партнерских лабораториях",
+  "@quickActionLabTestsSubtitle": {
+    "description": "Подзаголовок плитки «Сдать анализы»."
+  },
+  "quickActionDoctorTitle": "Запись\nк врачу",
+  "@quickActionDoctorTitle": {
+    "description": "Заголовок плитки «Запись к врачу» в карточке быстрых действий."
+  },
+  "quickActionDoctorSubtitle": "в удобное для Вас время",
+  "@quickActionDoctorSubtitle": {
+    "description": "Подзаголовок плитки «Запись к врачу»."
+  },
+  "quickActionFacilityTitle": "Найти лабораторию или\nбольницу",
+  "@quickActionFacilityTitle": {
+    "description": "Заголовок широкой плитки поиска лаборатории/больницы."
+  },
+  "quickActionFacilitySubtitle": "карта и сравнение цен",
+  "@quickActionFacilitySubtitle": {
+    "description": "Подзаголовок широкой плитки поиска лаборатории/больницы."
+  },
+  "doctorsCardTitle": "Врачи",
+  "@doctorsCardTitle": {
+    "description": "Заголовок карточки специальностей врачей на главной."
+  },
+  "viewAllLabel": "Все",
+  "@viewAllLabel": {
+    "description": "Ссылка «показать всё» рядом с заголовком списка (врачи, и т.п.)."
+  },
+  "specialtyDoctorCount": "{count} врачей",
+  "@specialtyDoctorCount": {
+    "description": "Число врачей у специальности в карусели на главной. Склонение по числу (1 врач / 2 врача / 5 врачей) не реализовано — форма всегда множественного числа, как было в захардкоженном варианте.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "upcomingAppointmentsTitle": "Предстоящие записи",
+  "@upcomingAppointmentsTitle": {
+    "description": "Заголовок карточки предстоящих записей на главной."
+  }
+}

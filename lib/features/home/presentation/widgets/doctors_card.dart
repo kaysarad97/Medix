@@ -4,6 +4,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_card.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/doctor_specialty.dart';
 import 'home_metrics.dart';
 
@@ -26,6 +27,7 @@ class DoctorsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AppCard(
       padding: EdgeInsets.zero,
       child: Column(
@@ -43,11 +45,14 @@ class DoctorsCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.baseline,
               textBaseline: TextBaseline.alphabetic,
               children: [
-                Text('Врачи', style: AppTypography.sectionTitle),
+                Text(l10n.doctorsCardTitle, style: AppTypography.sectionTitle),
                 GestureDetector(
                   onTap: onSeeAll,
                   behavior: HitTestBehavior.opaque,
-                  child: Text('Все', style: AppTypography.linkSmall),
+                  child: Text(
+                    l10n.viewAllLabel,
+                    style: AppTypography.linkSmall,
+                  ),
                 ),
               ],
             ),
@@ -88,6 +93,7 @@ class _SpecialtyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       width: HomeMetrics.doctorCardWidth,
       child: Material(
@@ -121,7 +127,7 @@ class _SpecialtyCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '${specialty.doctorCount} врачей',
+                        l10n.specialtyDoctorCount(specialty.doctorCount),
                         style: AppTypography.cardItemMeta,
                         maxLines: 1,
                       ),

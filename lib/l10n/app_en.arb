@@ -1,0 +1,17 @@
+{
+  "@@locale": "en",
+  "homeGreeting": "How's your health today?",
+  "symptomSearchHint": "Describe your symptoms...",
+  "uploadAnalysesTitle": "Upload test results",
+  "uploadAnalysesSubtitle": "AI interpretation",
+  "quickActionLabTestsTitle": "Get\ntested",
+  "quickActionLabTestsSubtitle": "at partner labs",
+  "quickActionDoctorTitle": "Book a\ndoctor",
+  "quickActionDoctorSubtitle": "at a time that suits you",
+  "quickActionFacilityTitle": "Find a lab or\nhospital",
+  "quickActionFacilitySubtitle": "map and price comparison",
+  "doctorsCardTitle": "Doctors",
+  "viewAllLabel": "All",
+  "specialtyDoctorCount": "{count} doctors",
+  "upcomingAppointmentsTitle": "Upcoming appointments"
+}

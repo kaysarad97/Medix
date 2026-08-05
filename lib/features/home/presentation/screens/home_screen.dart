@@ -8,6 +8,7 @@ import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/icon_chip.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../providers/home_providers.dart';
 import '../widgets/doctors_card.dart';
 import '../widgets/home_header.dart';
@@ -30,6 +31,7 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final specialties = ref.watch(specialtiesProvider);
     final appointments = ref.watch(upcomingAppointmentsProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return AppScaffold(
       background: AppBackgroundStyle.main,
@@ -47,7 +49,7 @@ class HomeScreen extends ConsumerWidget {
               const SizedBox(height: HomeMetrics.headerToGreeting),
               _Section(
                 child: Text(
-                  'Как Ваше здоровье сегодня?',
+                  l10n.homeGreeting,
                   style: AppTypography.homeGreeting,
                 ),
               ),
@@ -116,6 +118,7 @@ class _SymptomSearchField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return _Section(
       child: SizedBox(
         height: HomeMetrics.searchHeight,
@@ -145,7 +148,7 @@ class _SymptomSearchField extends StatelessWidget {
                     decoration: InputDecoration(
                       isCollapsed: true,
                       border: InputBorder.none,
-                      hintText: 'Опишите Ваши симптомы...',
+                      hintText: l10n.symptomSearchHint,
                       hintStyle: AppTypography.placeholder,
                     ),
                   ),

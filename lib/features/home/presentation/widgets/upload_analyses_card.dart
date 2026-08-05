@@ -4,6 +4,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/icon_chip.dart';
+import '../../../../l10n/app_localizations.dart';
 import 'home_metrics.dart';
 
 /// «Загрузить анализы» — широкая голубая карточка с плотной иконкой слева.
@@ -14,6 +15,7 @@ class UploadAnalysesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       height: HomeMetrics.uploadCardHeight,
       child: Material(
@@ -39,10 +41,13 @@ class UploadAnalysesCard extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Загрузить анализы', style: AppTypography.tileTitle),
+                      Text(
+                        l10n.uploadAnalysesTitle,
+                        style: AppTypography.tileTitle,
+                      ),
                       const SizedBox(height: 4),
                       Text(
-                        'ИИ-интерпретация',
+                        l10n.uploadAnalysesSubtitle,
                         style: AppTypography.tileSubtitle,
                       ),
                     ],

@@ -1,0 +1,17 @@
+{
+  "@@locale": "kk",
+  "homeGreeting": "Бүгін денсаулығыңыз қалай?",
+  "symptomSearchHint": "Симптомдарыңызды сипаттаңыз...",
+  "uploadAnalysesTitle": "Талдауларды жүктеу",
+  "uploadAnalysesSubtitle": "ЖИ түсіндірмесі",
+  "quickActionLabTestsTitle": "Талдау\nтапсыру",
+  "quickActionLabTestsSubtitle": "серіктес зертханаларда",
+  "quickActionDoctorTitle": "Дәрігерге\nжазылу",
+  "quickActionDoctorSubtitle": "Сізге қолайлы уақытта",
+  "quickActionFacilityTitle": "Зертхана немесе\nаурухана табу",
+  "quickActionFacilitySubtitle": "карта және бағаларды салыстыру",
+  "doctorsCardTitle": "Дәрігерлер",
+  "viewAllLabel": "Барлығы",
+  "specialtyDoctorCount": "{count} дәрігер",
+  "upcomingAppointmentsTitle": "Алдағы жазбалар"
+}

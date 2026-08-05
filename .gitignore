@@ -51,3 +51,9 @@ app.*.map.json
 # Картинки различий golden-тестов: генерируются при каждом падении сверки.
 # В CI выкладываются артефактом, в репозитории им делать нечего.
 test/**/failures/
+
+# AppLocalizations генерируется `flutter gen-l10n` из lib/l10n/*.arb (см.
+# l10n.yaml) — пересобирается сам при `flutter pub get`/`test`/`run` за счёт
+# `generate: true` в pubspec.yaml.
+lib/l10n/app_localizations*.dart
+/l10n_untranslated.json

@@ -5,6 +5,7 @@ import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/icon_chip.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/appointment.dart';
 import 'home_metrics.dart';
 
@@ -21,6 +22,7 @@ class UpcomingAppointmentsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AppCard(
       padding: const EdgeInsets.all(HomeMetrics.cardPadding),
       child: Column(
@@ -31,7 +33,10 @@ class UpcomingAppointmentsCard extends StatelessWidget {
             children: [
               const AppIconChip(icon: MedixIcon.calendar),
               const SizedBox(width: 18),
-              Text('Предстоящие записи', style: AppTypography.sectionTitle),
+              Text(
+                l10n.upcomingAppointmentsTitle,
+                style: AppTypography.sectionTitle,
+              ),
             ],
           ),
           const SizedBox(height: HomeMetrics.doctorsTitleToList),

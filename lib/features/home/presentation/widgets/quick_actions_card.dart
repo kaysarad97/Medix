@@ -5,6 +5,7 @@ import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/icon_chip.dart';
+import '../../../../l10n/app_localizations.dart';
 import 'home_metrics.dart';
 
 /// Карточка быстрых действий: две плитки в ряд и одна широкая под ними.
@@ -22,6 +23,7 @@ class QuickActionsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AppCard(
       padding: const EdgeInsets.all(HomeMetrics.cardPadding),
       child: Column(
@@ -34,8 +36,8 @@ class QuickActionsCard extends StatelessWidget {
                 Expanded(
                   flex: HomeMetrics.actionTileLeftFlex,
                   child: _ActionTile(
-                    title: 'Сдать\nанализы',
-                    subtitle: 'в партнерских лабораториях',
+                    title: l10n.quickActionLabTestsTitle,
+                    subtitle: l10n.quickActionLabTestsSubtitle,
                     icon: MedixIcon.labTest,
                     onTap: onLabTests,
                   ),
@@ -44,8 +46,8 @@ class QuickActionsCard extends StatelessWidget {
                 Expanded(
                   flex: HomeMetrics.actionTileRightFlex,
                   child: _ActionTile(
-                    title: 'Запись\nк врачу',
-                    subtitle: 'в удобное для Вас время',
+                    title: l10n.quickActionDoctorTitle,
+                    subtitle: l10n.quickActionDoctorSubtitle,
                     icon: MedixIcon.doctorCall,
                     onTap: onDoctorAppointment,
                   ),
@@ -55,8 +57,8 @@ class QuickActionsCard extends StatelessWidget {
           ),
           const SizedBox(height: HomeMetrics.tilesToWideTile),
           _WideTile(
-            title: 'Найти лабораторию или\nбольницу',
-            subtitle: 'карта и сравнение цен',
+            title: l10n.quickActionFacilityTitle,
+            subtitle: l10n.quickActionFacilitySubtitle,
             icon: MedixIcon.mapSearch,
             onTap: onFindFacility,
           ),
