@@ -60,6 +60,9 @@ abstract final class Routes {
   /// Форма мед-карты: группа крови, аллергии, операции.
   static const String medicalCardForm = '/profile/medical-card';
 
+  /// История консультаций: «Предыдущие процедуры».
+  static const String procedures = '/profile/procedures';
+
   /// Настройки приложения.
   static const String settings = '/profile/settings';
 

@@ -1,6 +1,7 @@
 import 'package:medix/features/profile/data/repositories/profile_repository.dart';
 import 'package:medix/features/profile/domain/entities/analysis_result.dart';
 import 'package:medix/features/profile/domain/entities/medical_card.dart';
+import 'package:medix/features/profile/domain/entities/medical_procedure.dart';
 import 'package:medix/features/profile/domain/entities/user_profile.dart';
 import 'package:medix/shared/models/my_doctor.dart';
 
@@ -29,6 +30,10 @@ class FakeProfileRepository implements ProfileRepository {
   @override
   Future<List<AnalysisResult>> analyses() async =>
       MockProfileRepository.mockAnalyses;
+
+  @override
+  Future<List<MedicalProcedure>> procedures() async =>
+      MockProfileRepository.mockProcedures;
 
   @override
   Future<void> saveMedicalCard(MedicalCard card) async {}

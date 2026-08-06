@@ -5,6 +5,7 @@ import '../../../../shared/models/my_doctor.dart';
 import '../../data/repositories/profile_repository.dart';
 import '../../domain/entities/analysis_result.dart';
 import '../../domain/entities/medical_card.dart';
+import '../../domain/entities/medical_procedure.dart';
 import '../../domain/entities/user_profile.dart';
 
 final profileRepositoryProvider = Provider<ProfileRepository>(
@@ -28,6 +29,49 @@ final myDoctorsProvider = FutureProvider<List<MyDoctor>>(
 final analysesProvider = FutureProvider<List<AnalysisResult>>(
   (ref) => ref.watch(profileRepositoryProvider).analyses(),
 );
+
+final proceduresProvider = FutureProvider<List<MedicalProcedure>>(
+  (ref) => ref.watch(profileRepositoryProvider).procedures(),
+);
+
+/// Строка поиска в «Название процедуры».
+class ProcedureSearchQuery extends Notifier<String> {
+  @override
+  String build() => '';
+
+  void update(String value) => state = value;
+}
+
+final procedureSearchQueryProvider =
+    NotifierProvider<ProcedureSearchQuery, String>(ProcedureSearchQuery.new);
+
+/// Вкладка «Мои процедуры» / «Процедуры ребёнка» / «Процедуры старших».
+class ProcedureScopeFilter extends Notifier<FamilyScope> {
+  @override
+  FamilyScope build() => FamilyScope.self;
+
+  void select(FamilyScope scope) => state = scope;
+}
+
+final procedureScopeFilterProvider =
+    NotifierProvider<ProcedureScopeFilter, FamilyScope>(
+      ProcedureScopeFilter.new,
+    );
+
+/// Процедуры с учётом вкладки и поиска — то, что реально попадает в список
+/// на экране.
+final visibleProceduresProvider = Provider<List<MedicalProcedure>>((ref) {
+  final all = ref.watch(proceduresProvider).value ?? const [];
+  final scope = ref.watch(procedureScopeFilterProvider);
+  final query = ref.watch(procedureSearchQueryProvider).trim().toLowerCase();
+
+  return all.where((p) {
+    if (p.scope != scope) return false;
+    if (query.isEmpty) return true;
+    return p.doctorName.toLowerCase().contains(query) ||
+        p.specialty.toLowerCase().contains(query);
+  }).toList();
+});
 
 /// Выбранная вкладка над списком анализов.
 final analysesFilterProvider =

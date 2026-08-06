@@ -105,7 +105,7 @@ class _ProceduresCard extends StatelessWidget {
       child: SectionHeader(
         icon: MedixIcon.procedures,
         title: 'Предыдущие процедуры',
-        onTap: () {},
+        onTap: () => context.push(Routes.procedures),
       ),
     );
   }

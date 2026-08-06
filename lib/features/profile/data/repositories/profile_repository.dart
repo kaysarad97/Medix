@@ -1,6 +1,7 @@
 import '../../../../shared/models/my_doctor.dart';
 import '../../domain/entities/analysis_result.dart';
 import '../../domain/entities/medical_card.dart';
+import '../../domain/entities/medical_procedure.dart';
 import '../../../../shared/models/medix_avatars.dart';
 import '../../../../shared/models/subscription_tier.dart';
 import '../../domain/entities/user_profile.dart';
@@ -13,6 +14,8 @@ abstract interface class ProfileRepository {
   Future<List<MyDoctor>> myDoctors();
 
   Future<List<AnalysisResult>> analyses();
+
+  Future<List<MedicalProcedure>> procedures();
 
   Future<void> saveMedicalCard(MedicalCard card);
 }
@@ -56,6 +59,12 @@ class MockProfileRepository implements ProfileRepository {
   }
 
   @override
+  Future<List<MedicalProcedure>> procedures() async {
+    await Future<void>.delayed(_latency);
+    return mockProcedures;
+  }
+
+  @override
   Future<void> saveMedicalCard(MedicalCard card) async {
     // Сохранять некуда: бэкенда нет, а хранить мед-данные в открытом виде
     // на устройстве нельзя — закон РК «О персональных данных».
@@ -94,5 +103,77 @@ class MockProfileRepository implements ProfileRepository {
         referenceHigh: 32.2,
         takenAt: DateTime(2026, 7, 20 - i),
       ),
+  ];
+
+  /// `design/Предыдущие Процедуры.png` показывает один и тот же ряд
+  /// специальностей (Пульмонолог, Гастроэнтеролог, ЛОР, Дерматолог) — как и
+  /// с анализами выше, это заглушка дизайнера, а не данные. Мок разнообразит
+  /// специальности и добавляет пару записей на вкладки «Процедуры ребёнка»/
+  /// «Процедуры старших», иначе фильтр было бы не на чем проверить.
+  static final List<MedicalProcedure> mockProcedures = [
+    MedicalProcedure(
+      id: 'p1',
+      doctorName: 'Имя Фамилия',
+      specialty: 'Пульмонолог',
+      date: DateTime(2026, 5, 21),
+    ),
+    MedicalProcedure(
+      id: 'p2',
+      doctorName: 'Имя Фамилия',
+      specialty: 'Гастроэнтеролог',
+      date: DateTime(2026, 5, 20),
+    ),
+    MedicalProcedure(
+      id: 'p3',
+      doctorName: 'Имя Фамилия',
+      specialty: 'ЛОР',
+      date: DateTime(2026, 5, 19),
+    ),
+    MedicalProcedure(
+      id: 'p4',
+      doctorName: 'Имя Фамилия',
+      specialty: 'Дерматолог',
+      date: DateTime(2026, 5, 18),
+    ),
+    MedicalProcedure(
+      id: 'p5',
+      doctorName: 'Имя Фамилия',
+      specialty: 'Кардиолог',
+      date: DateTime(2026, 5, 17),
+    ),
+    MedicalProcedure(
+      id: 'p6',
+      doctorName: 'Имя Фамилия',
+      specialty: 'Терапевт',
+      date: DateTime(2026, 5, 10),
+    ),
+    MedicalProcedure(
+      id: 'p7',
+      doctorName: 'Имя Фамилия',
+      specialty: 'Педиатр',
+      date: DateTime(2026, 5, 21),
+      scope: FamilyScope.child,
+    ),
+    MedicalProcedure(
+      id: 'p8',
+      doctorName: 'Имя Фамилия',
+      specialty: 'Аллерголог',
+      date: DateTime(2026, 5, 15),
+      scope: FamilyScope.child,
+    ),
+    MedicalProcedure(
+      id: 'p9',
+      doctorName: 'Имя Фамилия',
+      specialty: 'Офтальмолог',
+      date: DateTime(2026, 5, 21),
+      scope: FamilyScope.senior,
+    ),
+    MedicalProcedure(
+      id: 'p10',
+      doctorName: 'Имя Фамилия',
+      specialty: 'Невролог',
+      date: DateTime(2026, 5, 14),
+      scope: FamilyScope.senior,
+    ),
   ];
 }
