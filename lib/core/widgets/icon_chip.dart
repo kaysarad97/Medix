@@ -124,6 +124,18 @@ enum MedixIcon {
 
   /// Здание с крестом. Метка больницы на карте и вкладка «Больницы».
   hospital,
+
+  /// Домик. Таб «Домой» в нижней навигации.
+  navHome,
+
+  /// Карта-книжка. Таб «Карта» в нижней навигации.
+  navMap,
+
+  /// Квадратные пузыри чата. Таб «Чаты» в нижней навигации.
+  navChats,
+
+  /// Человечек в кружке. Таб «Профиль» в нижней навигации.
+  navProfile,
 }
 
 abstract final class MedixIcons {
@@ -170,6 +182,10 @@ abstract final class MedixIcons {
     MedixIcon.attachment: 'assets/icons/attachment.svg',
     MedixIcon.search: 'assets/icons/search.svg',
     MedixIcon.hospital: 'assets/icons/hospital.svg',
+    MedixIcon.navHome: 'assets/icons/nav_home.svg',
+    MedixIcon.navMap: 'assets/icons/nav_map.svg',
+    MedixIcon.navChats: 'assets/icons/nav_chats.svg',
+    MedixIcon.navProfile: 'assets/icons/nav_profile.svg',
   };
 
   /// Иконки, экспорта которых ещё нет.

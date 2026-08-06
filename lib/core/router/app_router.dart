@@ -25,6 +25,7 @@ import '../../features/subscriptions/presentation/screens/payment_result_screen.
 import '../../features/subscriptions/presentation/screens/subscription_screen.dart';
 import '../../features/telemedicine/presentation/screens/appointment_screen.dart';
 import '../../features/telemedicine/presentation/screens/doctor_profile_screen.dart';
+import 'app_shell.dart';
 import 'routes.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -64,17 +65,50 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: Routes.policy,
         builder: (context, state) => const PolicyScreen(),
       ),
-      GoRoute(
-        path: Routes.home,
-        builder: (context, state) => const HomeScreen(),
+      // Нижняя навигация: Домой/Карта/Чаты/Профиль — общий плавающий
+      // таб-бар в AppShell, у каждой ветки свой стек и своя история.
+      // Порядок веток совпадает с порядком вкладок в BottomNavBar.
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) =>
+            AppShell(navigationShell: navigationShell),
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.home,
+                builder: (context, state) => const HomeScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.mapSearch,
+                builder: (context, state) => const MapSearchScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.chats,
+                builder: (context, state) => const ChatsListScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.profile,
+                builder: (context, state) => const MedicalCardScreen(),
+              ),
+            ],
+          ),
+        ],
       ),
       GoRoute(
         path: Routes.chatbot,
         builder: (context, state) => const ChatbotScreen(),
-      ),
-      GoRoute(
-        path: Routes.chats,
-        builder: (context, state) => const ChatsListScreen(),
       ),
       GoRoute(
         path: Routes.chat,
@@ -125,14 +159,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             onContinue: () => failed ? context.pop() : context.go(Routes.home),
           );
         },
-      ),
-      GoRoute(
-        path: Routes.mapSearch,
-        builder: (context, state) => const MapSearchScreen(),
-      ),
-      GoRoute(
-        path: Routes.profile,
-        builder: (context, state) => const MedicalCardScreen(),
       ),
       GoRoute(
         path: Routes.medicalCardForm,
