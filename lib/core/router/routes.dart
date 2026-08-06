@@ -51,6 +51,9 @@ abstract final class Routes {
   /// Больницы и лаборатории на карте.
   static const String mapSearch = '/map';
 
+  /// Перечень услуг: каталог анализов и комплексов.
+  static const String labServices = '/lab-services';
+
   /// Профиль пользователя — «Ваша Мед-Карта».
   static const String profile = '/profile';
 

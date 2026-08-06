@@ -60,12 +60,13 @@ class HomeScreen extends ConsumerWidget {
               const SizedBox(height: HomeMetrics.searchToActions),
               _Section(
                 child: QuickActionsCard(
-                  // «Сдать анализы» ведёт к боту: подбор лаборатории и
-                  // сравнение цен — его работа.
-                  onLabTests: () => context.push(Routes.chatbot),
+                  // «Сдать анализы» — каталог анализов с ценами, а не бот:
+                  // это прямое действие, а не диалог. Бот остаётся доступен
+                  // через поиск симптомов и «Загрузить анализы» ниже.
+                  onLabTests: () => context.push(Routes.labServices),
                   onMessages: () => context.push(Routes.chats),
-                  // Тот же временный переход на заглушку врача, что и у
-                  // карусели специальностей ниже — списка врачей ещё нет.
+                  // Быстрый переход сразу к записи, в отличие от карусели
+                  // специальностей ниже — там сначала список врачей.
                   onDoctorAppointment: () =>
                       context.push(Routes.doctorOf('d1')),
                   onFindFacility: () => context.push(Routes.mapSearch),
