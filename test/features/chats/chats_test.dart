@@ -47,6 +47,8 @@ void main() {
       await pumpScreen(tester, const ChatsListScreen());
 
       expect(find.text('Все чаты'), findsOneWidget);
+      // Чат-бот закреплён первой строкой над перепиской с врачами.
+      expect(find.text('Чат с Medi-Bot'), findsOneWidget);
       // Все четыре переписки помещаются на экран без прокрутки.
       expect(find.text('Имя Фамилия'), findsNWidgets(4));
       expect(find.textContaining('Вы: Здравствуйте'), findsOneWidget);

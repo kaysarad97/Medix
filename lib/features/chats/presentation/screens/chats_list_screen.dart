@@ -12,7 +12,9 @@ import '../../../../core/widgets/screen_top_bar.dart';
 import '../../domain/entities/chat_thread.dart';
 import '../providers/chats_providers.dart';
 
-/// Список переписок с врачами по `design/Чаты с врачами.png`.
+/// Список переписок по `design/Чаты.png`: чат-бот закреплён первой строкой
+/// над перепиской с врачами — единая точка входа в чаты, вместо отдельной
+/// от бота.
 class ChatsListScreen extends ConsumerWidget {
   const ChatsListScreen({super.key});
 
@@ -43,10 +45,16 @@ class ChatsListScreen extends ConsumerWidget {
               Expanded(
                 child: ListView.separated(
                   padding: EdgeInsets.zero,
-                  itemCount: threads.length,
+                  itemCount: threads.length + 1,
                   separatorBuilder: (_, _) => const SizedBox(height: _rowGap),
                   itemBuilder: (context, index) {
-                    final thread = threads[index];
+                    if (index == 0) {
+                      return _BotThreadRow(
+                        height: _rowHeight,
+                        onTap: () => context.push(Routes.chatbot),
+                      );
+                    }
+                    final thread = threads[index - 1];
                     return _ThreadRow(
                       thread: thread,
                       height: _rowHeight,
@@ -102,6 +110,63 @@ class _SearchField extends ConsumerWidget {
             ),
             const SizedBox(width: 22),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Закреплённая первая строка — переход в чат-бота лабораторий.
+///
+/// Не [ChatThread]: это не переписка из репозитория, а статичная точка
+/// входа, поэтому текст и время — как в макете, без привязки к реальной
+/// истории сообщений бота.
+class _BotThreadRow extends StatelessWidget {
+  const _BotThreadRow({required this.height, required this.onTap});
+
+  final double height;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: height,
+      child: Material(
+        color: AppColors.surface,
+        borderRadius: AppRadius.allMd,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 13),
+            child: Row(
+              children: [
+                const AppIconChip(icon: MedixIcon.botAvatar, size: 44),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Чат с Medi-Bot',
+                        style: AppTypography.cardItemTitle,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Опишите Ваши симптомы...',
+                        style: AppTypography.tileSubtitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Text('21.07, 13:44', style: AppTypography.cardItemMeta),
+              ],
+            ),
+          ),
         ),
       ),
     );
