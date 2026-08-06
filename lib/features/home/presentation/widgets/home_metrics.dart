@@ -29,16 +29,18 @@ abstract final class HomeMetrics {
   /// Расстояние между карточками верхнего уровня.
   static const double cardGap = 24;
 
-  /// Плитки «Сдать анализы» и «Запись к врачу»: 375…469.
+  /// Плитки быстрых действий: 375…469.
   static const double actionTileHeight = 95;
 
-  /// Зазор между плитками.
+  /// Зазор между плитками в горизонтальном списке.
   static const double actionTileGap = 14;
 
-  /// В макете плитки неравной ширины: 197 и 165. Пропорция сохраняется
-  /// на любой ширине экрана.
-  static const int actionTileLeftFlex = 197;
-  static const int actionTileRightFlex = 165;
+  /// «Сдать анализы» и «Мои сообщения» — заголовок в два слова, нужна
+  /// более широкая плитка: 197.
+  static const double actionTileWideWidth = 197;
+
+  /// «Запись к врачу» — 165, как в старой раскладке из двух плиток в ряд.
+  static const double actionTileNarrowWidth = 165;
 
   /// Широкая плитка «Найти лабораторию или больницу»: 487…582.
   static const double wideTileHeight = 96;

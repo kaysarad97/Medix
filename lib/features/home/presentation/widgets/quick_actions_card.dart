@@ -8,16 +8,19 @@ import '../../../../core/widgets/icon_chip.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'home_metrics.dart';
 
-/// Карточка быстрых действий: две плитки в ряд и одна широкая под ними.
+/// Карточка быстрых действий: горизонтальный список плиток и одна широкая
+/// под ним.
 class QuickActionsCard extends StatelessWidget {
   const QuickActionsCard({
     super.key,
     this.onLabTests,
+    this.onMessages,
     this.onDoctorAppointment,
     this.onFindFacility,
   });
 
   final VoidCallback? onLabTests;
+  final VoidCallback? onMessages;
   final VoidCallback? onDoctorAppointment;
   final VoidCallback? onFindFacility;
 
@@ -31,28 +34,35 @@ class QuickActionsCard extends StatelessWidget {
         children: [
           SizedBox(
             height: HomeMetrics.actionTileHeight,
-            child: Row(
-              children: [
-                Expanded(
-                  flex: HomeMetrics.actionTileLeftFlex,
-                  child: _ActionTile(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  _ActionTile(
+                    width: HomeMetrics.actionTileWideWidth,
                     title: l10n.quickActionLabTestsTitle,
                     subtitle: l10n.quickActionLabTestsSubtitle,
                     icon: MedixIcon.labTest,
                     onTap: onLabTests,
                   ),
-                ),
-                const SizedBox(width: HomeMetrics.actionTileGap),
-                Expanded(
-                  flex: HomeMetrics.actionTileRightFlex,
-                  child: _ActionTile(
+                  const SizedBox(width: HomeMetrics.actionTileGap),
+                  _ActionTile(
+                    width: HomeMetrics.actionTileWideWidth,
+                    title: l10n.quickActionMessagesTitle,
+                    subtitle: l10n.quickActionMessagesSubtitle,
+                    icon: MedixIcon.attachment,
+                    onTap: onMessages,
+                  ),
+                  const SizedBox(width: HomeMetrics.actionTileGap),
+                  _ActionTile(
+                    width: HomeMetrics.actionTileNarrowWidth,
                     title: l10n.quickActionDoctorTitle,
                     subtitle: l10n.quickActionDoctorSubtitle,
                     icon: MedixIcon.doctorCall,
                     onTap: onDoctorAppointment,
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           const SizedBox(height: HomeMetrics.tilesToWideTile),
@@ -70,12 +80,14 @@ class QuickActionsCard extends StatelessWidget {
 
 class _ActionTile extends StatelessWidget {
   const _ActionTile({
+    required this.width,
     required this.title,
     required this.subtitle,
     required this.icon,
     this.onTap,
   });
 
+  final double width;
   final String title;
   final String subtitle;
   final MedixIcon icon;
@@ -83,35 +95,38 @@ class _ActionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: AppColors.surfaceWhite,
-      borderRadius: AppRadius.allMd,
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(14, 14, 13, 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Text(title, style: AppTypography.tileTitle),
-                    ),
-                    AppIconChip(icon: icon),
-                  ],
+    return SizedBox(
+      width: width,
+      child: Material(
+        color: AppColors.surfaceWhite,
+        borderRadius: AppRadius.allMd,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(14, 14, 13, 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(title, style: AppTypography.tileTitle),
+                      ),
+                      AppIconChip(icon: icon),
+                    ],
+                  ),
                 ),
-              ),
-              Text(
-                subtitle,
-                style: AppTypography.tileSubtitle,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
+                Text(
+                  subtitle,
+                  style: AppTypography.tileSubtitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
           ),
         ),
       ),

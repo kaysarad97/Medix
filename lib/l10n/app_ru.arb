@@ -24,6 +24,14 @@
   "@quickActionLabTestsSubtitle": {
     "description": "Подзаголовок плитки «Сдать анализы»."
   },
+  "quickActionMessagesTitle": "Мои\nсообщения",
+  "@quickActionMessagesTitle": {
+    "description": "Заголовок плитки «Мои сообщения» в карточке быстрых действий."
+  },
+  "quickActionMessagesSubtitle": "чаты с врачами",
+  "@quickActionMessagesSubtitle": {
+    "description": "Подзаголовок плитки «Мои сообщения»."
+  },
   "quickActionDoctorTitle": "Запись\nк врачу",
   "@quickActionDoctorTitle": {
     "description": "Заголовок плитки «Запись к врачу» в карточке быстрых действий."
