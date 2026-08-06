@@ -32,3 +32,18 @@ final visiblePlacesProvider = Provider<List<MedicalPlace>>((ref) {
   final filter = ref.watch(placeFilterProvider);
   return places.where((place) => filter.includes(place.kind)).toList();
 });
+
+/// Место, выбранное нажатием на метку — карта сжимается, под ней
+/// раскрывается `PlaceDetailCard`. `null` — выбора нет, карта на весь экран.
+class SelectedPlace extends Notifier<MedicalPlace?> {
+  @override
+  MedicalPlace? build() => null;
+
+  void select(MedicalPlace place) => state = place;
+
+  void clear() => state = null;
+}
+
+final selectedPlaceProvider = NotifierProvider<SelectedPlace, MedicalPlace?>(
+  SelectedPlace.new,
+);

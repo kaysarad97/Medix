@@ -86,4 +86,68 @@ void main() {
       expect(place.position.longitude, closeTo(76.9, 0.15));
     }
   });
+
+  group('карточка места', () {
+    testWidgets('выбор места раскрывает карточку с деталями', (tester) async {
+      final container = await pump(tester);
+      final lab = MockPlacesRepository.mockPlaces.firstWhere(
+        (p) => p.id == 'l1',
+      );
+
+      container.read(selectedPlaceProvider.notifier).select(lab);
+      await tester.pump();
+
+      expect(find.text('Олимп'), findsOneWidget);
+      expect(find.text('Открыто'), findsOneWidget);
+      expect(find.text('900 м'), findsOneWidget);
+      expect(find.text('Показать все филиалы (19)'), findsOneWidget);
+      expect(find.text('Сдать анализы в КДЛ «Олимп»'), findsOneWidget);
+    });
+
+    testWidgets('у больницы нет кнопки «Сдать анализы»', (tester) async {
+      final container = await pump(tester);
+      final hospital = MockPlacesRepository.mockPlaces.firstWhere(
+        (p) => p.id == 'h1',
+      );
+
+      container.read(selectedPlaceProvider.notifier).select(hospital);
+      await tester.pump();
+
+      expect(find.textContaining('Сдать анализы'), findsNothing);
+      // У h1 branchesCount = 1 — своих филиалов нет, строки тоже нет.
+      expect(find.textContaining('Показать все филиалы'), findsNothing);
+    });
+
+    testWidgets('кнопка «назад» при выбранном месте снимает выбор', (
+      tester,
+    ) async {
+      final container = await pump(tester);
+      final lab = MockPlacesRepository.mockPlaces.first;
+
+      container.read(selectedPlaceProvider.notifier).select(lab);
+      await tester.pump();
+      expect(find.byIcon(Icons.arrow_back), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.arrow_back));
+      await tester.pump();
+
+      expect(container.read(selectedPlaceProvider), isNull);
+      expect(find.text(lab.category), findsNothing);
+    });
+
+    testWidgets('«Показать все филиалы» показывает снек-бар', (tester) async {
+      final container = await pump(tester);
+      final lab = MockPlacesRepository.mockPlaces.firstWhere(
+        (p) => p.id == 'l1',
+      );
+
+      container.read(selectedPlaceProvider.notifier).select(lab);
+      await tester.pump();
+
+      await tester.tap(find.text('Показать все филиалы (19)'));
+      await tester.pump();
+
+      expect(find.text('Список филиалов ещё не готов'), findsOneWidget);
+    });
+  });
 }
