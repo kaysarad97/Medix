@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/theme/app_theme.dart';
+import 'package:medix/features/family_access/presentation/providers/family_providers.dart';
 import 'package:medix/features/profile/presentation/providers/profile_providers.dart';
 import 'package:medix/features/profile/presentation/screens/contact_screen.dart';
 import 'package:medix/features/profile/presentation/screens/medical_card_form_screen.dart';
@@ -12,6 +13,7 @@ import 'package:medix/features/profile/presentation/screens/medical_card_screen.
 import 'package:medix/features/profile/presentation/screens/profile_settings_screen.dart';
 import 'package:medix/features/profile/presentation/screens/settings_screen.dart';
 
+import '../../helpers/fake_family_repository.dart';
 import '../../helpers/fake_profile_repository.dart';
 import '../../helpers/test_fonts.dart';
 
@@ -42,6 +44,9 @@ void main() {
           profileRepositoryProvider.overrideWithValue(
             const FakeProfileRepository(),
           ),
+          familyRepositoryProvider.overrideWithValue(
+            const FakeFamilyRepository(),
+          ),
         ],
         child: MaterialApp(theme: AppTheme.light, home: screen),
       ),
@@ -68,7 +73,7 @@ void main() {
       // Возраст от фиксированной даты: иначе эталон протухнет в день
       // рождения из заглушки.
       MedicalCardScreen(now: DateTime(2026, 8, 2)),
-      const Size(440, 1511),
+      const Size(440, 1656),
     );
 
     await expectLater(

@@ -10,6 +10,7 @@ import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/auth/presentation/screens/verify_code_screen.dart';
 import '../../features/chats/presentation/screens/chats_list_screen.dart';
 import '../../features/chats/presentation/screens/doctor_chat_screen.dart';
+import '../../features/family_access/presentation/screens/family_member_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/lab_chatbot/presentation/screens/chatbot_screen.dart';
 import '../../features/lab_services/presentation/screens/lab_services_screen.dart';
@@ -185,6 +186,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.procedures,
         builder: (context, state) => const ProceduresScreen(),
+      ),
+      GoRoute(
+        path: Routes.familyMember,
+        builder: (context, state) =>
+            FamilyMemberScreen(memberId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: Routes.settings,

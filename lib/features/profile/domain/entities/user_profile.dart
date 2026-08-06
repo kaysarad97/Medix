@@ -1,13 +1,6 @@
+import '../../../../core/utils/ru_plurals.dart';
+import '../../../../shared/models/gender.dart';
 import '../../../../shared/models/subscription_tier.dart';
-
-enum Gender {
-  male('мужчина'),
-  female('женщина');
-
-  const Gender(this.label);
-
-  final String label;
-}
 
 /// Владелец аккаунта — то, что видно в шапке экрана «Ваша Мед-Карта»
 /// и правится в «Настройках профиля».
@@ -71,22 +64,7 @@ class UserProfile {
   }
 
   /// «30 лет» — с русским числительным.
-  String ageLabel(DateTime now) {
-    final years = ageAt(now);
-    final tail = years % 100;
-    final last = years % 10;
-    final String word;
-    if (tail >= 11 && tail <= 14) {
-      word = 'лет';
-    } else if (last == 1) {
-      word = 'год';
-    } else if (last >= 2 && last <= 4) {
-      word = 'года';
-    } else {
-      word = 'лет';
-    }
-    return '$years $word';
-  }
+  String ageLabel(DateTime now) => RuPlurals.years(ageAt(now));
 
   /// «176 см», либо прочерк, пока рост не заполнен.
   String get heightLabel => heightCm == null ? '—' : '$heightCm см';

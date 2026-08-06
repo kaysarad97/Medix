@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/theme/app_theme.dart';
+import 'package:medix/features/family_access/presentation/providers/family_providers.dart';
 import 'package:medix/features/profile/presentation/providers/profile_providers.dart';
 import 'package:medix/features/profile/presentation/screens/contact_screen.dart';
 import 'package:medix/features/profile/presentation/screens/medical_card_form_screen.dart';
@@ -11,6 +12,7 @@ import 'package:medix/features/profile/presentation/screens/settings_screen.dart
 import 'package:medix/features/profile/domain/entities/medical_card.dart';
 import 'package:medix/shared/models/app_language.dart';
 
+import '../../helpers/fake_family_repository.dart';
 import '../../helpers/fake_profile_repository.dart';
 import '../../helpers/test_fonts.dart';
 
@@ -29,6 +31,9 @@ void main() {
           profileRepositoryProvider.overrideWithValue(
             const FakeProfileRepository(),
           ),
+          familyRepositoryProvider.overrideWithValue(
+            const FakeFamilyRepository(),
+          ),
         ],
         child: MaterialApp(theme: AppTheme.light, home: screen),
       ),
@@ -44,7 +49,8 @@ void main() {
     testWidgets('рисует шапку с именем, полом и подпиской', (tester) async {
       await pump(tester, screen);
 
-      expect(find.text('Имя'), findsOneWidget);
+      // Ещё два совпадения — имена мок-членов семьи в переключателе ниже.
+      expect(find.text('Имя'), findsNWidgets(3));
       expect(find.text('Фамилия'), findsOneWidget);
       expect(find.text('мужчина'), findsOneWidget);
       expect(find.text('6/12/1996'), findsOneWidget);
@@ -67,6 +73,17 @@ void main() {
       await pump(tester, screen);
       // Родился 6 декабря 1996, на 2 августа 2026 — 29 полных лет.
       expect(find.text('29 лет'), findsOneWidget);
+    });
+
+    testWidgets('переключатель «Моя семья» показывает членов семьи', (
+      tester,
+    ) async {
+      await pump(tester, screen);
+
+      expect(find.text('Моя семья'), findsOneWidget);
+      // 3 совпадения: имя самого пользователя в шапке плюс оба мок-члена
+      // семьи, которых заглушка тоже зовёт «Имя».
+      expect(find.text('Имя'), findsNWidgets(3));
     });
   });
 

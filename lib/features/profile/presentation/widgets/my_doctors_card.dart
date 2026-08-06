@@ -15,11 +15,17 @@ class MyDoctorsCard extends StatelessWidget {
   const MyDoctorsCard({
     super.key,
     required this.doctors,
+    this.title = 'Мои Врачи',
     this.onSeeAll,
     this.onDoctorTap,
   });
 
   final List<MyDoctor> doctors;
+
+  /// «Врачи моего ребёнка» / «Врачи для старших» на карточке члена семьи —
+  /// см. `design/Моя Семья Ребенок.png`.
+  final String title;
+
   final VoidCallback? onSeeAll;
   final ValueChanged<MyDoctor>? onDoctorTap;
 
@@ -44,7 +50,7 @@ class MyDoctorsCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.baseline,
               textBaseline: TextBaseline.alphabetic,
               children: [
-                Text('Мои Врачи', style: AppTypography.sectionTitle),
+                Text(title, style: AppTypography.sectionTitle),
                 GestureDetector(
                   onTap: onSeeAll,
                   child: Text('Все', style: AppTypography.linkSmall),

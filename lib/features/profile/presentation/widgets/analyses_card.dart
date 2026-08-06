@@ -5,7 +5,7 @@ import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/icon_chip.dart';
-import '../../domain/entities/analysis_result.dart';
+import '../../../../shared/models/analysis_result.dart';
 import 'profile_metrics.dart';
 import 'section_header.dart';
 
@@ -15,12 +15,18 @@ class AnalysesCard extends StatelessWidget {
     super.key,
     required this.analyses,
     required this.filter,
+    this.title = 'Ваши анализы',
     this.onFilterChanged,
     this.onOpenAll,
   });
 
   final List<AnalysisResult> analyses;
   final AnalysesFilter filter;
+
+  /// «Анализы ребёнка» / «Анализы Имя Фамилия» на карточке члена семьи —
+  /// см. `design/Моя Семья Ребенок.png` и `design/Моя Семья Старшие.png`.
+  final String title;
+
   final ValueChanged<AnalysesFilter>? onFilterChanged;
   final VoidCallback? onOpenAll;
 
@@ -36,7 +42,7 @@ class AnalysesCard extends StatelessWidget {
         children: [
           SectionHeader(
             icon: MedixIcon.analyses,
-            title: 'Ваши анализы',
+            title: title,
             onTap: onOpenAll,
           ),
           const SizedBox(height: ProfileMetrics.titleToToggle),

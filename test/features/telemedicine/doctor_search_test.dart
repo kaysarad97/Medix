@@ -7,6 +7,7 @@ import 'package:medix/features/profile/presentation/providers/profile_providers.
 import 'package:medix/features/telemedicine/presentation/providers/telemedicine_providers.dart';
 import 'package:medix/features/telemedicine/presentation/screens/doctor_search_results_screen.dart';
 import 'package:medix/features/telemedicine/presentation/screens/doctor_search_screen.dart';
+import 'package:medix/shared/models/gender.dart';
 import 'package:medix/shared/models/subscription_tier.dart';
 
 import '../../helpers/fake_doctors_repository.dart';

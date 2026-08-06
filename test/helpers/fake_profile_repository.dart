@@ -1,8 +1,8 @@
 import 'package:medix/features/profile/data/repositories/profile_repository.dart';
-import 'package:medix/features/profile/domain/entities/analysis_result.dart';
 import 'package:medix/features/profile/domain/entities/medical_card.dart';
 import 'package:medix/features/profile/domain/entities/medical_procedure.dart';
 import 'package:medix/features/profile/domain/entities/user_profile.dart';
+import 'package:medix/shared/models/analysis_result.dart';
 import 'package:medix/shared/models/my_doctor.dart';
 
 /// Те же данные, что у [MockProfileRepository], но без задержки: таймер вне

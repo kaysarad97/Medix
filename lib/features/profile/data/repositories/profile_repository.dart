@@ -1,9 +1,10 @@
+import '../../../../shared/models/analysis_result.dart';
+import '../../../../shared/models/gender.dart';
+import '../../../../shared/models/medix_avatars.dart';
 import '../../../../shared/models/my_doctor.dart';
-import '../../domain/entities/analysis_result.dart';
+import '../../../../shared/models/subscription_tier.dart';
 import '../../domain/entities/medical_card.dart';
 import '../../domain/entities/medical_procedure.dart';
-import '../../../../shared/models/medix_avatars.dart';
-import '../../../../shared/models/subscription_tier.dart';
 import '../../domain/entities/user_profile.dart';
 
 abstract interface class ProfileRepository {

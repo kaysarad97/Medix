@@ -5,29 +5,37 @@ import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/icon_chip.dart';
-import '../../domain/entities/user_profile.dart';
 import 'profile_metrics.dart';
 import 'section_header.dart';
 
-/// Карточка «Мед-карта» на экране профиля: ИИН, три плитки с ростом, весом
-/// и возрастом, место прописки.
+/// Карточка «Мед-карта»: верхнее поле (ИИН у пользователя, «Родство с
+/// Вами» у члена семьи — см. `design/Моя Семья Ребенок.png`), три плитки с
+/// ростом, весом и возрастом, место прописки.
+///
+/// Принимает готовые подписи, а не `UserProfile` целиком: у члена семьи
+/// (`FamilyMember`) те же поля, но другой тип, а возраст в обоих случаях
+/// считается снаружи — иначе виджет-тест начнёт зависеть от дня прогона.
 ///
 /// Показывает то, что уже заполнено; правится на отдельном экране, куда
 /// ведёт шеврон в заголовке.
 class MedicalCardSummary extends StatelessWidget {
   const MedicalCardSummary({
     super.key,
-    required this.profile,
-    required this.now,
+    required this.topFieldValue,
+    required this.topFieldPlaceholder,
+    required this.heightLabel,
+    required this.weightLabel,
+    required this.ageLabel,
+    required this.registrationAddress,
     this.onOpen,
   });
 
-  final UserProfile profile;
-
-  /// Сегодняшняя дата — возраст считается от неё. Передаётся снаружи, иначе
-  /// виджет-тест начнёт зависеть от дня прогона.
-  final DateTime now;
-
+  final String? topFieldValue;
+  final String topFieldPlaceholder;
+  final String heightLabel;
+  final String weightLabel;
+  final String ageLabel;
+  final String? registrationAddress;
   final VoidCallback? onOpen;
 
   @override
@@ -45,7 +53,7 @@ class MedicalCardSummary extends StatelessWidget {
             onTap: onOpen,
           ),
           const SizedBox(height: ProfileMetrics.headerToField),
-          _Field(text: profile.iin, placeholder: 'ИИН'),
+          _Field(text: topFieldValue, placeholder: topFieldPlaceholder),
           const SizedBox(height: ProfileMetrics.fieldToTiles),
           Row(
             children: [
@@ -53,7 +61,7 @@ class MedicalCardSummary extends StatelessWidget {
                 child: _Tile(
                   icon: MedixIcon.height,
                   label: 'Рост',
-                  value: profile.heightLabel,
+                  value: heightLabel,
                 ),
               ),
               const SizedBox(width: ProfileMetrics.tileGap),
@@ -61,7 +69,7 @@ class MedicalCardSummary extends StatelessWidget {
                 child: _Tile(
                   icon: MedixIcon.weight,
                   label: 'Вес',
-                  value: profile.weightLabel,
+                  value: weightLabel,
                 ),
               ),
               const SizedBox(width: ProfileMetrics.tileGap),
@@ -69,16 +77,13 @@ class MedicalCardSummary extends StatelessWidget {
                 child: _Tile(
                   icon: MedixIcon.age,
                   label: 'Возраст',
-                  value: profile.ageLabel(now),
+                  value: ageLabel,
                 ),
               ),
             ],
           ),
           const SizedBox(height: ProfileMetrics.tilesToField),
-          _Field(
-            text: profile.registrationAddress,
-            placeholder: 'Место прописки',
-          ),
+          _Field(text: registrationAddress, placeholder: 'Место прописки'),
         ],
       ),
     );

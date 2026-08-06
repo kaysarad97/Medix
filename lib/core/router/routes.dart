@@ -63,6 +63,11 @@ abstract final class Routes {
   /// История консультаций: «Предыдущие процедуры».
   static const String procedures = '/profile/procedures';
 
+  /// Карточка члена семьи — «Моя Семья».
+  static const String familyMember = '/profile/family/:id';
+
+  static String familyMemberOf(String id) => '/profile/family/$id';
+
   /// Настройки приложения.
   static const String settings = '/profile/settings';
 
