@@ -1,0 +1,418 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../core/router/routes.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_radius.dart';
+import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/app_scaffold.dart';
+import '../../../../core/widgets/icon_chip.dart';
+import '../../../../core/widgets/screen_top_bar.dart';
+import '../../../../shared/models/subscription_tier.dart';
+import '../../../profile/presentation/providers/profile_providers.dart';
+import '../../domain/entities/doctor.dart';
+import '../providers/telemedicine_providers.dart';
+import '../widgets/city_chip.dart';
+
+enum _SortBy { rating, experience, price }
+
+/// Результаты поиска врача по специальности/запросу.
+///
+/// Свёрстан по `design/Поиск врача результаты - Gold.png`. Фильтр «Близко к
+/// Вам» переключается визуально, но не сортирует — координат пользователя и
+/// клиник в моках нет. Скидка и подпись «для пользователей Gold» показаны,
+/// только когда `profile.subscription == SubscriptionTier.gold` — на макете
+/// эта подпись не как раскраска цены, а обещание тарифа, поэтому без
+/// подписки та же цена показана без зачёркнутой «до скидки».
+class DoctorSearchResultsScreen extends ConsumerStatefulWidget {
+  const DoctorSearchResultsScreen({super.key, required this.query});
+
+  final String query;
+
+  @override
+  ConsumerState<DoctorSearchResultsScreen> createState() =>
+      _DoctorSearchResultsScreenState();
+}
+
+class _DoctorSearchResultsScreenState
+    extends ConsumerState<DoctorSearchResultsScreen> {
+  late final TextEditingController _controller;
+  late String _query;
+  _SortBy _sortBy = _SortBy.rating;
+
+  @override
+  void initState() {
+    super.initState();
+    _query = widget.query;
+    _controller = TextEditingController(text: widget.query);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  List<Doctor> _sorted(List<Doctor> doctors) {
+    final sorted = [...doctors];
+    switch (_sortBy) {
+      case _SortBy.rating:
+        sorted.sort((a, b) => b.rating.compareTo(a.rating));
+      case _SortBy.experience:
+        sorted.sort((a, b) => b.experienceYears.compareTo(a.experienceYears));
+      case _SortBy.price:
+        sorted.sort((a, b) => (a.price ?? 0).compareTo(b.price ?? 0));
+    }
+    return sorted;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final results =
+        ref.watch(doctorSearchResultsProvider(_query)).value ?? const [];
+    final sorted = _sorted(results);
+    final isGold =
+        ref.watch(profileProvider).value?.subscription == SubscriptionTier.gold;
+
+    return AppScaffold(
+      background: AppBackgroundStyle.main,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: 16),
+              ScreenTopBar(
+                title: 'Поиск врача',
+                onBack: () => context.pop(),
+                trailing: const CityChip(city: 'Алматы'),
+              ),
+              const SizedBox(height: 17),
+              _SearchField(
+                controller: _controller,
+                onSubmit: (query) => setState(() => _query = query),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Было найдено ${results.length} врачей по Вашему запросу',
+                style: AppTypography.cardItemMeta,
+              ),
+              const SizedBox(height: 12),
+              _FilterChips(
+                selected: _sortBy,
+                onSelect: (value) => setState(() => _sortBy = value),
+              ),
+              const SizedBox(height: 12),
+              Expanded(
+                child: ListView.separated(
+                  itemCount: sorted.length,
+                  separatorBuilder: (_, _) => const SizedBox(height: 12),
+                  itemBuilder: (context, index) {
+                    final doctor = sorted[index];
+                    return _ResultCard(
+                      doctor: doctor,
+                      isTopMatch: index == 0 && _sortBy == _SortBy.rating,
+                      isGold: isGold,
+                      onTap: () => context.push(Routes.doctorOf(doctor.id)),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SearchField extends StatelessWidget {
+  const _SearchField({required this.controller, required this.onSubmit});
+
+  final TextEditingController controller;
+  final ValueChanged<String> onSubmit;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 54,
+      child: DecoratedBox(
+        decoration: const BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: AppRadius.allPill,
+        ),
+        child: Row(
+          children: [
+            const SizedBox(width: 22),
+            const AppIcon(icon: MedixIcon.search, size: 20),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Center(
+                child: TextField(
+                  controller: controller,
+                  onSubmitted: onSubmit,
+                  style: AppTypography.bodyLg.copyWith(
+                    color: AppColors.textPrimary,
+                  ),
+                  cursorColor: AppColors.accent,
+                  decoration: const InputDecoration(
+                    isCollapsed: true,
+                    border: InputBorder.none,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 22),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _FilterChips extends StatelessWidget {
+  const _FilterChips({required this.selected, required this.onSelect});
+
+  final _SortBy selected;
+  final ValueChanged<_SortBy> onSelect;
+
+  static const _labels = {
+    _SortBy.rating: 'Рейтинг',
+    _SortBy.experience: 'Стаж',
+    _SortBy.price: 'Доступная цена',
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 36,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: _labels.length + 1,
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
+        itemBuilder: (context, index) {
+          if (index == _labels.length) {
+            // «Близко к Вам» — визуальный чип без сортировки, геоданных нет.
+            return const _Chip(label: 'Близко к Вам', active: false);
+          }
+          final entry = _labels.entries.elementAt(index);
+          return _Chip(
+            label: entry.value,
+            active: entry.key == selected,
+            onTap: () => onSelect(entry.key),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _Chip extends StatelessWidget {
+  const _Chip({required this.label, required this.active, this.onTap});
+
+  final String label;
+  final bool active;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: active ? AppColors.primaryBright : AppColors.surfaceWhite,
+      borderRadius: AppRadius.allPill,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          child: Center(
+            child: Text(
+              label,
+              style: AppTypography.chipLabel.copyWith(
+                color: active ? AppColors.textOnPrimary : AppColors.textPrimary,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ResultCard extends StatelessWidget {
+  const _ResultCard({
+    required this.doctor,
+    required this.isTopMatch,
+    required this.isGold,
+    required this.onTap,
+  });
+
+  final Doctor doctor;
+  final bool isTopMatch;
+  final bool isGold;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: isTopMatch ? AppColors.accentSofter : AppColors.surfaceWhite,
+      borderRadius: AppRadius.allMd,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(13),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const _Photo(),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      doctor.clinic,
+                      style: AppTypography.doctorClinic,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      doctor.fullName,
+                      style: AppTypography.cardItemTitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      doctor.specialty,
+                      style: AppTypography.doctorClinic,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        const AppIcon(
+                          icon: MedixIcon.star,
+                          size: 14,
+                          color: AppColors.primaryBright,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          doctor.ratingLabel,
+                          style: AppTypography.chipLabel,
+                        ),
+                        const SizedBox(width: 6),
+                        Flexible(
+                          child: Text(
+                            '${doctor.reviewsCount} отзывов',
+                            style: AppTypography.cardItemMeta,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      doctor.experienceLabel,
+                      style: AppTypography.cardItemMeta,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              SizedBox(
+                width: 96,
+                child: _Price(
+                  doctor: doctor,
+                  isTopMatch: isTopMatch,
+                  isGold: isGold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _Photo extends StatelessWidget {
+  const _Photo();
+
+  static const double _size = 56;
+
+  @override
+  Widget build(BuildContext context) {
+    // accentSoft, а не accentSofter: на подсвеченной топ-карточке фон уже
+    // accentSofter — тем же цветом кружок сливался бы с ним.
+    return const SizedBox(
+      width: _size,
+      height: _size,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppColors.accentSoft,
+          shape: BoxShape.circle,
+        ),
+      ),
+    );
+  }
+}
+
+class _Price extends StatelessWidget {
+  const _Price({
+    required this.doctor,
+    required this.isTopMatch,
+    required this.isGold,
+  });
+
+  final Doctor doctor;
+  final bool isTopMatch;
+  final bool isGold;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        if (isTopMatch)
+          Text(
+            'Топ рейтинга',
+            style: AppTypography.cardItemMeta,
+            textAlign: TextAlign.right,
+          ),
+        if (isGold && doctor.priceBeforeDiscountLabel != null)
+          Text(
+            '${doctor.priceBeforeDiscountLabel} ₸',
+            style: AppTypography.cardItemMeta.copyWith(
+              decoration: TextDecoration.lineThrough,
+              color: AppColors.textDisabled,
+            ),
+            textAlign: TextAlign.right,
+          ),
+        Text(
+          '${isGold ? doctor.priceLabel : doctor.priceBeforeDiscountLabel} ₸',
+          style: AppTypography.cardItemTitle,
+          textAlign: TextAlign.right,
+        ),
+        Text(
+          'за консультацию',
+          style: AppTypography.cardItemMeta,
+          textAlign: TextAlign.right,
+        ),
+        if (isGold)
+          Text(
+            'для пользователей Gold',
+            style: AppTypography.goldLabel.copyWith(fontSize: 11),
+            textAlign: TextAlign.right,
+          ),
+      ],
+    );
+  }
+}

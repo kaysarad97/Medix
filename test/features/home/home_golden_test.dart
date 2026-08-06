@@ -7,7 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/l10n/app_localizations.dart';
 import 'package:medix/shared/models/appointment.dart';
-import 'package:medix/features/home/domain/entities/doctor_specialty.dart';
+import 'package:medix/shared/models/doctor_specialty.dart';
 import 'package:medix/features/home/presentation/providers/home_providers.dart';
 import 'package:medix/features/home/presentation/screens/home_screen.dart';
 

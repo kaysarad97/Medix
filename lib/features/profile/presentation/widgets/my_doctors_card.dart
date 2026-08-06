@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_card.dart';
-import '../../domain/entities/medical_card.dart';
+import '../../../../shared/models/my_doctor.dart';
 import 'profile_metrics.dart';
 
 /// «Мои Врачи» — заголовок со ссылкой «Все» и горизонтальная карусель тех,

@@ -9,6 +9,9 @@ class Doctor {
     required this.experienceYears,
     this.city,
     this.photoUrl,
+    this.reviewsCount = 0,
+    this.price,
+    this.priceBeforeDiscount,
   });
 
   final String id;
@@ -28,6 +31,18 @@ class Doctor {
 
   /// Фотография-вырезка на подложке шапки. Приходит с бэкенда; пока пусто.
   final String? photoUrl;
+
+  /// «100 отзывов» в результатах поиска. На экране профиля не показывается.
+  final int reviewsCount;
+
+  /// Цена консультации в тенге. `null` — цены нет (например, на экране
+  /// профиля врача, вне поиска). Мок для теста вёрстки; настоящая цена и
+  /// правило скидки для Gold — с бэкенда.
+  final int? price;
+
+  /// Цена до скидки — зачёркнута рядом с [price] на макете
+  /// `design/Поиск врача результаты - Gold.png`. `null` — скидки нет.
+  final int? priceBeforeDiscount;
 
   /// Текст чипа рейтинга: «4.5».
   String get ratingLabel => rating.toStringAsFixed(1);
@@ -50,5 +65,24 @@ class Doctor {
       word = 'лет';
     }
     return 'Стаж $experienceYears $word';
+  }
+
+  /// «10 000 ₸» — разряды разделены пробелом, как на
+  /// `design/Поиск врача результаты - Gold.png` (там разделитель — точка,
+  /// но пробел — общий разделитель разрядов в остальном приложении).
+  String? get priceLabel => _withThousands(price);
+
+  /// Зачёркнутая цена до скидки, тем же форматом.
+  String? get priceBeforeDiscountLabel => _withThousands(priceBeforeDiscount);
+
+  static String? _withThousands(int? value) {
+    if (value == null) return null;
+    final digits = value.toString();
+    final groups = <String>[];
+    for (var end = digits.length; end > 0; end -= 3) {
+      final start = end - 3 < 0 ? 0 : end - 3;
+      groups.insert(0, digits.substring(start, end));
+    }
+    return groups.join(' ');
   }
 }

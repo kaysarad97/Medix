@@ -5,7 +5,7 @@ import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../domain/entities/doctor_specialty.dart';
+import '../../../../shared/models/doctor_specialty.dart';
 import 'home_metrics.dart';
 
 /// «Врачи» — заголовок со ссылкой «Все» и горизонтальная карусель

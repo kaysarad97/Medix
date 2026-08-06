@@ -1,3 +1,4 @@
+import '../../../../shared/models/my_doctor.dart';
 import '../../domain/entities/analysis_result.dart';
 import '../../domain/entities/medical_card.dart';
 import '../../../../shared/models/medix_avatars.dart';

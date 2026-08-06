@@ -1,5 +1,5 @@
 import '../../../../shared/models/appointment.dart';
-import '../../domain/entities/doctor_specialty.dart';
+import '../../../../shared/models/doctor_specialty.dart';
 
 abstract interface class HomeRepository {
   Future<List<DoctorSpecialty>> specialties();

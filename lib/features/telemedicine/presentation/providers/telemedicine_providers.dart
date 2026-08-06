@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../shared/models/appointment.dart';
+import '../../../../shared/models/doctor_specialty.dart';
+import '../../../../shared/models/my_doctor.dart';
 import '../../data/repositories/doctors_repository.dart';
 import '../../domain/entities/doctor.dart';
 import '../../domain/entities/doctor_review.dart';
@@ -14,6 +16,21 @@ final doctorsRepositoryProvider = Provider<DoctorsRepository>(
 
 final doctorProvider = FutureProvider.family<Doctor, String>(
   (ref, id) => ref.watch(doctorsRepositoryProvider).doctor(id),
+);
+
+/// Специальности для грида «Все Врачи» на экране поиска.
+final doctorSpecialtiesProvider = FutureProvider<List<DoctorSpecialty>>(
+  (ref) => ref.watch(doctorsRepositoryProvider).specialties(),
+);
+
+/// «Мои Врачи» на том же экране.
+final myDoctorsProvider = FutureProvider<List<MyDoctor>>(
+  (ref) => ref.watch(doctorsRepositoryProvider).myDoctors(),
+);
+
+/// Результаты поиска по специальности/запросу.
+final doctorSearchResultsProvider = FutureProvider.family<List<Doctor>, String>(
+  (ref, query) => ref.watch(doctorsRepositoryProvider).search(query),
 );
 
 final doctorScheduleProvider = FutureProvider.family<DoctorSchedule, String>(

@@ -75,11 +75,10 @@ class HomeScreen extends ConsumerWidget {
               _Section(
                 child: DoctorsCard(
                   specialties: specialties.value ?? const [],
-                  // TODO(telemedicine): вести на список врачей выбранной
-                  // специальности, когда он появится. Пока открываем профиль
-                  // врача из заглушки — иначе экран недостижим.
-                  onSpecialtyTap: (specialty) =>
-                      context.push(Routes.doctorOf('d1')),
+                  onSeeAll: () => context.push(Routes.doctorSearch),
+                  onSpecialtyTap: (specialty) => context.push(
+                    Routes.doctorSearchResultsOf(specialty.title),
+                  ),
                 ),
               ),
               const SizedBox(height: HomeMetrics.cardGap),

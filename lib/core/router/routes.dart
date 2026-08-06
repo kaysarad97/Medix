@@ -36,6 +36,15 @@ abstract final class Routes {
   /// Профиль врача с записью на приём.
   static const String doctor = '/doctor/:id';
 
+  /// Поиск врача: «Мои Врачи» и грид специальностей.
+  static const String doctorSearch = '/doctor-search';
+
+  /// Результаты поиска. Параметр `q` — специальность или свободный запрос.
+  static const String doctorSearchResults = '/doctor-search/results';
+
+  static String doctorSearchResultsOf(String query) =>
+      '$doctorSearchResults?q=${Uri.encodeQueryComponent(query)}';
+
   /// Оформленная запись к врачу.
   static const String appointment = '/appointment/:id';
 

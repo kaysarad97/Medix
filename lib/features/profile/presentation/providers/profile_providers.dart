@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../shared/models/app_language.dart';
+import '../../../../shared/models/my_doctor.dart';
 import '../../data/repositories/profile_repository.dart';
 import '../../domain/entities/analysis_result.dart';
 import '../../domain/entities/medical_card.dart';
