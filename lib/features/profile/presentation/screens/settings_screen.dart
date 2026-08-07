@@ -9,6 +9,7 @@ import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../core/widgets/user_avatar.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/app_language.dart';
 import '../providers/profile_providers.dart';
 import '../widgets/profile_metrics.dart';
@@ -31,6 +32,7 @@ class SettingsScreen extends ConsumerWidget {
     final settings = ref.watch(appSettingsProvider);
     final notifier = ref.read(appSettingsProvider.notifier);
     final profile = ref.watch(profileProvider).value;
+    final l10n = AppLocalizations.of(context)!;
 
     return AppScaffold(
       background: AppBackgroundStyle.main,
@@ -42,7 +44,7 @@ class SettingsScreen extends ConsumerWidget {
             children: [
               const SizedBox(height: 36),
               ScreenTopBar(
-                title: 'Настройки',
+                title: l10n.settingsTitle,
                 titleColor: AppColors.primaryBright,
                 onBack: () => Navigator.of(context).maybePop(),
               ),
@@ -56,7 +58,7 @@ class SettingsScreen extends ConsumerWidget {
                     size: const Size.square(ProfileMetrics.settingsAvatarSize),
                     borderRadius: AppRadius.allSm,
                   ),
-                  title: 'Настройки профиля',
+                  title: l10n.profileSettingsTitle,
                 ),
               ),
               const SizedBox(height: ProfileMetrics.settingsGap),
@@ -74,7 +76,7 @@ class SettingsScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Язык приложения',
+                        l10n.appLanguageLabel,
                         style: AppTypography.cardItemMeta,
                       ),
                       const SizedBox(height: 10),
@@ -90,14 +92,14 @@ class SettingsScreen extends ConsumerWidget {
               _Section(
                 child: _RowCard(
                   onTap: onOpenPaymentDetails,
-                  title: 'Банковские данные',
+                  title: l10n.bankDetailsTitle,
                 ),
               ),
               const SizedBox(height: ProfileMetrics.settingsGap),
               _Section(
                 child: _RowCard(
                   onTap: onOpenContacts,
-                  title: 'Свяжитесь с нами',
+                  title: l10n.contactUsTitle,
                 ),
               ),
               const SizedBox(height: ProfileMetrics.settingsGap),
@@ -166,7 +168,12 @@ class _NotificationsRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 7),
       child: Row(
         children: [
-          Expanded(child: Text('Уведомления', style: AppTypography.tileTitle)),
+          Expanded(
+            child: Text(
+              AppLocalizations.of(context)!.notificationsLabel,
+              style: AppTypography.tileTitle,
+            ),
+          ),
           Switch(
             value: enabled,
             onChanged: onChanged,

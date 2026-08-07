@@ -12,6 +12,7 @@ import 'package:medix/features/profile/presentation/screens/medical_card_form_sc
 import 'package:medix/features/profile/presentation/screens/medical_card_screen.dart';
 import 'package:medix/features/profile/presentation/screens/profile_settings_screen.dart';
 import 'package:medix/features/profile/presentation/screens/settings_screen.dart';
+import 'package:medix/l10n/app_localizations.dart';
 
 import '../../helpers/fake_family_repository.dart';
 import '../../helpers/fake_profile_repository.dart';
@@ -48,7 +49,13 @@ void main() {
             const FakeFamilyRepository(),
           ),
         ],
-        child: MaterialApp(theme: AppTheme.light, home: screen),
+        child: MaterialApp(
+          theme: AppTheme.light,
+          locale: const Locale('ru'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: screen,
+        ),
       ),
     );
 

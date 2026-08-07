@@ -5,6 +5,7 @@ import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/icon_chip.dart';
+import '../../../../l10n/app_localizations.dart';
 import 'profile_metrics.dart';
 import 'section_header.dart';
 
@@ -40,6 +41,7 @@ class MedicalCardSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AppCard(
       borderRadius: ProfileMetrics.allRadius,
       padding: const EdgeInsets.all(ProfileMetrics.cardPadding),
@@ -49,7 +51,7 @@ class MedicalCardSummary extends StatelessWidget {
         children: [
           SectionHeader(
             icon: MedixIcon.medicalCard,
-            title: 'Мед-карта',
+            title: l10n.medicalCardSectionTitle,
             onTap: onOpen,
           ),
           const SizedBox(height: ProfileMetrics.headerToField),
@@ -60,7 +62,7 @@ class MedicalCardSummary extends StatelessWidget {
               Expanded(
                 child: _Tile(
                   icon: MedixIcon.height,
-                  label: 'Рост',
+                  label: l10n.heightFieldLabel,
                   value: heightLabel,
                 ),
               ),
@@ -68,7 +70,7 @@ class MedicalCardSummary extends StatelessWidget {
               Expanded(
                 child: _Tile(
                   icon: MedixIcon.weight,
-                  label: 'Вес',
+                  label: l10n.weightFieldLabel,
                   value: weightLabel,
                 ),
               ),
@@ -76,14 +78,17 @@ class MedicalCardSummary extends StatelessWidget {
               Expanded(
                 child: _Tile(
                   icon: MedixIcon.age,
-                  label: 'Возраст',
+                  label: l10n.ageFieldLabel,
                   value: ageLabel,
                 ),
               ),
             ],
           ),
           const SizedBox(height: ProfileMetrics.tilesToField),
-          _Field(text: registrationAddress, placeholder: 'Место прописки'),
+          _Field(
+            text: registrationAddress,
+            placeholder: l10n.registrationAddressPlaceholder,
+          ),
         ],
       ),
     );

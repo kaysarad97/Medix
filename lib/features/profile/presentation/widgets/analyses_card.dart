@@ -5,6 +5,7 @@ import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/icon_chip.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/analysis_result.dart';
 import 'profile_metrics.dart';
 import 'section_header.dart';
@@ -15,7 +16,7 @@ class AnalysesCard extends StatelessWidget {
     super.key,
     required this.analyses,
     required this.filter,
-    this.title = 'Ваши анализы',
+    required this.title,
     this.onFilterChanged,
     this.onOpenAll,
   });
@@ -23,8 +24,11 @@ class AnalysesCard extends StatelessWidget {
   final List<AnalysisResult> analyses;
   final AnalysesFilter filter;
 
-  /// «Анализы ребёнка» / «Анализы Имя Фамилия» на карточке члена семьи —
-  /// см. `design/Моя Семья Ребенок.png` и `design/Моя Семья Старшие.png`.
+  /// «Ваши анализы» у пользователя, «Анализы ребёнка» / «Анализы Имя
+  /// Фамилия» на карточке члена семьи — см. `design/Моя Семья Ребенок.png`
+  /// и `design/Моя Семья Старшие.png`. Локализованное значение всегда
+  /// приходит от вызывающей стороны: у `BuildContext` внутри виджета нет
+  /// доступа к тому, каким текстом его вызвали как значение по умолчанию.
   final String title;
 
   final ValueChanged<AnalysesFilter>? onFilterChanged;
@@ -106,6 +110,12 @@ class _Tab extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
+  static String _labelFor(AnalysesFilter option, AppLocalizations l10n) =>
+      switch (option) {
+        AnalysesFilter.changed => l10n.analysesFilterChanged,
+        AnalysesFilter.all => l10n.analysesFilterAll,
+      };
+
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -118,7 +128,7 @@ class _Tab extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Text(
-              option.label,
+              _labelFor(option, AppLocalizations.of(context)!),
               // Мельче остальных чипов: длинная подпись «Анализы с
               // изменениями» в половину переключателя иначе не помещается.
               style: AppTypography.chipLabel.copyWith(fontSize: 13),

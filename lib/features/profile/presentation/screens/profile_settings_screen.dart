@@ -8,6 +8,7 @@ import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../core/widgets/user_avatar.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../providers/profile_providers.dart';
 import '../widgets/profile_metrics.dart';
 
@@ -51,6 +52,7 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
       _last.text = profile.lastName;
       _email.text = profile.email ?? '';
     }
+    final l10n = AppLocalizations.of(context)!;
 
     return AppScaffold(
       background: AppBackgroundStyle.auth,
@@ -62,7 +64,7 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
             children: [
               const SizedBox(height: 36),
               ScreenTopBar(
-                title: 'Настройки профиля',
+                title: l10n.profileSettingsTitle,
                 onBack: () => Navigator.of(context).maybePop(),
               ),
               const SizedBox(height: 30),
@@ -81,7 +83,7 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
               GestureDetector(
                 onTap: widget.onChangeAvatar,
                 child: Text(
-                  'изменить аватара',
+                  l10n.changeAvatarLink,
                   textAlign: TextAlign.center,
                   style: AppTypography.captionMuted,
                 ),
@@ -97,15 +99,15 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      _Field(controller: _first, hint: 'Имя'),
+                      _Field(controller: _first, hint: l10n.firstNameHint),
                       const SizedBox(height: ProfileMetrics.formFieldGap),
-                      _Field(controller: _last, hint: 'Фамилия'),
+                      _Field(controller: _last, hint: l10n.lastNameHint),
                       const SizedBox(height: ProfileMetrics.formFieldGap),
                       _Field(controller: _email, hint: 'E-mail'),
                       const SizedBox(height: ProfileMetrics.formFieldGap),
                       _Field(
                         controller: _password,
-                        hint: 'Пароль',
+                        hint: l10n.passwordFieldHint,
                         obscure: true,
                       ),
                     ],

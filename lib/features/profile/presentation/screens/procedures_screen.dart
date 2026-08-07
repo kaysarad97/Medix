@@ -9,6 +9,7 @@ import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/medical_procedure.dart';
 import '../providers/profile_providers.dart';
 
@@ -62,6 +63,7 @@ class ProceduresScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final procedures = ref.watch(visibleProceduresProvider);
     final scope = ref.watch(procedureScopeFilterProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return AppScaffold(
       background: AppBackgroundStyle.main,
@@ -73,7 +75,7 @@ class ProceduresScreen extends ConsumerWidget {
             children: [
               const SizedBox(height: 16),
               ScreenTopBar(
-                title: 'Предыдущие процедуры',
+                title: l10n.previousProceduresTitle,
                 onBack: () => context.pop(),
               ),
               const SizedBox(height: 17),
@@ -84,8 +86,7 @@ class ProceduresScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'Было найдено ${procedures.length} процедур в Вашей '
-                'мед-карте',
+                l10n.proceduresResultsCount(procedures.length),
                 style: AppTypography.cardItemMeta,
               ),
               const SizedBox(height: 12),
@@ -122,7 +123,7 @@ class ProceduresScreen extends ConsumerWidget {
       ..showSnackBar(
         SnackBar(
           content: Text(
-            'Экран с результатами процедуры ещё не готов',
+            AppLocalizations.of(context)!.procedureResultsNotReadySnackbar,
             style: AppTypography.bodyMd.copyWith(
               color: AppColors.textOnPrimary,
             ),
@@ -164,7 +165,9 @@ class _SearchField extends StatelessWidget {
                   decoration: InputDecoration(
                     isCollapsed: true,
                     border: InputBorder.none,
-                    hintText: 'Название процедуры',
+                    hintText: AppLocalizations.of(
+                      context,
+                    )!.proceduresSearchHint,
                     hintStyle: AppTypography.placeholder,
                   ),
                 ),
@@ -184,8 +187,16 @@ class _ScopeTabs extends StatelessWidget {
   final FamilyScope selected;
   final ValueChanged<FamilyScope> onSelect;
 
+  static String _labelFor(FamilyScope scope, AppLocalizations l10n) =>
+      switch (scope) {
+        FamilyScope.self => l10n.familyScopeSelf,
+        FamilyScope.child => l10n.familyScopeChild,
+        FamilyScope.senior => l10n.familyScopeSenior,
+      };
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
@@ -193,7 +204,7 @@ class _ScopeTabs extends StatelessWidget {
           for (final scope in FamilyScope.values) ...[
             if (scope != FamilyScope.values.first) const SizedBox(width: 8),
             _TabButton(
-              label: scope.label,
+              label: _labelFor(scope, l10n),
               active: scope == selected,
               onTap: () => onSelect(scope),
             ),
@@ -281,7 +292,10 @@ class _ProcedureRow extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Консультация с', style: AppTypography.linkSmall),
+                      Text(
+                        AppLocalizations.of(context)!.consultationWithLabel,
+                        style: AppTypography.linkSmall,
+                      ),
                       Text(
                         procedure.doctorName,
                         style: AppTypography.titleMd,
@@ -329,7 +343,7 @@ class _ProcedureRow extends StatelessWidget {
                     SizedBox(
                       width: 74,
                       child: Text(
-                        'посмотреть результаты',
+                        AppLocalizations.of(context)!.viewResultsLinkLabel,
                         textAlign: TextAlign.right,
                         style: AppTypography.linkSmall,
                         maxLines: 2,
@@ -352,7 +366,10 @@ class _EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Text('Ничего не нашлось', style: AppTypography.cardItemMeta),
+      child: Text(
+        AppLocalizations.of(context)!.emptyResultsLabel,
+        style: AppTypography.cardItemMeta,
+      ),
     );
   }
 }

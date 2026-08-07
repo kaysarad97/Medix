@@ -70,16 +70,6 @@ class FamilyMember {
 
   String get weightLabel => weightKg == null ? '—' : '$weightKg кг';
 
-  /// Заголовок карточки «Врачи…» — по макету разный для ребёнка и старших.
-  String get doctorsCardTitle => switch (relation) {
-    FamilyRelation.child => 'Врачи моего ребёнка',
-    FamilyRelation.senior => 'Врачи для старших',
-  };
-
-  /// Заголовок карточки анализов. У ребёнка — родовое «ребёнка», у старших
-  /// — имя: так расходятся оба макета, а не по недосмотру.
-  String get analysesCardTitle => switch (relation) {
-    FamilyRelation.child => 'Анализы ребёнка',
-    FamilyRelation.senior => 'Анализы $fullName',
-  };
+  // Заголовки карточек «Врачи…»/«Анализы…» — в виджете, не здесь: у entity
+  // нет доступа к BuildContext, нужного `AppLocalizations.of(context)`.
 }

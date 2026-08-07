@@ -5,6 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/user_avatar.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/user_profile.dart';
 import 'profile_metrics.dart';
 
@@ -47,6 +48,7 @@ class _Info extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -66,12 +68,15 @@ class _Info extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: _MetaColumn(value: profile.gender.label, label: 'пол'),
+              child: _MetaColumn(
+                value: profile.gender.label,
+                label: l10n.genderLabel,
+              ),
             ),
             Expanded(
               child: _MetaColumn(
                 value: profile.birthDateLabel,
-                label: 'дата рождения',
+                label: l10n.birthDateLabel,
               ),
             ),
           ],

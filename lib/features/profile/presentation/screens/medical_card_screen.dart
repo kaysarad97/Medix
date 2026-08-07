@@ -10,6 +10,7 @@ import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../core/widgets/user_avatar.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/family_member.dart';
 import '../../../family_access/presentation/providers/family_providers.dart';
 import '../providers/profile_providers.dart';
@@ -37,6 +38,7 @@ class MedicalCardScreen extends ConsumerWidget {
     final analyses = ref.watch(analysesProvider).value ?? const [];
     final filter = ref.watch(analysesFilterProvider);
     final family = ref.watch(familyMembersProvider).value ?? const [];
+    final l10n = AppLocalizations.of(context)!;
 
     return AppScaffold(
       background: AppBackgroundStyle.main,
@@ -50,7 +52,7 @@ class MedicalCardScreen extends ConsumerWidget {
                   children: [
                     const SizedBox(height: 36),
                     ScreenTopBar(
-                      title: 'Ваша Мед-Карта',
+                      title: l10n.yourMedicalCardTitle,
                       onBack: () => Navigator.of(context).maybePop(),
                       trailing: GestureDetector(
                         onTap: () => context.push(Routes.settings),
@@ -71,7 +73,7 @@ class MedicalCardScreen extends ConsumerWidget {
                     _Section(
                       child: MedicalCardSummary(
                         topFieldValue: profile.iin,
-                        topFieldPlaceholder: 'ИИН',
+                        topFieldPlaceholder: l10n.iinHint,
                         heightLabel: profile.heightLabel,
                         weightLabel: profile.weightLabel,
                         ageLabel: profile.ageLabel(now ?? DateTime.now()),
@@ -80,15 +82,25 @@ class MedicalCardScreen extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: ProfileMetrics.cardGap),
-                    _Section(child: MyDoctorsCard(doctors: doctors)),
+                    _Section(
+                      child: MyDoctorsCard(
+                        doctors: doctors,
+                        title: l10n.myDoctorsTitle,
+                      ),
+                    ),
                     const SizedBox(height: ProfileMetrics.cardGap),
-                    const _Section(child: _ProceduresCard()),
+                    _Section(
+                      child: _ProceduresCard(
+                        title: l10n.previousProceduresTitle,
+                      ),
+                    ),
                     const SizedBox(height: ProfileMetrics.cardGap),
                     if (analyses.isNotEmpty)
                       _Section(
                         child: AnalysesCard(
                           analyses: analyses,
                           filter: filter,
+                          title: l10n.yourAnalysesTitle,
                           onFilterChanged: ref
                               .read(analysesFilterProvider.notifier)
                               .select,
@@ -105,7 +117,9 @@ class MedicalCardScreen extends ConsumerWidget {
 
 /// «Предыдущие процедуры» — карточка из одной строки-ссылки.
 class _ProceduresCard extends StatelessWidget {
-  const _ProceduresCard();
+  const _ProceduresCard({required this.title});
+
+  final String title;
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +131,7 @@ class _ProceduresCard extends StatelessWidget {
       ),
       child: SectionHeader(
         icon: MedixIcon.procedures,
-        title: 'Предыдущие процедуры',
+        title: title,
         onTap: () => context.push(Routes.procedures),
       ),
     );
@@ -140,7 +154,10 @@ class _FamilySwitcher extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Моя семья', style: AppTypography.sectionTitle),
+        Text(
+          AppLocalizations.of(context)!.myFamilyTitle,
+          style: AppTypography.sectionTitle,
+        ),
         const SizedBox(height: 12),
         SizedBox(
           height: _chipSize + 28,

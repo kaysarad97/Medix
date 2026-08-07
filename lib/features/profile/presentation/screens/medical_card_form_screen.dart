@@ -10,6 +10,7 @@ import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/medical_card.dart';
 import '../providers/profile_providers.dart';
 import '../widgets/medical_card_metrics.dart';
@@ -87,11 +88,12 @@ class _MedicalCardFormScreenState extends ConsumerState<MedicalCardFormScreen> {
   /// Форма собирается методом, а не отдельным виджетом: она правит
   /// состояние экрана, а вызывать setState снаружи класса нельзя.
   Widget _buildForm() {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        const _Label('Группа крови:'),
+        _Label(l10n.bloodGroupLabel),
         const SizedBox(height: MedicalCardMetrics.labelToControl),
         _BloodGroupRow(
           selected: _bloodGroup,
@@ -99,7 +101,7 @@ class _MedicalCardFormScreenState extends ConsumerState<MedicalCardFormScreen> {
         ),
         const SizedBox(height: MedicalCardMetrics.controlToLabel),
 
-        const _Label('Резус-фактор:'),
+        _Label(l10n.rhesusFactorLabel),
         const SizedBox(height: MedicalCardMetrics.labelToControl),
         _ChoiceRow(
           options: [
@@ -115,15 +117,16 @@ class _MedicalCardFormScreenState extends ConsumerState<MedicalCardFormScreen> {
         ),
         const SizedBox(height: MedicalCardMetrics.controlToLabel),
 
-        const _Label('Хронические заболевания'),
+        _Label(l10n.chronicDiseasesLabel),
         const SizedBox(height: MedicalCardMetrics.labelToControl),
         _YesNoRow(
           value: _hasChronic,
+          l10n: l10n,
           onChanged: (value) => setState(() => _hasChronic = value),
         ),
         const SizedBox(height: 18),
         Text(
-          'Если ответили “Да”, укажите их',
+          l10n.chronicDiseasesDetailPrompt,
           style: AppTypography.tileSubtitle.copyWith(
             color: AppColors.primaryBright,
           ),
@@ -134,12 +137,12 @@ class _MedicalCardFormScreenState extends ConsumerState<MedicalCardFormScreen> {
 
         Row(
           children: [
-            const SizedBox(
+            SizedBox(
               width: MedicalCardMetrics.yesNoWidth,
-              child: _Label('Рост'),
+              child: _Label(l10n.heightFieldLabel),
             ),
             const SizedBox(width: MedicalCardMetrics.yesNoGap),
-            const _Label('Вес'),
+            _Label(l10n.weightFieldLabel),
           ],
         ),
         const SizedBox(height: MedicalCardMetrics.labelToControl),
@@ -152,20 +155,21 @@ class _MedicalCardFormScreenState extends ConsumerState<MedicalCardFormScreen> {
         ),
         const SizedBox(height: MedicalCardMetrics.controlToLabel),
 
-        const _Label('Аллергии (пищевые, лекарственные, прочие)'),
+        _Label(l10n.allergiesLabel),
         const SizedBox(height: MedicalCardMetrics.labelToControl),
         _TextField(controller: _allergies),
         const SizedBox(height: MedicalCardMetrics.controlToLabel),
 
-        const _Label('Перенесенные операции'),
+        _Label(l10n.surgeriesLabel),
         const SizedBox(height: MedicalCardMetrics.labelToControl),
         _TextField(controller: _surgeries),
         const SizedBox(height: MedicalCardMetrics.controlToLabel),
 
-        const _Label('Вредные привычки (курение, алкоголь)'),
+        _Label(l10n.badHabitsLabel),
         const SizedBox(height: MedicalCardMetrics.labelToControl),
         _YesNoRow(
           value: _hasBadHabits,
+          l10n: l10n,
           onChanged: (value) => setState(() => _hasBadHabits = value),
         ),
       ],
@@ -176,6 +180,7 @@ class _MedicalCardFormScreenState extends ConsumerState<MedicalCardFormScreen> {
   Widget build(BuildContext context) {
     final card = ref.watch(medicalCardProvider).value;
     if (card != null && !_prefilled) _prefill(card);
+    final l10n = AppLocalizations.of(context)!;
 
     return AppScaffold(
       background: AppBackgroundStyle.main,
@@ -187,7 +192,7 @@ class _MedicalCardFormScreenState extends ConsumerState<MedicalCardFormScreen> {
             children: [
               const SizedBox(height: 36),
               ScreenTopBar(
-                title: 'Ваша Мед-Карта',
+                title: l10n.yourMedicalCardTitle,
                 onBack: () => Navigator.of(context).maybePop(),
                 trailing: const AppIcon(
                   icon: MedixIcon.settings,
@@ -212,7 +217,7 @@ class _MedicalCardFormScreenState extends ConsumerState<MedicalCardFormScreen> {
                   horizontal: ProfileMetrics.screenH,
                 ),
                 child: PrimaryButton(
-                  label: 'Сохранить',
+                  label: l10n.saveButtonLabel,
                   isLoading: _saving,
                   onPressed: _save,
                 ),
@@ -371,10 +376,15 @@ class _ChoiceButton extends StatelessWidget {
 }
 
 class _YesNoRow extends StatelessWidget {
-  const _YesNoRow({required this.value, required this.onChanged});
+  const _YesNoRow({
+    required this.value,
+    required this.l10n,
+    required this.onChanged,
+  });
 
   /// `null` — пользователь ещё не отвечал; тогда обе кнопки белые.
   final bool? value;
+  final AppLocalizations l10n;
   final ValueChanged<bool> onChanged;
 
   @override
@@ -382,8 +392,16 @@ class _YesNoRow extends StatelessWidget {
     return _ChoiceRow(
       height: MedicalCardMetrics.yesNoHeight,
       options: [
-        (label: 'Да', selected: value == true, onTap: () => onChanged(true)),
-        (label: 'Нет', selected: value == false, onTap: () => onChanged(false)),
+        (
+          label: l10n.yesLabel,
+          selected: value == true,
+          onTap: () => onChanged(true),
+        ),
+        (
+          label: l10n.noLabel,
+          selected: value == false,
+          onTap: () => onChanged(false),
+        ),
       ],
     );
   }

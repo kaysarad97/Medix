@@ -6,6 +6,7 @@ import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../widgets/profile_metrics.dart';
 
 /// «Свяжитесь с нами» — свёрстан по `design/Свяжитесь с нами.png`.
@@ -34,7 +35,7 @@ class ContactScreen extends StatelessWidget {
             children: [
               const SizedBox(height: 36),
               ScreenTopBar(
-                title: 'Свяжитесь с нами',
+                title: AppLocalizations.of(context)!.contactUsTitle,
                 onBack: () => Navigator.of(context).maybePop(),
               ),
               const SizedBox(height: 74),
@@ -67,7 +68,7 @@ class _PhonesCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Text(
-              'Номера телефона поддержки',
+              AppLocalizations.of(context)!.supportPhonesTitle,
               style: AppTypography.chipLabel.copyWith(
                 color: AppColors.textOnPrimary,
               ),
@@ -96,6 +97,7 @@ class _MailCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       height: ProfileMetrics.contactMailHeight,
       child: AppCard(
@@ -105,14 +107,14 @@ class _MailCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Электронная почта', style: AppTypography.tileSubtitle),
+            Text(l10n.emailSectionTitle, style: AppTypography.tileSubtitle),
             const SizedBox(height: 14),
             Text(
               ContactScreen.supportEmail,
               style: AppTypography.titleMd.copyWith(color: AppColors.primary),
             ),
             const SizedBox(height: 22),
-            Text('Социальные сети', style: AppTypography.tileSubtitle),
+            Text(l10n.socialNetworksTitle, style: AppTypography.tileSubtitle),
             const SizedBox(height: 10),
             const Row(
               children: [

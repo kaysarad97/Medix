@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_card.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/my_doctor.dart';
 import 'profile_metrics.dart';
 
@@ -15,15 +16,18 @@ class MyDoctorsCard extends StatelessWidget {
   const MyDoctorsCard({
     super.key,
     required this.doctors,
-    this.title = 'Мои Врачи',
+    required this.title,
     this.onSeeAll,
     this.onDoctorTap,
   });
 
   final List<MyDoctor> doctors;
 
-  /// «Врачи моего ребёнка» / «Врачи для старших» на карточке члена семьи —
-  /// см. `design/Моя Семья Ребенок.png`.
+  /// «Мои Врачи» у пользователя, «Врачи моего ребёнка» / «Врачи для
+  /// старших» на карточке члена семьи — см. `design/Моя Семья Ребенок.png`.
+  /// Локализованное значение всегда приходит от вызывающей стороны: у
+  /// `BuildContext` внутри виджета нет доступа к тому, каким текстом его
+  /// вызвали как значение по умолчанию.
   final String title;
 
   final VoidCallback? onSeeAll;
@@ -53,7 +57,10 @@ class MyDoctorsCard extends StatelessWidget {
                 Text(title, style: AppTypography.sectionTitle),
                 GestureDetector(
                   onTap: onSeeAll,
-                  child: Text('Все', style: AppTypography.linkSmall),
+                  child: Text(
+                    AppLocalizations.of(context)!.viewAllLabel,
+                    style: AppTypography.linkSmall,
+                  ),
                 ),
               ],
             ),

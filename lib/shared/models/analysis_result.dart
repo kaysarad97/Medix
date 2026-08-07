@@ -63,12 +63,7 @@ class AnalysisResult {
   }
 }
 
+// Подписи вкладок — в виджете, не здесь: у enum нет доступа к BuildContext,
+// нужного `AppLocalizations.of(context)`.
 /// Вкладки над списком анализов.
-enum AnalysesFilter {
-  changed('Анализы с изменениями'),
-  all('Все результаты');
-
-  const AnalysesFilter(this.label);
-
-  final String label;
-}
+enum AnalysesFilter { changed, all }

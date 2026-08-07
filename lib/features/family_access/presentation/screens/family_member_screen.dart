@@ -17,9 +17,9 @@ import '../providers/family_providers.dart';
 ///
 /// Свёрстан по `design/Моя Семья Ребенок.png` и `design/Моя Семья
 /// Старшие.png`: один экран на оба макета, различие только в подписях
-/// ([FamilyMember.doctorsCardTitle], [FamilyMember.analysesCardTitle]) и
-/// аватаре. Верхняя строка проще, чем на «Ваша Мед-Карта»: без шестерёнки
-/// настроек и без значка Gold — у члена семьи нет ни того, ни другого.
+/// карточек (собираются здесь по `member.relation`, см. ниже) и аватаре.
+/// Верхняя строка проще, чем на «Ваша Мед-Карта»: без шестерёнки настроек
+/// и без значка Gold — у члена семьи нет ни того, ни другого.
 ///
 /// Карточки «Мед-карта», «Врачи…» и «Анализы…» — те же виджеты, что и на
 /// экране пользователя (`MedicalCardSummary`, `MyDoctorsCard`,
@@ -74,7 +74,12 @@ class FamilyMemberScreen extends ConsumerWidget {
                     _Section(
                       child: MyDoctorsCard(
                         doctors: doctors,
-                        title: member.doctorsCardTitle,
+                        title: switch (member.relation) {
+                          FamilyRelation.child =>
+                            l10n.familyDoctorsCardTitleChild,
+                          FamilyRelation.senior =>
+                            l10n.familyDoctorsCardTitleSenior,
+                        },
                       ),
                     ),
                     const SizedBox(height: ProfileMetrics.cardGap),
@@ -83,7 +88,14 @@ class FamilyMemberScreen extends ConsumerWidget {
                         child: AnalysesCard(
                           analyses: analyses,
                           filter: filter,
-                          title: member.analysesCardTitle,
+                          title: switch (member.relation) {
+                            FamilyRelation.child =>
+                              l10n.familyAnalysesCardTitleChild,
+                            FamilyRelation.senior =>
+                              l10n.familyAnalysesCardTitleSenior(
+                                member.fullName,
+                              ),
+                          },
                           onFilterChanged: ref
                               .read(familyAnalysesFilterProvider.notifier)
                               .select,

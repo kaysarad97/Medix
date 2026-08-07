@@ -2,18 +2,9 @@
 /// процедуры». Семейный доступ (`lib/features/family_access/`) ещё не
 /// построен: здесь только фильтр по мок-данным, без реальных профилей детей
 /// и старших.
-enum FamilyScope {
-  self,
-  child,
-  senior;
-
-  /// Подпись вкладки.
-  String get label => switch (this) {
-    FamilyScope.self => 'Мои процедуры',
-    FamilyScope.child => 'Процедуры ребёнка',
-    FamilyScope.senior => 'Процедуры старших',
-  };
-}
+// Подписи вкладок — в виджете, не здесь: у enum нет доступа к BuildContext,
+// нужного `AppLocalizations.of(context)`.
+enum FamilyScope { self, child, senior }
 
 /// Запись о прошлой консультации — карточка на экране «Предыдущие
 /// процедуры» (`design/Предыдущие Процедуры.png`).

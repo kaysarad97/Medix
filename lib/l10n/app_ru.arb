@@ -543,5 +543,199 @@
   "goldPricePillLabel": "Цена с подпиской Gold",
   "@goldPricePillLabel": {
     "description": "Пилюля под ценой со скидкой в блоке предоплаты."
+  },
+  "yourMedicalCardTitle": "Ваша Мед-Карта",
+  "@yourMedicalCardTitle": {
+    "description": "Заголовок экрана мед-карты пользователя и её формы."
+  },
+  "previousProceduresTitle": "Предыдущие процедуры",
+  "@previousProceduresTitle": {
+    "description": "Заголовок карточки-ссылки и экрана истории процедур."
+  },
+  "myFamilyTitle": "Моя семья",
+  "@myFamilyTitle": {
+    "description": "Заголовок переключателя членов семьи на «Ваша Мед-Карта»."
+  },
+  "medicalCardSectionTitle": "Мед-карта",
+  "@medicalCardSectionTitle": {
+    "description": "Заголовок карточки-сводки мед-карты (рост/вес/возраст)."
+  },
+  "heightFieldLabel": "Рост",
+  "@heightFieldLabel": {
+    "description": "Подпись поля/плитки роста."
+  },
+  "weightFieldLabel": "Вес",
+  "@weightFieldLabel": {
+    "description": "Подпись поля/плитки веса."
+  },
+  "ageFieldLabel": "Возраст",
+  "@ageFieldLabel": {
+    "description": "Подпись плитки возраста в сводке мед-карты."
+  },
+  "registrationAddressPlaceholder": "Место прописки",
+  "@registrationAddressPlaceholder": {
+    "description": "Подсказка пустого поля прописки в сводке мед-карты."
+  },
+  "yourAnalysesTitle": "Ваши анализы",
+  "@yourAnalysesTitle": {
+    "description": "Заголовок карточки анализов пользователя по умолчанию."
+  },
+  "familyDoctorsCardTitleChild": "Врачи моего ребёнка",
+  "@familyDoctorsCardTitleChild": {
+    "description": "Заголовок карточки врачей на карточке члена семьи-ребёнка."
+  },
+  "familyDoctorsCardTitleSenior": "Врачи для старших",
+  "@familyDoctorsCardTitleSenior": {
+    "description": "Заголовок карточки врачей на карточке члена семьи-старшего."
+  },
+  "familyAnalysesCardTitleChild": "Анализы ребёнка",
+  "@familyAnalysesCardTitleChild": {
+    "description": "Заголовок карточки анализов на карточке члена семьи-ребёнка."
+  },
+  "familyAnalysesCardTitleSenior": "Анализы {name}",
+  "@familyAnalysesCardTitleSenior": {
+    "description": "Заголовок карточки анализов на карточке члена семьи-старшего.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "analysesFilterChanged": "Анализы с изменениями",
+  "@analysesFilterChanged": {
+    "description": "Вкладка фильтра анализов с отклонением от нормы."
+  },
+  "analysesFilterAll": "Все результаты",
+  "@analysesFilterAll": {
+    "description": "Вкладка фильтра всех результатов анализов."
+  },
+  "familyScopeSelf": "Мои процедуры",
+  "@familyScopeSelf": {
+    "description": "Вкладка «Предыдущих процедур» — процедуры самого пользователя."
+  },
+  "familyScopeChild": "Процедуры ребёнка",
+  "@familyScopeChild": {
+    "description": "Вкладка «Предыдущих процедур» — процедуры ребёнка."
+  },
+  "familyScopeSenior": "Процедуры старших",
+  "@familyScopeSenior": {
+    "description": "Вкладка «Предыдущих процедур» — процедуры старших членов семьи."
+  },
+  "proceduresSearchHint": "Название процедуры",
+  "@proceduresSearchHint": {
+    "description": "Подсказка поля поиска на экране «Предыдущие процедуры»."
+  },
+  "proceduresResultsCount": "Было найдено {count} процедур в Вашей мед-карте",
+  "@proceduresResultsCount": {
+    "description": "Счётчик результатов на экране «Предыдущие процедуры».",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "procedureResultsNotReadySnackbar": "Экран с результатами процедуры ещё не готов",
+  "@procedureResultsNotReadySnackbar": {
+    "description": "Снек-бар при нажатии на процедуру — экрана результатов ещё нет."
+  },
+  "consultationWithLabel": "Консультация с",
+  "@consultationWithLabel": {
+    "description": "Подпись над именем врача в карточке процедуры."
+  },
+  "viewResultsLinkLabel": "посмотреть результаты",
+  "@viewResultsLinkLabel": {
+    "description": "Ссылка в карточке процедуры."
+  },
+  "bloodGroupLabel": "Группа крови:",
+  "@bloodGroupLabel": {
+    "description": "Подпись поля группы крови в форме мед-карты."
+  },
+  "rhesusFactorLabel": "Резус-фактор:",
+  "@rhesusFactorLabel": {
+    "description": "Подпись поля резус-фактора в форме мед-карты."
+  },
+  "chronicDiseasesLabel": "Хронические заболевания",
+  "@chronicDiseasesLabel": {
+    "description": "Подпись поля хронических заболеваний в форме мед-карты."
+  },
+  "chronicDiseasesDetailPrompt": "Если ответили “Да”, укажите их",
+  "@chronicDiseasesDetailPrompt": {
+    "description": "Подсказка над полем расшифровки хронических заболеваний."
+  },
+  "allergiesLabel": "Аллергии (пищевые, лекарственные, прочие)",
+  "@allergiesLabel": {
+    "description": "Подпись поля аллергий в форме мед-карты."
+  },
+  "surgeriesLabel": "Перенесенные операции",
+  "@surgeriesLabel": {
+    "description": "Подпись поля операций в форме мед-карты."
+  },
+  "badHabitsLabel": "Вредные привычки (курение, алкоголь)",
+  "@badHabitsLabel": {
+    "description": "Подпись поля вредных привычек в форме мед-карты."
+  },
+  "saveButtonLabel": "Сохранить",
+  "@saveButtonLabel": {
+    "description": "Кнопка сохранения формы мед-карты."
+  },
+  "yesLabel": "Да",
+  "@yesLabel": {
+    "description": "Кнопка «Да» в форме мед-карты."
+  },
+  "noLabel": "Нет",
+  "@noLabel": {
+    "description": "Кнопка «Нет» в форме мед-карты."
+  },
+  "settingsTitle": "Настройки",
+  "@settingsTitle": {
+    "description": "Заголовок экрана настроек."
+  },
+  "profileSettingsTitle": "Настройки профиля",
+  "@profileSettingsTitle": {
+    "description": "Заголовок строки-перехода и экрана настроек профиля."
+  },
+  "appLanguageLabel": "Язык приложения",
+  "@appLanguageLabel": {
+    "description": "Подпись переключателя языка приложения в настройках."
+  },
+  "bankDetailsTitle": "Банковские данные",
+  "@bankDetailsTitle": {
+    "description": "Строка-переход к банковским данным в настройках."
+  },
+  "contactUsTitle": "Свяжитесь с нами",
+  "@contactUsTitle": {
+    "description": "Строка-переход в настройках и заголовок экрана контактов."
+  },
+  "notificationsLabel": "Уведомления",
+  "@notificationsLabel": {
+    "description": "Подпись переключателя уведомлений в настройках."
+  },
+  "supportPhonesTitle": "Номера телефона поддержки",
+  "@supportPhonesTitle": {
+    "description": "Заголовок карточки телефонов поддержки на экране контактов."
+  },
+  "emailSectionTitle": "Электронная почта",
+  "@emailSectionTitle": {
+    "description": "Заголовок блока почты на экране контактов."
+  },
+  "socialNetworksTitle": "Социальные сети",
+  "@socialNetworksTitle": {
+    "description": "Заголовок блока соцсетей на экране контактов."
+  },
+  "changeAvatarLink": "изменить аватара",
+  "@changeAvatarLink": {
+    "description": "Ссылка смены аватара на экране настроек профиля."
+  },
+  "firstNameHint": "Имя",
+  "@firstNameHint": {
+    "description": "Подсказка поля имени на экране настроек профиля."
+  },
+  "lastNameHint": "Фамилия",
+  "@lastNameHint": {
+    "description": "Подсказка поля фамилии на экране настроек профиля."
+  },
+  "passwordFieldHint": "Пароль",
+  "@passwordFieldHint": {
+    "description": "Подсказка поля пароля на экране настроек профиля."
   }
 }
