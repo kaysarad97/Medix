@@ -16,6 +16,14 @@ class AppointmentSummaryCard extends StatelessWidget {
 
   static const double iconSize = 30;
 
+  static String _labelFor(AppointmentKind kind, AppLocalizations l10n) =>
+      switch (kind) {
+        AppointmentKind.videoCall => l10n.videoCallSubtitle,
+        AppointmentKind.audioCall => l10n.audioCallLabel,
+        AppointmentKind.chat => l10n.chatAppointmentLabel,
+        AppointmentKind.inPerson => l10n.inPersonAppointmentLabel,
+      };
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -40,7 +48,7 @@ class AppointmentSummaryCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    appointment.kind.label,
+                    _labelFor(appointment.kind, l10n),
                     style: AppTypography.actionTitle,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

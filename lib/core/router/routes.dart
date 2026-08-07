@@ -48,6 +48,12 @@ abstract final class Routes {
   /// Оформленная запись к врачу.
   static const String appointment = '/appointment/:id';
 
+  /// Экран звонка по записи: видео или аудио, в зависимости от
+  /// `Appointment.kind`.
+  static const String call = '/appointment/:id/call';
+
+  static String callOf(String id) => '/appointment/$id/call';
+
   /// Больницы и лаборатории на карте.
   static const String mapSearch = '/map';
 

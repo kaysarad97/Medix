@@ -70,6 +70,14 @@ class _Content extends ConsumerWidget {
   final Doctor doctor;
   final DoctorSchedule? schedule;
 
+  static String _labelFor(AppointmentKind kind, AppLocalizations l10n) =>
+      switch (kind) {
+        AppointmentKind.videoCall => l10n.videoCallSubtitle,
+        AppointmentKind.audioCall => l10n.audioCallLabel,
+        AppointmentKind.chat => l10n.chatAppointmentLabel,
+        AppointmentKind.inPerson => l10n.inPersonAppointmentLabel,
+      };
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notifier = ref.read(scheduleSelectionProvider.notifier);
@@ -104,8 +112,8 @@ class _Content extends ConsumerWidget {
               primary: ActionButtonData(
                 icon: MedixIcon.audioCall,
                 title: l10n.startCallTitle,
-                subtitle: appointment.kind.label,
-                onTap: () {},
+                subtitle: _labelFor(appointment.kind, l10n),
+                onTap: () => context.push(Routes.callOf(appointment.id)),
               ),
               secondary: ActionButtonData(
                 icon: MedixIcon.chat,

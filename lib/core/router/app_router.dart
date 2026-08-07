@@ -8,6 +8,7 @@ import '../../features/auth/presentation/screens/policy_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/auth/presentation/screens/verify_code_screen.dart';
+import '../../features/calls/presentation/screens/call_screen.dart';
 import '../../features/chats/presentation/screens/chats_list_screen.dart';
 import '../../features/chats/presentation/screens/doctor_chat_screen.dart';
 import '../../features/family_access/presentation/screens/family_member_screen.dart';
@@ -143,6 +144,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: Routes.appointment,
         builder: (context, state) =>
             AppointmentScreen(appointmentId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: Routes.call,
+        builder: (context, state) =>
+            CallScreen(appointmentId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: Routes.subscription,

@@ -169,5 +169,9 @@
   "changeAvatarLink": "change avatar",
   "firstNameHint": "First name",
   "lastNameHint": "Last name",
-  "passwordFieldHint": "Password"
+  "passwordFieldHint": "Password",
+  "audioCallLabel": "Audio call",
+  "chatAppointmentLabel": "Chat",
+  "inPersonAppointmentLabel": "In-person visit",
+  "callEndedLabel": "Call ended"
 }

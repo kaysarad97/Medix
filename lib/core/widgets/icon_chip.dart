@@ -136,6 +136,13 @@ enum MedixIcon {
 
   /// Человечек в кружке. Таб «Профиль» в нижней навигации.
   navProfile,
+
+  /// Видеокамера, перечёркнутая. Кнопка камеры на экране аудио-звонка и
+  /// оба экрана «Вызов завершен».
+  videoOff,
+
+  /// Телефонная трубка с крестиком, красная. Кнопка завершения звонка.
+  callDecline,
 }
 
 abstract final class MedixIcons {
@@ -186,6 +193,8 @@ abstract final class MedixIcons {
     MedixIcon.navMap: 'assets/icons/nav_map.svg',
     MedixIcon.navChats: 'assets/icons/nav_chats.svg',
     MedixIcon.navProfile: 'assets/icons/nav_profile.svg',
+    MedixIcon.videoOff: 'assets/icons/video_off.svg',
+    MedixIcon.callDecline: 'assets/icons/call_decline.svg',
   };
 
   /// Иконки, экспорта которых ещё нет.

@@ -211,6 +211,10 @@ abstract final class AppTypography {
   static TextStyle get actionTitle =>
       _style(size: 16, weight: 400, color: AppColors.textPrimary);
 
+  /// Таймер и статус на экране звонка. «0:36», «Вызов завершен».
+  static TextStyle get callStatus =>
+      _style(size: 15, weight: 400, color: AppColors.textOnPrimary);
+
   // ─── Экраны профиля ──────────────────────────────────────────────────────
 
   /// Имя в шапке профиля. В макете курсив, но в Golos Text курсивного

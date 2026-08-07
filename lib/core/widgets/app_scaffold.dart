@@ -7,6 +7,9 @@ enum AppBackgroundStyle {
 
   /// Вертикальный градиент основных экранов (`design/BG.png`).
   main,
+
+  /// Тёмно-синий вертикальный градиент экранов звонка (`design/BG (1).png`).
+  call,
 }
 
 /// Экран MedIx: фоновая картинка из макетов + прозрачный [Scaffold].
@@ -27,10 +30,14 @@ class AppScaffold extends StatelessWidget {
   final bool resizeToAvoidBottomInset;
   final PreferredSizeWidget? appBar;
 
+  static const Map<AppBackgroundStyle, String> _assets = {
+    AppBackgroundStyle.auth: 'assets/images/auth_bg.png',
+    AppBackgroundStyle.main: 'assets/images/app_bg.png',
+    AppBackgroundStyle.call: 'assets/images/call_bg.png',
+  };
+
   @override
   Widget build(BuildContext context) {
-    final isAuth = background == AppBackgroundStyle.auth;
-
     return DecoratedBox(
       decoration: const BoxDecoration(color: Colors.white),
       child: Stack(
@@ -39,10 +46,7 @@ class AppScaffold extends StatelessWidget {
           // Никаких фильтров поверх картинки: фоны в `design/` несут чанки
           // gAMA/sRGB, Flutter применяет их сам и попадает в макет с
           // точностью 1–2 уровня яркости (проверено golden-сверкой).
-          Image.asset(
-            isAuth ? 'assets/images/auth_bg.png' : 'assets/images/app_bg.png',
-            fit: BoxFit.cover,
-          ),
+          Image.asset(_assets[background]!, fit: BoxFit.cover),
           Scaffold(
             backgroundColor: Colors.transparent,
             resizeToAvoidBottomInset: resizeToAvoidBottomInset,

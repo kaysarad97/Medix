@@ -1,17 +1,10 @@
 import '../../core/utils/ru_dates.dart';
 import '../../core/utils/ru_money.dart';
 
+// Подпись — в виджете, не здесь: у enum нет доступа к BuildContext, нужного
+// `AppLocalizations.of(context)`.
 /// Формат приёма.
-enum AppointmentKind {
-  videoCall('Видео-звонок'),
-  audioCall('Аудио-звонок'),
-  chat('Чат'),
-  inPerson('Очный приём');
-
-  const AppointmentKind(this.label);
-
-  final String label;
-}
+enum AppointmentKind { videoCall, audioCall, chat, inPerson }
 
 /// Запись к врачу.
 ///

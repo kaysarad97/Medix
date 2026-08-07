@@ -737,5 +737,21 @@
   "passwordFieldHint": "Пароль",
   "@passwordFieldHint": {
     "description": "Подсказка поля пароля на экране настроек профиля."
+  },
+  "audioCallLabel": "Аудио-звонок",
+  "@audioCallLabel": {
+    "description": "Формат приёма: аудио-звонок. Заголовок экрана звонка."
+  },
+  "chatAppointmentLabel": "Чат",
+  "@chatAppointmentLabel": {
+    "description": "Формат приёма: чат."
+  },
+  "inPersonAppointmentLabel": "Очный приём",
+  "@inPersonAppointmentLabel": {
+    "description": "Формат приёма: очный приём."
+  },
+  "callEndedLabel": "Вызов завершен",
+  "@callEndedLabel": {
+    "description": "Статус экрана звонка после завершения."
   }
 }

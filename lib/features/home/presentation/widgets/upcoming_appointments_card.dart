@@ -60,8 +60,17 @@ class _AppointmentRow extends StatelessWidget {
   final Appointment appointment;
   final VoidCallback? onTap;
 
+  static String _labelFor(AppointmentKind kind, AppLocalizations l10n) =>
+      switch (kind) {
+        AppointmentKind.videoCall => l10n.videoCallSubtitle,
+        AppointmentKind.audioCall => l10n.audioCallLabel,
+        AppointmentKind.chat => l10n.chatAppointmentLabel,
+        AppointmentKind.inPerson => l10n.inPersonAppointmentLabel,
+      };
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       height: HomeMetrics.appointmentRowHeight,
       child: Material(
@@ -88,7 +97,7 @@ class _AppointmentRow extends StatelessWidget {
                       Text(appointment.specialty, style: AppTypography.bodyMd),
                       const SizedBox(height: 2),
                       Text(
-                        appointment.kind.label,
+                        _labelFor(appointment.kind, l10n),
                         style: AppTypography.tileSubtitle,
                       ),
                     ],
