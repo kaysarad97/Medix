@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/core/widgets/primary_button.dart';
 import 'package:medix/features/auth/presentation/screens/login_screen.dart';
+import 'package:medix/l10n/app_localizations.dart';
 
 import '../../helpers/test_fonts.dart';
 
@@ -18,7 +19,13 @@ void main() {
 
     await tester.pumpWidget(
       ProviderScope(
-        child: MaterialApp(theme: AppTheme.light, home: const LoginScreen()),
+        child: MaterialApp(
+          theme: AppTheme.light,
+          locale: const Locale('ru'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const LoginScreen(),
+        ),
       ),
     );
     await tester.pump();

@@ -10,6 +10,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/form_error_snack_bar.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/step_progress_bar.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../providers/registration_controller.dart';
 import '../widgets/otp_code_input.dart';
 import '../widgets/registration_step_layout.dart';
@@ -51,15 +52,16 @@ class _VerifyCodeScreenState extends ConsumerState<VerifyCodeScreen> {
     });
 
     final codeError = state.errorOf(RegField.code);
+    final l10n = AppLocalizations.of(context)!;
 
     return RegistrationStepLayout(
       progress: RegistrationProgress.verifyCode,
-      title: 'Введите код',
+      title: l10n.verifyCodeTitle,
       children: [
         const SizedBox(height: _titleToSubtitle),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenH),
-          child: Text('Подтвердите личность', style: AppTypography.subtitle),
+          child: Text(l10n.verifyCodeSubtitle, style: AppTypography.subtitle),
         ),
         const SizedBox(height: _subtitleToOtp),
         Padding(
@@ -84,7 +86,7 @@ class _VerifyCodeScreenState extends ConsumerState<VerifyCodeScreen> {
         const SizedBox(height: _timerToButton),
         RegistrationNextButton(
           child: PrimaryButton(
-            label: 'Далее',
+            label: l10n.nextButtonLabel,
             trailingIcon: Icons.arrow_forward,
             isLoading: state.isSubmitting,
             onPressed: state.value(RegField.code).isNotEmpty ? _next : null,
@@ -144,6 +146,7 @@ class _ResendTimerState extends State<_ResendTimer> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (_secondsLeft == 0) {
       return TextButton(
         onPressed: () {
@@ -151,10 +154,7 @@ class _ResendTimerState extends State<_ResendTimer> {
           // эндпоинт. Сейчас только перезапускаем отсчёт.
           _start();
         },
-        child: Text(
-          'выслать СМС-сообщение ещё раз',
-          style: AppTypography.captionMuted,
-        ),
+        child: Text(l10n.resendCodeNow, style: AppTypography.captionMuted),
       );
     }
 
@@ -162,7 +162,7 @@ class _ResendTimerState extends State<_ResendTimer> {
     final seconds = (_secondsLeft % 60).toString().padLeft(2, '0');
 
     return Text(
-      'выслать СМС-сообщение еще раз через $minutes:$seconds',
+      l10n.resendCodeCountdown('$minutes:$seconds'),
       style: AppTypography.captionMuted,
     );
   }

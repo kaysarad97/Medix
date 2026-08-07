@@ -9,6 +9,7 @@ import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/step_progress_bar.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../providers/registration_controller.dart';
 import '../widgets/registration_step_layout.dart';
 
@@ -38,10 +39,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Widget build(BuildContext context) {
     final controller = ref.read(registrationControllerProvider.notifier);
     final state = ref.watch(registrationControllerProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return RegistrationStepLayout(
       progress: RegistrationProgress.credentials,
-      title: 'Создайте профиль',
+      title: l10n.createProfileTitle,
       children: [
         const SizedBox(height: _titleToCard),
         Padding(
@@ -53,7 +55,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 AppTextField(
-                  hint: 'Введите Вашу почту',
+                  hint: l10n.emailHint,
                   height: AppTextField.compactFieldHeight,
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
@@ -63,7 +65,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: RegistrationFormCard.fieldGap),
                 AppTextField(
-                  hint: 'Придумайте пароль',
+                  hint: l10n.createPasswordHint,
                   height: AppTextField.compactFieldHeight,
                   obscureText: _obscurePassword,
                   textInputAction: TextInputAction.next,
@@ -78,7 +80,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: RegistrationFormCard.fieldGap),
                 AppTextField(
-                  hint: 'Подтвердите пароль',
+                  hint: l10n.confirmPasswordHint,
                   height: AppTextField.compactFieldHeight,
                   obscureText: _obscureConfirm,
                   textInputAction: TextInputAction.done,
@@ -99,7 +101,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         const SizedBox(height: _cardToButton),
         RegistrationNextButton(
           child: PrimaryButton(
-            label: 'Далее',
+            label: l10n.nextButtonLabel,
             trailingIcon: Icons.arrow_forward,
             onPressed:
                 state.filled(const [
@@ -130,6 +132,7 @@ class _EyeToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return IconButton(
       onPressed: onPressed,
       icon: Icon(
@@ -137,7 +140,7 @@ class _EyeToggle extends StatelessWidget {
         size: 22,
         color: AppColors.textSecondary,
       ),
-      tooltip: obscured ? 'Показать пароль' : 'Скрыть пароль',
+      tooltip: obscured ? l10n.showPasswordTooltip : l10n.hidePasswordTooltip,
     );
   }
 }

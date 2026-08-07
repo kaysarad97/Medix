@@ -11,6 +11,7 @@ import '../../../../core/widgets/app_text_field.dart';
 import '../../../../core/widgets/form_error_snack_bar.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/step_progress_bar.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../providers/registration_controller.dart';
 import '../widgets/registration_step_layout.dart';
 
@@ -45,9 +46,10 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
       }
     });
 
+    final l10n = AppLocalizations.of(context)!;
     return RegistrationStepLayout(
       progress: RegistrationProgress.personalData,
-      title: 'Ваши данные',
+      title: l10n.personalDataTitle,
       children: [
         const SizedBox(height: _titleToCard),
         Padding(
@@ -59,7 +61,7 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 AppTextField(
-                  hint: 'ИИН',
+                  hint: l10n.iinHint,
                   height: AppTextField.compactFieldHeight,
                   keyboardType: TextInputType.number,
                   textInputAction: TextInputAction.next,
@@ -70,7 +72,7 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
                 ),
                 const SizedBox(height: RegistrationFormCard.fieldGap),
                 AppTextField(
-                  hint: 'ФИО',
+                  hint: l10n.fullNameHint,
                   height: AppTextField.compactFieldHeight,
                   keyboardType: TextInputType.name,
                   textInputAction: TextInputAction.next,
@@ -80,7 +82,7 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
                 ),
                 const SizedBox(height: RegistrationFormCard.fieldGap),
                 AppTextField(
-                  hint: 'Номер телефона',
+                  hint: l10n.phoneHint,
                   height: AppTextField.compactFieldHeight,
                   keyboardType: TextInputType.phone,
                   textInputAction: TextInputAction.done,
@@ -96,7 +98,7 @@ class _PersonalDataScreenState extends ConsumerState<PersonalDataScreen> {
         const SizedBox(height: _cardToButton),
         RegistrationNextButton(
           child: PrimaryButton(
-            label: 'Далее',
+            label: l10n.nextButtonLabel,
             trailingIcon: Icons.arrow_forward,
             isLoading: state.isSubmitting,
             onPressed:

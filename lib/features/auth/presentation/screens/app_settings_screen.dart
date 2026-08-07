@@ -10,6 +10,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/step_progress_bar.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/app_language.dart';
 import '../providers/registration_controller.dart';
 import '../widgets/consent_row.dart';
@@ -43,11 +44,12 @@ class AppSettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = ref.read(registrationControllerProvider.notifier);
     final state = ref.watch(registrationControllerProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return RegistrationStepLayout(
       progress: RegistrationProgress.appSettings,
       barToTitle: _barToTitle,
-      title: 'Настройки приложения',
+      title: l10n.appSettingsTitle,
       children: [
         const SizedBox(height: _titleToCard),
         Padding(
@@ -78,14 +80,12 @@ class AppSettingsScreen extends ConsumerWidget {
         ConsentRow(
           value: state.pushConsent,
           onChanged: controller.setPushConsent,
-          text:
-              'Я согласен(-на) на получение Push-уведомлений, '
-              'СМС-сообщений, и электронных писем',
+          text: l10n.pushConsentText,
         ),
         const SizedBox(height: _consentToButton),
         RegistrationNextButton(
           child: PrimaryButton(
-            label: 'Далее',
+            label: l10n.nextButtonLabel,
             trailingIcon: Icons.arrow_forward,
             // Согласие на рассылки не блокирует переход — блокирует только
             // невыбранный язык.

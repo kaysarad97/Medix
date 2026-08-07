@@ -10,6 +10,7 @@ import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/step_progress_bar.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../data/legal/privacy_policy_draft.dart';
 import '../providers/registration_controller.dart';
 import '../widgets/consent_row.dart';
@@ -47,6 +48,7 @@ class PolicyScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = ref.read(registrationControllerProvider.notifier);
     final state = ref.watch(registrationControllerProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return AppScaffold(
       child: SafeArea(
@@ -56,8 +58,7 @@ class PolicyScreen extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
               child: Text(
-                'Политика Конфиденциальности и Условия '
-                'Обработки Персональных Данных',
+                l10n.policyTitle,
                 textAlign: TextAlign.center,
                 style: AppTypography.policyTitle,
               ),
@@ -77,15 +78,12 @@ class PolicyScreen extends ConsumerWidget {
             ConsentRow(
               value: state.policyAccepted,
               onChanged: controller.setPolicyAccepted,
-              text:
-                  'Я даю согласие на обработку моих персональных данных, '
-                  'включая данные о состоянии здоровья, на условиях, '
-                  'изложенных в Политике конфиденциальности.',
+              text: l10n.policyConsentText,
             ),
             const SizedBox(height: _consentToButton),
             RegistrationNextButton(
               child: PrimaryButton(
-                label: 'Далее',
+                label: l10n.nextButtonLabel,
                 trailingIcon: Icons.arrow_forward,
                 // Без согласия дальше нельзя: обрабатывать медицинские
                 // данные без него противозаконно.

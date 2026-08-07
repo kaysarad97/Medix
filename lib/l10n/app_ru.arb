@@ -308,5 +308,110 @@
   "todayHoursPrefix": "Сегодня: ",
   "@todayHoursPrefix": {
     "description": "Префикс перед часами работы сегодня в карточке места."
+  },
+  "loginTitle": "Логин",
+  "@loginTitle": {
+    "description": "Заголовок экрана входа."
+  },
+  "loginButtonLabel": "Войти",
+  "@loginButtonLabel": {
+    "description": "Кнопка входа на экране логина."
+  },
+  "createProfileLink": "или создать профиль",
+  "@createProfileLink": {
+    "description": "Ссылка на регистрацию под кнопкой входа."
+  },
+  "emailOrIinLabel": "Ваш E-mail или ИИН:",
+  "@emailOrIinLabel": {
+    "description": "Подпись поля логина."
+  },
+  "passwordLabel": "Пароль:",
+  "@passwordLabel": {
+    "description": "Подпись поля пароля на экране логина."
+  },
+  "createProfileTitle": "Создайте профиль",
+  "@createProfileTitle": {
+    "description": "Заголовок шага 1 регистрации."
+  },
+  "emailHint": "Введите Вашу почту",
+  "@emailHint": {
+    "description": "Плейсхолдер поля почты при регистрации."
+  },
+  "createPasswordHint": "Придумайте пароль",
+  "@createPasswordHint": {
+    "description": "Плейсхолдер поля пароля при регистрации."
+  },
+  "confirmPasswordHint": "Подтвердите пароль",
+  "@confirmPasswordHint": {
+    "description": "Плейсхолдер поля подтверждения пароля."
+  },
+  "showPasswordTooltip": "Показать пароль",
+  "@showPasswordTooltip": {
+    "description": "Подсказка кнопки-глаза, когда пароль скрыт."
+  },
+  "hidePasswordTooltip": "Скрыть пароль",
+  "@hidePasswordTooltip": {
+    "description": "Подсказка кнопки-глаза, когда пароль показан."
+  },
+  "personalDataTitle": "Ваши данные",
+  "@personalDataTitle": {
+    "description": "Заголовок шага 2 регистрации."
+  },
+  "iinHint": "ИИН",
+  "@iinHint": {
+    "description": "Плейсхолдер поля ИИН."
+  },
+  "fullNameHint": "ФИО",
+  "@fullNameHint": {
+    "description": "Плейсхолдер поля ФИО."
+  },
+  "phoneHint": "Номер телефона",
+  "@phoneHint": {
+    "description": "Плейсхолдер поля телефона."
+  },
+  "verifyCodeTitle": "Введите код",
+  "@verifyCodeTitle": {
+    "description": "Заголовок шага 3 регистрации."
+  },
+  "verifyCodeSubtitle": "Подтвердите личность",
+  "@verifyCodeSubtitle": {
+    "description": "Подзаголовок шага ввода кода из СМС."
+  },
+  "resendCodeNow": "выслать СМС-сообщение ещё раз",
+  "@resendCodeNow": {
+    "description": "Ссылка повторной отправки кода, когда таймер истёк."
+  },
+  "resendCodeCountdown": "выслать СМС-сообщение еще раз через {time}",
+  "@resendCodeCountdown": {
+    "description": "Обратный отсчёт до повторной отправки кода, «мм:сс».",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "appSettingsTitle": "Настройки приложения",
+  "@appSettingsTitle": {
+    "description": "Заголовок шага 4 регистрации."
+  },
+  "pushConsentText": "Я согласен(-на) на получение Push-уведомлений, СМС-сообщений, и электронных писем",
+  "@pushConsentText": {
+    "description": "Текст согласия на рассылки на шаге настроек приложения."
+  },
+  "policyTitle": "Политика Конфиденциальности и Условия Обработки Персональных Данных",
+  "@policyTitle": {
+    "description": "Заголовок шага 5 регистрации."
+  },
+  "policyConsentText": "Я даю согласие на обработку моих персональных данных, включая данные о состоянии здоровья, на условиях, изложенных в Политике конфиденциальности.",
+  "@policyConsentText": {
+    "description": "Текст согласия на обработку персональных данных."
+  },
+  "socialAuthCaption": "или авторизоваться через",
+  "@socialAuthCaption": {
+    "description": "Подпись над иконками соцвхода на экране логина."
+  },
+  "googleSignInSemanticLabel": "Войти через Google",
+  "@googleSignInSemanticLabel": {
+    "description": "Метка для скринридера на иконке входа через Google."
   }
 }

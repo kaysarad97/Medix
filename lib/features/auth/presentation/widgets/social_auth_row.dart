@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../l10n/app_localizations.dart';
 
 /// Блок «или авторизоваться через» с иконками сторонних провайдеров.
 ///
@@ -19,10 +20,11 @@ class SocialAuthRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text('или авторизоваться через', style: AppTypography.caption),
+        Text(l10n.socialAuthCaption, style: AppTypography.caption),
         const SizedBox(height: 10),
         SizedBox(
           width: _tapTarget,
@@ -38,7 +40,7 @@ class SocialAuthRow extends StatelessWidget {
                   'assets/icons/google.svg',
                   width: _iconSize,
                   height: _iconSize,
-                  semanticsLabel: 'Войти через Google',
+                  semanticsLabel: l10n.googleSignInSemanticLabel,
                 ),
               ),
             ),

@@ -6,6 +6,7 @@ import 'package:medix/core/widgets/app_text_field.dart';
 import 'package:medix/features/auth/presentation/screens/register_screen.dart';
 import 'package:medix/features/auth/presentation/screens/verify_code_screen.dart';
 import 'package:medix/features/auth/presentation/widgets/otp_code_input.dart';
+import 'package:medix/l10n/app_localizations.dart';
 
 import '../../helpers/test_fonts.dart';
 
@@ -31,7 +32,13 @@ void main() {
 
     await tester.pumpWidget(
       ProviderScope(
-        child: MaterialApp(theme: AppTheme.light, home: screen),
+        child: MaterialApp(
+          theme: AppTheme.light,
+          locale: const Locale('ru'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: screen,
+        ),
       ),
     );
     await tester.pump();

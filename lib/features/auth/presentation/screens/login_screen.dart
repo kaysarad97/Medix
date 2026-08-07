@@ -11,6 +11,7 @@ import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../../../core/widgets/form_error_snack_bar.dart';
 import '../../../../core/widgets/primary_button.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../providers/login_controller.dart';
 import '../widgets/social_auth_row.dart';
 
@@ -58,6 +59,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     final controller = ref.read(loginControllerProvider.notifier);
     final state = ref.watch(loginControllerProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     ref.listen(loginControllerProvider, (previous, next) {
       if (next.isAuthenticated && previous?.isAuthenticated != true) {
@@ -80,7 +82,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             children: [
               const SizedBox(height: _titleTop),
               Text(
-                'Логин',
+                l10n.loginTitle,
                 textAlign: TextAlign.center,
                 style: AppTypography.h1,
               ),
@@ -112,7 +114,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   horizontal: AppSpacing.screenH,
                 ),
                 child: PrimaryButton(
-                  label: 'Войти',
+                  label: l10n.loginButtonLabel,
                   size: PrimaryButtonSize.large,
                   color: AppColors.primary,
                   isLoading: state.isSubmitting,
@@ -130,7 +132,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       horizontal: AppSpacing.md,
                     ),
                     child: Text(
-                      'или создать профиль',
+                      l10n.createProfileLink,
                       style: AppTypography.link,
                     ),
                   ),
@@ -172,6 +174,7 @@ class _CredentialsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AppCard(
       padding: _cardPadding,
       child: Column(
@@ -179,7 +182,7 @@ class _CredentialsCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           AppTextField(
-            label: 'Ваш E-mail или ИИН:',
+            label: l10n.emailOrIinLabel,
             controller: identifierController,
             keyboardType: TextInputType.emailAddress,
             textInputAction: TextInputAction.next,
@@ -190,7 +193,7 @@ class _CredentialsCard extends StatelessWidget {
           ),
           const SizedBox(height: _fieldToLabel),
           AppTextField(
-            label: 'Пароль:',
+            label: l10n.passwordLabel,
             controller: passwordController,
             focusNode: passwordFocus,
             obscureText: true,
