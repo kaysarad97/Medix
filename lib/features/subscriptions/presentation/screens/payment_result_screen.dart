@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/primary_button.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../data/repositories/subscriptions_repository.dart';
 
 /// Итог оплаты — свёрстан по `design/Оплата прошла.png` и
@@ -26,11 +27,6 @@ class PaymentResultScreen extends StatelessWidget {
 
   bool get _ok => outcome == PaymentOutcome.success;
 
-  String get message =>
-      _ok ? 'Карта успешно сохранена!' : 'Неверные данные карты';
-
-  String get action => _ok ? 'На главную страницу' : 'Попробовать еще раз';
-
   /// Замеры по макету: круг 183 с центром на 220, надпись на 655, кнопка
   /// 330×55 на 826. Безопасная зона сверху 62.
   static const double circleSize = 183;
@@ -41,6 +37,12 @@ class PaymentResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final message = _ok
+        ? l10n.paymentSuccessMessage
+        : l10n.paymentFailureMessage;
+    final action = _ok ? l10n.paymentSuccessAction : l10n.paymentFailureAction;
+
     // Фон сплошной, без градиента и картинки — на обоих макетах это ровная
     // заливка на весь экран.
     return ColoredBox(

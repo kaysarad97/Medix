@@ -11,6 +11,7 @@ import 'package:medix/features/subscriptions/presentation/screens/card_form_scre
 import 'package:medix/features/subscriptions/presentation/screens/payment_method_screen.dart';
 import 'package:medix/features/subscriptions/presentation/screens/payment_result_screen.dart';
 import 'package:medix/features/subscriptions/presentation/screens/subscription_screen.dart';
+import 'package:medix/l10n/app_localizations.dart';
 
 import '../../helpers/fake_subscriptions_repository.dart';
 import '../../helpers/test_fonts.dart';
@@ -36,7 +37,13 @@ void main() {
             const FakeSubscriptionsRepository(),
           ),
         ],
-        child: MaterialApp(theme: AppTheme.light, home: screen),
+        child: MaterialApp(
+          theme: AppTheme.light,
+          locale: const Locale('ru'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: screen,
+        ),
       ),
     );
 

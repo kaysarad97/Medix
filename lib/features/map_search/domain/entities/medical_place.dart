@@ -1,15 +1,10 @@
 import 'package:latlong2/latlong.dart';
 
 /// Что за учреждение. Определяет и метку на карте, и вкладку фильтра.
-enum PlaceKind {
-  hospital('Больницы'),
-  laboratory('Лаборатории');
-
-  const PlaceKind(this.tabLabel);
-
-  /// Подпись на переключателе над картой.
-  final String tabLabel;
-}
+///
+/// Подпись вкладки — в виджете (`_KindTab` в `MapSearchScreen`), не здесь:
+/// у enum нет доступа к `BuildContext`, а значит и к переводу.
+enum PlaceKind { hospital, laboratory }
 
 /// Больница или лаборатория на карте.
 ///
@@ -86,12 +81,6 @@ class MedicalPlace {
 
   /// Текст чипа рейтинга: «4.5».
   String get ratingLabel => rating.toStringAsFixed(1);
-
-  String get statusLabel => openNow ? 'Открыто' : 'Закрыто';
-
-  String get driveLabel => '$driveMinutes мин';
-
-  String get walkLabel => '$walkMinutes мин';
 }
 
 /// Что показано на карте: одно из двух или всё сразу.

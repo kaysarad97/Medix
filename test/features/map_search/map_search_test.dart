@@ -5,6 +5,7 @@ import 'package:medix/features/map_search/data/repositories/places_repository.da
 import 'package:medix/features/map_search/domain/entities/medical_place.dart';
 import 'package:medix/features/map_search/presentation/providers/map_providers.dart';
 import 'package:medix/features/map_search/presentation/screens/map_search_screen.dart';
+import 'package:medix/l10n/app_localizations.dart';
 
 import '../../helpers/fake_places_repository.dart';
 import '../../helpers/test_fonts.dart';
@@ -25,7 +26,12 @@ void main() {
             const FakePlacesRepository(),
           ),
         ],
-        child: const MaterialApp(home: MapSearchScreen(showTiles: false)),
+        child: MaterialApp(
+          locale: const Locale('ru'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const MapSearchScreen(showTiles: false),
+        ),
       ),
     );
     await tester.pump();

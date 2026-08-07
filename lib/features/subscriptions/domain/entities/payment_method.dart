@@ -1,15 +1,17 @@
 import '../../../../core/widgets/icon_chip.dart';
 
 /// Способ оплаты со экрана `design/Оплата.png`.
+///
+/// Подпись — в виджете (`PaymentMethodScreen`, `PrepaymentCard`), не здесь:
+/// у enum нет доступа к `BuildContext`, а значит и к переводу.
 enum PaymentMethod {
-  kaspi('Оплата через Kaspi.kz', MedixIcon.paymentKaspi),
-  halyk('Оплата через Halyk Bank', MedixIcon.paymentHalyk),
-  applePay('Оплата через Apple Pay', MedixIcon.paymentApplePay),
-  otherBank('Оплата через другие банки', MedixIcon.paymentCard);
+  kaspi(MedixIcon.paymentKaspi),
+  halyk(MedixIcon.paymentHalyk),
+  applePay(MedixIcon.paymentApplePay),
+  otherBank(MedixIcon.paymentCard);
 
-  const PaymentMethod(this.label, this.icon);
+  const PaymentMethod(this.icon);
 
-  final String label;
   final MedixIcon icon;
 
   /// Ведёт ли способ на форму ввода карты. Для Kaspi, Halyk и Apple Pay

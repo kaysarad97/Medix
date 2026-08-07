@@ -6,6 +6,7 @@ import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../profile/presentation/widgets/profile_metrics.dart';
 import '../../domain/entities/payment_method.dart';
 
@@ -22,8 +23,17 @@ class PaymentMethodScreen extends StatelessWidget {
 
   static const double rowHeight = 74;
 
+  static String _labelFor(PaymentMethod method, AppLocalizations l10n) =>
+      switch (method) {
+        PaymentMethod.kaspi => l10n.paymentMethodKaspi,
+        PaymentMethod.halyk => l10n.paymentMethodHalyk,
+        PaymentMethod.applePay => l10n.paymentMethodApplePay,
+        PaymentMethod.otherBank => l10n.paymentMethodOtherBank,
+      };
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AppScaffold(
       background: AppBackgroundStyle.main,
       child: SafeArea(
@@ -34,7 +44,7 @@ class PaymentMethodScreen extends StatelessWidget {
             children: [
               const SizedBox(height: 36),
               ScreenTopBar(
-                title: 'Выберите метод оплаты',
+                title: l10n.choosePaymentMethodTitle,
                 onBack: () => Navigator.of(context).maybePop(),
               ),
               const SizedBox(height: 42),
@@ -50,7 +60,7 @@ class PaymentMethodScreen extends StatelessWidget {
                           const SizedBox(height: 8),
                         _MethodRow(
                           icon: method.icon,
-                          label: method.label,
+                          label: _labelFor(method, l10n),
                           onTap: () => onMethodSelected?.call(method),
                         ),
                       ],
@@ -65,7 +75,7 @@ class PaymentMethodScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(8),
                   child: _MethodRow(
                     icon: MedixIcon.paymentCard,
-                    label: 'Сохраненные карты',
+                    label: l10n.savedCardsLabel,
                     onTap: onSavedCards,
                   ),
                 ),

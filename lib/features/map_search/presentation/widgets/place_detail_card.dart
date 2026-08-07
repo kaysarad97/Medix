@@ -5,6 +5,7 @@ import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/icon_chip.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/medical_place.dart';
 
 /// Детальная карточка учреждения под сжатой картой.
@@ -29,6 +30,7 @@ class PlaceDetailCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -57,7 +59,9 @@ class PlaceDetailCard extends StatelessWidget {
                   const SizedBox(width: 8),
                   _Chip(
                     child: Text(
-                      place.statusLabel,
+                      place.openNow
+                          ? l10n.placeOpenStatus
+                          : l10n.placeClosedStatus,
                       style: AppTypography.chipLabel.copyWith(
                         color: place.openNow
                             ? AppColors.scaleNormal
@@ -121,7 +125,10 @@ class PlaceDetailCard extends StatelessWidget {
                           color: AppColors.primary,
                         ),
                         const SizedBox(width: 6),
-                        Text(place.driveLabel, style: AppTypography.chipLabel),
+                        Text(
+                          l10n.minutesLabel(place.driveMinutes),
+                          style: AppTypography.chipLabel,
+                        ),
                       ],
                     ),
                   ),
@@ -136,7 +143,10 @@ class PlaceDetailCard extends StatelessWidget {
                           color: AppColors.primary,
                         ),
                         const SizedBox(width: 6),
-                        Text(place.walkLabel, style: AppTypography.chipLabel),
+                        Text(
+                          l10n.minutesLabel(place.walkMinutes),
+                          style: AppTypography.chipLabel,
+                        ),
                       ],
                     ),
                   ),
@@ -161,7 +171,7 @@ class PlaceDetailCard extends StatelessWidget {
                             TextSpan(
                               style: AppTypography.bodyMd,
                               children: [
-                                const TextSpan(text: 'Сегодня: '),
+                                TextSpan(text: l10n.todayHoursPrefix),
                                 TextSpan(
                                   text: place.todayHours,
                                   style: TextStyle(
@@ -195,7 +205,7 @@ class PlaceDetailCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Контакты', style: AppTypography.label),
+                      Text(l10n.contactsTitle, style: AppTypography.label),
                       const SizedBox(height: 10),
                       Row(
                         children: [
@@ -230,7 +240,10 @@ class PlaceDetailCard extends StatelessWidget {
                                 color: AppColors.primary,
                               ),
                               const SizedBox(width: 6),
-                              Text('Веб-сайт', style: AppTypography.linkSmall),
+                              Text(
+                                l10n.websiteLabel,
+                                style: AppTypography.linkSmall,
+                              ),
                             ],
                           ],
                         ),
@@ -256,7 +269,7 @@ class PlaceDetailCard extends StatelessWidget {
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
-                            'Показать все филиалы (${place.branchesCount})',
+                            l10n.showAllBranchesLabel(place.branchesCount),
                             style: AppTypography.bodyMd,
                           ),
                         ),
@@ -294,7 +307,7 @@ class PlaceDetailCard extends StatelessWidget {
                     const SizedBox(width: 10),
                     Flexible(
                       child: Text(
-                        'Сдать анализы в КДЛ «${place.name}»',
+                        l10n.orderTestsAtLab(place.name),
                         style: AppTypography.bodyMd,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,

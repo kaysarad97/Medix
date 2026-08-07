@@ -9,6 +9,7 @@ import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/medix_wait_view.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../profile/presentation/widgets/profile_metrics.dart';
 import '../../data/repositories/subscriptions_repository.dart';
 import '../../domain/entities/payment_method.dart';
@@ -89,14 +90,15 @@ class _CardFormScreenState extends ConsumerState<CardFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (_paying) {
       // Экран ожидания по `design/Подождите....png`. Показываем его прямо
       // здесь, а не отдельным маршрутом: иначе данные карты пришлось бы
       // передавать между экранами, а им место только в этом виджете.
       return MedixWaitView(
         animated: widget.animatedWait,
-        title: 'подождите...',
-        subtitle: 'проверяем данные карты...',
+        title: l10n.waitingTitle,
+        subtitle: l10n.waitingCardSubtitle,
       );
     }
 
@@ -110,7 +112,7 @@ class _CardFormScreenState extends ConsumerState<CardFormScreen> {
             children: [
               const SizedBox(height: 36),
               ScreenTopBar(
-                title: 'Выберите метод оплаты',
+                title: l10n.choosePaymentMethodTitle,
                 onBack: () => Navigator.of(context).maybePop(),
               ),
               const SizedBox(height: 26),
@@ -118,14 +120,14 @@ class _CardFormScreenState extends ConsumerState<CardFormScreen> {
               const SizedBox(height: 22),
               _Section(
                 child: Text(
-                  'Банковские данные',
+                  l10n.bankDetailsTitle,
                   style: AppTypography.h2.copyWith(fontSize: 20),
                 ),
               ),
               const SizedBox(height: 18),
               _Section(
                 child: _Field(
-                  label: 'Номер карты',
+                  label: l10n.cardNumberLabel,
                   controller: _number,
                   keyboardType: TextInputType.number,
                   formatters: [
@@ -136,7 +138,7 @@ class _CardFormScreenState extends ConsumerState<CardFormScreen> {
               ),
               const SizedBox(height: 14),
               _Section(
-                child: _Field(label: 'ФИО на карте', controller: _holder),
+                child: _Field(label: l10n.cardHolderLabel, controller: _holder),
               ),
               const SizedBox(height: 14),
               _Section(
@@ -144,7 +146,7 @@ class _CardFormScreenState extends ConsumerState<CardFormScreen> {
                   children: [
                     Expanded(
                       child: _Field(
-                        label: 'Срок действия',
+                        label: l10n.cardExpiryLabel,
                         controller: _expiry,
                         keyboardType: TextInputType.number,
                         formatters: [
@@ -156,7 +158,7 @@ class _CardFormScreenState extends ConsumerState<CardFormScreen> {
                     const SizedBox(width: 14),
                     Expanded(
                       child: _Field(
-                        label: 'CVV-код',
+                        label: l10n.cardCvvLabel,
                         controller: _cvv,
                         obscure: true,
                         keyboardType: TextInputType.number,
@@ -175,7 +177,7 @@ class _CardFormScreenState extends ConsumerState<CardFormScreen> {
                   child: SizedBox(
                     width: PrimaryButton.mediumWidth,
                     child: PrimaryButton(
-                      label: 'Далее',
+                      label: l10n.nextButtonLabel,
                       trailingIcon: Icons.arrow_forward,
                       isLoading: _paying,
                       onPressed: _card.isComplete ? _submit : null,

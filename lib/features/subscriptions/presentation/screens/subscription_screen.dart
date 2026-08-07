@@ -5,6 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/subscription_tier.dart';
 import '../../../profile/presentation/widgets/profile_metrics.dart';
 import '../../domain/entities/subscription_plan.dart';
@@ -25,6 +26,7 @@ class SubscriptionScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final features = ref.watch(planFeaturesProvider).value ?? const [];
     final plans = ref.watch(plansProvider).value ?? const [];
+    final l10n = AppLocalizations.of(context)!;
 
     return AppScaffold(
       background: AppBackgroundStyle.main,
@@ -36,12 +38,12 @@ class SubscriptionScreen extends ConsumerWidget {
             children: [
               const SizedBox(height: 36),
               ScreenTopBar(
-                title: 'Варианты подписки',
+                title: l10n.subscriptionPlansTitle,
                 onBack: () => Navigator.of(context).maybePop(),
               ),
               const SizedBox(height: 32),
               Text(
-                'Оформите подписку',
+                l10n.subscriptionHeroTitle,
                 textAlign: TextAlign.center,
                 style: AppTypography.h1.copyWith(
                   color: AppColors.textOnPrimary,
@@ -49,7 +51,7 @@ class SubscriptionScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 10),
               Text(
-                'и забота о себе станет проще и быстрее!',
+                l10n.subscriptionHeroSubtitle,
                 textAlign: TextAlign.center,
                 style: AppTypography.captionMuted.copyWith(
                   color: AppColors.textOnPrimary,
@@ -77,7 +79,7 @@ class SubscriptionScreen extends ConsumerWidget {
               GestureDetector(
                 onTap: onSkip,
                 child: Text(
-                  'или продолжить без подписки',
+                  l10n.continueWithoutSubscription,
                   textAlign: TextAlign.center,
                   style: AppTypography.caption.copyWith(
                     color: AppColors.primaryBright,
@@ -213,6 +215,7 @@ class _PlanCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final onCard = _filled ? AppColors.textOnPrimary : AppColors.textPrimary;
     final accent = _filled ? AppColors.textOnPrimary : AppColors.primaryBright;
 
@@ -248,7 +251,7 @@ class _PlanCard extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(bottom: 6),
                       child: Text(
-                        SubscriptionPlan.priceUnit,
+                        l10n.subscriptionPriceUnit,
                         style: AppTypography.tileSubtitle.copyWith(
                           color: accent,
                         ),
@@ -258,7 +261,7 @@ class _PlanCard extends StatelessWidget {
                 ),
                 const Spacer(),
                 Text(
-                  SubscriptionPlan.callToAction,
+                  l10n.subscriptionCallToAction,
                   style: AppTypography.tileSubtitle.copyWith(color: accent),
                 ),
               ],

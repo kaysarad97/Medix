@@ -6,6 +6,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/primary_button.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/appointment.dart';
 import '../../../subscriptions/domain/entities/payment_method.dart';
 import 'doctor_metrics.dart';
@@ -162,8 +163,17 @@ class _PaymentRow extends StatelessWidget {
   static const double _height = 60;
   static const double _logoSize = 36;
 
+  static String _labelFor(PaymentMethod method, AppLocalizations l10n) =>
+      switch (method) {
+        PaymentMethod.kaspi => l10n.paymentMethodKaspi,
+        PaymentMethod.halyk => l10n.paymentMethodHalyk,
+        PaymentMethod.applePay => l10n.paymentMethodApplePay,
+        PaymentMethod.otherBank => l10n.paymentMethodOtherBank,
+      };
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Material(
       color: AppColors.surfaceWhite,
       borderRadius: DoctorMetrics.allRadius,
@@ -186,7 +196,7 @@ class _PaymentRow extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    method.label,
+                    _labelFor(method, l10n),
                     style: AppTypography.bodyMd,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,

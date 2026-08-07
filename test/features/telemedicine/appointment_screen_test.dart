@@ -6,6 +6,7 @@ import 'package:medix/features/profile/domain/entities/user_profile.dart';
 import 'package:medix/features/profile/presentation/providers/profile_providers.dart';
 import 'package:medix/features/telemedicine/presentation/providers/telemedicine_providers.dart';
 import 'package:medix/features/telemedicine/presentation/screens/appointment_screen.dart';
+import 'package:medix/l10n/app_localizations.dart';
 import 'package:medix/shared/models/gender.dart';
 import 'package:medix/shared/models/subscription_tier.dart';
 
@@ -39,6 +40,9 @@ void main() {
         ],
         child: MaterialApp(
           theme: AppTheme.light,
+          locale: const Locale('ru'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: const AppointmentScreen(appointmentId: 'a1'),
         ),
       ),

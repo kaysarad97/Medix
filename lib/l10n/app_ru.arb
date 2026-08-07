@@ -149,5 +149,164 @@
   "emptyResultsLabel": "Ничего не нашлось",
   "@emptyResultsLabel": {
     "description": "Пустое состояние поиска: перечень услуг, предыдущие процедуры."
+  },
+  "waitingTitle": "подождите...",
+  "@waitingTitle": {
+    "description": "Заголовок экрана ожидания при оплате картой."
+  },
+  "waitingCardSubtitle": "проверяем данные карты...",
+  "@waitingCardSubtitle": {
+    "description": "Подзаголовок экрана ожидания при оплате картой."
+  },
+  "choosePaymentMethodTitle": "Выберите метод оплаты",
+  "@choosePaymentMethodTitle": {
+    "description": "Заголовок экрана выбора способа оплаты и формы ввода карты."
+  },
+  "bankDetailsTitle": "Банковские данные",
+  "@bankDetailsTitle": {
+    "description": "Заголовок формы ввода данных карты."
+  },
+  "cardNumberLabel": "Номер карты",
+  "@cardNumberLabel": {
+    "description": "Подпись поля номера карты."
+  },
+  "cardHolderLabel": "ФИО на карте",
+  "@cardHolderLabel": {
+    "description": "Подпись поля имени держателя карты."
+  },
+  "cardExpiryLabel": "Срок действия",
+  "@cardExpiryLabel": {
+    "description": "Подпись поля срока действия карты."
+  },
+  "cardCvvLabel": "CVV-код",
+  "@cardCvvLabel": {
+    "description": "Подпись поля CVV-кода карты."
+  },
+  "nextButtonLabel": "Далее",
+  "@nextButtonLabel": {
+    "description": "Надпись на кнопке «Далее» — общая для форм регистрации и оплаты."
+  },
+  "subscriptionPlansTitle": "Варианты подписки",
+  "@subscriptionPlansTitle": {
+    "description": "Заголовок экрана выбора тарифа."
+  },
+  "subscriptionHeroTitle": "Оформите подписку",
+  "@subscriptionHeroTitle": {
+    "description": "Крупный заголовок над таблицей сравнения тарифов."
+  },
+  "subscriptionHeroSubtitle": "и забота о себе станет проще и быстрее!",
+  "@subscriptionHeroSubtitle": {
+    "description": "Подзаголовок под заголовком экрана подписки."
+  },
+  "continueWithoutSubscription": "или продолжить без подписки",
+  "@continueWithoutSubscription": {
+    "description": "Ссылка пропуска подписки внизу экрана тарифов."
+  },
+  "subscriptionPriceUnit": "₸/в месяц",
+  "@subscriptionPriceUnit": {
+    "description": "Единица цены на карточке тарифа."
+  },
+  "subscriptionCallToAction": "Оформить подписку в 1 клик",
+  "@subscriptionCallToAction": {
+    "description": "Подпись снизу карточки тарифа."
+  },
+  "savedCardsLabel": "Сохраненные карты",
+  "@savedCardsLabel": {
+    "description": "Строка перехода к сохранённым картам на экране выбора оплаты."
+  },
+  "paymentSuccessMessage": "Карта успешно сохранена!",
+  "@paymentSuccessMessage": {
+    "description": "Заголовок экрана успешной оплаты."
+  },
+  "paymentFailureMessage": "Неверные данные карты",
+  "@paymentFailureMessage": {
+    "description": "Заголовок экрана неуспешной оплаты."
+  },
+  "paymentSuccessAction": "На главную страницу",
+  "@paymentSuccessAction": {
+    "description": "Кнопка на экране успешной оплаты."
+  },
+  "paymentFailureAction": "Попробовать еще раз",
+  "@paymentFailureAction": {
+    "description": "Кнопка на экране неуспешной оплаты."
+  },
+  "paymentMethodKaspi": "Оплата через Kaspi.kz",
+  "@paymentMethodKaspi": {
+    "description": "Строка способа оплаты Kaspi."
+  },
+  "paymentMethodHalyk": "Оплата через Halyk Bank",
+  "@paymentMethodHalyk": {
+    "description": "Строка способа оплаты Halyk Bank."
+  },
+  "paymentMethodApplePay": "Оплата через Apple Pay",
+  "@paymentMethodApplePay": {
+    "description": "Строка способа оплаты Apple Pay."
+  },
+  "paymentMethodOtherBank": "Оплата через другие банки",
+  "@paymentMethodOtherBank": {
+    "description": "Строка способа оплаты картой другого банка."
+  },
+  "mapScreenTitle": "Больницы и\nлаборатории рядом",
+  "@mapScreenTitle": {
+    "description": "Заголовок экрана карты."
+  },
+  "branchesNotReadySnackbar": "Список филиалов ещё не готов",
+  "@branchesNotReadySnackbar": {
+    "description": "Снек-бар «Показать все филиалы» — экрана списка ещё нет."
+  },
+  "placeHospitalTab": "Больницы",
+  "@placeHospitalTab": {
+    "description": "Вкладка-фильтр больниц на карте."
+  },
+  "placeLaboratoryTab": "Лаборатории",
+  "@placeLaboratoryTab": {
+    "description": "Вкладка-фильтр лабораторий на карте."
+  },
+  "placeOpenStatus": "Открыто",
+  "@placeOpenStatus": {
+    "description": "Статус учреждения — сейчас открыто."
+  },
+  "placeClosedStatus": "Закрыто",
+  "@placeClosedStatus": {
+    "description": "Статус учреждения — сейчас закрыто."
+  },
+  "minutesLabel": "{minutes} мин",
+  "@minutesLabel": {
+    "description": "Время в пути на машине/пешком в карточке места.",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "contactsTitle": "Контакты",
+  "@contactsTitle": {
+    "description": "Заголовок блока контактов в карточке места."
+  },
+  "websiteLabel": "Веб-сайт",
+  "@websiteLabel": {
+    "description": "Ссылка на сайт учреждения в карточке места."
+  },
+  "showAllBranchesLabel": "Показать все филиалы ({count})",
+  "@showAllBranchesLabel": {
+    "description": "Строка перехода к списку филиалов сети.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "orderTestsAtLab": "Сдать анализы в КДЛ «{name}»",
+  "@orderTestsAtLab": {
+    "description": "Кнопка заказа анализов в конкретной лаборатории.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "todayHoursPrefix": "Сегодня: ",
+  "@todayHoursPrefix": {
+    "description": "Префикс перед часами работы сегодня в карточке места."
   }
 }

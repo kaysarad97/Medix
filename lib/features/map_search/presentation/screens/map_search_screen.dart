@@ -8,6 +8,7 @@ import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/icon_chip.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../data/repositories/places_repository.dart';
 import '../../domain/entities/medical_place.dart';
 import '../providers/map_providers.dart';
@@ -50,6 +51,7 @@ class MapSearchScreen extends ConsumerWidget {
     final filter = ref.watch(placeFilterProvider);
     final places = ref.watch(visiblePlacesProvider);
     final selected = ref.watch(selectedPlaceProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return AppScaffold(
       background: AppBackgroundStyle.main,
@@ -69,7 +71,7 @@ class MapSearchScreen extends ConsumerWidget {
                   ),
                   Expanded(
                     child: Text(
-                      'Больницы и\nлаборатории рядом',
+                      l10n.mapScreenTitle,
                       textAlign: TextAlign.center,
                       style: AppTypography.screenTitle,
                     ),
@@ -167,7 +169,7 @@ class MapSearchScreen extends ConsumerWidget {
       ..showSnackBar(
         SnackBar(
           content: Text(
-            'Список филиалов ещё не готов',
+            AppLocalizations.of(context)!.branchesNotReadySnackbar,
             style: AppTypography.bodyMd.copyWith(
               color: AppColors.textOnPrimary,
             ),
@@ -193,6 +195,10 @@ class _KindTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final label = kind == PlaceKind.hospital
+        ? l10n.placeHospitalTab
+        : l10n.placeLaboratoryTab;
     return SizedBox(
       height: MapSearchScreen.tabsHeight,
       child: Material(
@@ -217,7 +223,7 @@ class _KindTab extends StatelessWidget {
               const SizedBox(width: 10),
               Flexible(
                 child: Text(
-                  kind.tabLabel,
+                  label,
                   style: AppTypography.bodyMd,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

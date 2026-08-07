@@ -9,6 +9,7 @@ import 'package:medix/features/profile/presentation/providers/profile_providers.
 import 'package:medix/features/telemedicine/presentation/providers/telemedicine_providers.dart';
 import 'package:medix/features/telemedicine/presentation/screens/appointment_screen.dart';
 import 'package:medix/features/telemedicine/presentation/screens/doctor_profile_screen.dart';
+import 'package:medix/l10n/app_localizations.dart';
 
 import '../../helpers/fake_doctors_repository.dart';
 import '../../helpers/fake_profile_repository.dart';
@@ -48,7 +49,13 @@ void main() {
             const FakeProfileRepository(),
           ),
         ],
-        child: MaterialApp(theme: AppTheme.light, home: screen),
+        child: MaterialApp(
+          theme: AppTheme.light,
+          locale: const Locale('ru'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: screen,
+        ),
       ),
     );
 

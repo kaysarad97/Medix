@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/features/map_search/presentation/providers/map_providers.dart';
 import 'package:medix/features/map_search/presentation/screens/map_search_screen.dart';
+import 'package:medix/l10n/app_localizations.dart';
 
 import '../../helpers/fake_places_repository.dart';
 import '../../helpers/test_fonts.dart';
@@ -34,6 +35,9 @@ void main() {
         ],
         child: MaterialApp(
           theme: AppTheme.light,
+          locale: const Locale('ru'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: const MapSearchScreen(showTiles: false),
         ),
       ),

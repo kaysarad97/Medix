@@ -34,8 +34,4 @@ class SubscriptionPlan {
 
   /// «9999» — разряды не разделяем, так в макете.
   String get priceLabel => pricePerMonth.toString();
-
-  static const String priceUnit = '₸/в месяц';
-
-  static const String callToAction = 'Оформить подписку в 1 клик';
 }

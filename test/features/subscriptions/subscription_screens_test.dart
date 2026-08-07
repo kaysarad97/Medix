@@ -11,6 +11,7 @@ import 'package:medix/features/subscriptions/presentation/screens/card_form_scre
 import 'package:medix/features/subscriptions/presentation/screens/payment_method_screen.dart';
 import 'package:medix/features/subscriptions/presentation/screens/payment_result_screen.dart';
 import 'package:medix/features/subscriptions/presentation/screens/subscription_screen.dart';
+import 'package:medix/l10n/app_localizations.dart';
 
 import '../../helpers/fake_subscriptions_repository.dart';
 import '../../helpers/test_fonts.dart';
@@ -31,7 +32,13 @@ void main() {
             const FakeSubscriptionsRepository(),
           ),
         ],
-        child: MaterialApp(theme: AppTheme.light, home: screen),
+        child: MaterialApp(
+          theme: AppTheme.light,
+          locale: const Locale('ru'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: screen,
+        ),
       ),
     );
     await tester.pump();
@@ -53,9 +60,10 @@ void main() {
   testWidgets('выбор способа оплаты рисует все методы', (tester) async {
     await pump(tester, const PaymentMethodScreen());
 
-    for (final method in PaymentMethod.values) {
-      expect(find.text(method.label), findsOneWidget);
-    }
+    expect(find.text('Оплата через Kaspi.kz'), findsOneWidget);
+    expect(find.text('Оплата через Halyk Bank'), findsOneWidget);
+    expect(find.text('Оплата через Apple Pay'), findsOneWidget);
+    expect(find.text('Оплата через другие банки'), findsOneWidget);
     expect(find.text('Сохраненные карты'), findsOneWidget);
   });
 
