@@ -68,5 +68,86 @@
   "upcomingAppointmentsTitle": "Предстоящие записи",
   "@upcomingAppointmentsTitle": {
     "description": "Заголовок карточки предстоящих записей на главной."
+  },
+  "attachFileTooltip": "Прикрепить файл",
+  "@attachFileTooltip": {
+    "description": "Подсказка на кнопке-скрепке в строке ввода чата (бот и врач)."
+  },
+  "chatbotFaqTitle": "Часто задаваемые вопросы:",
+  "@chatbotFaqTitle": {
+    "description": "Заголовок над пилюлями быстрых вопросов в пустой переписке с ботом."
+  },
+  "chatbotDisclaimer": "Бот не ставит диагнозы. Окончательное решение всегда за врачом.",
+  "@chatbotDisclaimer": {
+    "description": "Медицинский дисклеймер под быстрыми вопросами бота. Требование ТЗ, в макете его нет."
+  },
+  "allChatsTitle": "Все чаты",
+  "@allChatsTitle": {
+    "description": "Заголовок экрана списка переписок."
+  },
+  "chatSearchHint": "Поиск чата",
+  "@chatSearchHint": {
+    "description": "Плейсхолдер поля поиска на экране «Все чаты»."
+  },
+  "botThreadTitle": "Чат с Medi-Bot",
+  "@botThreadTitle": {
+    "description": "Заголовок закреплённой строки бота на экране «Все чаты»."
+  },
+  "messageReadLabel": "прочитано",
+  "@messageReadLabel": {
+    "description": "Статус переписки — прочитана."
+  },
+  "messageUnreadLabel": "не прочитано",
+  "@messageUnreadLabel": {
+    "description": "Статус переписки — не прочитана."
+  },
+  "myMessagePrefix": "Вы: {message}",
+  "@myMessagePrefix": {
+    "description": "Превью последней реплики в списке чатов, когда она своя.",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "doctorChatTitle": "Чат с врачом",
+  "@doctorChatTitle": {
+    "description": "Заголовок экрана переписки с врачом."
+  },
+  "familyScreenTitle": "Моя Семья",
+  "@familyScreenTitle": {
+    "description": "Заголовок карточки члена семьи."
+  },
+  "relationshipPlaceholder": "Родство с Вами",
+  "@relationshipPlaceholder": {
+    "description": "Плейсхолдер поля родства в мед-карте члена семьи."
+  },
+  "genderLabel": "пол",
+  "@genderLabel": {
+    "description": "Подпись под значением пола в шапке профиля/члена семьи."
+  },
+  "birthDateLabel": "дата рождения",
+  "@birthDateLabel": {
+    "description": "Подпись под датой рождения в шапке профиля/члена семьи."
+  },
+  "labServicesTitle": "Перечень услуг",
+  "@labServicesTitle": {
+    "description": "Заголовок экрана каталога анализов."
+  },
+  "labServiceSearchHint": "Какой анализ Вам нужен?",
+  "@labServiceSearchHint": {
+    "description": "Плейсхолдер поиска в перечне услуг."
+  },
+  "labServiceIndividualTab": "отдельные анализы",
+  "@labServiceIndividualTab": {
+    "description": "Вкладка отдельных анализов в перечне услуг."
+  },
+  "labServiceBundleTab": "комплексы анализов",
+  "@labServiceBundleTab": {
+    "description": "Вкладка комплексов анализов в перечне услуг."
+  },
+  "emptyResultsLabel": "Ничего не нашлось",
+  "@emptyResultsLabel": {
+    "description": "Пустое состояние поиска: перечень услуг, предыдущие процедуры."
   }
 }

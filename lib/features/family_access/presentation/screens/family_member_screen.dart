@@ -5,6 +5,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../core/widgets/user_avatar.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/family_member.dart';
 import '../../../profile/presentation/widgets/analyses_card.dart';
 import '../../../profile/presentation/widgets/medical_card_summary.dart';
@@ -39,6 +40,7 @@ class FamilyMemberScreen extends ConsumerWidget {
     final analyses =
         ref.watch(familyAnalysesProvider(memberId)).value ?? const [];
     final filter = ref.watch(familyAnalysesFilterProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return AppScaffold(
       background: AppBackgroundStyle.main,
@@ -52,7 +54,7 @@ class FamilyMemberScreen extends ConsumerWidget {
                   children: [
                     const SizedBox(height: 36),
                     ScreenTopBar(
-                      title: 'Моя Семья',
+                      title: l10n.familyScreenTitle,
                       onBack: () => Navigator.of(context).maybePop(),
                     ),
                     const SizedBox(height: ProfileMetrics.topBarToHeader),
@@ -61,7 +63,7 @@ class FamilyMemberScreen extends ConsumerWidget {
                     _Section(
                       child: MedicalCardSummary(
                         topFieldValue: member.relationshipLabel,
-                        topFieldPlaceholder: 'Родство с Вами',
+                        topFieldPlaceholder: l10n.relationshipPlaceholder,
                         heightLabel: member.heightLabel,
                         weightLabel: member.weightLabel,
                         ageLabel: member.ageLabel(now ?? DateTime.now()),
@@ -105,6 +107,7 @@ class _MemberHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.only(left: ProfileMetrics.avatarLeft),
       child: Row(
@@ -129,13 +132,13 @@ class _MemberHeader extends StatelessWidget {
                     Expanded(
                       child: _MetaColumn(
                         value: member.gender.label,
-                        label: 'пол',
+                        label: l10n.genderLabel,
                       ),
                     ),
                     Expanded(
                       child: _MetaColumn(
                         value: member.birthDateLabel,
-                        label: 'дата рождения',
+                        label: l10n.birthDateLabel,
                       ),
                     ),
                   ],

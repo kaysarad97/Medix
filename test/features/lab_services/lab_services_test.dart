@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/features/lab_services/presentation/providers/lab_services_providers.dart';
 import 'package:medix/features/lab_services/presentation/screens/lab_services_screen.dart';
+import 'package:medix/l10n/app_localizations.dart';
 
 import '../../helpers/fake_lab_services_repository.dart';
 import '../../helpers/test_fonts.dart';
@@ -31,6 +32,9 @@ void main() {
         container: container,
         child: MaterialApp(
           theme: AppTheme.light,
+          locale: const Locale('ru'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
           home: const LabServicesScreen(),
         ),
       ),

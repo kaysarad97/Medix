@@ -10,6 +10,7 @@ import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/features/lab_chatbot/data/repositories/chatbot_repository.dart';
 import 'package:medix/features/lab_chatbot/presentation/providers/chatbot_controller.dart';
 import 'package:medix/features/lab_chatbot/presentation/screens/chatbot_screen.dart';
+import 'package:medix/l10n/app_localizations.dart';
 
 import '../../helpers/fake_chatbot_repository.dart';
 import '../../helpers/test_fonts.dart';
@@ -36,7 +37,13 @@ void main() {
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
-        child: MaterialApp(theme: AppTheme.light, home: const ChatbotScreen()),
+        child: MaterialApp(
+          theme: AppTheme.light,
+          locale: const Locale('ru'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const ChatbotScreen(),
+        ),
       ),
     );
 
@@ -101,7 +108,13 @@ void main() {
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
-        child: MaterialApp(theme: AppTheme.light, home: const ChatbotScreen()),
+        child: MaterialApp(
+          theme: AppTheme.light,
+          locale: const Locale('ru'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const ChatbotScreen(),
+        ),
       ),
     );
 

@@ -23,9 +23,6 @@ class ChatThread {
 
   final String? doctorPhotoUrl;
 
-  /// Превью последней реплики так, как оно выглядит в списке.
-  String get preview => lastMessageIsMine ? 'Вы: $lastMessage' : lastMessage;
-
   /// «21.07, 13:44».
   String get timeLabel {
     String two(int v) => v.toString().padLeft(2, '0');

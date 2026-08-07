@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_typography.dart';
@@ -45,6 +46,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       height: ChatInputBar.height,
       child: DecoratedBox(
@@ -71,7 +73,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
                   decoration: InputDecoration(
                     isCollapsed: true,
                     border: InputBorder.none,
-                    hintText: 'Опишите Ваши симптомы...',
+                    hintText: l10n.symptomSearchHint,
                     hintStyle: AppTypography.placeholder,
                   ),
                 ),
@@ -87,7 +89,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
                 size: 22,
                 color: AppColors.textSecondary,
               ),
-              tooltip: 'Прикрепить файл',
+              tooltip: l10n.attachFileTooltip,
             ),
             const SizedBox(width: 8),
           ],

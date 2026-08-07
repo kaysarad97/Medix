@@ -7,6 +7,7 @@ import 'package:medix/features/lab_chatbot/presentation/providers/chatbot_contro
 import 'package:medix/features/lab_chatbot/presentation/screens/chatbot_screen.dart';
 import 'package:medix/core/widgets/chat_bubble.dart';
 import 'package:medix/core/widgets/chat_input_bar.dart';
+import 'package:medix/l10n/app_localizations.dart';
 
 import '../../helpers/fake_chatbot_repository.dart';
 import '../../helpers/test_fonts.dart';
@@ -27,7 +28,13 @@ void main() {
             const FakeChatbotRepository(),
           ),
         ],
-        child: MaterialApp(theme: AppTheme.light, home: const ChatbotScreen()),
+        child: MaterialApp(
+          theme: AppTheme.light,
+          locale: const Locale('ru'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const ChatbotScreen(),
+        ),
       ),
     );
     await tester.pump();

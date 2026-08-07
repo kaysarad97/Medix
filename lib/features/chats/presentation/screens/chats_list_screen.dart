@@ -9,6 +9,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/chat_thread.dart';
 import '../providers/chats_providers.dart';
 
@@ -28,6 +29,7 @@ class ChatsListScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final threads = ref.watch(visibleChatThreadsProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return AppScaffold(
       background: AppBackgroundStyle.main,
@@ -38,7 +40,10 @@ class ChatsListScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: _topBarTop),
-              ScreenTopBar(title: 'Все чаты', onBack: () => context.pop()),
+              ScreenTopBar(
+                title: l10n.allChatsTitle,
+                onBack: () => context.pop(),
+              ),
               const SizedBox(height: _topBarToCard),
               const _SearchField(height: _searchHeight),
               const SizedBox(height: 16),
@@ -78,6 +83,7 @@ class _SearchField extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       height: height,
       child: DecoratedBox(
@@ -102,7 +108,7 @@ class _SearchField extends ConsumerWidget {
                   decoration: InputDecoration(
                     isCollapsed: true,
                     border: InputBorder.none,
-                    hintText: 'Поиск чата',
+                    hintText: l10n.chatSearchHint,
                     hintStyle: AppTypography.placeholder,
                   ),
                 ),
@@ -129,6 +135,7 @@ class _BotThreadRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       height: height,
       child: Material(
@@ -149,12 +156,12 @@ class _BotThreadRow extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Чат с Medi-Bot',
+                        l10n.botThreadTitle,
                         style: AppTypography.cardItemTitle,
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Опишите Ваши симптомы...',
+                        l10n.symptomSearchHint,
                         style: AppTypography.tileSubtitle,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -188,6 +195,7 @@ class _ThreadRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       height: height,
       child: Material(
@@ -216,7 +224,9 @@ class _ThreadRow extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        thread.preview,
+                        thread.lastMessageIsMine
+                            ? l10n.myMessagePrefix(thread.lastMessage)
+                            : thread.lastMessage,
                         style: AppTypography.tileSubtitle,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -232,7 +242,9 @@ class _ThreadRow extends StatelessWidget {
                     Text(thread.timeLabel, style: AppTypography.cardItemMeta),
                     const SizedBox(height: 6),
                     Text(
-                      thread.isRead ? 'прочитано' : 'не прочитано',
+                      thread.isRead
+                          ? l10n.messageReadLabel
+                          : l10n.messageUnreadLabel,
                       style: AppTypography.cardItemMeta,
                     ),
                   ],

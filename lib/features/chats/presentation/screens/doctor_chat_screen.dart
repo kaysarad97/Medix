@@ -8,6 +8,7 @@ import '../../../../core/widgets/chat_bubble.dart';
 import '../../../../core/widgets/chat_input_bar.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../providers/chats_providers.dart';
 
 /// Переписка с врачом по `design/Чат с врачом.png`.
@@ -47,6 +48,7 @@ class _DoctorChatScreenState extends ConsumerState<DoctorChatScreen> {
   Widget build(BuildContext context) {
     final controller = ref.read(doctorChatControllerProvider.notifier);
     final state = ref.watch(doctorChatControllerProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return AppScaffold(
       background: AppBackgroundStyle.main,
@@ -59,7 +61,10 @@ class _DoctorChatScreenState extends ConsumerState<DoctorChatScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: DoctorChatScreen._topBarTop),
-              ScreenTopBar(title: 'Чат с врачом', onBack: () => context.pop()),
+              ScreenTopBar(
+                title: l10n.doctorChatTitle,
+                onBack: () => context.pop(),
+              ),
               const SizedBox(height: DoctorChatScreen._topBarToCard),
               Expanded(
                 child: DecoratedBox(

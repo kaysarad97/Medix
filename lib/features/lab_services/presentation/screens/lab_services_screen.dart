@@ -9,6 +9,7 @@ import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/lab_service.dart';
 import '../providers/lab_services_providers.dart';
 
@@ -34,6 +35,7 @@ class LabServicesScreen extends ConsumerWidget {
     final kind = ref.watch(labServiceKindFilterProvider);
     final cartCount = ref.watch(labServicesCartProvider).length;
     final letters = grouped.keys.toList()..sort();
+    final l10n = AppLocalizations.of(context)!;
 
     return AppScaffold(
       background: AppBackgroundStyle.main,
@@ -45,7 +47,7 @@ class LabServicesScreen extends ConsumerWidget {
             children: [
               const SizedBox(height: 16),
               ScreenTopBar(
-                title: 'Перечень услуг',
+                title: l10n.labServicesTitle,
                 onBack: () => context.pop(),
                 trailing: _CartBadge(count: cartCount),
               ),
@@ -133,6 +135,7 @@ class _SearchField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       height: 54,
       child: DecoratedBox(
@@ -156,7 +159,7 @@ class _SearchField extends StatelessWidget {
                   decoration: InputDecoration(
                     isCollapsed: true,
                     border: InputBorder.none,
-                    hintText: 'Какой анализ Вам нужен?',
+                    hintText: l10n.labServiceSearchHint,
                     hintStyle: AppTypography.placeholder,
                   ),
                 ),
@@ -176,19 +179,19 @@ class _KindToggle extends StatelessWidget {
   final LabServiceKind selected;
   final ValueChanged<LabServiceKind> onSelect;
 
-  static const _labels = {
-    LabServiceKind.individual: 'отдельные анализы',
-    LabServiceKind.bundle: 'комплексы анализов',
-  };
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final labels = {
+      LabServiceKind.individual: l10n.labServiceIndividualTab,
+      LabServiceKind.bundle: l10n.labServiceBundleTab,
+    };
     return Row(
       children: [
-        for (final kind in _labels.keys) ...[
-          if (kind != _labels.keys.first) const SizedBox(width: 8),
+        for (final kind in labels.keys) ...[
+          if (kind != labels.keys.first) const SizedBox(width: 8),
           _ToggleButton(
-            label: _labels[kind]!,
+            label: labels[kind]!,
             active: kind == selected,
             onTap: () => onSelect(kind),
           ),
@@ -315,7 +318,10 @@ class _EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Text('Ничего не нашлось', style: AppTypography.cardItemMeta),
+      child: Text(
+        AppLocalizations.of(context)!.emptyResultsLabel,
+        style: AppTypography.cardItemMeta,
+      ),
     );
   }
 }

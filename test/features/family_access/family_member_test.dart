@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/features/family_access/presentation/providers/family_providers.dart';
 import 'package:medix/features/family_access/presentation/screens/family_member_screen.dart';
+import 'package:medix/l10n/app_localizations.dart';
 
 import '../../helpers/fake_family_repository.dart';
 import '../../helpers/test_fonts.dart';
@@ -24,7 +25,13 @@ void main() {
             const FakeFamilyRepository(),
           ),
         ],
-        child: MaterialApp(theme: AppTheme.light, home: screen),
+        child: MaterialApp(
+          theme: AppTheme.light,
+          locale: const Locale('ru'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: screen,
+        ),
       ),
     );
     await tester.pump();

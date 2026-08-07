@@ -7,6 +7,7 @@ import 'package:medix/features/chats/domain/entities/chat_thread.dart';
 import 'package:medix/features/chats/presentation/providers/chats_providers.dart';
 import 'package:medix/features/chats/presentation/screens/chats_list_screen.dart';
 import 'package:medix/features/chats/presentation/screens/doctor_chat_screen.dart';
+import 'package:medix/l10n/app_localizations.dart';
 
 import '../../helpers/fake_chats_repository.dart';
 import '../../helpers/test_fonts.dart';
@@ -33,7 +34,13 @@ void main() {
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
-        child: MaterialApp(theme: AppTheme.light, home: screen),
+        child: MaterialApp(
+          theme: AppTheme.light,
+          locale: const Locale('ru'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: screen,
+        ),
       ),
     );
     await tester.pump();
@@ -75,26 +82,6 @@ void main() {
   });
 
   group('модель', () {
-    test('своя реплика показывается с приставкой «Вы»', () {
-      final mine = ChatThread(
-        id: 't',
-        doctorName: 'Врач',
-        lastMessage: 'Привет',
-        lastMessageAt: DateTime(2026, 7, 21, 13, 44),
-        lastMessageIsMine: true,
-      );
-      final theirs = ChatThread(
-        id: 't',
-        doctorName: 'Врач',
-        lastMessage: 'Привет',
-        lastMessageAt: DateTime(2026, 7, 21, 13, 44),
-        lastMessageIsMine: false,
-      );
-
-      expect(mine.preview, 'Вы: Привет');
-      expect(theirs.preview, 'Привет');
-    });
-
     test('время форматируется как в макете', () {
       final thread = ChatThread(
         id: 't',

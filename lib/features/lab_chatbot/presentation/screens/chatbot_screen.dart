@@ -9,6 +9,7 @@ import '../../../../core/widgets/chat_bubble.dart';
 import '../../../../core/widgets/chat_input_bar.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/chat_message.dart';
 import '../providers/chatbot_controller.dart';
 
@@ -111,12 +112,13 @@ class _QuickReplies extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const AppIconChip(icon: MedixIcon.botAvatar, size: 44),
         const SizedBox(height: 20),
-        Text('Часто задаваемые вопросы:', style: AppTypography.bodyMd),
+        Text(l10n.chatbotFaqTitle, style: AppTypography.bodyMd),
         const SizedBox(height: 12),
         for (final reply in replies) ...[
           if (reply != replies.first) const SizedBox(height: _pillGap),
@@ -128,7 +130,7 @@ class _QuickReplies extends StatelessWidget {
         // приложения он обязателен — как и кнопка вызова 103 на главной,
         // которой там тоже нет.
         Text(
-          'Бот не ставит диагнозы. Окончательное решение всегда за врачом.',
+          l10n.chatbotDisclaimer,
           style: AppTypography.captionMuted,
           textAlign: TextAlign.center,
         ),
