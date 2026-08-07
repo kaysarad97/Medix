@@ -4,6 +4,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/icon_chip.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/appointment.dart';
 import 'doctor_metrics.dart';
 
@@ -17,6 +18,7 @@ class AppointmentSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       height: DoctorMetrics.summaryHeight,
       child: AppCard(
@@ -45,7 +47,7 @@ class AppointmentSummaryCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    'Ваша запись',
+                    l10n.appointmentTitle,
                     style: AppTypography.tileSubtitle.copyWith(
                       color: AppColors.primaryBright,
                     ),

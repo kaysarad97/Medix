@@ -413,5 +413,135 @@
   "googleSignInSemanticLabel": "Войти через Google",
   "@googleSignInSemanticLabel": {
     "description": "Метка для скринридера на иконке входа через Google."
+  },
+  "appointmentTitle": "Ваша запись",
+  "@appointmentTitle": {
+    "description": "Заголовок экрана записи и подпись под форматом приёма в карточке записи."
+  },
+  "startCallTitle": "Начать звонок",
+  "@startCallTitle": {
+    "description": "Кнопка начала звонка на экране записи."
+  },
+  "messageActionTitle": "Сообщение",
+  "@messageActionTitle": {
+    "description": "Кнопка перехода в чат с врачом. Подпись под ней — тот же текст, что и заголовок экрана переписки, см. doctorChatTitle."
+  },
+  "rescheduleTitle": "Перенести запись",
+  "@rescheduleTitle": {
+    "description": "Заголовок карточки переноса записи."
+  },
+  "createAppointmentTitle": "Создать запись",
+  "@createAppointmentTitle": {
+    "description": "Кнопка создания/переноса записи на экранах врача."
+  },
+  "videoCallSubtitle": "Видео-звонок",
+  "@videoCallSubtitle": {
+    "description": "Подпись под кнопкой «Создать запись»."
+  },
+  "appointmentRescheduledSnackbar": "Приём перенесён на {date}, {time}",
+  "@appointmentRescheduledSnackbar": {
+    "description": "Снек-бар подтверждения переноса записи.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "doctorSearchTitle": "Поиск врача",
+  "@doctorSearchTitle": {
+    "description": "Заголовок экранов поиска врача и результатов поиска."
+  },
+  "myDoctorsTitle": "Мои Врачи",
+  "@myDoctorsTitle": {
+    "description": "Заголовок карусели «Мои Врачи» — на поиске врача и в мед-карте."
+  },
+  "allDoctorsTitle": "Все Врачи",
+  "@allDoctorsTitle": {
+    "description": "Заголовок грида специальностей на поиске врача."
+  },
+  "doctorSearchHint": "Какой врач Вам нужен?",
+  "@doctorSearchHint": {
+    "description": "Плейсхолдер поиска врача."
+  },
+  "topReviewsTitle": "Топ отзывов",
+  "@topReviewsTitle": {
+    "description": "Заголовок карусели отзывов на профиле врача."
+  },
+  "writeReviewPlaceholder": "Оставьте свой отзыв...",
+  "@writeReviewPlaceholder": {
+    "description": "Плейсхолдер поля написания отзыва."
+  },
+  "aboutDoctorTitle": "О враче",
+  "@aboutDoctorTitle": {
+    "description": "Заголовок экрана профиля врача."
+  },
+  "scheduleTitle": "Расписание",
+  "@scheduleTitle": {
+    "description": "Заголовок карточки расписания на профиле врача."
+  },
+  "searchResultsCount": "Было найдено {count} врачей по Вашему запросу",
+  "@searchResultsCount": {
+    "description": "Счётчик результатов поиска врача.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sortByRating": "Рейтинг",
+  "@sortByRating": {
+    "description": "Фильтр сортировки результатов поиска по рейтингу."
+  },
+  "sortByExperience": "Стаж",
+  "@sortByExperience": {
+    "description": "Фильтр сортировки результатов поиска по стажу."
+  },
+  "sortByPrice": "Доступная цена",
+  "@sortByPrice": {
+    "description": "Фильтр сортировки результатов поиска по цене."
+  },
+  "nearbyFilterChip": "Близко к Вам",
+  "@nearbyFilterChip": {
+    "description": "Косметический фильтр «рядом» — не сортирует, геоданных нет."
+  },
+  "reviewsCountLabel": "{count} отзывов",
+  "@reviewsCountLabel": {
+    "description": "Число отзывов у врача в результатах поиска.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "topMatchLabel": "Топ рейтинга",
+  "@topMatchLabel": {
+    "description": "Метка лучшей карточки в результатах поиска."
+  },
+  "perConsultationLabel": "за консультацию",
+  "@perConsultationLabel": {
+    "description": "Подпись под ценой врача в результатах поиска."
+  },
+  "forGoldUsersLabel": "для пользователей Gold",
+  "@forGoldUsersLabel": {
+    "description": "Подпись скидочной цены для подписчиков Gold."
+  },
+  "prepaymentCardTitle": "Предоплата записи",
+  "@prepaymentCardTitle": {
+    "description": "Заголовок блока предоплаты на экране записи."
+  },
+  "prepaymentDiscountPrompt": "или оформите подписку и получите скидку",
+  "@prepaymentDiscountPrompt": {
+    "description": "Текст-приглашение оформить подписку в блоке предоплаты."
+  },
+  "subscribeButtonLabel": "Оформить подписку",
+  "@subscribeButtonLabel": {
+    "description": "Кнопка подписки в блоке предоплаты."
+  },
+  "goldPricePillLabel": "Цена с подпиской Gold",
+  "@goldPricePillLabel": {
+    "description": "Пилюля под ценой со скидкой в блоке предоплаты."
   }
 }

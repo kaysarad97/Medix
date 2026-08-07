@@ -58,6 +58,7 @@ class PrepaymentCard extends StatelessWidget {
 
     final gold = appointment.goldPriceLabel;
     final showDiscount = gold != null && !isGold;
+    final l10n = AppLocalizations.of(context)!;
 
     return AppCard(
       borderRadius: DoctorMetrics.allRadius,
@@ -65,7 +66,7 @@ class PrepaymentCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('Предоплата записи', style: AppTypography.cardTitleAccent),
+          Text(l10n.prepaymentCardTitle, style: AppTypography.cardTitleAccent),
           const SizedBox(height: 16),
           if (isGold && gold != null) ...[
             _StrikedPrice(label: base),
@@ -89,7 +90,7 @@ class PrepaymentCard extends StatelessWidget {
             const SizedBox(height: 16),
             Center(
               child: Text(
-                'или оформите подписку и получите скидку',
+                l10n.prepaymentDiscountPrompt,
                 style: AppTypography.captionMuted,
                 textAlign: TextAlign.center,
               ),
@@ -105,7 +106,10 @@ class PrepaymentCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
-            PrimaryButton(label: 'Оформить подписку', onPressed: onSubscribe),
+            PrimaryButton(
+              label: l10n.subscribeButtonLabel,
+              onPressed: onSubscribe,
+            ),
           ],
         ],
       ),
@@ -146,7 +150,7 @@ class _GoldPricePill extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Text(
-          'Цена с подпиской Gold',
+          AppLocalizations.of(context)!.goldPricePillLabel,
           style: AppTypography.goldLabel.copyWith(fontSize: 13),
         ),
       ),

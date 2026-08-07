@@ -9,6 +9,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/doctor_specialty.dart';
 import '../../../../shared/models/my_doctor.dart';
 import '../providers/telemedicine_providers.dart';
@@ -28,6 +29,7 @@ class DoctorSearchScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final specialties = ref.watch(doctorSpecialtiesProvider).value ?? const [];
     final myDoctors = ref.watch(myDoctorsProvider).value ?? const [];
+    final l10n = AppLocalizations.of(context)!;
 
     return AppScaffold(
       background: AppBackgroundStyle.main,
@@ -39,7 +41,7 @@ class DoctorSearchScreen extends ConsumerWidget {
             children: [
               const SizedBox(height: 16),
               ScreenTopBar(
-                title: 'Поиск врача',
+                title: l10n.doctorSearchTitle,
                 onBack: () => context.pop(),
                 trailing: const CityChip(city: 'Алматы'),
               ),
@@ -50,12 +52,15 @@ class DoctorSearchScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 20),
               if (myDoctors.isNotEmpty) ...[
-                _SectionTitle(title: 'Мои Врачи', onSeeAll: () {}),
+                _SectionTitle(title: l10n.myDoctorsTitle, onSeeAll: () {}),
                 const SizedBox(height: 12),
                 _MyDoctorsList(doctors: myDoctors),
                 const SizedBox(height: 20),
               ],
-              _SectionTitle(title: 'Все Врачи', trailing: const _SortIcon()),
+              _SectionTitle(
+                title: l10n.allDoctorsTitle,
+                trailing: const _SortIcon(),
+              ),
               const SizedBox(height: 12),
               Expanded(
                 child: SingleChildScrollView(
@@ -83,6 +88,7 @@ class _SearchField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       height: 54,
       child: DecoratedBox(
@@ -106,7 +112,7 @@ class _SearchField extends StatelessWidget {
                   decoration: InputDecoration(
                     isCollapsed: true,
                     border: InputBorder.none,
-                    hintText: 'Какой врач Вам нужен?',
+                    hintText: l10n.doctorSearchHint,
                     hintStyle: AppTypography.placeholder,
                   ),
                 ),
@@ -140,7 +146,10 @@ class _SectionTitle extends StatelessWidget {
           GestureDetector(
             onTap: onSeeAll,
             behavior: HitTestBehavior.opaque,
-            child: Text('Все', style: AppTypography.linkSmall),
+            child: Text(
+              AppLocalizations.of(context)!.viewAllLabel,
+              style: AppTypography.linkSmall,
+            ),
           ),
       ],
     );
@@ -259,7 +268,9 @@ class _SpecialtyTile extends StatelessWidget {
               ),
               const SizedBox(height: 2),
               Text(
-                '${specialty.doctorCount} врачей',
+                AppLocalizations.of(
+                  context,
+                )!.specialtyDoctorCount(specialty.doctorCount),
                 style: AppTypography.cardItemMeta,
               ),
             ],

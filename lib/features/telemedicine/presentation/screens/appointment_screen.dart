@@ -9,6 +9,7 @@ import '../../../../core/utils/ru_dates.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/appointment.dart';
 import '../../../../shared/models/subscription_tier.dart';
 import '../../../profile/presentation/providers/profile_providers.dart';
@@ -77,6 +78,7 @@ class _Content extends ConsumerWidget {
         : ref.watch(scheduleSelectionProvider).resolve(schedule!);
     final isGold =
         ref.watch(profileProvider).value?.subscription == SubscriptionTier.gold;
+    final l10n = AppLocalizations.of(context)!;
 
     return SingleChildScrollView(
       child: Column(
@@ -84,7 +86,7 @@ class _Content extends ConsumerWidget {
         children: [
           const SizedBox(height: DoctorMetrics.topBarTop),
           ScreenTopBar(
-            title: 'Ваша запись',
+            title: l10n.appointmentTitle,
             onBack: () => Navigator.of(context).maybePop(),
           ),
           const SizedBox(height: DoctorMetrics.topBarToHeader),
@@ -101,14 +103,14 @@ class _Content extends ConsumerWidget {
               secondaryFlex: 1,
               primary: ActionButtonData(
                 icon: MedixIcon.audioCall,
-                title: 'Начать звонок',
+                title: l10n.startCallTitle,
                 subtitle: appointment.kind.label,
                 onTap: () {},
               ),
               secondary: ActionButtonData(
                 icon: MedixIcon.chat,
-                title: 'Сообщение',
-                subtitle: 'Чат с врачом',
+                title: l10n.messageActionTitle,
+                subtitle: l10n.doctorChatTitle,
                 onTap: () => context.push(Routes.chats),
               ),
             ),
@@ -132,7 +134,7 @@ class _Content extends ConsumerWidget {
           if (schedule != null)
             _Section(
               child: ScheduleCard(
-                title: 'Перенести запись',
+                title: l10n.rescheduleTitle,
                 schedule: schedule!,
                 // Стрелок перелистывания месяца на этом макете нет.
                 showMonthArrows: false,
@@ -144,8 +146,8 @@ class _Content extends ConsumerWidget {
                   // В макете здесь трубка, а не камера, хотя подпись
                   // «Видео-звонок» — так на обоих экранах.
                   icon: MedixIcon.audioCall,
-                  title: 'Создать запись',
-                  subtitle: 'Видео-звонок',
+                  title: l10n.createAppointmentTitle,
+                  subtitle: l10n.videoCallSubtitle,
                   // Активна только после выбора нового дня и времени.
                   // Бэкенда нет — переносом считаем показ подтверждения,
                   // изменить дату самого приёма нечем: `appointment(id)`
@@ -159,9 +161,10 @@ class _Content extends ConsumerWidget {
                             ..showSnackBar(
                               SnackBar(
                                 content: Text(
-                                  'Приём перенесён на '
-                                  '${RuDates.dayMonth(slot)}, '
-                                  '${RuDates.time(slot)}',
+                                  l10n.appointmentRescheduledSnackbar(
+                                    RuDates.dayMonth(slot),
+                                    RuDates.time(slot),
+                                  ),
                                   style: AppTypography.bodyMd.copyWith(
                                     color: AppColors.textOnPrimary,
                                   ),
@@ -175,8 +178,8 @@ class _Content extends ConsumerWidget {
                 ),
                 secondaryAction: ActionButtonData(
                   icon: MedixIcon.mail,
-                  title: 'Сообщение',
-                  subtitle: 'Чат с врачом',
+                  title: l10n.messageActionTitle,
+                  subtitle: l10n.doctorChatTitle,
                   onTap: () => context.push(Routes.chats),
                 ),
               ),

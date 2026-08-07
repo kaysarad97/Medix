@@ -4,6 +4,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/icon_chip.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/doctor_review.dart';
 import 'doctor_metrics.dart';
 import 'rating_stars.dart';
@@ -48,7 +49,10 @@ class _ReviewsCardState extends State<ReviewsCard> {
           Padding(
             // Заголовок вдвинут глубже белой карточки: 42 против 33.
             padding: const EdgeInsets.only(left: 9),
-            child: Text('Топ отзывов', style: AppTypography.cardTitleDark),
+            child: Text(
+              AppLocalizations.of(context)!.topReviewsTitle,
+              style: AppTypography.cardTitleDark,
+            ),
           ),
           const SizedBox(height: DoctorMetrics.reviewsTitleToCard),
           SizedBox(
@@ -188,7 +192,7 @@ class ReviewComposer extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  'Оставьте свой отзыв...',
+                  AppLocalizations.of(context)!.writeReviewPlaceholder,
                   style: AppTypography.placeholder,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

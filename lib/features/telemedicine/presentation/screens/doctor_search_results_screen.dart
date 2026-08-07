@@ -9,6 +9,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/subscription_tier.dart';
 import '../../../profile/presentation/providers/profile_providers.dart';
 import '../../domain/entities/doctor.dart';
@@ -74,6 +75,7 @@ class _DoctorSearchResultsScreenState
     final sorted = _sorted(results);
     final isGold =
         ref.watch(profileProvider).value?.subscription == SubscriptionTier.gold;
+    final l10n = AppLocalizations.of(context)!;
 
     return AppScaffold(
       background: AppBackgroundStyle.main,
@@ -85,7 +87,7 @@ class _DoctorSearchResultsScreenState
             children: [
               const SizedBox(height: 16),
               ScreenTopBar(
-                title: 'Поиск врача',
+                title: l10n.doctorSearchTitle,
                 onBack: () => context.pop(),
                 trailing: const CityChip(city: 'Алматы'),
               ),
@@ -96,7 +98,7 @@ class _DoctorSearchResultsScreenState
               ),
               const SizedBox(height: 10),
               Text(
-                'Было найдено ${results.length} врачей по Вашему запросу',
+                l10n.searchResultsCount(results.length),
                 style: AppTypography.cardItemMeta,
               ),
               const SizedBox(height: 12),
@@ -178,26 +180,26 @@ class _FilterChips extends StatelessWidget {
   final _SortBy selected;
   final ValueChanged<_SortBy> onSelect;
 
-  static const _labels = {
-    _SortBy.rating: 'Рейтинг',
-    _SortBy.experience: 'Стаж',
-    _SortBy.price: 'Доступная цена',
-  };
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final labels = {
+      _SortBy.rating: l10n.sortByRating,
+      _SortBy.experience: l10n.sortByExperience,
+      _SortBy.price: l10n.sortByPrice,
+    };
     return SizedBox(
       height: 36,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        itemCount: _labels.length + 1,
+        itemCount: labels.length + 1,
         separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
-          if (index == _labels.length) {
+          if (index == labels.length) {
             // «Близко к Вам» — визуальный чип без сортировки, геоданных нет.
-            return const _Chip(label: 'Близко к Вам', active: false);
+            return _Chip(label: l10n.nearbyFilterChip, active: false);
           }
-          final entry = _labels.entries.elementAt(index);
+          final entry = labels.entries.elementAt(index);
           return _Chip(
             label: entry.value,
             active: entry.key == selected,
@@ -308,7 +310,9 @@ class _ResultCard extends StatelessWidget {
                         const SizedBox(width: 6),
                         Flexible(
                           child: Text(
-                            '${doctor.reviewsCount} отзывов',
+                            AppLocalizations.of(
+                              context,
+                            )!.reviewsCountLabel(doctor.reviewsCount),
                             style: AppTypography.cardItemMeta,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -378,12 +382,13 @@ class _Price extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         if (isTopMatch)
           Text(
-            'Топ рейтинга',
+            l10n.topMatchLabel,
             style: AppTypography.cardItemMeta,
             textAlign: TextAlign.right,
           ),
@@ -402,13 +407,13 @@ class _Price extends StatelessWidget {
           textAlign: TextAlign.right,
         ),
         Text(
-          'за консультацию',
+          l10n.perConsultationLabel,
           style: AppTypography.cardItemMeta,
           textAlign: TextAlign.right,
         ),
         if (isGold)
           Text(
-            'для пользователей Gold',
+            l10n.forGoldUsersLabel,
             style: AppTypography.goldLabel.copyWith(fontSize: 11),
             textAlign: TextAlign.right,
           ),

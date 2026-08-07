@@ -6,6 +6,7 @@ import '../../../../core/router/routes.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/doctor.dart';
 import '../../domain/entities/doctor_review.dart';
 import '../../domain/entities/doctor_schedule.dart';
@@ -65,6 +66,7 @@ class _Content extends ConsumerWidget {
     final selected = schedule == null
         ? null
         : ref.watch(scheduleSelectionProvider).resolve(schedule!);
+    final l10n = AppLocalizations.of(context)!;
 
     return SingleChildScrollView(
       child: Column(
@@ -72,7 +74,7 @@ class _Content extends ConsumerWidget {
         children: [
           const SizedBox(height: DoctorMetrics.topBarTop),
           ScreenTopBar(
-            title: 'О враче',
+            title: l10n.aboutDoctorTitle,
             onBack: () => Navigator.of(context).maybePop(),
             trailing: doctor.city == null ? null : CityChip(city: doctor.city!),
           ),
@@ -82,7 +84,7 @@ class _Content extends ConsumerWidget {
           if (schedule != null)
             _Section(
               child: ScheduleCard(
-                title: 'Расписание',
+                title: l10n.scheduleTitle,
                 schedule: schedule!,
                 selectedDay: selected?.day,
                 selectedSlot: selected?.slot,
@@ -92,8 +94,8 @@ class _Content extends ConsumerWidget {
                   // В макете здесь трубка, а не камера, хотя подпись
                   // «Видео-звонок» — так на обоих экранах.
                   icon: MedixIcon.audioCall,
-                  title: 'Создать запись',
-                  subtitle: 'Видео-звонок',
+                  title: l10n.createAppointmentTitle,
+                  subtitle: l10n.videoCallSubtitle,
                   // Активна только после выбора дня и времени. Настоящего
                   // бронирования нет — заглушка `DoctorsRepository.appointment`
                   // игнорирует id и всегда отдаёт один и тот же мок-приём,
@@ -104,8 +106,8 @@ class _Content extends ConsumerWidget {
                 ),
                 secondaryAction: ActionButtonData(
                   icon: MedixIcon.mail,
-                  title: 'Сообщение',
-                  subtitle: 'Чат с врачом',
+                  title: l10n.messageActionTitle,
+                  subtitle: l10n.doctorChatTitle,
                   onTap: () => context.push(Routes.chats),
                 ),
               ),
