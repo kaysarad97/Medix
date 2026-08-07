@@ -1,3 +1,5 @@
+import '../../../../core/utils/ru_money.dart';
+
 /// Врач в каталоге телемедицины.
 class Doctor {
   const Doctor({
@@ -70,19 +72,9 @@ class Doctor {
   /// «10 000 ₸» — разряды разделены пробелом, как на
   /// `design/Поиск врача результаты - Gold.png` (там разделитель — точка,
   /// но пробел — общий разделитель разрядов в остальном приложении).
-  String? get priceLabel => _withThousands(price);
+  String? get priceLabel => RuMoney.withThousands(price);
 
   /// Зачёркнутая цена до скидки, тем же форматом.
-  String? get priceBeforeDiscountLabel => _withThousands(priceBeforeDiscount);
-
-  static String? _withThousands(int? value) {
-    if (value == null) return null;
-    final digits = value.toString();
-    final groups = <String>[];
-    for (var end = digits.length; end > 0; end -= 3) {
-      final start = end - 3 < 0 ? 0 : end - 3;
-      groups.insert(0, digits.substring(start, end));
-    }
-    return groups.join(' ');
-  }
+  String? get priceBeforeDiscountLabel =>
+      RuMoney.withThousands(priceBeforeDiscount);
 }

@@ -10,6 +10,8 @@ import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../shared/models/appointment.dart';
+import '../../../../shared/models/subscription_tier.dart';
+import '../../../profile/presentation/providers/profile_providers.dart';
 import '../../domain/entities/doctor.dart';
 import '../../domain/entities/doctor_schedule.dart';
 import '../providers/telemedicine_providers.dart';
@@ -17,6 +19,7 @@ import '../widgets/action_button_row.dart';
 import '../widgets/appointment_summary_card.dart';
 import '../widgets/doctor_header.dart';
 import '../widgets/doctor_metrics.dart';
+import '../widgets/prepayment_card.dart';
 import '../widgets/schedule_card.dart';
 
 /// Оформленная запись: как связаться с врачом и как перенести приём.
@@ -72,6 +75,8 @@ class _Content extends ConsumerWidget {
     final selected = schedule == null
         ? null
         : ref.watch(scheduleSelectionProvider).resolve(schedule!);
+    final isGold =
+        ref.watch(profileProvider).value?.subscription == SubscriptionTier.gold;
 
     return SingleChildScrollView(
       child: Column(
@@ -108,6 +113,21 @@ class _Content extends ConsumerWidget {
               ),
             ),
           ),
+          if (appointment.basePriceLabel != null) ...[
+            const SizedBox(height: DoctorMetrics.summaryToActions),
+            _Section(
+              child: PrepaymentCard(
+                appointment: appointment,
+                isGold: isGold,
+                // Kaspi и Apple Pay проводят оплату своим интерфейсом — SDK
+                // ещё нет, поэтому оба ведут в один и тот же мок-результат,
+                // как кнопки на PaymentMethodScreen.
+                onPay: (method) =>
+                    context.push(Routes.paymentResultOf('success')),
+                onSubscribe: () => context.push(Routes.subscription),
+              ),
+            ),
+          ],
           const SizedBox(height: DoctorMetrics.actionsToReschedule),
           if (schedule != null)
             _Section(

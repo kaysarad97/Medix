@@ -51,6 +51,8 @@ class FakeDoctorsRepository implements DoctorsRepository {
     kind: AppointmentKind.audioCall,
     startsAt: DateTime(2026, 7, 10, 13, 30),
     doctorId: 'd1',
+    basePrice: 15000,
+    goldPrice: 10000,
   );
 
   @override

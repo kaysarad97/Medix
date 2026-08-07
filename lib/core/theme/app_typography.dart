@@ -184,9 +184,15 @@ abstract final class AppTypography {
   static TextStyle get chipLabel =>
       _style(size: 14, weight: 400, color: AppColors.textPrimary);
 
-  /// Заголовок карточки расписания. «Расписание», «Перенести запись».
+  /// Заголовок карточки расписания. «Расписание», «Перенести запись»,
+  /// «Предоплата записи».
   static TextStyle get cardTitleAccent =>
       _style(size: 19, weight: 400, color: AppColors.primaryBright);
+
+  /// Крупная цена в блоке предоплаты. «15 000 ₸», «10 000 ₸» — замер по
+  /// ширине краски «10.000 ₸» в `design/Предоплата - GOLD.png` (193 px).
+  static TextStyle get priceHero =>
+      _style(size: 34, weight: 600, color: AppColors.textPrimary);
 
   /// Заголовок карточки отзывов — мельче, чем у карточки расписания.
   static TextStyle get cardTitleDark =>

@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/theme/app_theme.dart';
+import 'package:medix/features/profile/presentation/providers/profile_providers.dart';
 import 'package:medix/features/telemedicine/presentation/providers/telemedicine_providers.dart';
 import 'package:medix/features/telemedicine/presentation/screens/appointment_screen.dart';
 import 'package:medix/features/telemedicine/presentation/screens/doctor_profile_screen.dart';
 
 import '../../helpers/fake_doctors_repository.dart';
+import '../../helpers/fake_profile_repository.dart';
 import '../../helpers/test_fonts.dart';
 
 /// Эталоны экранов врача для сверки с `design/Профиль врача + запись.png`
@@ -42,6 +44,9 @@ void main() {
           doctorsRepositoryProvider.overrideWithValue(
             const FakeDoctorsRepository(),
           ),
+          profileRepositoryProvider.overrideWithValue(
+            const FakeProfileRepository(),
+          ),
         ],
         child: MaterialApp(theme: AppTheme.light, home: screen),
       ),
@@ -55,6 +60,10 @@ void main() {
       await Future<void>.delayed(const Duration(milliseconds: 500));
     });
     await tester.pump();
+    await tester.pump();
+    // На «Ваша Запись» профиль подтягивается только после записи и врача —
+    // третий pump, иначе блок предоплаты застаёт Gold-подписку ещё
+    // незагруженной и рисует состояние «без подписки».
     await tester.pump();
   }
 
@@ -75,7 +84,7 @@ void main() {
     await pumpScreen(
       tester,
       const AppointmentScreen(appointmentId: 'a1'),
-      const Size(440, 978),
+      const Size(440, 1307),
     );
 
     await expectLater(
