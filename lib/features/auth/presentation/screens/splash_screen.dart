@@ -17,7 +17,11 @@ class SplashScreen extends ConsumerStatefulWidget {
   ///
   /// Проверка хранилища занимает миллисекунды, и без задержки логотип
   /// мигнул бы одним кадром — выглядит как сбой отрисовки.
-  static const Duration minimumVisible = Duration(milliseconds: 900);
+  ///
+  /// Значение — полный цикл анимации логотипа: в `logo_animated.gif`
+  /// 96 кадров с задержками 3–4 сотых, в сумме 3210 мс. Раньше стояло
+  /// 900 мс, и анимация обрывалась на первой трети.
+  static const Duration minimumVisible = Duration(milliseconds: 3210);
 
   @override
   ConsumerState<SplashScreen> createState() => _SplashScreenState();
