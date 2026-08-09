@@ -39,9 +39,8 @@ void main() {
       ),
     );
 
-    final fields = find.byType(TextField);
-    await tester.enterText(fields.at(0), 'abcedfg@gmail.com');
-    await tester.enterText(fields.at(1), 'password');
+    // Поле на экране одно: пароля больше нет, вход идёт по коду из письма.
+    await tester.enterText(find.byType(TextField), 'abcedfg@gmail.com');
 
     // Фоновая картинка и SVG декодируются асинхронно — без runAsync
     // в golden попадёт пустой прямоугольник.
