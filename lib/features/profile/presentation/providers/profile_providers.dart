@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../shared/models/analysis_result.dart';
 import '../../../../shared/models/app_language.dart';
 import '../../../../shared/models/my_doctor.dart';
+import '../../../../shared/services/preferences_service.dart';
 import '../../data/repositories/profile_repository.dart';
 import '../../domain/entities/medical_card.dart';
 import '../../domain/entities/medical_procedure.dart';
@@ -26,9 +27,12 @@ final profileProvider = FutureProvider<UserProfile>(
 /// переедут в него вместе.
 class AvatarSelection extends Notifier<String?> {
   @override
-  String? build() => null;
+  String? build() => ref.read(preferencesServiceProvider).readAvatar();
 
-  void select(String asset) => state = asset;
+  Future<void> select(String asset) async {
+    state = asset;
+    await ref.read(preferencesServiceProvider).saveAvatar(asset);
+  }
 }
 
 final avatarSelectionProvider = NotifierProvider<AvatarSelection, String?>(
@@ -120,7 +124,8 @@ class AppSettings {
 
   final bool notificationsEnabled;
 
-  /// `null` — язык не выбирали, интерфейс на языке системы.
+  /// Выбранный язык интерфейса. Системный не подхватываем: русский —
+  /// язык по умолчанию для казахстанского рынка, см. [MedixApp].
   final AppLanguage? language;
 
   AppSettings copyWith({bool? notificationsEnabled, AppLanguage? language}) {
@@ -137,11 +142,18 @@ final appSettingsProvider = NotifierProvider<AppSettingsNotifier, AppSettings>(
 
 class AppSettingsNotifier extends Notifier<AppSettings> {
   @override
-  AppSettings build() => const AppSettings(language: AppLanguage.ru);
+  AppSettings build() {
+    final stored = ref.read(preferencesServiceProvider).readLanguage();
+    return AppSettings(language: AppLanguage.byCode(stored) ?? AppLanguage.ru);
+  }
 
   void toggleNotifications(bool enabled) =>
       state = state.copyWith(notificationsEnabled: enabled);
 
-  void selectLanguage(AppLanguage language) =>
-      state = state.copyWith(language: language);
+  /// Экран не ждёт записи: интерфейс переключается сразу, на диск значение
+  /// уходит следом. Не дойдёт — потеряется ровно один выбор, а не сессия.
+  Future<void> selectLanguage(AppLanguage language) async {
+    state = state.copyWith(language: language);
+    await ref.read(preferencesServiceProvider).saveLanguage(language.code);
+  }
 }
