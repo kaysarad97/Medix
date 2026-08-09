@@ -94,34 +94,49 @@ class _CartBadge extends StatelessWidget {
 
   final int count;
 
+  /// Замеры по `design/Перечень услуг.png`: плашка 47×31 на x 352…399,
+  /// y 101…132. Радиус выведен по отступу края на трёх строках подряд
+  /// (4, 2 и 0 при 2, 4 и 7 от верха) — это ровно 10.
+  static const double height = 31;
+  static const double radius = 10;
+  static const double horizontalPadding = 10;
+  static const double iconSize = 16;
+  static const double iconToCount = 2;
+
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        color: AppColors.surfaceChip,
-        shape: BoxShape.circle,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(6),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(
-              Icons.shopping_cart_outlined,
-              size: 18,
-              color: AppColors.primary,
-            ),
-            if (count > 0) ...[
-              const SizedBox(width: 4),
-              Text(
-                '$count',
-                style: AppTypography.chipLabel.copyWith(
-                  color: AppColors.primary,
-                  fontSize: 13,
-                ),
+    return SizedBox(
+      height: height,
+      child: DecoratedBox(
+        decoration: const BoxDecoration(
+          color: AppColors.surfaceChip,
+          // Не круг: в макете это скруглённый прямоугольник, и ширина
+          // растёт вместе с числом — на двузначном круг обрезал бы цифры.
+          borderRadius: BorderRadius.all(Radius.circular(radius)),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: horizontalPadding),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                // Тележки в наборе дизайнера нет — глиф материальный.
+                Icons.shopping_cart_outlined,
+                size: iconSize,
+                color: AppColors.brandIndigo,
               ),
+              if (count > 0) ...[
+                const SizedBox(width: iconToCount),
+                Text(
+                  '$count',
+                  style: AppTypography.chipLabel.copyWith(
+                    color: AppColors.brandIndigo,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
