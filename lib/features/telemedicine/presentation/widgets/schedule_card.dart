@@ -143,7 +143,15 @@ class _Arrow extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: onTap,
-          child: Icon(icon, size: 18, color: AppColors.primary),
+          child: Icon(
+            icon,
+            size: 18,
+            // Гаснет, когда листать некуда: иначе нажатие без отклика
+            // читается как поломка.
+            color: onTap == null
+                ? AppColors.primary.withValues(alpha: 0.3)
+                : AppColors.primary,
+          ),
         ),
       ),
     );

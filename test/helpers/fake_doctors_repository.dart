@@ -45,8 +45,11 @@ class FakeDoctorsRepository implements DoctorsRepository {
     days: MockDoctorsRepository.weekFrom(DateTime(2026, 7, 20)),
   );
 
+  /// [from] намеренно игнорируется: тестам нужна одна и та же лента, на
+  /// какой бы неделе ни стоял экран.
   @override
-  Future<DoctorSchedule> schedule(String doctorId) async => fixedWeek;
+  Future<DoctorSchedule> schedule(String doctorId, {DateTime? from}) async =>
+      fixedWeek;
 
   @override
   Future<List<DoctorReview>> reviews(String doctorId) async => const [review1];

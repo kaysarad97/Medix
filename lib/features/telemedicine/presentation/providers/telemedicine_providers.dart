@@ -33,9 +33,41 @@ final doctorSearchResultsProvider = FutureProvider.family<List<Doctor>, String>(
   (ref, query) => ref.watch(doctorsRepositoryProvider).search(query),
 );
 
-final doctorScheduleProvider = FutureProvider.family<DoctorSchedule, String>(
-  (ref, doctorId) => ref.watch(doctorsRepositoryProvider).schedule(doctorId),
+/// На сколько недель вперёд отлистана лента расписания. Ноль — текущая.
+///
+/// Назад не уходим: записаться в прошлое нельзя, и стрелка «влево» на нуле
+/// гаснет.
+class ScheduleWeekOffset extends Notifier<int> {
+  @override
+  int build() => 0;
+
+  void next() => state = state + 1;
+
+  void previous() {
+    if (state > 0) state = state - 1;
+  }
+}
+
+final scheduleWeekOffsetProvider = NotifierProvider<ScheduleWeekOffset, int>(
+  ScheduleWeekOffset.new,
 );
+
+final doctorScheduleProvider = FutureProvider.family<DoctorSchedule, String>((
+  ref,
+  doctorId,
+) {
+  final weeks = ref.watch(scheduleWeekOffsetProvider);
+  final now = DateTime.now();
+
+  // На текущей неделе отсчёт от «сейчас», чтобы отпало уже прошедшее время.
+  // На будущих — от начала дня: там отсекать нечего, а от времени суток
+  // набор часов зависеть не должен.
+  final from = weeks == 0
+      ? now
+      : DateTime(now.year, now.month, now.day + weeks * 7);
+
+  return ref.watch(doctorsRepositoryProvider).schedule(doctorId, from: from);
+});
 
 final doctorReviewsProvider = FutureProvider.family<List<DoctorReview>, String>(
   (ref, doctorId) => ref.watch(doctorsRepositoryProvider).reviews(doctorId),
@@ -44,6 +76,39 @@ final doctorReviewsProvider = FutureProvider.family<List<DoctorReview>, String>(
 final appointmentProvider = FutureProvider.family<Appointment, String>(
   (ref, id) => ref.watch(doctorsRepositoryProvider).appointment(id),
 );
+
+/// Отзывы, написанные пользователем на экране врача.
+///
+/// Отправлять некуда: эндпоинта отзывов у бэкенда нет. Написанное встаёт
+/// первым в карусели — как своя реплика в переписке, — и живёт до
+/// перезапуска. Отдельно от [doctorReviewsProvider], чтобы не подменять
+/// собой то, что придёт с сервера.
+class ComposedReviews extends Notifier<List<DoctorReview>> {
+  @override
+  List<DoctorReview> build() => const [];
+
+  void add({required String text, required String authorName}) {
+    final trimmed = text.trim();
+    if (trimmed.isEmpty) return;
+
+    state = [
+      DoctorReview(
+        id: 'own-${DateTime.now().microsecondsSinceEpoch}',
+        authorName: authorName,
+        // ОЦЕНКУ СПРОСИТЬ НЕГДЕ. У поля отзыва в макете нет ни звёзд, ни
+        // чего-либо ещё для оценки, а `DoctorReview` без неё не бывает.
+        // Ставим пять; нужен ответ дизайнера — либо звёзды в поле, либо
+        // отзывы без оценки.
+        rating: 5,
+        text: trimmed,
+      ),
+      ...state,
+    ];
+  }
+}
+
+final composedReviewsProvider =
+    NotifierProvider<ComposedReviews, List<DoctorReview>>(ComposedReviews.new);
 
 /// Что пользователь выбрал в ленте расписания.
 ///
@@ -81,6 +146,10 @@ class ScheduleSelectionNotifier extends Notifier<ScheduleSelection> {
 
   void selectSlot(DateTime slot) =>
       state = ScheduleSelection(day: state.day, slot: slot);
+
+  /// Сбрасывается при листании недель: выбранный день остался в предыдущей
+  /// ленте, и подсветка встала бы на чужое число.
+  void reset() => state = const ScheduleSelection();
 }
 
 final scheduleSelectionProvider =

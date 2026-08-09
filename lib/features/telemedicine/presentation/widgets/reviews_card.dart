@@ -166,10 +166,33 @@ class _Dots extends StatelessWidget {
 ///
 /// Заливка в макете — не белая: замер даёт ровно чёрный с прозрачностью 4 %
 /// поверх градиента (204→196, 211→203, 230→221 по трём каналам).
-class ReviewComposer extends StatelessWidget {
-  const ReviewComposer({super.key, this.onTap});
+///
+/// Отправка идёт клавишей на клавиатуре, а не отдельной кнопкой: в макете
+/// рядом с полем ничего нет, и добавлять туда кнопку — уже не макет.
+class ReviewComposer extends StatefulWidget {
+  const ReviewComposer({super.key, this.onSubmit});
 
-  final VoidCallback? onTap;
+  /// Получает написанное. Пусто — поле только рисуется, как в голден-тестах.
+  final ValueChanged<String>? onSubmit;
+
+  @override
+  State<ReviewComposer> createState() => _ReviewComposerState();
+}
+
+class _ReviewComposerState extends State<ReviewComposer> {
+  final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _submit(String value) {
+    if (value.trim().isEmpty) return;
+    widget.onSubmit?.call(value);
+    _controller.clear();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -179,28 +202,34 @@ class ReviewComposer extends StatelessWidget {
         color: AppColors.textPrimary.withValues(alpha: 0.04),
         borderRadius: DoctorMetrics.allRadius,
         clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onTap,
-          child: Row(
-            children: [
-              const SizedBox(width: 14),
-              const AppIcon(
-                icon: MedixIcon.reviewCompose,
-                size: 28,
-                color: AppColors.primary,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  AppLocalizations.of(context)!.writeReviewPlaceholder,
-                  style: AppTypography.placeholder,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+        child: Row(
+          children: [
+            const SizedBox(width: 14),
+            const AppIcon(
+              icon: MedixIcon.reviewCompose,
+              size: 28,
+              color: AppColors.primary,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: TextField(
+                controller: _controller,
+                style: AppTypography.bodyMd,
+                cursorColor: AppColors.accent,
+                textInputAction: TextInputAction.send,
+                onSubmitted: _submit,
+                decoration: InputDecoration(
+                  isCollapsed: true,
+                  border: InputBorder.none,
+                  hintText: AppLocalizations.of(
+                    context,
+                  )!.writeReviewPlaceholder,
+                  hintStyle: AppTypography.placeholder,
                 ),
               ),
-              const SizedBox(width: 14),
-            ],
-          ),
+            ),
+            const SizedBox(width: 14),
+          ],
         ),
       ),
     );

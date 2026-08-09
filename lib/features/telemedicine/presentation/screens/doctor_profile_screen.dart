@@ -7,6 +7,7 @@ import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../profile/presentation/providers/profile_providers.dart';
 import '../../domain/entities/doctor.dart';
 import '../../domain/entities/doctor_review.dart';
 import '../../domain/entities/doctor_schedule.dart';
@@ -32,6 +33,8 @@ class DoctorProfileScreen extends ConsumerWidget {
     final doctor = ref.watch(doctorProvider(doctorId));
     final schedule = ref.watch(doctorScheduleProvider(doctorId));
     final reviews = ref.watch(doctorReviewsProvider(doctorId));
+    // Написанное здесь же идёт первым: свой отзыв должно быть видно сразу.
+    final composed = ref.watch(composedReviewsProvider);
 
     return AppScaffold(
       background: AppBackgroundStyle.main,
@@ -42,7 +45,7 @@ class DoctorProfileScreen extends ConsumerWidget {
             : _Content(
                 doctor: doctor.value!,
                 schedule: schedule.value,
-                reviews: reviews.value ?? const [],
+                reviews: [...composed, ...?reviews.value],
               ),
       ),
     );
@@ -66,6 +69,9 @@ class _Content extends ConsumerWidget {
     final selected = schedule == null
         ? null
         : ref.watch(scheduleSelectionProvider).resolve(schedule!);
+    final weekOffset = ref.watch(scheduleWeekOffsetProvider);
+    // Своим отзывом подписывается имя из профиля.
+    final profile = ref.watch(profileProvider).value;
     final l10n = AppLocalizations.of(context)!;
 
     return SingleChildScrollView(
@@ -86,6 +92,21 @@ class _Content extends ConsumerWidget {
               child: ScheduleCard(
                 title: l10n.scheduleTitle,
                 schedule: schedule!,
+                // Листание недель. Назад с текущей нельзя — записаться в
+                // прошлое некуда, и стрелка на нуле гаснет. Выбор дня при
+                // листании сбрасывается: он остался в прошлой ленте.
+                onPreviousMonth: weekOffset == 0
+                    ? null
+                    : () {
+                        ref
+                            .read(scheduleWeekOffsetProvider.notifier)
+                            .previous();
+                        notifier.reset();
+                      },
+                onNextMonth: () {
+                  ref.read(scheduleWeekOffsetProvider.notifier).next();
+                  notifier.reset();
+                },
                 selectedDay: selected?.day,
                 selectedSlot: selected?.slot,
                 onDaySelected: notifier.selectDay,
@@ -123,7 +144,17 @@ class _Content extends ConsumerWidget {
           if (reviews.isNotEmpty)
             _Section(child: ReviewsCard(reviews: reviews)),
           const SizedBox(height: DoctorMetrics.composerTop),
-          const _Section(child: ReviewComposer()),
+          _Section(
+            child: ReviewComposer(
+              // Пока профиль не загрузился, отзыв нечем подписать —
+              // отправка молчит, а печатать уже можно.
+              onSubmit: profile == null
+                  ? null
+                  : (text) => ref
+                        .read(composedReviewsProvider.notifier)
+                        .add(text: text, authorName: profile.fullName),
+            ),
+          ),
           const SizedBox(height: DoctorMetrics.screenH),
         ],
       ),

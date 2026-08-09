@@ -8,7 +8,9 @@ import '../../domain/entities/doctor_schedule.dart';
 abstract interface class DoctorsRepository {
   Future<Doctor> doctor(String id);
 
-  Future<DoctorSchedule> schedule(String doctorId);
+  /// Лента на семь дней начиная с [from]. Пусто — начиная с сегодняшнего дня.
+  /// Через параметр листаются недели вперёд.
+  Future<DoctorSchedule> schedule(String doctorId, {DateTime? from});
 
   Future<List<DoctorReview>> reviews(String doctorId);
 
@@ -49,9 +51,9 @@ class MockDoctorsRepository implements DoctorsRepository {
   }
 
   @override
-  Future<DoctorSchedule> schedule(String doctorId) async {
+  Future<DoctorSchedule> schedule(String doctorId, {DateTime? from}) async {
     await Future<void>.delayed(_latency);
-    return DoctorSchedule(days: weekFrom(DateTime.now()));
+    return DoctorSchedule(days: weekFrom(from ?? DateTime.now()));
   }
 
   @override

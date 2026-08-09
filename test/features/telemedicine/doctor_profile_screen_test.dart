@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/theme/app_theme.dart';
+import 'package:medix/features/profile/presentation/providers/profile_providers.dart';
 import 'package:medix/features/telemedicine/presentation/providers/telemedicine_providers.dart';
 import 'package:medix/features/telemedicine/presentation/screens/doctor_profile_screen.dart';
+import 'package:medix/features/telemedicine/presentation/widgets/reviews_card.dart';
 import 'package:medix/l10n/app_localizations.dart';
 
 import '../../helpers/fake_doctors_repository.dart';
+import '../../helpers/fake_profile_repository.dart';
 import '../../helpers/test_fonts.dart';
 
 void main() {
@@ -24,6 +27,10 @@ void main() {
         overrides: [
           doctorsRepositoryProvider.overrideWithValue(
             const FakeDoctorsRepository(),
+          ),
+          // Экран берёт отсюда имя, которым подписывается свой отзыв.
+          profileRepositoryProvider.overrideWithValue(
+            const FakeProfileRepository(),
           ),
         ],
         child: MaterialApp(
@@ -98,6 +105,27 @@ void main() {
     expect(
       container.read(scheduleSelectionProvider).resolve(schedule).slot,
       schedule.days[1].slots.first,
+    );
+  });
+
+  testWidgets('написанный отзыв появляется в карусели первым', (tester) async {
+    await pumpProfile(tester);
+
+    // Поле отзыва — единственный ввод на экране.
+    await tester.enterText(find.byType(TextField), 'Спасибо, всё объяснил');
+    await tester.testTextInput.receiveAction(TextInputAction.send);
+    await tester.pump();
+
+    expect(find.text('Спасибо, всё объяснил'), findsOneWidget);
+    // Подписан именем из профиля, а не «Пользователь 1» из заглушки. Ищем
+    // внутри карточки отзывов: врача в заглушке зовут так же, и по всему
+    // экрану совпадений два.
+    expect(
+      find.descendant(
+        of: find.byType(ReviewsCard),
+        matching: find.text('Имя Фамилия'),
+      ),
+      findsOneWidget,
     );
   });
 
