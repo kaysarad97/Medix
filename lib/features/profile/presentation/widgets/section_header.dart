@@ -25,7 +25,7 @@ class SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    final row = SizedBox(
       height: ProfileMetrics.sectionHeaderHeight,
       child: Row(
         children: [
@@ -52,6 +52,17 @@ class SectionHeader extends StatelessWidget {
             ),
         ],
       ),
+    );
+
+    if (onTap == null) return row;
+
+    // Нажимается вся строка, а не только шеврон: в макете это одна ссылка
+    // целиком, да и попасть пальцем в стрелку 14 px трудно. `opaque` нужен,
+    // чтобы срабатывал и пустой промежуток между названием и шевроном.
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: row,
     );
   }
 }
