@@ -46,7 +46,10 @@ class HomeScreen extends ConsumerWidget {
               const SizedBox(height: HomeMetrics.headerTop),
               HomeHeader(
                 unreadCount: 2,
-                onAvatarTap: () => context.push(Routes.profile),
+                // Вкладки нижней навигации переключаются через `go`: `push`
+                // поднимает вторую копию оболочки, и навигатор падает на
+                // повторных глобальных ключах.
+                onAvatarTap: () => context.go(Routes.profile),
               ),
               const SizedBox(height: HomeMetrics.headerToGreeting),
               _Section(
@@ -64,12 +67,12 @@ class HomeScreen extends ConsumerWidget {
                   // это прямое действие, а не диалог. Бот остаётся доступен
                   // через поиск симптомов и «Загрузить анализы» ниже.
                   onLabTests: () => context.push(Routes.labServices),
-                  onMessages: () => context.push(Routes.chats),
+                  onMessages: () => context.go(Routes.chats),
                   // Быстрый переход сразу к записи, в отличие от карусели
                   // специальностей ниже — там сначала список врачей.
                   onDoctorAppointment: () =>
                       context.push(Routes.doctorOf('d1')),
-                  onFindFacility: () => context.push(Routes.mapSearch),
+                  onFindFacility: () => context.go(Routes.mapSearch),
                 ),
               ),
               const SizedBox(height: HomeMetrics.cardGap),

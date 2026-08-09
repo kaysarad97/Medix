@@ -301,7 +301,7 @@ class _CallControls extends StatelessWidget {
             top: CallMetrics.controlsSideTop,
             child: _ControlButton(
               icon: MedixIcon.chat,
-              onTap: () => context.push(Routes.chats),
+              onTap: () => context.push(Routes.chatOf('t1')),
             ),
           ),
           Positioned(

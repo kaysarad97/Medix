@@ -108,7 +108,14 @@ class _Content extends ConsumerWidget {
                   icon: MedixIcon.mail,
                   title: l10n.messageActionTitle,
                   subtitle: l10n.doctorChatTitle,
-                  onTap: () => context.push(Routes.chats),
+                  // В переписку с врачом, а не в список чатов: список —
+                  // ветка нижней навигации, и `push` на неё поднимает вторую
+                  // копию оболочки с теми же глобальными ключами. Навигатор
+                  // на этом падает.
+                  //
+                  // Связи «врач → переписка» в заглушке нет, поэтому id
+                  // временный — как и мок-приём в кнопке рядом.
+                  onTap: () => context.push(Routes.chatOf('t1')),
                 ),
               ),
             ),
