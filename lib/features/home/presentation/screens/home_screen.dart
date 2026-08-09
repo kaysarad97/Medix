@@ -96,7 +96,13 @@ class HomeScreen extends ConsumerWidget {
                       context.push(Routes.appointmentOf(appointment.id)),
                 ),
               ),
-              const SizedBox(height: HomeMetrics.cardGap),
+              // Плавающий таб-бар накрывает низ экрана: его высоту AppShell
+              // кладёт в нижний отступ MediaQuery, и последняя карточка
+              // должна на неё подняться.
+              SizedBox(
+                height:
+                    HomeMetrics.cardGap + MediaQuery.paddingOf(context).bottom,
+              ),
             ],
           ),
         ),
