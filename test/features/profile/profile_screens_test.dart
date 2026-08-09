@@ -12,7 +12,7 @@ import 'package:medix/features/profile/presentation/screens/medical_card_form_sc
 import 'package:medix/features/profile/presentation/screens/medical_card_screen.dart';
 import 'package:medix/features/profile/presentation/screens/profile_settings_screen.dart';
 import 'package:medix/features/profile/presentation/screens/settings_screen.dart';
-import 'package:medix/features/profile/presentation/widgets/section_header.dart';
+import 'package:medix/core/widgets/section_header.dart';
 import 'package:medix/features/profile/domain/entities/medical_card.dart';
 import 'package:medix/l10n/app_localizations.dart';
 import 'package:medix/shared/models/app_language.dart';

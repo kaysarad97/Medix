@@ -7,8 +7,10 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_scaffold.dart';
+import '../../../../core/widgets/family_card.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../family_access/presentation/providers/family_providers.dart';
 import '../providers/home_providers.dart';
 import '../widgets/doctors_card.dart';
 import '../widgets/home_header.dart';
@@ -33,6 +35,7 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final specialties = ref.watch(specialtiesProvider);
     final appointments = ref.watch(upcomingAppointmentsProvider);
+    final family = ref.watch(familyMembersProvider).value ?? const [];
     final l10n = AppLocalizations.of(context)!;
 
     return AppScaffold(
@@ -91,6 +94,20 @@ class HomeScreen extends ConsumerWidget {
                   onTap: () => context.push(Routes.chatbot),
                 ),
               ),
+              if (family.isNotEmpty) ...[
+                const SizedBox(height: HomeMetrics.cardGap),
+                _Section(
+                  child: FamilyCard(
+                    members: family,
+                    title: l10n.familyScreenTitle,
+                    // На главной строка — вход в чужой профиль, а не сведения
+                    // о человеке: «Профиль для ребенка» вместо имени.
+                    rowStyle: FamilyRowStyle.entry,
+                    onMemberTap: (member) =>
+                        context.push(Routes.familyMemberOf(member.id)),
+                  ),
+                ),
+              ],
               const SizedBox(height: HomeMetrics.cardGap),
               _Section(
                 child: UpcomingAppointmentsCard(

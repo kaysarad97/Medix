@@ -8,9 +8,11 @@ import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/l10n/app_localizations.dart';
 import 'package:medix/shared/models/appointment.dart';
 import 'package:medix/shared/models/doctor_specialty.dart';
+import 'package:medix/features/family_access/presentation/providers/family_providers.dart';
 import 'package:medix/features/home/presentation/providers/home_providers.dart';
 import 'package:medix/features/home/presentation/screens/home_screen.dart';
 
+import '../../helpers/fake_family_repository.dart';
 import '../../helpers/test_fonts.dart';
 
 /// Эталон главной для сверки с `design/Главная.png`.
@@ -34,6 +36,11 @@ void main() {
           // на «timersPending».
           specialtiesProvider.overrideWith((ref) => _specialties),
           upcomingAppointmentsProvider.overrideWith((ref) => _appointments),
+          // По той же причине: заглушка семьи отдаёт данные через
+          // Future.delayed, и таймер переживает тест.
+          familyRepositoryProvider.overrideWithValue(
+            const FakeFamilyRepository(),
+          ),
         ],
         child: MaterialApp(
           theme: AppTheme.light,

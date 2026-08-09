@@ -6,18 +6,19 @@ import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_scaffold.dart';
+import '../../../../core/widgets/family_card.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
+import '../../../../core/widgets/section_header.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../family_access/presentation/providers/family_providers.dart';
 import '../providers/profile_providers.dart';
 import '../widgets/analyses_card.dart';
-import '../widgets/family_card.dart';
+
 import '../widgets/medical_card_summary.dart';
 import '../widgets/my_doctors_card.dart';
 import '../widgets/profile_header.dart';
 import '../widgets/profile_metrics.dart';
-import '../widgets/section_header.dart';
 
 /// Профиль пользователя — «Ваша Мед-Карта».
 ///

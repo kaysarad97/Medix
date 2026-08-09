@@ -7,7 +7,7 @@ import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'profile_metrics.dart';
-import 'section_header.dart';
+import '../../../../core/widgets/section_header.dart';
 
 /// Карточка «Мед-карта»: верхнее поле (ИИН у пользователя, «Родство с
 /// Вами» у члена семьи — см. `design/Моя Семья Ребенок.png`), три плитки с

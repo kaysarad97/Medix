@@ -8,7 +8,7 @@ import '../../../../core/widgets/icon_chip.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/analysis_result.dart';
 import 'profile_metrics.dart';
-import 'section_header.dart';
+import '../../../../core/widgets/section_header.dart';
 
 /// «Ваши анализы»: переключатель вкладок и список результатов со шкалой.
 class AnalysesCard extends StatelessWidget {

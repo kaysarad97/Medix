@@ -565,6 +565,18 @@
   "@yourAnalysesTitle": {
     "description": "Заголовок карточки анализов пользователя по умолчанию."
   },
+  "familyProfileChild": "Профиль для ребенка",
+  "@familyProfileChild": {
+    "description": "Строка «Моя Семья» на главной: вход в профиль ребёнка."
+  },
+  "familyProfileSenior": "Профиль для старшего поколения",
+  "@familyProfileSenior": {
+    "description": "Строка «Моя Семья» на главной: вход в профиль старшего."
+  },
+  "familyProfileHint": "мед-карта и процедуры",
+  "@familyProfileHint": {
+    "description": "Подпись под строкой «Моя Семья» на главной: что внутри."
+  },
   "familyRoleChild": "профиль ребенка",
   "@familyRoleChild": {
     "description": "Подпись под именем в карточке «Моя Семья»: профиль ребёнка."
