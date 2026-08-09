@@ -51,7 +51,7 @@ class MockDoctorsRepository implements DoctorsRepository {
   @override
   Future<DoctorSchedule> schedule(String doctorId) async {
     await Future<void>.delayed(_latency);
-    return DoctorSchedule(days: mockWeek);
+    return DoctorSchedule(days: weekFrom(DateTime.now()));
   }
 
   @override
@@ -155,24 +155,63 @@ class MockDoctorsRepository implements DoctorsRepository {
     MyDoctor(id: 'd3', specialty: 'Педиатр', fullName: 'Ф. Имя Отчество'),
   ];
 
-  /// Неделя из макета: понедельник — воскресенье, выходные недоступны.
+  /// Семь дней подряд начиная с [from]: столько же колонок, сколько в макете.
+  ///
+  /// Отсчёт идёт от переданного дня, а не от понедельника его недели. Это
+  /// экран записи: дни, которые уже прошли, занимают место и выбрать их
+  /// нельзя. По той же причине у первого дня отбрасывается время, которое
+  /// уже наступило.
+  ///
+  /// Параметр, а не `DateTime.now()` внутри: тестам нужна неподвижная
+  /// неделя, иначе эталоны менялись бы каждый день.
   ///
   /// РАСХОЖДЕНИЕ С МАКЕТОМ, ОСОЗНАННОЕ. На макете подписан «Июль, 2026»,
   /// а числа под днями идут 18…24 с понедельника. В июле 2026 года 18-е —
-  /// суббота, такой недели не существует. Числа взяты настоящие: 20…26.
-  /// Вёрстка от этого не меняется, ширина колонок одинаковая.
-  static final List<ScheduleDay> mockWeek = [
-    for (var day = 20; day <= 26; day++)
-      ScheduleDay(
-        date: DateTime(2026, 7, day),
-        slots: day >= 25
-            ? const []
-            : [
-                DateTime(2026, 7, day, 9, 30),
-                DateTime(2026, 7, day, 10, 30),
-                DateTime(2026, 7, day, 12, 30),
-                DateTime(2026, 7, day, 15, 30),
-              ],
-      ),
+  /// суббота, такой недели не существует. Вёрстка от настоящих чисел не
+  /// меняется: ширина колонок одинаковая.
+  static List<ScheduleDay> weekFrom(DateTime from) {
+    final first = DateTime(from.year, from.month, from.day);
+    return [
+      for (var i = 0; i < 7; i++)
+        _scheduleDay(
+          // Через конструктор, а не add(Duration): так переход через конец
+          // месяца считает сам DateTime.
+          DateTime(first.year, first.month, first.day + i),
+          notBefore: from,
+        ),
+    ];
+  }
+
+  /// Часы приёма одинаковы во все будни — как на макете. Выходные пустые:
+  /// в макете суббота и воскресенье серые.
+  static const List<({int hour, int minute})> _workingHours = [
+    (hour: 9, minute: 30),
+    (hour: 10, minute: 30),
+    (hour: 12, minute: 30),
+    (hour: 15, minute: 30),
   ];
+
+  static ScheduleDay _scheduleDay(
+    DateTime date, {
+    required DateTime notBefore,
+  }) {
+    final isWeekend =
+        date.weekday == DateTime.saturday || date.weekday == DateTime.sunday;
+
+    final slots = <DateTime>[];
+    if (!isWeekend) {
+      for (final time in _workingHours) {
+        final slot = DateTime(
+          date.year,
+          date.month,
+          date.day,
+          time.hour,
+          time.minute,
+        );
+        if (slot.isAfter(notBefore)) slots.add(slot);
+      }
+    }
+
+    return ScheduleDay(date: date, slots: slots);
+  }
 }

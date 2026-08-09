@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/utils/ru_dates.dart';
+import 'package:medix/features/telemedicine/data/repositories/doctors_repository.dart';
 import 'package:medix/features/telemedicine/domain/entities/doctor.dart';
 import 'package:medix/features/telemedicine/domain/entities/doctor_schedule.dart';
 import 'package:medix/shared/models/appointment.dart';
@@ -102,6 +103,53 @@ void main() {
 
     test('заголовок месяца берётся по первому дню ленты', () {
       expect(DoctorSchedule(days: week).monthLabel, 'Июль, 2026');
+    });
+  });
+
+  group('лента расписания строится от переданного дня', () {
+    test('семь дней подряд начиная с сегодняшнего', () {
+      final days = MockDoctorsRepository.weekFrom(DateTime(2026, 8, 12, 8));
+
+      expect(days.length, 7);
+      expect(days.first.date, DateTime(2026, 8, 12));
+      expect(days.last.date, DateTime(2026, 8, 18));
+    });
+
+    test('переход через конец месяца считается верно', () {
+      final days = MockDoctorsRepository.weekFrom(DateTime(2026, 8, 30));
+
+      expect(days.last.date, DateTime(2026, 9, 5));
+    });
+
+    test('выходные остаются без слотов', () {
+      // 15 и 16 августа 2026 — суббота и воскресенье.
+      final days = MockDoctorsRepository.weekFrom(DateTime(2026, 8, 12, 8));
+      final weekend = days.where(
+        (d) =>
+            d.date == DateTime(2026, 8, 15) || d.date == DateTime(2026, 8, 16),
+      );
+
+      expect(weekend, hasLength(2));
+      expect(weekend.every((d) => d.isAvailable), isFalse);
+    });
+
+    test('время, которое уже прошло, в первый день не попадает', () {
+      // Полдень: 9:30 и 10:30 позади, 12:30 и 15:30 ещё впереди.
+      final days = MockDoctorsRepository.weekFrom(DateTime(2026, 8, 12, 12));
+
+      expect(days.first.slots, [
+        DateTime(2026, 8, 12, 12, 30),
+        DateTime(2026, 8, 12, 15, 30),
+      ]);
+      // Следующий день урезать нечего.
+      expect(days[1].slots.first, DateTime(2026, 8, 13, 9, 30));
+    });
+
+    test('день, в котором приём уже кончился, недоступен', () {
+      final days = MockDoctorsRepository.weekFrom(DateTime(2026, 8, 12, 23));
+
+      expect(days.first.isAvailable, isFalse);
+      expect(DoctorSchedule(days: days).firstAvailable, days[1]);
     });
   });
 }

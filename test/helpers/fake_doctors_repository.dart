@@ -37,9 +37,16 @@ class FakeDoctorsRepository implements DoctorsRepository {
   @override
   Future<Doctor> doctor(String id) async => doctor1;
 
+  /// Неделя от понедельника 20 июля 2026 — та же, что была зашита в
+  /// заглушке до перехода на текущую дату. Здесь она неподвижна намеренно:
+  /// расписание в приложении отсчитывается от сегодняшнего дня, и без
+  /// фиксированной точки эталоны расходились бы каждые сутки.
+  static final DoctorSchedule fixedWeek = DoctorSchedule(
+    days: MockDoctorsRepository.weekFrom(DateTime(2026, 7, 20)),
+  );
+
   @override
-  Future<DoctorSchedule> schedule(String doctorId) async =>
-      DoctorSchedule(days: MockDoctorsRepository.mockWeek);
+  Future<DoctorSchedule> schedule(String doctorId) async => fixedWeek;
 
   @override
   Future<List<DoctorReview>> reviews(String doctorId) async => const [review1];
