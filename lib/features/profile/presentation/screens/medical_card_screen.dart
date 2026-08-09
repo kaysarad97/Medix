@@ -4,17 +4,15 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
-import '../../../../core/widgets/user_avatar.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../../shared/models/family_member.dart';
 import '../../../family_access/presentation/providers/family_providers.dart';
 import '../providers/profile_providers.dart';
 import '../widgets/analyses_card.dart';
+import '../widgets/family_card.dart';
 import '../widgets/medical_card_summary.dart';
 import '../widgets/my_doctors_card.dart';
 import '../widgets/profile_header.dart';
@@ -64,16 +62,18 @@ class MedicalCardScreen extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: ProfileMetrics.topBarToHeader),
-                    ProfileHeader(profile: profile),
-                    if (family.isNotEmpty) ...[
-                      const SizedBox(height: ProfileMetrics.cardGap),
-                      _Section(child: _FamilySwitcher(members: family)),
-                    ],
+                    ProfileHeader(
+                      profile: profile,
+                      avatarAsset: ref.watch(userAvatarProvider),
+                    ),
                     const SizedBox(height: ProfileMetrics.cardGap),
                     _Section(
                       child: MedicalCardSummary(
-                        topFieldValue: profile.iin,
-                        topFieldPlaceholder: l10n.iinHint,
+                        // Раньше здесь был ИИН. Его больше нет ни в профиле,
+                        // ни на бэкенде, а почта — то, по чему аккаунт
+                        // опознаётся при входе.
+                        topFieldValue: profile.email,
+                        topFieldPlaceholder: 'E-mail',
                         heightLabel: profile.heightLabel,
                         weightLabel: profile.weightLabel,
                         ageLabel: profile.ageLabel(now ?? DateTime.now()),
@@ -88,6 +88,17 @@ class MedicalCardScreen extends ConsumerWidget {
                         title: l10n.myDoctorsTitle,
                       ),
                     ),
+                    if (family.isNotEmpty) ...[
+                      const SizedBox(height: ProfileMetrics.cardGap),
+                      _Section(
+                        child: FamilyCard(
+                          members: family,
+                          title: l10n.familyScreenTitle,
+                          onMemberTap: (member) =>
+                              context.push(Routes.familyMemberOf(member.id)),
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: ProfileMetrics.cardGap),
                     _Section(
                       child: _ProceduresCard(
@@ -106,7 +117,14 @@ class MedicalCardScreen extends ConsumerWidget {
                               .select,
                         ),
                       ),
-                    const SizedBox(height: ProfileMetrics.cardGap),
+                    // Высоту плавающего таб-бара AppShell кладёт в нижний
+                    // отступ MediaQuery — без него карточка анализов уедет
+                    // под таблетку.
+                    SizedBox(
+                      height:
+                          ProfileMetrics.cardGap +
+                          MediaQuery.paddingOf(context).bottom,
+                    ),
                   ],
                 ),
               ),
@@ -133,79 +151,6 @@ class _ProceduresCard extends StatelessWidget {
         icon: MedixIcon.procedures,
         title: title,
         onTap: () => context.push(Routes.procedures),
-      ),
-    );
-  }
-}
-
-/// Переключатель «Моя семья» — своего макета нет ни у самой строки, ни у
-/// перехода с главной; есть только карточки, на которые она ведёт
-/// (`design/Моя Семья Ребенок.png`, `design/Моя Семья Старшие.png`).
-/// Помещена под шапкой профиля как самое естественное место входа.
-class _FamilySwitcher extends StatelessWidget {
-  const _FamilySwitcher({required this.members});
-
-  final List<FamilyMember> members;
-
-  static const double _chipSize = 48;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          AppLocalizations.of(context)!.myFamilyTitle,
-          style: AppTypography.sectionTitle,
-        ),
-        const SizedBox(height: 12),
-        SizedBox(
-          height: _chipSize + 28,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: members.length,
-            separatorBuilder: (_, _) => const SizedBox(width: 16),
-            itemBuilder: (context, index) {
-              final member = members[index];
-              return _MemberChip(
-                member: member,
-                onTap: () => context.push(Routes.familyMemberOf(member.id)),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _MemberChip extends StatelessWidget {
-  const _MemberChip({required this.member, required this.onTap});
-
-  final FamilyMember member;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: SizedBox(
-        width: 64,
-        child: Column(
-          children: [
-            UserAvatar(
-              asset: member.avatarAsset,
-              size: const Size.square(_FamilySwitcher._chipSize),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              member.firstName,
-              style: AppTypography.cardItemMeta,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
       ),
     );
   }

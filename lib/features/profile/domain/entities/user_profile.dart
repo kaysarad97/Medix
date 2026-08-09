@@ -13,7 +13,6 @@ class UserProfile {
     required this.birthDate,
     required this.subscription,
     this.email,
-    this.iin,
     this.registrationAddress,
     this.heightCm,
     this.weightKg,
@@ -28,10 +27,8 @@ class UserProfile {
   final DateTime birthDate;
   final SubscriptionTier subscription;
 
+  /// Почта — она же логин: вход идёт по коду, присланному на неё.
   final String? email;
-
-  /// ИИН. Пустой, пока пользователь не заполнил мед-карту.
-  final String? iin;
 
   final String? registrationAddress;
   final int? heightCm;

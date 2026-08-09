@@ -92,6 +92,9 @@ enum MedixIcon {
   /// Карандаш. «Ваши анализы».
   analyses,
 
+  /// Домик с сердцем. Заголовок карточки «Моя Семья» в мед-карте.
+  family,
+
   /// Ромб. Значок подписки Gold в шапке профиля.
   subscriptionGold,
 
@@ -179,6 +182,7 @@ abstract final class MedixIcons {
     MedixIcon.age: 'assets/icons/age.svg',
     MedixIcon.procedures: 'assets/icons/procedures.svg',
     MedixIcon.analyses: 'assets/icons/analyses.svg',
+    MedixIcon.family: 'assets/icons/family.svg',
     MedixIcon.subscriptionGold: 'assets/icons/subscription_gold.svg',
     MedixIcon.instagram: 'assets/icons/instagram.svg',
     MedixIcon.whatsapp: 'assets/icons/whatsapp.svg',

@@ -12,9 +12,19 @@ import 'profile_metrics.dart';
 /// Шапка экрана «Ваша Мед-Карта»: аватар, имя, пол с датой рождения
 /// и значок подписки.
 class ProfileHeader extends StatelessWidget {
-  const ProfileHeader({super.key, required this.profile, this.onAvatarTap});
+  const ProfileHeader({
+    super.key,
+    required this.profile,
+    this.avatarAsset,
+    this.onAvatarTap,
+  });
 
   final UserProfile profile;
+
+  /// Что показать вместо картинки из профиля — выбор пользователя на
+  /// экране «Выбор аватарки». Пусто, пока он ничего не выбирал.
+  final String? avatarAsset;
+
   final VoidCallback? onAvatarTap;
 
   @override
@@ -25,7 +35,7 @@ class ProfileHeader extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           UserAvatar(
-            asset: profile.avatarAsset,
+            asset: avatarAsset ?? profile.avatarAsset,
             url: profile.avatarUrl,
             size: ProfileMetrics.avatarSize,
             borderRadius: BorderRadius.circular(ProfileMetrics.avatarRadius),

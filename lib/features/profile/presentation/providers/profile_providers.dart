@@ -18,6 +18,30 @@ final profileProvider = FutureProvider<UserProfile>(
   (ref) => ref.watch(profileRepositoryProvider).profile(),
 );
 
+/// Аватарка, выбранная на экране «Выбор аватарки».
+///
+/// Живёт в памяти: поля под неё нет ни у бэкенда, ни у заглушки профиля,
+/// а хранилища настроек в проекте пока нет — как и у выбора языка, после
+/// перезапуска выбор сбрасывается. Появится хранилище — обе настройки
+/// переедут в него вместе.
+class AvatarSelection extends Notifier<String?> {
+  @override
+  String? build() => null;
+
+  void select(String asset) => state = asset;
+}
+
+final avatarSelectionProvider = NotifierProvider<AvatarSelection, String?>(
+  AvatarSelection.new,
+);
+
+/// Что показывать в шапках: выбранное пользователем, иначе то, что пришло
+/// с профилем.
+final userAvatarProvider = Provider<String?>((ref) {
+  return ref.watch(avatarSelectionProvider) ??
+      ref.watch(profileProvider).value?.avatarAsset;
+});
+
 final medicalCardProvider = FutureProvider<MedicalCard>(
   (ref) => ref.watch(profileRepositoryProvider).medicalCard(),
 );

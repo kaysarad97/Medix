@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/auth/presentation/screens/app_settings_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
+import '../../features/auth/presentation/screens/login_verify_screen.dart';
 import '../../features/auth/presentation/screens/personal_data_screen.dart';
 import '../../features/auth/presentation/screens/policy_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
@@ -16,6 +17,7 @@ import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/lab_chatbot/presentation/screens/chatbot_screen.dart';
 import '../../features/lab_services/presentation/screens/lab_services_screen.dart';
 import '../../features/map_search/presentation/screens/map_search_screen.dart';
+import '../../features/profile/presentation/screens/avatar_picker_screen.dart';
 import '../../features/profile/presentation/screens/contact_screen.dart';
 import '../../features/profile/presentation/screens/medical_card_form_screen.dart';
 import '../../features/profile/presentation/screens/medical_card_screen.dart';
@@ -50,6 +52,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.login,
         builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: Routes.loginVerify,
+        builder: (context, state) => const LoginVerifyScreen(),
       ),
       GoRoute(
         path: Routes.register,
@@ -208,7 +214,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: Routes.profileSettings,
-        builder: (context, state) => const ProfileSettingsScreen(),
+        builder: (context, state) => ProfileSettingsScreen(
+          onChangeAvatar: () => context.push(Routes.avatarPicker),
+        ),
+      ),
+      GoRoute(
+        path: Routes.avatarPicker,
+        builder: (context, state) => const AvatarPickerScreen(),
       ),
       GoRoute(
         path: Routes.contacts,

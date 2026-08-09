@@ -2,16 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/theme/app_theme.dart';
+import 'package:medix/core/widgets/icon_chip.dart';
+import 'package:medix/core/widgets/user_avatar.dart';
 import 'package:medix/features/family_access/presentation/providers/family_providers.dart';
 import 'package:medix/features/profile/presentation/providers/profile_providers.dart';
+import 'package:medix/features/profile/presentation/screens/avatar_picker_screen.dart';
 import 'package:medix/features/profile/presentation/screens/contact_screen.dart';
 import 'package:medix/features/profile/presentation/screens/medical_card_form_screen.dart';
 import 'package:medix/features/profile/presentation/screens/medical_card_screen.dart';
 import 'package:medix/features/profile/presentation/screens/profile_settings_screen.dart';
 import 'package:medix/features/profile/presentation/screens/settings_screen.dart';
+import 'package:medix/features/profile/presentation/widgets/section_header.dart';
 import 'package:medix/features/profile/domain/entities/medical_card.dart';
 import 'package:medix/l10n/app_localizations.dart';
 import 'package:medix/shared/models/app_language.dart';
+import 'package:medix/shared/models/medix_avatars.dart';
 
 import '../../helpers/fake_family_repository.dart';
 import '../../helpers/fake_profile_repository.dart';
@@ -56,8 +61,10 @@ void main() {
     testWidgets('рисует шапку с именем, полом и подпиской', (tester) async {
       await pump(tester, screen);
 
-      // Ещё два совпадения — имена мок-членов семьи в переключателе ниже.
-      expect(find.text('Имя'), findsNWidgets(3));
+      // Имя и фамилия в шапке — двумя строками, поэтому по отдельности.
+      // В карточке «Моя Семья» ниже они склеены в «Имя Фамилия» и сюда
+      // не попадают.
+      expect(find.text('Имя'), findsOneWidget);
       expect(find.text('Фамилия'), findsOneWidget);
       expect(find.text('мужчина'), findsOneWidget);
       expect(find.text('6/12/1996'), findsOneWidget);
@@ -76,21 +83,44 @@ void main() {
       expect(find.text('Ваши анализы'), findsOneWidget);
     });
 
+    testWidgets('строка-заголовок нажимается целиком, а не только шеврон', (
+      tester,
+    ) async {
+      var taps = 0;
+      await pump(
+        tester,
+        Scaffold(
+          body: SectionHeader(
+            icon: MedixIcon.medicalCard,
+            title: 'Мед-карта',
+            onTap: () => taps++,
+          ),
+        ),
+      );
+
+      // Жмём по названию, а не по стрелке: `onTap` не был подключён вовсе,
+      // строка рисовала шеврон и молчала на любое нажатие.
+      await tester.tap(find.text('Мед-карта'));
+      expect(taps, 1);
+    });
+
     testWidgets('возраст считается от переданной даты', (tester) async {
       await pump(tester, screen);
       // Родился 6 декабря 1996, на 2 августа 2026 — 29 полных лет.
       expect(find.text('29 лет'), findsOneWidget);
     });
 
-    testWidgets('переключатель «Моя семья» показывает членов семьи', (
+    testWidgets('карточка «Моя Семья» показывает членов семьи и их роли', (
       tester,
     ) async {
       await pump(tester, screen);
 
-      expect(find.text('Моя семья'), findsOneWidget);
-      // 3 совпадения: имя самого пользователя в шапке плюс оба мок-члена
-      // семьи, которых заглушка тоже зовёт «Имя».
-      expect(find.text('Имя'), findsNWidgets(3));
+      expect(find.text('Моя Семья'), findsOneWidget);
+      // Оба мок-члена семьи: заглушка зовёт обоих «Имя Фамилия», роли
+      // различаются.
+      expect(find.text('Имя Фамилия'), findsNWidgets(2));
+      expect(find.text('профиль ребенка'), findsOneWidget);
+      expect(find.text('профиль для старшего поколения'), findsOneWidget);
     });
   });
 
@@ -138,6 +168,43 @@ void main() {
     });
   });
 
+  group('Выбор аватарки', () {
+    testWidgets('рисует все аватарки из набора', (tester) async {
+      await pump(tester, const AvatarPickerScreen());
+
+      expect(find.text('Выбор аватарки'), findsOneWidget);
+      expect(find.byType(UserAvatar), findsNWidgets(MedixAvatars.all.length));
+    });
+
+    testWidgets('нажатие меняет выбранную', (tester) async {
+      await pump(tester, const AvatarPickerScreen());
+
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(AvatarPickerScreen)),
+      );
+      expect(container.read(avatarSelectionProvider), isNull);
+
+      // Третья по счёту: первая совпадает с запасной, и по ней нельзя
+      // отличить выбор от значения по умолчанию.
+      await tester.tap(find.byType(UserAvatar).at(2));
+      await tester.pump();
+
+      expect(container.read(avatarSelectionProvider), MedixAvatars.all[2]);
+      expect(container.read(userAvatarProvider), MedixAvatars.all[2]);
+    });
+  });
+
+  testWidgets('Настройки профиля: подпись ведёт на выбор аватарки', (
+    tester,
+  ) async {
+    var opened = 0;
+    await pump(tester, ProfileSettingsScreen(onChangeAvatar: () => opened++));
+
+    // Раньше роутер строил экран вообще без колбэка, и подпись молчала.
+    await tester.tap(find.text('изменить аватара'));
+    expect(opened, 1);
+  });
+
   testWidgets('Настройки профиля подставляют данные аккаунта', (tester) async {
     await pump(tester, const ProfileSettingsScreen());
     await tester.pump();
@@ -150,11 +217,11 @@ void main() {
     final fields = tester
         .widgetList<TextField>(find.byType(TextField))
         .toList();
-    expect(fields, hasLength(4));
+    // Полей три: поле пароля ушло вместе с паролями — вход по коду из письма.
+    expect(fields, hasLength(3));
     expect(fields[0].controller?.text, 'Имя');
     expect(fields[1].controller?.text, 'Фамилия');
     expect(fields[2].controller?.text, 'user@medix.kz');
-    expect(fields[3].controller?.text, isEmpty);
   });
 
   group('Форма мед-карты', () {

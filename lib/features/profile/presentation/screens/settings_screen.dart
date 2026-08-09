@@ -53,7 +53,7 @@ class SettingsScreen extends ConsumerWidget {
                 child: _RowCard(
                   onTap: onOpenProfileSettings,
                   leading: UserAvatar(
-                    asset: profile?.avatarAsset,
+                    asset: ref.watch(userAvatarProvider),
                     url: profile?.avatarUrl,
                     size: const Size.square(ProfileMetrics.settingsAvatarSize),
                     borderRadius: AppRadius.allSm,

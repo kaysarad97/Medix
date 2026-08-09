@@ -31,7 +31,6 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
   final _first = TextEditingController();
   final _last = TextEditingController();
   final _email = TextEditingController();
-  final _password = TextEditingController();
   var _prefilled = false;
 
   @override
@@ -39,7 +38,6 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
     _first.dispose();
     _last.dispose();
     _email.dispose();
-    _password.dispose();
     super.dispose();
   }
 
@@ -70,7 +68,7 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
               const SizedBox(height: 30),
               Center(
                 child: UserAvatar(
-                  asset: profile?.avatarAsset,
+                  asset: ref.watch(userAvatarProvider),
                   url: profile?.avatarUrl,
                   size: ProfileMetrics.profileAvatarSize,
                   borderRadius: BorderRadius.circular(
@@ -103,13 +101,9 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                       const SizedBox(height: ProfileMetrics.formFieldGap),
                       _Field(controller: _last, hint: l10n.lastNameHint),
                       const SizedBox(height: ProfileMetrics.formFieldGap),
+                      // Поля пароля здесь нет: паролей в MedIx нет вообще,
+                      // вход идёт по одноразовому коду на эту самую почту.
                       _Field(controller: _email, hint: 'E-mail'),
-                      const SizedBox(height: ProfileMetrics.formFieldGap),
-                      _Field(
-                        controller: _password,
-                        hint: l10n.passwordFieldHint,
-                        obscure: true,
-                      ),
                     ],
                   ),
                 ),
@@ -124,15 +118,10 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
 }
 
 class _Field extends StatelessWidget {
-  const _Field({
-    required this.controller,
-    required this.hint,
-    this.obscure = false,
-  });
+  const _Field({required this.controller, required this.hint});
 
   final TextEditingController controller;
   final String hint;
-  final bool obscure;
 
   @override
   Widget build(BuildContext context) {
@@ -148,7 +137,6 @@ class _Field extends StatelessWidget {
           child: Center(
             child: TextField(
               controller: controller,
-              obscureText: obscure,
               style: AppTypography.bodyMd,
               cursorColor: AppColors.accent,
               decoration: InputDecoration(
