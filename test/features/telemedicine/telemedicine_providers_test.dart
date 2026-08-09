@@ -61,10 +61,9 @@ void main() {
     test('пустая строка не отправляется', () {
       final ref = container();
 
-      ref.read(composedReviewsProvider.notifier).add(
-        text: '   ',
-        authorName: 'Имя Фамилия',
-      );
+      ref
+          .read(composedReviewsProvider.notifier)
+          .add(text: '   ', authorName: 'Имя Фамилия');
 
       expect(ref.read(composedReviewsProvider), isEmpty);
     });
@@ -72,10 +71,9 @@ void main() {
     test('пробелы по краям обрезаются', () {
       final ref = container();
 
-      ref.read(composedReviewsProvider.notifier).add(
-        text: '  Хороший врач  ',
-        authorName: 'Имя Фамилия',
-      );
+      ref
+          .read(composedReviewsProvider.notifier)
+          .add(text: '  Хороший врач  ', authorName: 'Имя Фамилия');
 
       expect(ref.read(composedReviewsProvider).single.text, 'Хороший врач');
     });
