@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 
-import '../theme/app_colors.dart';
-
 /// Аватар пользователя.
 ///
 /// Источников два: набор картинок в сборке, из которого пользователь
 /// выбирает себе одну, и ссылка с бэкенда — на случай, когда аватарки
-/// начнут приходить оттуда. Пока не выбрано ничего, рисуется подложка,
+/// начнут приходить оттуда. Пока не выбрано ничего, видна одна подложка,
 /// чтобы вёрстка не прыгала.
+///
+/// Подложка — градиент из макета (`icons/Фото.png`), а не заливка цветом:
+/// в `design/Профиль.png` под лицом лежит сиренево-голубой переход, и
+/// картинки аватаров нарисованы в расчёте на него.
 class UserAvatar extends StatelessWidget {
   const UserAvatar({
     super.key,
@@ -32,17 +34,18 @@ class UserAvatar extends StatelessWidget {
 
   final VoidCallback? onTap;
 
+  /// Градиентная подложка из макета.
+  static const String backgroundAsset = 'assets/images/avatar_bg.png';
+
   @override
   Widget build(BuildContext context) {
-    final Widget image;
+    final Widget? image;
     if (asset != null) {
       image = Image.asset(asset!, fit: BoxFit.cover);
     } else if (url != null) {
       image = Image.network(url!, fit: BoxFit.cover);
     } else {
-      image = const DecoratedBox(
-        decoration: BoxDecoration(color: AppColors.accentSoft),
-      );
+      image = null;
     }
 
     return GestureDetector(
@@ -53,7 +56,16 @@ class UserAvatar extends StatelessWidget {
         child: ClipRRect(
           borderRadius:
               borderRadius ?? BorderRadius.circular(size.shortestSide / 2),
-          child: image,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              // Градиент лежит и под выбранной картинкой: аватары дизайнера
+              // нарисованы с прозрачными углами, и без подложки на их месте
+              // просвечивал бы фон экрана.
+              Image.asset(backgroundAsset, fit: BoxFit.cover),
+              ?image,
+            ],
+          ),
         ),
       ),
     );
