@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:medix/core/constants/app_constants.dart';
+import 'package:medix/core/theme/app_spacing.dart';
 import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/core/widgets/primary_button.dart';
 import 'package:medix/features/auth/presentation/screens/personal_data_screen.dart';
@@ -9,6 +11,7 @@ import 'package:medix/features/auth/presentation/screens/verify_code_screen.dart
 import 'package:medix/features/auth/presentation/widgets/otp_code_input.dart';
 import 'package:medix/l10n/app_localizations.dart';
 
+import '../../helpers/auth_overrides.dart';
 import '../../helpers/test_fonts.dart';
 
 void main() {
@@ -22,6 +25,7 @@ void main() {
 
     await tester.pumpWidget(
       ProviderScope(
+        overrides: authOverrides,
         child: MaterialApp(
           theme: AppTheme.light,
           locale: const Locale('ru'),
@@ -34,14 +38,17 @@ void main() {
     await tester.pump();
   }
 
-  testWidgets('Создайте профиль: три поля и неактивная кнопка', (tester) async {
+  testWidgets('Создайте профиль: одно поле почты и неактивная кнопка', (
+    tester,
+  ) async {
     await pumpScreen(tester, const RegisterScreen());
 
     expect(find.text('Создайте профиль'), findsOneWidget);
     expect(find.text('Введите Вашу почту'), findsOneWidget);
-    expect(find.text('Придумайте пароль'), findsOneWidget);
-    expect(find.text('Подтвердите пароль'), findsOneWidget);
-    expect(find.byType(TextField), findsNWidgets(3));
+
+    // Паролей нет — поле осталось одно.
+    expect(find.byType(TextField), findsOneWidget);
+    expect(find.text('Придумайте пароль'), findsNothing);
 
     expect(
       tester.widget<PrimaryButton>(find.byType(PrimaryButton)).onPressed,
@@ -49,26 +56,10 @@ void main() {
     );
   });
 
-  testWidgets('кнопка «Далее» стоит в габаритах макета', (tester) async {
+  testWidgets('кнопка активируется после ввода почты', (tester) async {
     await pumpScreen(tester, const RegisterScreen());
 
-    // Замер по `design/Создайте профиль.png`: x 55…384, y 631…685.
-    final rect = tester.getRect(find.byType(PrimaryButton));
-    expect(rect.left, 55);
-    expect(rect.width, 330);
-    expect(rect.top, 631);
-    expect(rect.height, 55);
-  });
-
-  testWidgets('кнопка активируется после заполнения всех полей', (
-    tester,
-  ) async {
-    await pumpScreen(tester, const RegisterScreen());
-
-    final fields = find.byType(TextField);
-    await tester.enterText(fields.at(0), 'user@medix.kz');
-    await tester.enterText(fields.at(1), 'supersecret');
-    await tester.enterText(fields.at(2), 'supersecret');
+    await tester.enterText(find.byType(TextField), 'user@medix.kz');
     await tester.pump();
 
     expect(
@@ -77,59 +68,69 @@ void main() {
     );
   });
 
-  testWidgets('несовпадающие пароли показывают ошибку под полем', (
-    tester,
-  ) async {
+  testWidgets('некорректная почта показывает ошибку под полем', (tester) async {
     await pumpScreen(tester, const RegisterScreen());
 
-    final fields = find.byType(TextField);
-    await tester.enterText(fields.at(0), 'user@medix.kz');
-    await tester.enterText(fields.at(1), 'supersecret');
-    await tester.enterText(fields.at(2), 'othersecret');
+    await tester.enterText(find.byType(TextField), 'не-почта');
     await tester.pump();
 
     await tester.tap(find.text('Далее'));
     await tester.pump();
 
-    expect(find.text('Пароли не совпадают'), findsOneWidget);
+    expect(find.text('Некорректный e-mail'), findsOneWidget);
   });
 
-  testWidgets('Ваши данные: поля ИИН, ФИО и телефон', (tester) async {
+  testWidgets('Ваши данные: ФИО и дата рождения', (tester) async {
     await pumpScreen(tester, const PersonalDataScreen());
 
     expect(find.text('Ваши данные'), findsOneWidget);
-    expect(find.text('ИИН'), findsOneWidget);
     expect(find.text('ФИО'), findsOneWidget);
-    expect(find.text('Номер телефона'), findsOneWidget);
+    expect(find.text('Дата рождения'), findsOneWidget);
+
+    // ИИН и телефон убраны — бэкенд их не хранит.
+    expect(find.text('ИИН'), findsNothing);
+    expect(find.text('Номер телефона'), findsNothing);
   });
 
-  testWidgets('Введите код: пять боксов и обратный отсчёт', (tester) async {
+  testWidgets('Введите код: шесть боксов и обратный отсчёт', (tester) async {
     await pumpScreen(tester, const VerifyCodeScreen());
 
     expect(find.text('Введите код'), findsOneWidget);
-    expect(find.text('Подтвердите личность'), findsOneWidget);
-    expect(find.byType(TextField), findsNWidgets(5));
+    expect(find.byType(TextField), findsNWidgets(AppConstants.otpCodeLength));
     expect(
-      find.text('выслать СМС-сообщение еще раз через 00:59'),
+      find.text('выслать письмо с кодом ещё раз через 01:00'),
       findsOneWidget,
     );
 
     await tester.pumpWidget(const SizedBox());
   });
 
-  testWidgets('боксы кода в габаритах макета, ввод переносит фокус', (
+  testWidgets('боксы кода ужимаются под ширину экрана, ввод переносит фокус', (
     tester,
   ) async {
     await pumpScreen(tester, const VerifyCodeScreen());
 
-    // Замер по `design/Введите код (ПУСТОЙ).png`: 70×83, зазор 12.
     final boxes = find.descendant(
       of: find.byType(OtpCodeInput),
       matching: find.byType(SizedBox),
     );
     final first = tester.getRect(boxes.first);
-    expect(first.width, OtpCodeInput.boxWidth);
-    expect(first.height, OtpCodeInput.boxHeight);
+
+    // Шесть боксов по 70 в ширину 440 не влезают, поэтому ряд ужимается по
+    // доступной ширине с сохранением пропорции 70:83 из макета.
+    const available = 440 - 2 * AppSpacing.screenH;
+    const gaps = OtpCodeInput.gap * (AppConstants.otpCodeLength - 1);
+    const expectedWidth = (available - gaps) / AppConstants.otpCodeLength;
+
+    expect(first.width, closeTo(expectedWidth, 0.01));
+    expect(
+      first.height,
+      closeTo(
+        expectedWidth * OtpCodeInput.boxHeight / OtpCodeInput.boxWidth,
+        0.01,
+      ),
+    );
+    expect(first.width, lessThan(OtpCodeInput.boxWidth));
 
     await tester.enterText(find.byType(TextField).at(0), '1');
     await tester.pump();

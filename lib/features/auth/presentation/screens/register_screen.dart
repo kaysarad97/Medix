@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/routes.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_text_field.dart';
@@ -13,11 +12,11 @@ import '../../../../l10n/app_localizations.dart';
 import '../providers/registration_controller.dart';
 import '../widgets/registration_step_layout.dart';
 
-/// Шаг 1 регистрации — почта и пароль.
+/// Шаг 1 регистрации — почта.
 ///
-/// Свёрстан по `design/Создайте профиль.png`. Карточка здесь шире, чем на
-/// логине (400 против 370), а поля ниже (59 против 66) — геометрия
-/// у экранов разная, значения замерены отдельно.
+/// Свёрстан по `design/Создайте профиль.png`. Отличие от макета: полей
+/// пароля нет — бэкенд паролей не хранит, вместо них на шаге 3 приходит
+/// одноразовый код. Карточка из-за этого ниже, чем нарисовано.
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
@@ -26,9 +25,6 @@ class RegisterScreen extends ConsumerStatefulWidget {
 }
 
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
-  bool _obscurePassword = true;
-  bool _obscureConfirm = true;
-
   /// Заголовок 261…304 → карточка 354.
   static const double _titleToCard = 50;
 
@@ -50,51 +46,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenH),
           child: AppCard(
             padding: RegistrationFormCard.padding,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                AppTextField(
-                  hint: l10n.emailHint,
-                  height: AppTextField.compactFieldHeight,
-                  keyboardType: TextInputType.emailAddress,
-                  textInputAction: TextInputAction.next,
-                  autofillHints: const [AutofillHints.newUsername],
-                  errorText: state.errorOf(RegField.email),
-                  onChanged: (v) => controller.setField(RegField.email, v),
-                ),
-                const SizedBox(height: RegistrationFormCard.fieldGap),
-                AppTextField(
-                  hint: l10n.createPasswordHint,
-                  height: AppTextField.compactFieldHeight,
-                  obscureText: _obscurePassword,
-                  textInputAction: TextInputAction.next,
-                  autofillHints: const [AutofillHints.newPassword],
-                  errorText: state.errorOf(RegField.password),
-                  onChanged: (v) => controller.setField(RegField.password, v),
-                  suffix: _EyeToggle(
-                    obscured: _obscurePassword,
-                    onPressed: () =>
-                        setState(() => _obscurePassword = !_obscurePassword),
-                  ),
-                ),
-                const SizedBox(height: RegistrationFormCard.fieldGap),
-                AppTextField(
-                  hint: l10n.confirmPasswordHint,
-                  height: AppTextField.compactFieldHeight,
-                  obscureText: _obscureConfirm,
-                  textInputAction: TextInputAction.done,
-                  errorText: state.errorOf(RegField.passwordConfirm),
-                  onChanged: (v) =>
-                      controller.setField(RegField.passwordConfirm, v),
-                  onSubmitted: (_) => _next(),
-                  suffix: _EyeToggle(
-                    obscured: _obscureConfirm,
-                    onPressed: () =>
-                        setState(() => _obscureConfirm = !_obscureConfirm),
-                  ),
-                ),
-              ],
+            child: AppTextField(
+              hint: l10n.emailHint,
+              height: AppTextField.compactFieldHeight,
+              keyboardType: TextInputType.emailAddress,
+              textInputAction: TextInputAction.done,
+              autofillHints: const [AutofillHints.email],
+              errorText: state.errorOf(RegField.email),
+              onChanged: (v) => controller.setField(RegField.email, v),
+              onSubmitted: (_) => _next(),
             ),
           ),
         ),
@@ -103,14 +63,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           child: PrimaryButton(
             label: l10n.nextButtonLabel,
             trailingIcon: Icons.arrow_forward,
-            onPressed:
-                state.filled(const [
-                  RegField.email,
-                  RegField.password,
-                  RegField.passwordConfirm,
-                ])
-                ? _next
-                : null,
+            onPressed: state.filled(const [RegField.email]) ? _next : null,
           ),
         ),
       ],
@@ -118,29 +71,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 
   void _next() {
-    if (ref.read(registrationControllerProvider.notifier).submitCredentials()) {
+    if (ref.read(registrationControllerProvider.notifier).submitEmail()) {
       context.push(Routes.personalData);
     }
-  }
-}
-
-class _EyeToggle extends StatelessWidget {
-  const _EyeToggle({required this.obscured, required this.onPressed});
-
-  final bool obscured;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return IconButton(
-      onPressed: onPressed,
-      icon: Icon(
-        obscured ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-        size: 22,
-        color: AppColors.textSecondary,
-      ),
-      tooltip: obscured ? l10n.showPasswordTooltip : l10n.hidePasswordTooltip,
-    );
   }
 }

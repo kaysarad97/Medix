@@ -3,24 +3,25 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
 
-/// Поле ввода кода из СМС.
+/// Поле ввода одноразового кода из письма.
 ///
-/// Геометрия из `design/Введите код (ПУСТОЙ).png`: пять боксов 70×83
-/// с зазором 12, радиус 18, заливка [AppColors.surfaceWhite].
+/// Геометрия из `design/Введите код (ПУСТОЙ).png`: боксы 70×83 с зазором 12,
+/// радиус 18, заливка [AppColors.surfaceWhite].
 ///
-/// Эти размеры — максимум, а не константа. В сумме ряд занимает 398, а
-/// макет нарисован под ширину 440; на телефоне поуже (у Galaxy S23 FE
-/// 393 логических точки) ряд не помещался и вылезал за экран. Поэтому
-/// боксы ужимаются под доступную ширину с сохранением пропорции 70:83.
+/// Эти размеры — максимум, а не константа: боксы ужимаются под доступную
+/// ширину с сохранением пропорции 70:83. В макете боксов было пять, но
+/// бэкенд присылает шестизначный код — шесть боксов в макетную ширину 440
+/// уже не помещаются и ужимаются всегда.
 class OtpCodeInput extends StatefulWidget {
   const OtpCodeInput({
     super.key,
     required this.onChanged,
-    this.length = 5,
+    this.length = AppConstants.otpCodeLength,
     this.onCompleted,
   });
 

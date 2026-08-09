@@ -49,16 +49,11 @@ abstract final class Validators {
     return null;
   }
 
-  /// Повтор пароля должен совпадать с исходным.
-  static String? passwordConfirmation(String? value, String? original) {
-    final v = value ?? '';
-    if (v.isEmpty) return 'Повторите пароль';
-    if (v != (original ?? '')) return 'Пароли не совпадают';
-    return null;
-  }
-
-  /// Код подтверждения из СМС: [length] цифр.
-  static String? smsCode(String? value, {int length = 5}) {
+  /// Одноразовый код из письма: [length] цифр.
+  static String? otpCode(
+    String? value, {
+    int length = AppConstants.otpCodeLength,
+  }) {
     final v = value?.trim() ?? '';
     if (v.length != length || !_digitsOnly.hasMatch(v)) {
       return 'Код состоит из $length цифр';
@@ -66,51 +61,22 @@ abstract final class Validators {
     return null;
   }
 
-  static String? password(String? value) {
-    final v = value ?? '';
-    if (v.isEmpty) return 'Введите пароль';
-    if (v.length < 8) return 'Минимум 8 символов';
-    return null;
-  }
-
-  /// Поле «Ваш E-mail или ИИН»: если введены одни цифры — проверяем как ИИН,
-  /// иначе как e-mail.
-  static String? emailOrIin(String? value) {
-    final v = value?.trim() ?? '';
-    if (v.isEmpty) return 'Введите e-mail или ИИН';
-    if (_digitsOnly.hasMatch(v)) return iin(v);
-    return email(v);
-  }
-
-  /// ИИН РК: 12 цифр с контрольной суммой.
+  /// Дата рождения в формате `ГГГГ-ММ-ДД` — так её ждёт бэкенд.
   ///
-  /// Алгоритм: контрольный разряд — остаток от деления на 11 суммы
-  /// произведений первых 11 цифр на веса 1…11. Если остаток равен 10,
-  /// расчёт повторяется со вторым набором весов; если и он даёт 10 —
-  /// такой ИИН не существует.
-  static String? iin(String? value) {
+  /// Значение приходит с выбора даты, поэтому разбор здесь — страховка от
+  /// пустого поля, а не разбор произвольного ввода. Дата в будущем и
+  /// невозможный год отсекаются отдельно: и то и другое означает промах по
+  /// колесу выбора, а не реальную дату.
+  static String? birthDate(String? value) {
     final v = value?.trim() ?? '';
-    if (v.isEmpty) return 'Введите ИИН';
-    if (v.length != AppConstants.iinLength || !_digitsOnly.hasMatch(v)) {
-      return 'ИИН состоит из ${AppConstants.iinLength} цифр';
-    }
+    if (v.isEmpty) return 'Укажите дату рождения';
 
-    final digits = v.split('').map(int.parse).toList(growable: false);
+    final parsed = DateTime.tryParse(v);
+    if (parsed == null) return 'Некорректная дата';
 
-    const weights1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-    const weights2 = [3, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2];
-
-    int checksum(List<int> weights) {
-      var sum = 0;
-      for (var i = 0; i < weights.length; i++) {
-        sum += digits[i] * weights[i];
-      }
-      return sum % 11;
-    }
-
-    var control = checksum(weights1);
-    if (control == 10) control = checksum(weights2);
-    if (control == 10 || control != digits.last) return 'Некорректный ИИН';
+    final now = DateTime.now();
+    if (parsed.isAfter(now)) return 'Дата рождения не может быть в будущем';
+    if (parsed.year < now.year - 120) return 'Проверьте год рождения';
 
     return null;
   }

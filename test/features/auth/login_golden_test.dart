@@ -8,6 +8,7 @@ import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/features/auth/presentation/screens/login_screen.dart';
 import 'package:medix/l10n/app_localizations.dart';
 
+import '../../helpers/auth_overrides.dart';
 import '../../helpers/test_fonts.dart';
 
 /// Эталонный рендер логина для сверки с `design/Логин Старт.png`.
@@ -27,6 +28,7 @@ void main() {
 
     await tester.pumpWidget(
       ProviderScope(
+        overrides: authOverrides,
         child: MaterialApp(
           theme: AppTheme.light,
           locale: const Locale('ru'),

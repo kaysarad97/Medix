@@ -6,13 +6,10 @@ import '../../data/repositories/auth_repository.dart';
 
 /// Работать против заглушки вместо реального API.
 ///
-/// Бэкенд (FastAPI) ещё в разработке, поэтому по умолчанию `true`.
-/// Переключается сборочным флагом:
-/// `flutter run --dart-define=MEDIX_USE_MOCKS=false`
-const bool useMocks = bool.fromEnvironment(
-  'MEDIX_USE_MOCKS',
-  defaultValue: true,
-);
+/// Авторизация на бэкенде готова, поэтому по умолчанию приложение ходит в
+/// настоящий API. Заглушка остаётся для работы без поднятого сервера:
+/// `flutter run --dart-define=MEDIX_USE_MOCKS=true`
+const bool useMocks = bool.fromEnvironment('MEDIX_USE_MOCKS');
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
   if (useMocks) return const MockAuthRepository();

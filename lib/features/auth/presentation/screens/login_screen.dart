@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -15,11 +15,14 @@ import '../../../../l10n/app_localizations.dart';
 import '../providers/login_controller.dart';
 import '../widgets/social_auth_row.dart';
 
-/// Экран логина.
+/// Экран входа — шаг 1: почта.
 ///
 /// Свёрстан по `design/Логин Старт.png`. Макет 440×956 = логические точки
 /// iPhone 16 Pro Max, поэтому вертикальные отступы ниже — прямые замеры,
 /// а не подобранные значения. Каждая константа помечена позицией в макете.
+///
+/// Отличие от макета: поля пароля нет — бэкенд паролей не хранит, вход идёт
+/// по одноразовому коду из письма. Карточка из-за этого ниже, чем нарисовано.
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -28,9 +31,7 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  final _identifierController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _passwordFocus = FocusNode();
+  final _emailController = TextEditingController();
 
   /// Верх строки заголовка — 172 при безопасной зоне 62.
   static const double _titleTop = 110;
@@ -47,11 +48,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   /// Кнопка 652…722 → ссылка 765.
   static const double _buttonToLink = 35;
 
+  /// Внутренние поля карточки: слева/справа 13, сверху 18, снизу 12.
+  static const EdgeInsets _cardPadding = EdgeInsets.fromLTRB(13, 18, 13, 12);
+
   @override
   void dispose() {
-    _identifierController.dispose();
-    _passwordController.dispose();
-    _passwordFocus.dispose();
+    _emailController.dispose();
     super.dispose();
   }
 
@@ -62,11 +64,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     ref.listen(loginControllerProvider, (previous, next) {
-      if (next.isAuthenticated && previous?.isAuthenticated != true) {
-        context.go(Routes.home);
-        return;
-      }
-
       final error = next.formError;
       if (error != null && error != previous?.formError) {
         showFormErrorSnackBar(context, error);
@@ -91,14 +88,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.formCardH,
                 ),
-                child: _CredentialsCard(
-                  identifierController: _identifierController,
-                  passwordController: _passwordController,
-                  passwordFocus: _passwordFocus,
-                  state: state,
-                  onIdentifierChanged: controller.identifierChanged,
-                  onPasswordChanged: controller.passwordChanged,
-                  onSubmit: controller.submit,
+                child: AppCard(
+                  padding: _cardPadding,
+                  child: AppTextField(
+                    label: l10n.emailLabel,
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.done,
+                    autofillHints: const [AutofillHints.email],
+                    errorText: state.emailError,
+                    onChanged: controller.emailChanged,
+                    onSubmitted: (_) => _next(),
+                  ),
                 ),
               ),
               const SizedBox(height: _cardToSocial),
@@ -114,11 +115,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   horizontal: AppSpacing.screenH,
                 ),
                 child: PrimaryButton(
-                  label: l10n.loginButtonLabel,
+                  label: l10n.sendCodeButtonLabel,
                   size: PrimaryButtonSize.large,
                   color: AppColors.primary,
                   isLoading: state.isSubmitting,
-                  onPressed: state.canSubmit ? controller.submit : null,
+                  onPressed: state.canSubmitEmail ? _next : null,
                 ),
               ),
               const SizedBox(height: _buttonToLink),
@@ -145,70 +146,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       ),
     );
   }
-}
 
-class _CredentialsCard extends StatelessWidget {
-  const _CredentialsCard({
-    required this.identifierController,
-    required this.passwordController,
-    required this.passwordFocus,
-    required this.state,
-    required this.onIdentifierChanged,
-    required this.onPasswordChanged,
-    required this.onSubmit,
-  });
-
-  final TextEditingController identifierController;
-  final TextEditingController passwordController;
-  final FocusNode passwordFocus;
-  final LoginState state;
-  final ValueChanged<String> onIdentifierChanged;
-  final ValueChanged<String> onPasswordChanged;
-  final VoidCallback onSubmit;
-
-  /// Внутренние поля карточки: слева/справа 13, сверху 18, снизу 12.
-  static const EdgeInsets _cardPadding = EdgeInsets.fromLTRB(13, 18, 13, 12);
-
-  /// Низ первого поля (415) → верх подписи «Пароль:» (431).
-  static const double _fieldToLabel = 16;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return AppCard(
-      padding: _cardPadding,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          AppTextField(
-            label: l10n.emailOrIinLabel,
-            controller: identifierController,
-            keyboardType: TextInputType.emailAddress,
-            textInputAction: TextInputAction.next,
-            autofillHints: const [AutofillHints.username],
-            errorText: state.identifierError,
-            onChanged: onIdentifierChanged,
-            onSubmitted: (_) => passwordFocus.requestFocus(),
-          ),
-          const SizedBox(height: _fieldToLabel),
-          AppTextField(
-            label: l10n.passwordLabel,
-            controller: passwordController,
-            focusNode: passwordFocus,
-            obscureText: true,
-            textInputAction: TextInputAction.done,
-            autofillHints: const [AutofillHints.password],
-            errorText: state.passwordError,
-            onChanged: onPasswordChanged,
-            onSubmitted: (_) => onSubmit(),
-            // В `Логин Старт.png` кнопки «показать пароль» нет, хотя на
-            // `Создайте профиль.png` она есть. Оставлено как в макете
-            // логина — AppTextField поддерживает suffix, включается одной
-            // строкой, если дизайн решит добавить.
-          ),
-        ],
-      ),
-    );
+  Future<void> _next() async {
+    final ok = await ref.read(loginControllerProvider.notifier).submitEmail();
+    if (ok && mounted) context.push(Routes.loginVerify);
   }
 }

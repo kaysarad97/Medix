@@ -6,6 +6,7 @@ import 'package:medix/core/widgets/primary_button.dart';
 import 'package:medix/features/auth/presentation/screens/login_screen.dart';
 import 'package:medix/l10n/app_localizations.dart';
 
+import '../../helpers/auth_overrides.dart';
 import '../../helpers/test_fonts.dart';
 
 void main() {
@@ -19,6 +20,7 @@ void main() {
 
     await tester.pumpWidget(
       ProviderScope(
+        overrides: authOverrides,
         child: MaterialApp(
           theme: AppTheme.light,
           locale: const Locale('ru'),
@@ -31,32 +33,31 @@ void main() {
     await tester.pump();
   }
 
-  testWidgets('рисует все элементы макета Логин Старт', (tester) async {
+  testWidgets('рисует элементы шага 1 входа: только почта', (tester) async {
     await pumpLogin(tester);
 
     expect(find.text('Логин'), findsOneWidget);
-    expect(find.text('Ваш E-mail или ИИН:'), findsOneWidget);
-    expect(find.text('Пароль:'), findsOneWidget);
+    expect(find.text('Ваш E-mail:'), findsOneWidget);
     expect(find.text('или авторизоваться через'), findsOneWidget);
-    expect(find.text('Войти'), findsOneWidget);
+    expect(find.text('Получить код'), findsOneWidget);
     expect(find.text('или создать профиль'), findsOneWidget);
+
+    // Поле пароля убрано вместе с паролями — на экране ровно одно поле.
+    expect(find.byType(TextField), findsOneWidget);
+    expect(find.text('Пароль:'), findsNothing);
   });
 
-  testWidgets('кнопка «Войти» неактивна, пока поля пустые', (tester) async {
+  testWidgets('кнопка неактивна, пока поле пустое', (tester) async {
     await pumpLogin(tester);
 
     final button = tester.widget<PrimaryButton>(find.byType(PrimaryButton));
     expect(button.onPressed, isNull);
   });
 
-  testWidgets('кнопка активируется после заполнения обоих полей', (
-    tester,
-  ) async {
+  testWidgets('кнопка активируется после ввода почты', (tester) async {
     await pumpLogin(tester);
 
-    final fields = find.byType(TextField);
-    await tester.enterText(fields.at(0), 'abcedfg@gmail.com');
-    await tester.enterText(fields.at(1), 'supersecret');
+    await tester.enterText(find.byType(TextField), 'abcedfg@gmail.com');
     await tester.pump();
 
     final button = tester.widget<PrimaryButton>(find.byType(PrimaryButton));
@@ -68,18 +69,16 @@ void main() {
   ) async {
     await pumpLogin(tester);
 
-    final fields = find.byType(TextField);
-    await tester.enterText(fields.at(0), 'не-почта');
-    await tester.enterText(fields.at(1), 'supersecret');
+    await tester.enterText(find.byType(TextField), 'не-почта');
     await tester.pump();
 
-    await tester.tap(find.text('Войти'));
+    await tester.tap(find.text('Получить код'));
     await tester.pump();
 
     expect(find.text('Некорректный e-mail'), findsOneWidget);
   });
 
-  testWidgets('высота кнопки и полей совпадает с макетом', (tester) async {
+  testWidgets('высота кнопки и поля совпадает с макетом', (tester) async {
     await pumpLogin(tester);
 
     expect(tester.getSize(find.byType(PrimaryButton)).height, 70);

@@ -7,7 +7,7 @@ import '../../../../shared/models/app_language.dart';
 import 'auth_providers.dart';
 
 /// Текстовые поля мастера регистрации.
-enum RegField { email, password, passwordConfirm, iin, fullName, phone, code }
+enum RegField { email, fullName, birthDate, code }
 
 @immutable
 class RegistrationState {
@@ -19,6 +19,7 @@ class RegistrationState {
     this.language,
     this.pushConsent = false,
     this.policyAccepted = false,
+    this.codeTtlSeconds = 0,
   });
 
   final Map<RegField, String> values;
@@ -40,6 +41,10 @@ class RegistrationState {
   /// обрабатывать персональные и медицинские данные нельзя.
   final bool policyAccepted;
 
+  /// Сколько живёт отправленный код, по данным сервера. Экран ввода кода
+  /// показывает по нему, когда код протухнет.
+  final int codeTtlSeconds;
+
   String value(RegField field) => values[field] ?? '';
   String? errorOf(RegField field) => fieldErrors[field];
 
@@ -54,6 +59,7 @@ class RegistrationState {
     AppLanguage? language,
     bool? pushConsent,
     bool? policyAccepted,
+    int? codeTtlSeconds,
   }) {
     return RegistrationState(
       values: values ?? this.values,
@@ -64,12 +70,16 @@ class RegistrationState {
       language: language ?? this.language,
       pushConsent: pushConsent ?? this.pushConsent,
       policyAccepted: policyAccepted ?? this.policyAccepted,
+      codeTtlSeconds: codeTtlSeconds ?? this.codeTtlSeconds,
     );
   }
 }
 
-/// Состояние мастера регистрации целиком: данные копятся между шагами,
-/// на сервер уходят одним запросом после шага «Ваши данные».
+/// Состояние мастера регистрации целиком.
+///
+/// Данные копятся между шагами и уходят на сервер одним запросом после шага
+/// «Ваши данные»: бэкенд заводит заявку и отправляет код только когда знает
+/// и почту, и имя, и дату рождения.
 class RegistrationController extends Notifier<RegistrationState> {
   @override
   RegistrationState build() => const RegistrationState();
@@ -81,15 +91,11 @@ class RegistrationController extends Notifier<RegistrationState> {
     );
   }
 
-  /// Шаг 1 — почта и пароль. Сервер не трогаем, только проверяем ввод.
-  bool submitCredentials() {
+  /// Шаг 1 — почта. Сервер не трогаем, только проверяем ввод: узнать, занят
+  /// ли адрес, всё равно можно лишь на следующем шаге.
+  bool submitEmail() {
     final errors = _collect({
       RegField.email: Validators.email(state.value(RegField.email)),
-      RegField.password: Validators.password(state.value(RegField.password)),
-      RegField.passwordConfirm: Validators.passwordConfirmation(
-        state.value(RegField.passwordConfirm),
-        state.value(RegField.password),
-      ),
     });
 
     if (errors.isNotEmpty) {
@@ -99,14 +105,13 @@ class RegistrationController extends Notifier<RegistrationState> {
     return true;
   }
 
-  /// Шаг 2 — ИИН, ФИО, телефон. Здесь создаётся профиль и уходит СМС.
+  /// Шаг 2 — ФИО и дата рождения. Здесь создаётся заявка и уходит письмо.
   Future<bool> submitPersonalData() async {
     if (state.isSubmitting) return false;
 
     final errors = _collect({
-      RegField.iin: Validators.iin(state.value(RegField.iin)),
       RegField.fullName: Validators.fullName(state.value(RegField.fullName)),
-      RegField.phone: Validators.phone(state.value(RegField.phone)),
+      RegField.birthDate: Validators.birthDate(state.value(RegField.birthDate)),
     });
 
     if (errors.isNotEmpty) {
@@ -114,18 +119,26 @@ class RegistrationController extends Notifier<RegistrationState> {
       return false;
     }
 
+    return _requestCode();
+  }
+
+  /// Повторная отправка кода с экрана ввода.
+  ///
+  /// Это тот же запрос, что и на шаге 2: у бэкенда нет отдельного эндпоинта
+  /// «отправить ещё раз», заявка просто перезаписывается.
+  Future<bool> resendCode() => _requestCode();
+
+  Future<bool> _requestCode() async {
     state = state.copyWith(isSubmitting: true);
     try {
-      await ref
+      final ttl = await ref
           .read(authRepositoryProvider)
-          .register(
-            email: state.value(RegField.email),
-            password: state.value(RegField.password),
-            iin: state.value(RegField.iin).trim(),
+          .registerStart(
+            email: state.value(RegField.email).trim(),
             fullName: state.value(RegField.fullName).trim(),
-            phone: state.value(RegField.phone).trim(),
+            birthDate: DateTime.parse(state.value(RegField.birthDate)),
           );
-      state = state.copyWith(isSubmitting: false);
+      state = state.copyWith(isSubmitting: false, codeTtlSeconds: ttl);
       return true;
     } on ApiException catch (e) {
       state = state.copyWith(isSubmitting: false, formError: e.message);
@@ -133,12 +146,12 @@ class RegistrationController extends Notifier<RegistrationState> {
     }
   }
 
-  /// Шаг 3 — код из СМС. Успех открывает сессию.
+  /// Шаг 3 — код из письма. Успех открывает сессию.
   Future<bool> submitCode() async {
     if (state.isSubmitting) return false;
 
     final errors = _collect({
-      RegField.code: Validators.smsCode(state.value(RegField.code)),
+      RegField.code: Validators.otpCode(state.value(RegField.code)),
     });
 
     if (errors.isNotEmpty) {
@@ -150,8 +163,8 @@ class RegistrationController extends Notifier<RegistrationState> {
     try {
       await ref
           .read(authRepositoryProvider)
-          .verifyCode(
-            phone: state.value(RegField.phone).trim(),
+          .registerVerify(
+            email: state.value(RegField.email).trim(),
             code: state.value(RegField.code),
           );
       state = state.copyWith(isSubmitting: false);

@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -13,11 +11,13 @@ import '../../../../core/widgets/step_progress_bar.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../providers/registration_controller.dart';
 import '../widgets/otp_code_input.dart';
+import '../widgets/otp_resend_timer.dart';
 import '../widgets/registration_step_layout.dart';
 
-/// Шаг 3 регистрации — код из СМС.
+/// Шаг 3 регистрации — код из письма.
 ///
-/// Свёрстан по `design/Введите код (ПУСТОЙ).png`.
+/// Свёрстан по `design/Введите код (ПУСТОЙ).png`. Отличие от макета: боксов
+/// шесть, а не пять — столько цифр в коде, который присылает бэкенд.
 class VerifyCodeScreen extends ConsumerStatefulWidget {
   const VerifyCodeScreen({super.key});
 
@@ -61,7 +61,10 @@ class _VerifyCodeScreenState extends ConsumerState<VerifyCodeScreen> {
         const SizedBox(height: _titleToSubtitle),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenH),
-          child: Text(l10n.verifyCodeSubtitle, style: AppTypography.subtitle),
+          child: Text(
+            l10n.verifyCodeSubtitle(state.value(RegField.email)),
+            style: AppTypography.subtitle,
+          ),
         ),
         const SizedBox(height: _subtitleToOtp),
         Padding(
@@ -82,7 +85,7 @@ class _VerifyCodeScreenState extends ConsumerState<VerifyCodeScreen> {
           ),
         ],
         const SizedBox(height: _otpToTimer),
-        const Center(child: _ResendTimer()),
+        Center(child: OtpResendTimer(onResend: controller.resendCode)),
         const SizedBox(height: _timerToButton),
         RegistrationNextButton(
           child: PrimaryButton(
@@ -101,69 +104,5 @@ class _VerifyCodeScreenState extends ConsumerState<VerifyCodeScreen> {
         .read(registrationControllerProvider.notifier)
         .submitCode();
     if (ok && mounted) context.push(Routes.appSettings);
-  }
-}
-
-/// Обратный отсчёт до повторной отправки СМС.
-class _ResendTimer extends StatefulWidget {
-  const _ResendTimer();
-
-  /// Столько же, сколько показано в макете (00:59).
-  static const Duration cooldown = Duration(seconds: 59);
-
-  @override
-  State<_ResendTimer> createState() => _ResendTimerState();
-}
-
-class _ResendTimerState extends State<_ResendTimer> {
-  late int _secondsLeft;
-  Timer? _timer;
-
-  @override
-  void initState() {
-    super.initState();
-    _start();
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
-  void _start() {
-    setState(() => _secondsLeft = _ResendTimer.cooldown.inSeconds);
-    _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_secondsLeft <= 1) {
-        timer.cancel();
-        setState(() => _secondsLeft = 0);
-      } else {
-        setState(() => _secondsLeft--);
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    if (_secondsLeft == 0) {
-      return TextButton(
-        onPressed: () {
-          // TODO(auth): дёрнуть повторную отправку кода, когда появится
-          // эндпоинт. Сейчас только перезапускаем отсчёт.
-          _start();
-        },
-        child: Text(l10n.resendCodeNow, style: AppTypography.captionMuted),
-      );
-    }
-
-    final minutes = (_secondsLeft ~/ 60).toString().padLeft(2, '0');
-    final seconds = (_secondsLeft % 60).toString().padLeft(2, '0');
-
-    return Text(
-      l10n.resendCodeCountdown('$minutes:$seconds'),
-      style: AppTypography.captionMuted,
-    );
   }
 }

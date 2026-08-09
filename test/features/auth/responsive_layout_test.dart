@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:medix/core/constants/app_constants.dart';
 import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/core/widgets/app_text_field.dart';
 import 'package:medix/features/auth/presentation/screens/register_screen.dart';
@@ -8,6 +9,7 @@ import 'package:medix/features/auth/presentation/screens/verify_code_screen.dart
 import 'package:medix/features/auth/presentation/widgets/otp_code_input.dart';
 import 'package:medix/l10n/app_localizations.dart';
 
+import '../../helpers/auth_overrides.dart';
 import '../../helpers/test_fonts.dart';
 
 /// Проверки на реальных размерах устройств, а не только на размере макета.
@@ -32,6 +34,7 @@ void main() {
 
     await tester.pumpWidget(
       ProviderScope(
+        overrides: authOverrides,
         child: MaterialApp(
           theme: AppTheme.light,
           locale: const Locale('ru'),
@@ -53,7 +56,9 @@ void main() {
 
         // Крайние боксы не должны выходить за края экрана.
         final first = tester.getRect(find.byKey(OtpCodeInput.boxKey(0)));
-        final last = tester.getRect(find.byKey(OtpCodeInput.boxKey(4)));
+        final last = tester.getRect(
+          find.byKey(OtpCodeInput.boxKey(AppConstants.otpCodeLength - 1)),
+        );
         expect(first.left, greaterThanOrEqualTo(0));
         expect(last.right, lessThanOrEqualTo(entry.value.width));
 
@@ -61,12 +66,20 @@ void main() {
       });
     }
 
-    testWidgets('на ширине макета боксы остаются 70×83', (tester) async {
+    testWidgets('на ширине макета боксы ужимаются, сохраняя пропорцию', (
+      tester,
+    ) async {
       await pumpScreen(tester, const VerifyCodeScreen(), const Size(440, 956));
 
+      // Раньше на ширине макета боксы оставались ровно 70×83. С переходом на
+      // шестизначный код ряд не влезает в 440 даже здесь, поэтому проверяем
+      // не размер из макета, а что ужатие сохранило пропорцию 70:83.
       final box = tester.getRect(find.byKey(OtpCodeInput.boxKey(0))).size;
-      expect(box.width, OtpCodeInput.boxWidth);
-      expect(box.height, OtpCodeInput.boxHeight);
+      expect(box.width, lessThan(OtpCodeInput.boxWidth));
+      expect(
+        box.height / box.width,
+        closeTo(OtpCodeInput.boxHeight / OtpCodeInput.boxWidth, 0.001),
+      );
 
       await tester.pumpWidget(const SizedBox());
     });
@@ -86,7 +99,7 @@ void main() {
         );
         await tester.pump();
 
-        for (var i = 0; i < 5; i++) {
+        for (var i = 0; i < AppConstants.otpCodeLength; i++) {
           final boxFinder = find.byKey(OtpCodeInput.boxKey(i));
           final box = tester.getRect(boxFinder);
           final editable = tester.getRect(
@@ -115,12 +128,14 @@ void main() {
         await pumpScreen(tester, const RegisterScreen(), entry.value);
 
         final fields = find.byType(AppTextField);
-        expect(fields, findsNWidgets(3));
+        expect(fields, findsOneWidget);
 
-        // На этом экране у полей нет подписей, поэтому рамка AppTextField
-        // совпадает с самим полем. Второе и третье поле — с иконкой «глаз»:
-        // именно она раньше уводила текст на 12 выше центра.
-        for (var i = 0; i < 3; i++) {
+        // На этом экране у поля нет подписи, поэтому рамка AppTextField
+        // совпадает с самим полем. Раньше полей было три, и у двух из них
+        // стояла иконка «глаз», которая уводила текст на 12 выше центра;
+        // поля пароля ушли вместе с паролями, но проверка центрирования
+        // остаётся — она страхует вёрстку поля, а не конкретный экран.
+        for (var i = 0; i < 1; i++) {
           final field = tester.getRect(fields.at(i));
           final editable = tester.getRect(
             find.descendant(

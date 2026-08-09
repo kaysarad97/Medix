@@ -13,13 +13,20 @@ class AuthSession {
   final String accessToken;
   final String refreshToken;
 
+  /// Разбирает ответ подтверждения кода.
+  ///
+  /// Бэкенд кладёт в тот же объект `token_type` и `is_new_user` — они здесь
+  /// не нужны: тип всегда `bearer`, а «новый ли пользователь» решает экран,
+  /// с которого пришли.
+  ///
+  /// Тариф подписки бэкенд пока не отдаёт (эндпоинты подписок — заглушки),
+  /// поэтому до их появления у всех будет бесплатный.
   factory AuthSession.fromJson(Map<String, dynamic> json) {
     final user = json['user'] as Map<String, dynamic>;
     return AuthSession(
       user: AppUser(
         id: user['id'] as String,
         email: user['email'] as String,
-        iin: user['iin'] as String?,
         fullName: user['full_name'] as String?,
         subscription: SubscriptionTier.values.firstWhere(
           (t) => t.name == user['subscription'],

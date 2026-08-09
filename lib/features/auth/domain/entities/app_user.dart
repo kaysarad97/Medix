@@ -5,16 +5,15 @@ class AppUser {
   const AppUser({
     required this.id,
     required this.email,
-    this.iin,
     this.fullName,
     this.subscription = SubscriptionTier.free,
   });
 
   final String id;
+
+  /// Единственный идентификатор входа: пароля нет, вход по коду из письма.
   final String email;
 
-  /// ИИН РК. Может отсутствовать, если профиль ещё не верифицирован.
-  final String? iin;
   final String? fullName;
   final SubscriptionTier subscription;
 }

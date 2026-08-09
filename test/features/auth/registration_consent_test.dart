@@ -10,6 +10,7 @@ import 'package:medix/features/auth/presentation/screens/app_settings_screen.dar
 import 'package:medix/features/auth/presentation/screens/policy_screen.dart';
 import 'package:medix/l10n/app_localizations.dart';
 
+import '../../helpers/auth_overrides.dart';
 import '../../helpers/test_fonts.dart';
 
 void main() {
@@ -23,6 +24,7 @@ void main() {
 
     await tester.pumpWidget(
       ProviderScope(
+        overrides: authOverrides,
         child: MaterialApp(
           theme: AppTheme.light,
           locale: const Locale('ru'),
@@ -99,7 +101,7 @@ void main() {
 
   group('контроллер: шаги 4 и 5', () {
     late ProviderContainer container;
-    setUp(() => container = ProviderContainer());
+    setUp(() => container = ProviderContainer(overrides: authOverrides));
     tearDown(() => container.dispose());
 
     test('шаг 4 не проходит без выбора языка', () {

@@ -3,15 +3,19 @@ abstract final class Routes {
   /// Заставка запуска. Решает, куда вести дальше, по сохранённой сессии.
   static const String splash = '/splash';
 
+  /// Шаг 1 входа — почта. Пароля нет: сервер присылает одноразовый код.
   static const String login = '/login';
 
-  /// Шаг 1 мастера регистрации — почта и пароль.
+  /// Шаг 2 входа — код из письма.
+  static const String loginVerify = '/login/verify';
+
+  /// Шаг 1 мастера регистрации — почта.
   static const String register = '/register';
 
-  /// Шаг 2 — ИИН, ФИО, телефон.
+  /// Шаг 2 — ФИО и дата рождения. На этом шаге уходит письмо с кодом.
   static const String personalData = '/register/personal';
 
-  /// Шаг 3 — код из СМС.
+  /// Шаг 3 — код из письма.
   static const String verifyCode = '/register/verify';
 
   /// Шаг 4 — язык интерфейса и согласие на рассылки.
@@ -79,6 +83,9 @@ abstract final class Routes {
 
   /// Настройки профиля: имя, почта, пароль.
   static const String profileSettings = '/profile/settings/account';
+
+  /// «Выбор аватарки» — сетка картинок из сборки.
+  static const String avatarPicker = '/profile/settings/account/avatar';
 
   /// «Свяжитесь с нами».
   static const String contacts = '/profile/settings/contacts';

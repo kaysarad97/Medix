@@ -6,26 +6,48 @@ import '../../../../shared/services/secure_storage_service.dart';
 import '../../domain/entities/app_user.dart';
 import '../models/auth_session.dart';
 
+/// Вход и регистрация по одноразовому коду из письма.
+///
+/// Паролей нет: бэкенд их не хранит. И вход, и регистрация идут в два шага —
+/// сначала сервер отправляет код на почту, потом код обменивается на сессию.
 abstract interface class AuthRepository {
-  /// [identifier] — e-mail или ИИН.
-  Future<AuthSession> login({
-    required String identifier,
-    required String password,
-  });
-
-  /// Создаёт профиль и запускает отправку СМС с кодом на [phone].
-  Future<void> register({
+  /// Шаг 1 регистрации: заводит заявку и отправляет код на [email].
+  ///
+  /// Возвращает время жизни кода в секундах — по нему экран ввода заводит
+  /// обратный отсчёт.
+  Future<int> registerStart({
     required String email,
-    required String password,
-    required String iin,
     required String fullName,
-    required String phone,
+    required DateTime birthDate,
   });
 
-  /// Подтверждает номер кодом из СМС и открывает сессию.
-  Future<AuthSession> verifyCode({required String phone, required String code});
+  /// Шаг 2 регистрации: обменивает код на сессию.
+  Future<AuthSession> registerVerify({
+    required String email,
+    required String code,
+  });
+
+  /// Шаг 1 входа: просит сервер отправить код на [email].
+  ///
+  /// Ответ одинаков и для существующей почты, и для незнакомой — так сервер
+  /// не даёт подбирать зарегистрированные адреса. Значит, «письмо ушло» на
+  /// экране показываем всегда.
+  Future<void> loginStart({required String email});
+
+  /// Шаг 2 входа: обменивает код на сессию.
+  Future<AuthSession> loginVerify({
+    required String email,
+    required String code,
+  });
 
   Future<void> logout();
+}
+
+/// Дата в формате, который ждёт бэкенд: `1995-06-15`.
+String _formatDate(DateTime date) {
+  final month = date.month.toString().padLeft(2, '0');
+  final day = date.day.toString().padLeft(2, '0');
+  return '${date.year.toString().padLeft(4, '0')}-$month-$day';
 }
 
 /// Боевая реализация поверх FastAPI-бэкенда.
@@ -36,44 +58,41 @@ class RemoteAuthRepository implements AuthRepository {
   final SecureStorageService _storage;
 
   @override
-  Future<AuthSession> login({
-    required String identifier,
-    required String password,
+  Future<int> registerStart({
+    required String email,
+    required String fullName,
+    required DateTime birthDate,
   }) async {
     try {
       final response = await _dio.post<Map<String, dynamic>>(
-        ApiEndpoints.login,
-        data: {'identifier': identifier, 'password': password},
-      );
-      final session = AuthSession.fromJson(response.data!);
-      await _storage.saveTokens(
-        accessToken: session.accessToken,
-        refreshToken: session.refreshToken,
-      );
-      return session;
-    } on DioException catch (e) {
-      throw ApiException.fromDio(e);
-    }
-  }
-
-  @override
-  Future<void> register({
-    required String email,
-    required String password,
-    required String iin,
-    required String fullName,
-    required String phone,
-  }) async {
-    try {
-      await _dio.post<void>(
-        ApiEndpoints.register,
+        ApiEndpoints.registerStart,
         data: {
           'email': email,
-          'password': password,
-          'iin': iin,
           'full_name': fullName,
-          'phone': phone,
+          'birth_date': _formatDate(birthDate),
         },
+      );
+      final expiresIn = response.data?['expires_in'];
+      return expiresIn is int ? expiresIn : 0;
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
+
+  @override
+  Future<AuthSession> registerVerify({
+    required String email,
+    required String code,
+  }) {
+    return _verify(ApiEndpoints.registerVerify, email: email, code: code);
+  }
+
+  @override
+  Future<void> loginStart({required String email}) async {
+    try {
+      await _dio.post<void>(
+        ApiEndpoints.loginStart,
+        data: {'identifier': email},
       );
     } on DioException catch (e) {
       throw ApiException.fromDio(e);
@@ -81,14 +100,24 @@ class RemoteAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<AuthSession> verifyCode({
-    required String phone,
+  Future<AuthSession> loginVerify({
+    required String email,
+    required String code,
+  }) {
+    return _verify(ApiEndpoints.loginVerify, email: email, code: code);
+  }
+
+  /// Оба подтверждения устроены одинаково: `identifier` + `code` в обмен на
+  /// пару токенов и профиль.
+  Future<AuthSession> _verify(
+    String path, {
+    required String email,
     required String code,
   }) async {
     try {
       final response = await _dio.post<Map<String, dynamic>>(
-        ApiEndpoints.verifyCode,
-        data: {'phone': phone, 'code': code},
+        path,
+        data: {'identifier': email, 'code': code},
       );
       final session = AuthSession.fromJson(response.data!);
       await _storage.saveTokens(
@@ -104,7 +133,13 @@ class RemoteAuthRepository implements AuthRepository {
   @override
   Future<void> logout() async {
     try {
-      await _dio.post<void>(ApiEndpoints.logout);
+      final refreshToken = await _storage.readRefreshToken();
+      if (refreshToken != null && refreshToken.isNotEmpty) {
+        await _dio.post<void>(
+          ApiEndpoints.logout,
+          data: {'refresh_token': refreshToken},
+        );
+      }
     } on DioException {
       // Разлогин локально имеет смысл даже при недоступном сервере.
     } finally {
@@ -113,76 +148,70 @@ class RemoteAuthRepository implements AuthRepository {
   }
 }
 
-/// Заглушка на время разработки бэкенда.
+/// Заглушка для работы без бэкенда.
 ///
 /// Негативные сценарии, чтобы их можно было прогонять руками:
-/// пароль `wrongpass` при входе, почта `taken@medix.kz` при регистрации,
-/// код `00000` при подтверждении.
+/// почта `taken@medix.kz` при регистрации, код `000000` при подтверждении.
 class MockAuthRepository implements AuthRepository {
   const MockAuthRepository();
 
-  /// Код, который заглушка считает верным.
-  static const String validCode = '12345';
+  /// Код, который заглушка считает верным. Длина — как у настоящего.
+  static const String validCode = '123456';
+
+  /// Столько же, сколько отдаёт бэкенд.
+  static const int codeTtlSeconds = 300;
 
   @override
-  Future<AuthSession> login({
-    required String identifier,
-    required String password,
+  Future<int> registerStart({
+    required String email,
+    required String fullName,
+    required DateTime birthDate,
   }) async {
     await Future<void>.delayed(const Duration(milliseconds: 900));
 
-    if (password == 'wrongpass') {
+    if (email == 'taken@medix.kz') {
       throw const ApiException(
-        'Неверный e-mail/ИИН или пароль',
-        statusCode: 401,
+        'Данный email уже зарегистрирован, войдите',
+        statusCode: 409,
+      );
+    }
+    return codeTtlSeconds;
+  }
+
+  @override
+  Future<AuthSession> registerVerify({
+    required String email,
+    required String code,
+  }) => _verify(email: email, code: code);
+
+  @override
+  Future<void> loginStart({required String email}) async {
+    await Future<void>.delayed(const Duration(milliseconds: 700));
+  }
+
+  @override
+  Future<AuthSession> loginVerify({
+    required String email,
+    required String code,
+  }) => _verify(email: email, code: code);
+
+  Future<AuthSession> _verify({
+    required String email,
+    required String code,
+  }) async {
+    await Future<void>.delayed(const Duration(milliseconds: 700));
+
+    if (code != validCode) {
+      throw const ApiException(
+        'Неверный код, осталось попыток: 4',
+        statusCode: 400,
       );
     }
 
     return AuthSession(
       user: AppUser(
         id: 'mock-user-1',
-        email: identifier.contains('@') ? identifier : 'user@medix.kz',
-        iin: identifier.contains('@') ? null : identifier,
-        fullName: 'Тестовый Пользователь',
-      ),
-      accessToken: 'mock-access-token',
-      refreshToken: 'mock-refresh-token',
-    );
-  }
-
-  @override
-  Future<void> register({
-    required String email,
-    required String password,
-    required String iin,
-    required String fullName,
-    required String phone,
-  }) async {
-    await Future<void>.delayed(const Duration(milliseconds: 900));
-
-    if (email == 'taken@medix.kz') {
-      throw const ApiException(
-        'Профиль с такой почтой уже существует',
-        statusCode: 409,
-      );
-    }
-  }
-
-  @override
-  Future<AuthSession> verifyCode({
-    required String phone,
-    required String code,
-  }) async {
-    await Future<void>.delayed(const Duration(milliseconds: 700));
-
-    if (code != validCode) {
-      throw const ApiException('Неверный код подтверждения', statusCode: 400);
-    }
-
-    return const AuthSession(
-      user: AppUser(
-        id: 'mock-user-1',
-        email: 'user@medix.kz',
+        email: email,
         fullName: 'Тестовый Пользователь',
       ),
       accessToken: 'mock-access-token',

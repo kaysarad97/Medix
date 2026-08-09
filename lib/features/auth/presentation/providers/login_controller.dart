@@ -8,95 +8,136 @@ import 'auth_providers.dart';
 @immutable
 class LoginState {
   const LoginState({
-    this.identifier = '',
-    this.password = '',
-    this.identifierError,
-    this.passwordError,
+    this.email = '',
+    this.code = '',
+    this.emailError,
+    this.codeError,
     this.formError,
     this.isSubmitting = false,
+    this.isCodeSent = false,
     this.isAuthenticated = false,
   });
 
-  final String identifier;
-  final String password;
+  final String email;
+  final String code;
 
-  /// Ошибка поля «E-mail или ИИН».
-  final String? identifierError;
-  final String? passwordError;
+  final String? emailError;
+  final String? codeError;
 
   /// Ошибка, не привязанная к полю (отказ сервера, нет сети).
   final String? formError;
 
   final bool isSubmitting;
+
+  /// Первый шаг пройден — сервер принял адрес и отправил письмо.
+  final bool isCodeSent;
+
   final bool isAuthenticated;
 
-  bool get canSubmit =>
-      identifier.trim().isNotEmpty && password.isNotEmpty && !isSubmitting;
+  bool get canSubmitEmail => email.trim().isNotEmpty && !isSubmitting;
+  bool get canSubmitCode => code.trim().isNotEmpty && !isSubmitting;
 
   /// Внимание: поля ошибок НЕ переносятся из предыдущего состояния —
   /// не передал явно, значит ошибка снята. Так правка любого поля сама
   /// гасит свою ошибку, и не нужно отдельного `clearErrors()`.
   LoginState copyWith({
-    String? identifier,
-    String? password,
-    String? identifierError,
-    String? passwordError,
+    String? email,
+    String? code,
+    String? emailError,
+    String? codeError,
     String? formError,
     bool? isSubmitting,
+    bool? isCodeSent,
     bool? isAuthenticated,
   }) {
     return LoginState(
-      identifier: identifier ?? this.identifier,
-      password: password ?? this.password,
-      identifierError: identifierError,
-      passwordError: passwordError,
+      email: email ?? this.email,
+      code: code ?? this.code,
+      emailError: emailError,
+      codeError: codeError,
       formError: formError,
       isSubmitting: isSubmitting ?? this.isSubmitting,
+      isCodeSent: isCodeSent ?? this.isCodeSent,
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
     );
   }
 }
 
+/// Вход в два шага: адрес → код из письма.
 class LoginController extends Notifier<LoginState> {
   @override
   LoginState build() => const LoginState();
 
   /// Ошибки сбрасываются при правке поля — переваливать их на пользователя
   /// пока он печатает не нужно.
-  void identifierChanged(String value) {
-    state = state.copyWith(
-      identifier: value,
-      passwordError: state.passwordError,
-    );
+  void emailChanged(String value) {
+    state = state.copyWith(email: value, codeError: state.codeError);
   }
 
-  void passwordChanged(String value) {
-    state = state.copyWith(
-      password: value,
-      identifierError: state.identifierError,
-    );
+  void codeChanged(String value) {
+    state = state.copyWith(code: value, emailError: state.emailError);
   }
 
-  Future<void> submit() async {
+  /// Шаг 1 — просим сервер отправить код.
+  ///
+  /// Успех здесь не означает, что аккаунт существует: сервер отвечает
+  /// одинаково на любой адрес, чтобы по нему нельзя было проверять,
+  /// зарегистрирован ли человек. Про несуществующий адрес пользователь
+  /// узнает только на шаге с кодом.
+  Future<bool> submitEmail() async {
+    if (state.isSubmitting) return false;
+
+    final emailError = Validators.email(state.email);
+    if (emailError != null) {
+      state = state.copyWith(emailError: emailError);
+      return false;
+    }
+
+    state = state.copyWith(isSubmitting: true);
+    try {
+      await ref
+          .read(authRepositoryProvider)
+          .loginStart(email: state.email.trim());
+      state = state.copyWith(isSubmitting: false, isCodeSent: true);
+      return true;
+    } on ApiException catch (e) {
+      state = state.copyWith(isSubmitting: false, formError: e.message);
+      return false;
+    }
+  }
+
+  /// Повторная отправка кода с экрана ввода — тот же запрос, что и шаг 1.
+  Future<bool> resendCode() async {
+    if (state.isSubmitting) return false;
+
+    state = state.copyWith(isSubmitting: true);
+    try {
+      await ref
+          .read(authRepositoryProvider)
+          .loginStart(email: state.email.trim());
+      state = state.copyWith(isSubmitting: false);
+      return true;
+    } on ApiException catch (e) {
+      state = state.copyWith(isSubmitting: false, formError: e.message);
+      return false;
+    }
+  }
+
+  /// Шаг 2 — обмениваем код на сессию.
+  Future<void> submitCode() async {
     if (state.isSubmitting) return;
 
-    final identifierError = Validators.emailOrIin(state.identifier);
-    final passwordError = Validators.password(state.password);
-
-    if (identifierError != null || passwordError != null) {
-      state = state.copyWith(
-        identifierError: identifierError,
-        passwordError: passwordError,
-      );
+    final codeError = Validators.otpCode(state.code);
+    if (codeError != null) {
+      state = state.copyWith(codeError: codeError);
       return;
     }
 
     state = state.copyWith(isSubmitting: true);
-
     try {
       await ref
           .read(authRepositoryProvider)
-          .login(identifier: state.identifier.trim(), password: state.password);
+          .loginVerify(email: state.email.trim(), code: state.code);
       state = state.copyWith(isSubmitting: false, isAuthenticated: true);
     } on ApiException catch (e) {
       state = state.copyWith(isSubmitting: false, formError: e.message);

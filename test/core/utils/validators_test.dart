@@ -2,23 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/utils/validators.dart';
 
 void main() {
-  group('Validators.iin', () {
-    test('принимает ИИН с верной контрольной суммой', () {
-      // 950815 350 12 + контрольный разряд 3 (веса 1…11, остаток от 11).
-      expect(Validators.iin('950815350123'), isNull);
-    });
-
-    test('отклоняет ИИН с неверным контрольным разрядом', () {
-      expect(Validators.iin('950815350124'), isNotNull);
-    });
-
-    test('отклоняет неверную длину и нецифровые символы', () {
-      expect(Validators.iin('95081535012'), isNotNull);
-      expect(Validators.iin('9508153501２3'), isNotNull);
-      expect(Validators.iin(''), isNotNull);
-    });
-  });
-
   group('Validators.email', () {
     test('принимает корректные адреса', () {
       expect(Validators.email('abcedfg@gmail.com'), isNull);
@@ -32,22 +15,46 @@ void main() {
     });
   });
 
-  group('Validators.emailOrIin', () {
-    test('одни цифры проверяются как ИИН', () {
-      expect(Validators.emailOrIin('950815350123'), isNull);
-      expect(Validators.emailOrIin('123'), isNotNull);
+  group('Validators.otpCode', () {
+    test('принимает шесть цифр — столько присылает бэкенд', () {
+      expect(Validators.otpCode('123456'), isNull);
     });
 
-    test('всё остальное проверяется как e-mail', () {
-      expect(Validators.emailOrIin('abcedfg@gmail.com'), isNull);
-      expect(Validators.emailOrIin('не-почта'), isNotNull);
+    test('отклоняет другую длину и нецифровые символы', () {
+      expect(Validators.otpCode('12345'), isNotNull);
+      expect(Validators.otpCode('1234567'), isNotNull);
+      expect(Validators.otpCode('12345a'), isNotNull);
+      expect(Validators.otpCode(''), isNotNull);
     });
   });
 
-  group('Validators.password', () {
-    test('требует минимум 8 символов', () {
-      expect(Validators.password('1234567'), isNotNull);
-      expect(Validators.password('12345678'), isNull);
+  group('Validators.birthDate', () {
+    test('принимает дату в формате бэкенда', () {
+      expect(Validators.birthDate('1995-06-15'), isNull);
+    });
+
+    test('отклоняет пустое значение и мусор', () {
+      expect(Validators.birthDate(''), isNotNull);
+      expect(Validators.birthDate('15.06.1995'), isNotNull);
+    });
+
+    test('отклоняет дату в будущем', () {
+      final tomorrow = DateTime.now().add(const Duration(days: 1));
+      final month = tomorrow.month.toString().padLeft(2, '0');
+      final day = tomorrow.day.toString().padLeft(2, '0');
+
+      expect(Validators.birthDate('${tomorrow.year}-$month-$day'), isNotNull);
+    });
+
+    test('отклоняет заведомо невозможный год', () {
+      expect(Validators.birthDate('1850-01-01'), isNotNull);
+    });
+  });
+
+  group('Validators.fullName', () {
+    test('требует минимум два слова', () {
+      expect(Validators.fullName('Дархан'), isNotNull);
+      expect(Validators.fullName('Аркалыков Дархан'), isNull);
     });
   });
 }

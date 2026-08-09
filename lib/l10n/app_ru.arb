@@ -164,7 +164,7 @@
   },
   "bankDetailsTitle": "Банковские данные",
   "@bankDetailsTitle": {
-    "description": "Заголовок формы ввода данных карты."
+    "description": "Строка-переход к банковским данным в настройках."
   },
   "cardNumberLabel": "Номер карты",
   "@cardNumberLabel": {
@@ -314,6 +314,10 @@
     "description": "Заголовок экрана входа."
   },
   "loginButtonLabel": "Войти",
+  "sendCodeButtonLabel": "Получить код",
+  "@sendCodeButtonLabel": {
+    "description": "Кнопка первого шага входа: просит выслать код."
+  },
   "@loginButtonLabel": {
     "description": "Кнопка входа на экране логина."
   },
@@ -321,13 +325,9 @@
   "@createProfileLink": {
     "description": "Ссылка на регистрацию под кнопкой входа."
   },
-  "emailOrIinLabel": "Ваш E-mail или ИИН:",
-  "@emailOrIinLabel": {
-    "description": "Подпись поля логина."
-  },
-  "passwordLabel": "Пароль:",
-  "@passwordLabel": {
-    "description": "Подпись поля пароля на экране логина."
+  "emailLabel": "Ваш E-mail:",
+  "@emailLabel": {
+    "description": "Подпись поля почты на экране входа."
   },
   "createProfileTitle": "Создайте профиль",
   "@createProfileTitle": {
@@ -337,51 +337,36 @@
   "@emailHint": {
     "description": "Плейсхолдер поля почты при регистрации."
   },
-  "createPasswordHint": "Придумайте пароль",
-  "@createPasswordHint": {
-    "description": "Плейсхолдер поля пароля при регистрации."
-  },
-  "confirmPasswordHint": "Подтвердите пароль",
-  "@confirmPasswordHint": {
-    "description": "Плейсхолдер поля подтверждения пароля."
-  },
-  "showPasswordTooltip": "Показать пароль",
-  "@showPasswordTooltip": {
-    "description": "Подсказка кнопки-глаза, когда пароль скрыт."
-  },
-  "hidePasswordTooltip": "Скрыть пароль",
-  "@hidePasswordTooltip": {
-    "description": "Подсказка кнопки-глаза, когда пароль показан."
-  },
   "personalDataTitle": "Ваши данные",
   "@personalDataTitle": {
     "description": "Заголовок шага 2 регистрации."
   },
-  "iinHint": "ИИН",
-  "@iinHint": {
-    "description": "Плейсхолдер поля ИИН."
-  },
   "fullNameHint": "ФИО",
+  "birthDateHint": "Дата рождения",
+  "@birthDateHint": {
+    "description": "Плейсхолдер поля даты рождения при регистрации."
+  },
   "@fullNameHint": {
     "description": "Плейсхолдер поля ФИО."
-  },
-  "phoneHint": "Номер телефона",
-  "@phoneHint": {
-    "description": "Плейсхолдер поля телефона."
   },
   "verifyCodeTitle": "Введите код",
   "@verifyCodeTitle": {
     "description": "Заголовок шага 3 регистрации."
   },
-  "verifyCodeSubtitle": "Подтвердите личность",
+  "verifyCodeSubtitle": "Мы отправили код на {email}",
   "@verifyCodeSubtitle": {
-    "description": "Подзаголовок шага ввода кода из СМС."
+    "description": "Подзаголовок шага ввода кода: куда ушло письмо.",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
   },
-  "resendCodeNow": "выслать СМС-сообщение ещё раз",
+  "resendCodeNow": "выслать письмо с кодом ещё раз",
   "@resendCodeNow": {
     "description": "Ссылка повторной отправки кода, когда таймер истёк."
   },
-  "resendCodeCountdown": "выслать СМС-сообщение еще раз через {time}",
+  "resendCodeCountdown": "выслать письмо с кодом ещё раз через {time}",
   "@resendCodeCountdown": {
     "description": "Обратный отсчёт до повторной отправки кода, «мм:сс».",
     "placeholders": {
@@ -580,6 +565,14 @@
   "@yourAnalysesTitle": {
     "description": "Заголовок карточки анализов пользователя по умолчанию."
   },
+  "familyRoleChild": "профиль ребенка",
+  "@familyRoleChild": {
+    "description": "Подпись под именем в карточке «Моя Семья»: профиль ребёнка."
+  },
+  "familyRoleSenior": "профиль для старшего поколения",
+  "@familyRoleSenior": {
+    "description": "Подпись под именем в карточке «Моя Семья»: профиль старшего."
+  },
   "familyDoctorsCardTitleChild": "Врачи моего ребёнка",
   "@familyDoctorsCardTitleChild": {
     "description": "Заголовок карточки врачей на карточке члена семьи-ребёнка."
@@ -698,10 +691,6 @@
   "@appLanguageLabel": {
     "description": "Подпись переключателя языка приложения в настройках."
   },
-  "bankDetailsTitle": "Банковские данные",
-  "@bankDetailsTitle": {
-    "description": "Строка-переход к банковским данным в настройках."
-  },
   "contactUsTitle": "Свяжитесь с нами",
   "@contactUsTitle": {
     "description": "Строка-переход в настройках и заголовок экрана контактов."
@@ -722,6 +711,10 @@
   "@socialNetworksTitle": {
     "description": "Заголовок блока соцсетей на экране контактов."
   },
+  "avatarPickerTitle": "Выбор аватарки",
+  "@avatarPickerTitle": {
+    "description": "Заголовок экрана выбора аватарки из набора."
+  },
   "changeAvatarLink": "изменить аватара",
   "@changeAvatarLink": {
     "description": "Ссылка смены аватара на экране настроек профиля."
@@ -733,10 +726,6 @@
   "lastNameHint": "Фамилия",
   "@lastNameHint": {
     "description": "Подсказка поля фамилии на экране настроек профиля."
-  },
-  "passwordFieldHint": "Пароль",
-  "@passwordFieldHint": {
-    "description": "Подсказка поля пароля на экране настроек профиля."
   },
   "audioCallLabel": "Аудио-звонок",
   "@audioCallLabel": {

@@ -12,6 +12,7 @@ import 'package:medix/features/auth/presentation/screens/register_screen.dart';
 import 'package:medix/features/auth/presentation/screens/verify_code_screen.dart';
 import 'package:medix/l10n/app_localizations.dart';
 
+import '../../helpers/auth_overrides.dart';
 import '../../helpers/test_fonts.dart';
 
 /// Эталонные рендеры шагов регистрации для сверки с макетами в `design/`.
@@ -28,6 +29,7 @@ void main() {
 
     await tester.pumpWidget(
       ProviderScope(
+        overrides: authOverrides,
         child: MaterialApp(
           theme: AppTheme.light,
           locale: const Locale('ru'),

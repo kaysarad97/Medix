@@ -7,8 +7,11 @@ abstract final class AppConstants {
   static const double designWidth = 440;
   static const double designHeight = 956;
 
-  /// Длина ИИН РК.
-  static const int iinLength = 12;
+  /// Длина одноразового кода из письма — столько цифр генерирует бэкенд.
+  static const int otpCodeLength = 6;
+
+  /// Пауза, которую бэкенд выдерживает перед повторной отправкой кода.
+  static const Duration otpResendCooldown = Duration(seconds: 60);
 
   static const Duration networkTimeout = Duration(seconds: 20);
 }

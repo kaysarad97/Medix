@@ -1,75 +1,98 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:medix/features/auth/data/repositories/auth_repository.dart';
 import 'package:medix/features/auth/presentation/providers/login_controller.dart';
+
+import '../../helpers/auth_overrides.dart';
 
 void main() {
   late ProviderContainer container;
 
-  setUp(() {
-    // authRepositoryProvider по умолчанию отдаёт MockAuthRepository,
-    // см. MEDIX_USE_MOCKS в auth_providers.dart.
-    container = ProviderContainer();
-  });
-
+  setUp(() => container = ProviderContainer(overrides: authOverrides));
   tearDown(() => container.dispose());
 
   LoginController controller() =>
       container.read(loginControllerProvider.notifier);
   LoginState state() => container.read(loginControllerProvider);
 
-  test(
-    'submit с пустой формой ставит ошибки полей и не ходит в сеть',
-    () async {
-      await controller().submit();
+  group('шаг 1 — почта', () {
+    test('пустая форма ставит ошибку поля и не ходит в сеть', () async {
+      expect(await controller().submitEmail(), isFalse);
 
-      expect(state().identifierError, isNotNull);
-      expect(state().passwordError, isNotNull);
+      expect(state().emailError, isNotNull);
+      expect(state().isCodeSent, isFalse);
       expect(state().isSubmitting, isFalse);
+    });
+
+    test('некорректный адрес отбивается до запроса', () async {
+      controller().emailChanged('не-почта');
+
+      expect(await controller().submitEmail(), isFalse);
+      expect(state().emailError, isNotNull);
+      expect(state().isCodeSent, isFalse);
+    });
+
+    test('корректный адрес переводит на шаг с кодом', () async {
+      controller().emailChanged('abcedfg@gmail.com');
+
+      expect(await controller().submitEmail(), isTrue);
+      expect(state().emailError, isNull);
+      expect(state().isCodeSent, isTrue);
       expect(state().isAuthenticated, isFalse);
-    },
-  );
+    });
 
-  test('короткий пароль отбивается до запроса', () async {
-    controller().identifierChanged('abcedfg@gmail.com');
-    controller().passwordChanged('123');
+    test('правка поля гасит его ошибку', () async {
+      await controller().submitEmail();
+      expect(state().emailError, isNotNull);
 
-    await controller().submit();
-
-    expect(state().identifierError, isNull);
-    expect(state().passwordError, isNotNull);
-    expect(state().isAuthenticated, isFalse);
+      controller().emailChanged('abcedfg@gmail.com');
+      expect(state().emailError, isNull);
+    });
   });
 
-  test('правка поля гасит его ошибку, не трогая соседнюю', () async {
-    await controller().submit();
-    expect(state().identifierError, isNotNull);
-    expect(state().passwordError, isNotNull);
+  group('шаг 2 — код', () {
+    Future<void> reachCodeStep() async {
+      controller().emailChanged('abcedfg@gmail.com');
+      await controller().submitEmail();
+    }
 
-    controller().identifierChanged('abcedfg@gmail.com');
+    test('код неверной длины отбивается до запроса', () async {
+      await reachCodeStep();
+      controller().codeChanged('123');
 
-    expect(state().identifierError, isNull);
-    expect(state().passwordError, isNotNull);
-  });
+      await controller().submitCode();
 
-  test('валидные данные приводят к авторизации', () async {
-    controller().identifierChanged('abcedfg@gmail.com');
-    controller().passwordChanged('supersecret');
+      expect(state().codeError, isNotNull);
+      expect(state().isAuthenticated, isFalse);
+    });
 
-    await controller().submit();
+    test('неверный код возвращается как ошибка формы, а не поля', () async {
+      await reachCodeStep();
+      controller().codeChanged('000000');
 
-    expect(state().isAuthenticated, isTrue);
-    expect(state().isSubmitting, isFalse);
-    expect(state().formError, isNull);
-  });
+      await controller().submitCode();
 
-  test('отказ сервера попадает в formError, а не в поля', () async {
-    controller().identifierChanged('abcedfg@gmail.com');
-    controller().passwordChanged('wrongpass');
+      expect(state().isAuthenticated, isFalse);
+      expect(state().formError, isNotNull);
+      expect(state().codeError, isNull);
+    });
 
-    await controller().submit();
+    test('верный код открывает сессию', () async {
+      await reachCodeStep();
+      controller().codeChanged(MockAuthRepository.validCode);
 
-    expect(state().isAuthenticated, isFalse);
-    expect(state().formError, isNotNull);
-    expect(state().identifierError, isNull);
+      await controller().submitCode();
+
+      expect(state().isAuthenticated, isTrue);
+      expect(state().isSubmitting, isFalse);
+      expect(state().formError, isNull);
+    });
+
+    test('повторная отправка не сбрасывает введённую почту', () async {
+      await reachCodeStep();
+
+      expect(await controller().resendCode(), isTrue);
+      expect(state().email, 'abcedfg@gmail.com');
+    });
   });
 }
