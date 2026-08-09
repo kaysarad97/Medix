@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/theme/app_theme.dart';
+import 'package:medix/core/widgets/user_avatar.dart';
 import 'package:medix/features/calls/presentation/screens/call_screen.dart';
 import 'package:medix/features/profile/presentation/providers/profile_providers.dart';
 import 'package:medix/features/telemedicine/presentation/providers/telemedicine_providers.dart';
@@ -73,6 +74,12 @@ void main() {
       );
       await precacheImage(
         const AssetImage('assets/images/avatars/avatar_01.png'),
+        tester.element(find.byType(MaterialApp)),
+      );
+      // Подложка видна сквозь прозрачные углы аватара — без прекэша эталон
+      // показывал бы на их месте фон экрана, а не то, что рисует код.
+      await precacheImage(
+        const AssetImage(UserAvatar.backgroundAsset),
         tester.element(find.byType(MaterialApp)),
       );
       await Future<void>.delayed(const Duration(milliseconds: 500));

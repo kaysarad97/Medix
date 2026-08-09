@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/theme/app_theme.dart';
+import 'package:medix/core/widgets/user_avatar.dart';
 import 'package:medix/features/family_access/presentation/providers/family_providers.dart';
 import 'package:medix/features/profile/presentation/providers/profile_providers.dart';
 import 'package:medix/features/profile/presentation/screens/contact_screen.dart';
@@ -66,6 +67,12 @@ void main() {
       );
       await precacheImage(
         const AssetImage('assets/images/auth_bg.png'),
+        tester.element(find.byType(MaterialApp)),
+      );
+      // Подложка аватара: без прекэша картинка не успевает декодироваться,
+      // и на месте аватара в эталоне остаётся дырка.
+      await precacheImage(
+        const AssetImage(UserAvatar.backgroundAsset),
         tester.element(find.byType(MaterialApp)),
       );
       await Future<void>.delayed(const Duration(milliseconds: 500));
