@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_shadows.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../domain/entities/medical_place.dart';
@@ -44,6 +45,9 @@ class MedixMap extends StatelessWidget {
   /// крайние обрезаются рамкой.
   static const double initialZoom = 11.6;
 
+  /// Коробка метки. Больше самого кружка: [_PlaceMarker.circleSize] в
+  /// макете 14, а по такому пятну пальцем не попасть — в коробку 30 входит
+  /// вся область нажатия, кружок рисуется по центру.
   static const double markerSize = 30;
 
   @override
@@ -88,30 +92,50 @@ class MedixMap extends StatelessWidget {
   }
 }
 
-/// Метка на карте: синий кружок с глифом внутри.
+/// Метка на карте: голубой кружок с синим кольцом и глифом внутри.
+///
+/// Замеры по `design/Поиск (карта) больницы.png` и
+/// `design/Поиск (карта) лаборатории.png`: кружок 14 (по четырём меткам
+/// вышло 12…16, взята медиана), заливка совпала с [AppColors.accentSofter]
+/// до значения пикселя, кольцо и глиф — [AppColors.primary].
 class _PlaceMarker extends StatelessWidget {
   const _PlaceMarker({required this.place, this.onTap});
 
   final MedicalPlace place;
   final VoidCallback? onTap;
 
+  static const double circleSize = 14;
+
+  /// Крест внутри кружка занимает 200…207 по замеру — восемь точек.
+  static const double glyphSize = 8;
+
+  static const double ringWidth = 1.5;
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AppColors.primaryBright,
-          shape: BoxShape.circle,
-          border: Border.all(color: AppColors.textOnPrimary, width: 2),
-        ),
-        child: Center(
-          child: AppIcon(
-            icon: place.kind == PlaceKind.hospital
-                ? MedixIcon.hospital
-                : MedixIcon.labTest,
-            size: 15,
-            color: AppColors.textOnPrimary,
+      // Нажимается вся коробка метки, а не кружок: 14 точек для пальца мало.
+      behavior: HitTestBehavior.opaque,
+      child: Center(
+        child: SizedBox.square(
+          dimension: circleSize,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: AppColors.accentSofter,
+              shape: BoxShape.circle,
+              border: Border.all(color: AppColors.primary, width: ringWidth),
+              boxShadow: AppShadows.card,
+            ),
+            child: Center(
+              child: AppIcon(
+                icon: place.kind == PlaceKind.hospital
+                    ? MedixIcon.hospital
+                    : MedixIcon.labTest,
+                size: glyphSize,
+                color: AppColors.primary,
+              ),
+            ),
           ),
         ),
       ),
