@@ -24,8 +24,12 @@ class LabOffersScreen extends ConsumerWidget {
   static const double topBarTop = 36;
   static const double topBarToCard = 26;
 
-  /// Карточка своей корзины: y 178…387 в макете 440×1077.
+  /// Карточка корзины кончается на y 402, подпись «Другие предложения» —
+  /// на 427, макет 440×1077.
   static const double cardGap = 20;
+
+  /// Между карточками предложений: низ первой 781, верх второй 800.
+  static const double offerGap = 20;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -64,9 +68,11 @@ class LabOffersScreen extends ConsumerWidget {
                   style: AppTypography.captionMuted,
                 ),
               ),
-              for (final offer in offers) ...[
-                const SizedBox(height: 12),
-                _Section(child: _OfferCard(offer: offer)),
+              for (final (index, offer) in offers.indexed) ...[
+                const SizedBox(height: offerGap),
+                _Section(
+                  child: _OfferCard(offer: offer, index: index),
+                ),
               ],
               const SizedBox(height: 32),
             ],
@@ -119,9 +125,11 @@ class _OwnCartCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  // Шаг строк в макете 18: строка 12-м кеглем занимает 15,
+                  // остаётся 3 на отбивку.
                   for (final item in items)
                     Padding(
-                      padding: const EdgeInsets.only(bottom: 6),
+                      padding: const EdgeInsets.only(bottom: 3),
                       child: Text(
                         '·  $item',
                         style: AppTypography.cardItemMeta,
@@ -147,19 +155,40 @@ class _OwnCartCard extends StatelessWidget {
 
 /// Карточка партнёра: шапка с рейтингом, цена на тот же набор и кнопка.
 class _OfferCard extends StatelessWidget {
-  const _OfferCard({required this.offer});
+  const _OfferCard({required this.offer, required this.index});
 
   final LabOffer offer;
 
-  static const double logoSize = 56;
+  /// Номер в списке: карточки чередуются по фону.
+  final int index;
+
+  /// Замеры по `design/Сравнение корзины.png`, макет 440×1077.
+  /// Круг логотипа x 34…102.
+  static const double logoSize = 68;
+
+  /// Логотип 34…102 → чипы от 126.
+  static const double _logoToText = 24;
+
+  /// Шапка → плашка цены (низ строки 574, верх плашки 596) и плашка → кнопка
+  /// (низ 677, верх 697).
+  static const double _blockGap = 20;
+
+  /// Чётные карточки синие, нечётные — серые, как в макете.
+  ///
+  /// ВОПРОС ДИЗАЙНЕРУ. В макете видно ровно две карточки, и по ним нельзя
+  /// отличить чередование от подсветки лучшей цены: синяя как раз дешевле.
+  /// Взято чередование — при трёх партнёрах оно даст ритм, а подсветка
+  /// одной карточки из макета никак не следует.
+  Color get _background =>
+      index.isEven ? AppColors.accentSofter : AppColors.surface;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
     return AppCard(
-      color: AppColors.accentSofter,
-      padding: const EdgeInsets.all(14),
+      color: _background,
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
@@ -181,7 +210,7 @@ class _OfferCard extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: _logoToText),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -228,18 +257,19 @@ class _OfferCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
+                    // Чипы → название → адрес: в макете между ними по 13.
+                    const SizedBox(height: 13),
                     Text(offer.labName, style: AppTypography.analysisValue),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 13),
                     Text(offer.address, style: AppTypography.tileSubtitle),
                   ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: _blockGap),
           _PriceRow(offer: offer),
-          const SizedBox(height: 12),
+          const SizedBox(height: _blockGap),
           _OrderButton(labName: offer.labName),
         ],
       ),
@@ -252,16 +282,24 @@ class _Pill extends StatelessWidget {
 
   final Widget child;
 
+  /// Чипы в макете y 477…515. Высота задана явно, а не отступами: у трёх
+  /// чипов разное содержимое (иконка со звездой, короткое и длинное слово),
+  /// и на отступах они разъехались бы по высоте.
+  static const double height = 39;
+
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        color: AppColors.surfaceWhite,
-        borderRadius: AppRadius.allPill,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        child: child,
+    return SizedBox(
+      height: height,
+      child: DecoratedBox(
+        decoration: const BoxDecoration(
+          color: AppColors.surfaceWhite,
+          borderRadius: AppRadius.allPill,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Center(child: child),
+        ),
       ),
     );
   }
@@ -272,44 +310,51 @@ class _PriceRow extends StatelessWidget {
 
   final LabOffer offer;
 
+  /// Плашка в макете y 596…677, кругляш внутри 44.
+  static const double height = 82;
+  static const double _chipSize = 44;
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        color: AppColors.surfaceWhite,
-        borderRadius: AppRadius.allMd,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          children: [
-            const AppIconChip(icon: MedixIcon.labTest, size: 40),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    l10n.priceAtLab(offer.labName),
-                    style: AppTypography.bodyMd,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    l10n.identicalTestsHint,
-                    style: AppTypography.captionMuted,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+    return SizedBox(
+      height: height,
+      child: DecoratedBox(
+        decoration: const BoxDecoration(
+          color: AppColors.surfaceWhite,
+          borderRadius: AppRadius.allMd,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 13),
+          child: Row(
+            children: [
+              const AppIconChip(icon: MedixIcon.labTest, size: _chipSize),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      l10n.priceAtLab(offer.labName),
+                      style: AppTypography.bodyMd,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      l10n.identicalTestsHint,
+                      style: AppTypography.captionMuted,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(width: 8),
-            Text(offer.priceLabel, style: AppTypography.cardTitleAccent),
-          ],
+              const SizedBox(width: 8),
+              Text(offer.priceLabel, style: AppTypography.cardTitleAccent),
+            ],
+          ),
         ),
       ),
     );
@@ -321,7 +366,9 @@ class _OrderButton extends StatelessWidget {
 
   final String labName;
 
-  static const double height = 56;
+  /// Кнопка в макете y 697…768, кругляш внутри 44.
+  static const double height = 72;
+  static const double _chipSize = 44;
 
   @override
   Widget build(BuildContext context) {
@@ -337,10 +384,10 @@ class _OrderButton extends StatelessWidget {
           // Записи в лабораторию у бэкенда нет — кнопка ждёт эндпоинта.
           onTap: null,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 13),
             child: Row(
               children: [
-                const AppIconChip(icon: MedixIcon.labTest, size: 36),
+                const AppIconChip(icon: MedixIcon.labTest, size: _chipSize),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
