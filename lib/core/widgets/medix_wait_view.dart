@@ -38,6 +38,10 @@ class MedixWaitView extends StatelessWidget {
   /// Анимация квадратная, 625×625.
   static const double animationSize = 96;
 
+  /// Вынесен, чтобы заставка могла прогреть картинку до показа: 96
+  /// кадров 625×625 декодируются заметное время.
+  static const String animationAsset = 'assets/images/logo_animated.gif';
+
   /// Верх логотипа при безопасной зоне 62.
   static const double _logoTop = 388;
 
@@ -72,7 +76,7 @@ class MedixWaitView extends StatelessWidget {
                 // макетах белый. Перекрасить покадровую анимацию нельзя —
                 // либо дизайнер отдаёт белый вариант, либо остаётся синий.
                 Image.asset(
-                  'assets/images/logo_animated.gif',
+                  animationAsset,
                   width: animationSize,
                   height: animationSize,
                   fit: BoxFit.contain,
