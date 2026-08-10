@@ -11,9 +11,11 @@ import 'package:medix/shared/models/appointment.dart';
 import 'package:medix/shared/models/doctor_specialty.dart';
 import 'package:medix/features/family_access/presentation/providers/family_providers.dart';
 import 'package:medix/features/home/presentation/providers/home_providers.dart';
+import 'package:medix/features/profile/presentation/providers/profile_providers.dart';
 import 'package:medix/features/home/presentation/screens/home_screen.dart';
 
 import '../../helpers/fake_family_repository.dart';
+import '../../helpers/fake_profile_repository.dart';
 import '../../helpers/test_fonts.dart';
 
 /// Эталон главной для сверки с `design/Главная.png`.
@@ -41,6 +43,10 @@ void main() {
           // Future.delayed, и таймер переживает тест.
           familyRepositoryProvider.overrideWithValue(
             const FakeFamilyRepository(),
+          ),
+          // Экран смотрит на тариф: семейный доступ входит в Gold.
+          profileRepositoryProvider.overrideWithValue(
+            const FakeProfileRepository(),
           ),
         ],
         child: MaterialApp(

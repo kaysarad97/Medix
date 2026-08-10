@@ -4,14 +4,37 @@ import 'package:medix/features/profile/domain/entities/medical_procedure.dart';
 import 'package:medix/features/profile/domain/entities/user_profile.dart';
 import 'package:medix/shared/models/analysis_result.dart';
 import 'package:medix/shared/models/my_doctor.dart';
+import 'package:medix/shared/models/subscription_tier.dart';
 
 /// Те же данные, что у [MockProfileRepository], но без задержки: таймер вне
 /// `runAsync` роняет виджет-тест на «timersPending».
 class FakeProfileRepository implements ProfileRepository {
-  const FakeProfileRepository();
+  const FakeProfileRepository({this.subscription});
+
+  /// Чем подменить тариф из мока. Нужен экранам, где что-то доступно
+  /// только по Gold: у мок-профиля он как раз Gold, и бесплатную ветку
+  /// иначе не проверить.
+  final SubscriptionTier? subscription;
 
   @override
-  Future<UserProfile> profile() async => MockProfileRepository.mockProfile;
+  Future<UserProfile> profile() async {
+    final profile = MockProfileRepository.mockProfile;
+    if (subscription == null) return profile;
+    return UserProfile(
+      id: profile.id,
+      firstName: profile.firstName,
+      lastName: profile.lastName,
+      gender: profile.gender,
+      birthDate: profile.birthDate,
+      subscription: subscription!,
+      email: profile.email,
+      registrationAddress: profile.registrationAddress,
+      heightCm: profile.heightCm,
+      weightKg: profile.weightKg,
+      avatarAsset: profile.avatarAsset,
+      avatarUrl: profile.avatarUrl,
+    );
+  }
 
   @override
   // Ответы «да» — как в макете `Медкарта.png`, где обе кнопки залиты.

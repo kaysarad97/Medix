@@ -4,10 +4,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/features/family_access/presentation/providers/family_providers.dart';
 import 'package:medix/features/home/presentation/providers/home_providers.dart';
+import 'package:medix/features/profile/presentation/providers/profile_providers.dart';
 import 'package:medix/features/home/presentation/screens/home_screen.dart';
 import 'package:medix/l10n/app_localizations.dart';
 
 import '../../helpers/fake_family_repository.dart';
+import '../../helpers/fake_profile_repository.dart';
 import '../../helpers/test_fonts.dart';
 
 /// Смена локали действительно переводит интерфейс — не только собирается.
@@ -32,6 +34,10 @@ void main() {
           // Future.delayed, и таймер переживает тест.
           familyRepositoryProvider.overrideWithValue(
             const FakeFamilyRepository(),
+          ),
+          // Экран смотрит на тариф: семейный доступ входит в Gold.
+          profileRepositoryProvider.overrideWithValue(
+            const FakeProfileRepository(),
           ),
         ],
         child: MaterialApp(

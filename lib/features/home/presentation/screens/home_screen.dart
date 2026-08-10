@@ -10,7 +10,9 @@ import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/family_card.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../shared/models/subscription_tier.dart';
 import '../../../family_access/presentation/providers/family_providers.dart';
+import '../../../profile/presentation/providers/profile_providers.dart';
 import '../providers/home_providers.dart';
 import '../widgets/doctors_card.dart';
 import '../widgets/home_header.dart';
@@ -36,6 +38,10 @@ class HomeScreen extends ConsumerWidget {
     final specialties = ref.watch(specialtiesProvider);
     final appointments = ref.watch(upcomingAppointmentsProvider);
     final family = ref.watch(familyMembersProvider).value ?? const [];
+    // Семейный доступ — возможность Gold: без подписки «Моя Семья» ведёт
+    // на экран тарифов, а не в профиль близкого.
+    final isGold =
+        ref.watch(profileProvider).value?.subscription == SubscriptionTier.gold;
     final l10n = AppLocalizations.of(context)!;
 
     return AppScaffold(
@@ -103,8 +109,14 @@ class HomeScreen extends ConsumerWidget {
                     // На главной строка — вход в чужой профиль, а не сведения
                     // о человеке: «Профиль для ребенка» вместо имени.
                     rowStyle: FamilyRowStyle.entry,
-                    onMemberTap: (member) =>
-                        context.push(Routes.familyMemberOf(member.id)),
+                    // Семейный доступ входит в Gold. Без подписки строка
+                    // ведёт не в профиль близкого, а на экран тарифов —
+                    // там цены и что даёт подписка.
+                    onMemberTap: (member) => context.push(
+                      isGold
+                          ? Routes.familyMemberOf(member.id)
+                          : Routes.subscription,
+                    ),
                   ),
                 ),
               ],
