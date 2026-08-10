@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:lottie/lottie.dart';
 
 import '../theme/app_colors.dart';
 import '../theme/app_typography.dart';
@@ -38,9 +39,20 @@ class MedixWaitView extends StatelessWidget {
   /// Анимация квадратная, 625×625.
   static const double animationSize = 96;
 
-  /// Вынесен, чтобы заставка могла прогреть картинку до показа: 96
-  /// кадров 625×625 декодируются заметное время.
-  static const String animationAsset = 'assets/images/logo_animated.gif';
+  /// Векторная анимация прорисовки знака (Lottie), 3,43 с при 30 к/с.
+  ///
+  /// Была гифка: 96 кадров 625×625, и распаковка не поспевала за
+  /// задержками — анимация замирала на первых штрихах. Вектор рисуется
+  /// на лету, весит 8 КБ вместо 378 и заодно решил давнее расхождение:
+  /// знак наконец белый, как в макетах, а не синий.
+  ///
+  /// Собрана из `assets/images/logo_medix.svg` скриптом
+  /// `tools/build_logo_lottie.py` — им же пересобирается, если знак
+  /// поменяется.
+  static const String animationAsset = 'assets/images/logo_animated.json';
+
+  /// Длительность анимации: 103 кадра при 30 к/с.
+  static const Duration animationDuration = Duration(milliseconds: 3433);
 
   /// Верх логотипа при безопасной зоне 62.
   static const double _logoTop = 388;
@@ -72,14 +84,13 @@ class MedixWaitView extends StatelessWidget {
               // Ставим по центру: смещение в 4 % ширины на телефоне читается
               // как промах вёрстки, а не как замысел.
               if (animated)
-                // Гифка идёт как прислал дизайнер: знак в ней синий, а на
-                // макетах белый. Перекрасить покадровую анимацию нельзя —
-                // либо дизайнер отдаёт белый вариант, либо остаётся синий.
-                Image.asset(
+                Lottie.asset(
                   animationAsset,
                   width: animationSize,
                   height: animationSize,
                   fit: BoxFit.contain,
+                  // Один проход: знак прорисовывается и остаётся.
+                  repeat: false,
                 )
               else
                 SvgPicture.asset(
