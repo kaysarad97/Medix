@@ -31,12 +31,19 @@ dart format --output=none --set-exit-if-changed . && flutter analyze --fatal-inf
 
 - Локально на macOS golden-тесты просто не гоняем: `--exclude-tags golden`.
 - Сверка идёт в CI, джоба «Сверка с макетами» на `windows-latest`.
-- Пересъёмка — вручную запустить workflow CI с галкой `update_goldens`,
-  затем скачать артефакт `goldens` и положить файлы в репозиторий:
+- Пересъёмка — вручную запустить workflow CI с галкой `update_goldens`.
+  Джоба кладёт снятое в ветку `goldens-refresh`; сверить глазами с `design/`
+  и влить в `main`:
 
 ```bash
 gh workflow run ci.yml -f update_goldens=true
+# когда прогон закончится
+git fetch origin goldens-refresh && git merge origin/goldens-refresh
 ```
+
+Артефактом эталоны не выкладываются: артефакты упираются в квоту хранилища
+ровно тогда, когда эталоны нужны, — место выедал APK на 86 МБ. Поэтому APK
+тоже собирается только по галочке `build_apk`, а не на каждый пуш.
 
 Тег объявлен в [dart_test.yaml](dart_test.yaml), файлы эталонов лежат рядом с
 тестами в `goldens/`, папки `failures/` — в `.gitignore`.

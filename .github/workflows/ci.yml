@@ -13,6 +13,12 @@ on:
           осознанно, а машина разработчика не на Windows.
         type: boolean
         default: false
+      build_apk:
+        description: >-
+          Собрать отладочный APK. По галочке, а не на каждый пуш: он весит
+          86 МБ и за несколько дней забивает всю квоту хранилища.
+        type: boolean
+        default: false
 
 # Новый пуш в ту же ветку отменяет предыдущий прогон.
 concurrency:
@@ -87,6 +93,12 @@ jobs:
   build-android:
     name: Сборка APK
     needs: analyze
+    # Только по галочке. Раньше собиралась на каждый пуш, и 86 МБ артефакта
+    # за несколько дней съедали всю квоту хранилища — после чего падала
+    # выгрузка эталонов, которые весят копейки, и CI стоял красным не из-за
+    # кода. Сборка ломается редко, а поймать поломку всё равно есть чем:
+    # `flutter analyze` и тесты идут на каждый пуш.
+    if: ${{ inputs.build_apk }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -133,6 +145,8 @@ jobs:
     # Windows».
     if: ${{ inputs.update_goldens }}
     runs-on: windows-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -147,16 +161,32 @@ jobs:
       - name: Переснять эталоны
         run: flutter test --tags golden --update-goldens
 
-      - name: Выложить эталоны
+      - name: Выложить эталоны в ветку
+        # Веткой, а не артефактом. Артефакты упираются в квоту хранилища
+        # ровно тогда, когда эталоны нужнее всего: место выедает APK на
+        # 86 МБ, а эталоны на 4 МБ следом не влезают — и прогон краснеет
+        # не из-за кода. Ветка не стоит ничего.
+        #
+        # Пишем в отдельную ветку, а не в main: коммит эталонов остаётся
+        # осознанным действием. Их надо глазами сверить с design/ и влить
+        # руками, а не получить побочным эффектом прогона.
+        #
         # Даже если один тест упал: остальные эталоны к этому моменту уже
         # переснялись, и терять их вместе с джобой незачем — иначе после
         # каждой мелкой поломки прогон приходится повторять целиком.
         if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          # Скачать, распаковать поверх test/, глазами сверить с design/
-          # и закоммитить. В репозиторий джоба ничего не пишет: коммит
-          # эталонов — осознанное действие, а не побочный эффект прогона.
-          name: goldens
-          path: test/**/goldens/
-          retention-days: 14
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git checkout -B goldens-refresh
+          # Папки failures/ лежат в .gitignore, так что сюда попадут
+          # только сами эталоны.
+          git add -A test
+          if git diff --cached --quiet; then
+            echo 'Эталоны не изменились — вливать нечего.'
+            exit 0
+          fi
+          git commit -m "Эталоны пересняты прогоном ${GITHUB_RUN_ID}"
+          git push -f origin goldens-refresh
+          echo 'Эталоны в ветке goldens-refresh. Сверить с design/ и влить.'
