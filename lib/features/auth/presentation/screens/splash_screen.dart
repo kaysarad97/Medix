@@ -18,9 +18,10 @@ class SplashScreen extends ConsumerStatefulWidget {
   /// Проверка хранилища занимает миллисекунды, и без задержки логотип
   /// мигнул бы одним кадром — выглядит как сбой отрисовки.
   ///
-  /// Значение — длительность анимации логотипа целиком, чтобы она
-  /// успела прорисоваться и задержаться на экране собранной.
-  static const Duration minimumVisible = MedixWaitView.animationDuration;
+  /// Значение — момент, когда след кисти сходит на нет. Уходим ровно
+  /// тогда: знак в этой анимации не остаётся на экране, а стирается, и
+  /// ждать хвост пустых кадров означало бы показать пустую заставку.
+  static const Duration minimumVisible = MedixWaitView.inkGone;
 
   @override
   ConsumerState<SplashScreen> createState() => _SplashScreenState();
