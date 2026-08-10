@@ -12,6 +12,7 @@ import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/lab_service.dart';
 import '../providers/lab_services_providers.dart';
+import '../widgets/cart_sheet.dart';
 
 /// Перечень услуг: каталог анализов и комплексов с корзиной.
 ///
@@ -21,9 +22,9 @@ import '../providers/lab_services_providers.dart';
 /// четыре раза подряд (Figma-плейсхолдер) — в моке услуги реальные и
 /// разных букв, см. `MockLabServicesRepository`.
 ///
-/// Отдельного экрана корзины нет — макета для него не прислали. Строка
-/// каталога по нажатию добавляется/убирается из корзины, счётчик в шапке
-/// обновляется; открыть саму корзину пока негде.
+/// Строка каталога по нажатию добавляется и убирается из корзины, счётчик
+/// в шапке обновляется. Сам счётчик открывает шторку `CartSheet` по
+/// `design/Моя корзина.png`; пока корзина пуста, нажимать не на что.
 class LabServicesScreen extends ConsumerWidget {
   const LabServicesScreen({super.key});
 
@@ -49,7 +50,12 @@ class LabServicesScreen extends ConsumerWidget {
               ScreenTopBar(
                 title: l10n.labServicesTitle,
                 onBack: () => context.pop(),
-                trailing: _CartBadge(count: cartCount),
+                trailing: GestureDetector(
+                  // Корзина открывается шторкой поверх каталога: в макете
+                  // за ней видны поиск и вкладки.
+                  onTap: cartCount == 0 ? null : () => showCartSheet(context),
+                  child: _CartBadge(count: cartCount),
+                ),
               ),
               const SizedBox(height: 17),
               _SearchField(

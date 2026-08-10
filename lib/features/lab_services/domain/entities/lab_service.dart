@@ -5,6 +5,7 @@ class LabService {
     required this.name,
     required this.price,
     this.kind = LabServiceKind.individual,
+    this.includes = const [],
   });
 
   final String id;
@@ -17,6 +18,10 @@ class LabService {
   final int price;
 
   final LabServiceKind kind;
+
+  /// Что входит в комплекс — списком, как в `design/Моя корзина.png`.
+  /// У отдельного анализа пусто: расшифровывать нечего.
+  final List<String> includes;
 
   /// «1000 ₸».
   String get priceLabel => '$price ₸';

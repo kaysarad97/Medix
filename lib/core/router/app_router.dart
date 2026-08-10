@@ -15,6 +15,7 @@ import '../../features/chats/presentation/screens/doctor_chat_screen.dart';
 import '../../features/family_access/presentation/screens/family_member_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/lab_chatbot/presentation/screens/chatbot_screen.dart';
+import '../../features/lab_services/presentation/screens/lab_offers_screen.dart';
 import '../../features/lab_services/presentation/screens/lab_services_screen.dart';
 import '../../features/map_search/presentation/screens/map_search_screen.dart';
 import '../../features/profile/presentation/screens/avatar_picker_screen.dart';
@@ -125,6 +126,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.labServices,
         builder: (context, state) => const LabServicesScreen(),
+      ),
+      GoRoute(
+        path: Routes.labOffers,
+        builder: (context, state) => const LabOffersScreen(),
       ),
       GoRoute(
         path: Routes.chat,

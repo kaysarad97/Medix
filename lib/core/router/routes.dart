@@ -64,6 +64,9 @@ abstract final class Routes {
   /// Перечень услуг: каталог анализов и комплексов.
   static const String labServices = '/lab-services';
 
+  /// «Партнерские лаборатории» — сколько та же корзина стоит у других.
+  static const String labOffers = '/lab-services/offers';
+
   /// Профиль пользователя — «Ваша Мед-Карта».
   static const String profile = '/profile';
 

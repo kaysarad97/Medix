@@ -1,7 +1,13 @@
+import '../../domain/entities/lab_offer.dart';
 import '../../domain/entities/lab_service.dart';
 
 abstract interface class LabServicesRepository {
   Future<List<LabService>> services();
+
+  /// Предложения партнёров на ту же корзину — экран сравнения цен.
+  /// Набор передаём, потому что у каждой лаборатории свой прайс и
+  /// пересчитывать его должна она, а не приложение.
+  Future<List<LabOffer>> offersFor(Set<String> serviceIds);
 }
 
 /// Заглушка на время разработки бэкенда. Названия — реальные лабораторные
@@ -49,11 +55,66 @@ class MockLabServicesRepository implements LabServicesRepository {
       price: _bundlePrice,
       kind: LabServiceKind.bundle,
     ),
+    LabService(
+      id: 'b4',
+      name: 'Комплекс “Вегетарианский”',
+      price: _bundlePrice,
+      kind: LabServiceKind.bundle,
+      // Состав — с `design/Моя корзина.png`.
+      includes: [
+        'Витамин D (25-ОН)',
+        'Витамин B12',
+        'Кальций общий',
+        'Общий белок',
+        'ОАК с лейкоцитарной формулой',
+      ],
+    ),
+  ];
+
+  /// Партнёры с `design/Сравнение корзины.png`. Цены отличаются от нашей
+  /// суммы намеренно: в этом весь смысл экрана — показать, что тот же
+  /// набор где-то дешевле.
+  static const List<LabOffer> mockOffers = [
+    LabOffer(
+      id: 'l1',
+      labName: 'Лаборатория N1',
+      address: 'Название лаборатории, улица, город',
+      rating: 4.5,
+      isOpen: true,
+      distanceMeters: 900,
+      price: 2900,
+    ),
+    LabOffer(
+      id: 'l2',
+      labName: 'КДЛ “Анализы”',
+      address: 'Название лаборатории, улица, город',
+      rating: 4.5,
+      isOpen: true,
+      distanceMeters: 900,
+      price: 2950,
+    ),
+    LabOffer(
+      id: 'l3',
+      labName: 'Инвитро',
+      address: 'Название лаборатории, улица, город',
+      rating: 4.5,
+      isOpen: false,
+      distanceMeters: 1200,
+      price: 3100,
+    ),
   ];
 
   @override
   Future<List<LabService>> services() async {
     await Future<void>.delayed(_latency);
     return mockServices;
+  }
+
+  @override
+  Future<List<LabOffer>> offersFor(Set<String> serviceIds) async {
+    await Future<void>.delayed(_latency);
+    // Настоящего пересчёта нет: бэкенд отдаст цену каждого партнёра на
+    // переданный набор, а заглушка всегда показывает один и тот же.
+    return mockOffers;
   }
 }

@@ -248,6 +248,22 @@ abstract final class AppTypography {
       _style(size: 11, weight: 500, color: AppColors.primaryBright);
 
   /// Тело отзыва — мельче основного текста и в несколько строк.
+  /// «Итого» под корзиной — синяя и крупная.
+  ///
+  /// Кегль не снят попиксельно: `design/Моя корзина.png` выгружен
+  /// шириной 450 вместо 440, а текст в нём мелкий — по стойкам глифов
+  /// высота не читается. Взят на глаз по соседним заголовкам.
+  static TextStyle get cartTotal =>
+      _style(size: 22, weight: 400, color: AppColors.primaryBright);
+
+  /// Сумма справа от «Итого» — того же кегля, приглушённая.
+  static TextStyle get cartTotalValue =>
+      _style(size: 22, weight: 400, color: AppColors.textMuted);
+
+  /// Цена позиции в корзине.
+  static TextStyle get cartRowPrice =>
+      _style(size: 16, weight: 400, color: AppColors.textMuted);
+
   static TextStyle get reviewBody => _style(
     size: 13,
     weight: 400,

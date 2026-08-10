@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/repositories/lab_services_repository.dart';
+import '../../domain/entities/lab_offer.dart';
 import '../../domain/entities/lab_service.dart';
 
 final labServicesRepositoryProvider = Provider<LabServicesRepository>(
@@ -75,3 +76,29 @@ class LabServicesCart extends Notifier<Set<String>> {
 final labServicesCartProvider = NotifierProvider<LabServicesCart, Set<String>>(
   LabServicesCart.new,
 );
+
+/// Услуги, лежащие в корзине, в порядке каталога — так их нумерует макет.
+final cartServicesProvider = Provider<List<LabService>>((ref) {
+  final ids = ref.watch(labServicesCartProvider);
+  final all = ref.watch(labServicesProvider).value ?? const <LabService>[];
+  return [
+    for (final service in all)
+      if (ids.contains(service.id)) service,
+  ];
+});
+
+/// Сумма корзины. Считается на клиенте: цены уже пришли вместе с каталогом,
+/// и отдельный запрос ради сложения не нужен.
+final cartTotalProvider = Provider<int>((ref) {
+  var total = 0;
+  for (final service in ref.watch(cartServicesProvider)) {
+    total += service.price;
+  }
+  return total;
+});
+
+/// Предложения партнёров на текущую корзину.
+final labOffersProvider = FutureProvider<List<LabOffer>>((ref) {
+  final ids = ref.watch(labServicesCartProvider);
+  return ref.watch(labServicesRepositoryProvider).offersFor(ids);
+});

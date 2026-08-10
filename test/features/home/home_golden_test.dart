@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/theme/app_theme.dart';
+import 'package:medix/core/widgets/user_avatar.dart';
 import 'package:medix/l10n/app_localizations.dart';
 import 'package:medix/shared/models/appointment.dart';
 import 'package:medix/shared/models/doctor_specialty.dart';
@@ -55,6 +56,12 @@ void main() {
     await tester.runAsync(() async {
       await precacheImage(
         const AssetImage('assets/images/app_bg.png'),
+        tester.element(find.byType(MaterialApp)),
+      );
+      // Подложка аватаров в «Моей Семье»: без прекэша в эталон попадут
+      // пустые места вместо кружков.
+      await precacheImage(
+        const AssetImage(UserAvatar.backgroundAsset),
         tester.element(find.byType(MaterialApp)),
       );
       await Future<void>.delayed(const Duration(milliseconds: 500));

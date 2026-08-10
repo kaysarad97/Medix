@@ -130,6 +130,65 @@
   "@birthDateLabel": {
     "description": "Подпись под датой рождения в шапке профиля/члена семьи."
   },
+  "cartTitle": "Моя Корзина",
+  "@cartTitle": {
+    "description": "Заголовок шторки корзины в «Перечне услуг»."
+  },
+  "cartPriceLabel": "Цена",
+  "@cartPriceLabel": {
+    "description": "Подпись слева от цены позиции в корзине."
+  },
+  "cartTotalLabel": "Итого",
+  "@cartTotalLabel": {
+    "description": "Подпись итоговой суммы корзины."
+  },
+  "cartPlaceOrder": "Сделать\nзаказ",
+  "@cartPlaceOrder": {
+    "description": "Кнопка оформления заказа под корзиной, в две строки."
+  },
+  "cartComparePrices": "Сравнить\nцены",
+  "@cartComparePrices": {
+    "description": "Кнопка перехода к ценам партнёров, в две строки."
+  },
+  "partnerLabsTitle": "Партнерские лаборатории",
+  "@partnerLabsTitle": {
+    "description": "Заголовок экрана сравнения цен."
+  },
+  "cartAtLabTitle": "Ваша Корзина в {lab}",
+  "@cartAtLabTitle": {
+    "description": "Заголовок карточки своей корзины на экране сравнения.",
+    "placeholders": {
+      "lab": {
+        "type": "String"
+      }
+    }
+  },
+  "otherOffersTitle": "Другие предложения",
+  "@otherOffersTitle": {
+    "description": "Заголовок списка предложений партнёров."
+  },
+  "priceAtLab": "Цена в «{lab}»",
+  "@priceAtLab": {
+    "description": "Строка цены партнёра на тот же набор анализов.",
+    "placeholders": {
+      "lab": {
+        "type": "String"
+      }
+    }
+  },
+  "identicalTestsHint": "расчет цены на идентичные анализы",
+  "@identicalTestsHint": {
+    "description": "Пояснение под ценой партнёра."
+  },
+  "orderAtLab": "Сдать анализы в «{lab}»",
+  "@orderAtLab": {
+    "description": "Кнопка записи в лабораторию партнёра.",
+    "placeholders": {
+      "lab": {
+        "type": "String"
+      }
+    }
+  },
   "labServicesTitle": "Перечень услуг",
   "@labServicesTitle": {
     "description": "Заголовок экрана каталога анализов."
