@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -13,39 +15,54 @@ import '../providers/session_providers.dart';
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
-  /// Заставка держится не меньше этого времени.
+  /// Верхняя граница ожидания, если сигнал «след сошёл на нет» так и не
+  /// пришёл.
   ///
-  /// Проверка хранилища занимает миллисекунды, и без задержки логотип
-  /// мигнул бы одним кадром — выглядит как сбой отрисовки.
-  ///
-  /// Значение — момент, когда след кисти сходит на нет. Уходим ровно
-  /// тогда: знак в этой анимации не остаётся на экране, а стирается, и
-  /// ждать хвост пустых кадров означало бы показать пустую заставку.
-  static const Duration minimumVisible = MedixWaitView.inkGone;
+  /// Раньше заставка держалась фиксированные 2838 мс по таймеру
+  /// (`MedixWaitView.inkGone`). На реальном телефоне живой замер —
+  /// `debugPrint` на каждый декодированный кадр — показал: декодирование
+  /// идёт ~42 мс/кадр вместо расчётных 33, и к 2838 мс декодер успевал
+  /// дойти только до ~68-го кадра из 87 — след обрывался, не дойдя до
+  /// конца. Теперь ждём сам кадр `MedixWaitView.inkGoneFrame` через
+  /// `MedixWaitView.onInkGone`, а не время до него — уход с экрана не
+  /// зависит от скорости декодирования на конкретном устройстве. Этот
+  /// таймаут — только страховка на случай, если сигнал не придёт вовсе:
+  /// например, в виджет-тестах картинка не декодируется совсем.
+  static const Duration maxWait = Duration(milliseconds: 4500);
 
   @override
   ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
 class _SplashScreenState extends ConsumerState<SplashScreen> {
+  final _inkGoneCompleter = Completer<void>();
+
   @override
   void initState() {
     super.initState();
     _decide();
   }
 
-  Future<void> _decide() async {
-    final started = DateTime.now();
-    final hasSession = await ref.read(hasStoredSessionProvider.future);
+  void _handleInkGone() {
+    if (!_inkGoneCompleter.isCompleted) _inkGoneCompleter.complete();
+  }
 
-    final elapsed = DateTime.now().difference(started);
-    final left = SplashScreen.minimumVisible - elapsed;
-    if (left > Duration.zero) await Future<void>.delayed(left);
+  Future<void> _decide() async {
+    // Оба запущены сразу — ждём того, кто закончит позже.
+    final sessionFuture = ref.read(hasStoredSessionProvider.future);
+    final inkGoneFuture = _inkGoneCompleter.future.timeout(
+      SplashScreen.maxWait,
+      onTimeout: () {},
+    );
+
+    final hasSession = await sessionFuture;
+    await inkGoneFuture;
 
     if (!mounted) return;
     context.go(hasSession ? Routes.home : Routes.login);
   }
 
   @override
-  Widget build(BuildContext context) => const MedixWaitView();
+  Widget build(BuildContext context) =>
+      MedixWaitView(onInkGone: _handleInkGone);
 }

@@ -45,7 +45,7 @@ void main() {
     expect(find.byType(SplashScreen), findsOneWidget);
     expect(find.text('ЛОГИН'), findsNothing);
 
-    await tester.pump(SplashScreen.minimumVisible);
+    await tester.pump(SplashScreen.maxWait);
     await tester.pumpAndSettle();
 
     expect(find.text('ЛОГИН'), findsOneWidget);
@@ -54,7 +54,7 @@ void main() {
   testWidgets('с сохранённой сессией ведёт на главную', (tester) async {
     await pumpSplash(tester, hasSession: true);
 
-    await tester.pump(SplashScreen.minimumVisible);
+    await tester.pump(SplashScreen.maxWait);
     await tester.pumpAndSettle();
 
     expect(find.text('ГЛАВНАЯ'), findsOneWidget);
@@ -65,11 +65,13 @@ void main() {
     await pumpSplash(tester, hasSession: true);
 
     // Проверка хранилища занимает миллисекунды; без выдержки заставка
-    // исчезла бы почти сразу и выглядела бы сбоем отрисовки.
+    // исчезла бы почти сразу и выглядела бы сбоем отрисовки. В тесте
+    // картинка не декодируется вовсе, поэтому сигнала «след сошёл на
+    // нет» не будет — заставка держится страховочным `maxWait`.
     await tester.pump(const Duration(milliseconds: 300));
     expect(find.byType(SplashScreen), findsOneWidget);
 
-    await tester.pump(SplashScreen.minimumVisible);
+    await tester.pump(SplashScreen.maxWait);
     await tester.pumpAndSettle();
   });
 }

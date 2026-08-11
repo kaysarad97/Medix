@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -16,6 +18,7 @@ class MedixWaitView extends StatelessWidget {
     this.title,
     this.subtitle,
     this.animated = true,
+    this.onInkGone,
   });
 
   /// Крутить анимацию логотипа вместо статичного знака.
@@ -31,6 +34,11 @@ class MedixWaitView extends StatelessWidget {
   /// Пояснение под [title].
   final String? subtitle;
 
+  /// Зовётся один раз, когда декодирован кадр [inkGoneFrame] — след кисти
+  /// сошёл на нет. Нужен заставке запуска, чтобы уходить по факту, а не по
+  /// расчётному времени — см. её же комментарий у `minimumVisible`.
+  final VoidCallback? onInkGone;
+
   /// Высота логотипа. Ширину задаёт сам знак: в макете глиф был 48×69, но
   /// присланный вектор шире по пропорции, и растягивать его нельзя.
   static const double logoHeight = 69;
@@ -39,7 +47,8 @@ class MedixWaitView extends StatelessWidget {
   /// под него, 288 пикселей при трёхкратной плотности.
   static const double animationSize = 96;
 
-  /// Анимация прорисовки знака: кадры дизайнера, 87 кадров, 3,4 с.
+  /// Анимация прорисовки знака: кадры дизайнера, 87 кадров, 3,4 с при
+  /// расчётных 33 мс/кадр.
   ///
   /// Кадры, а не вектор, — сознательно. Движение пробовали повторить дважды:
   /// обводкой силуэта из `logo_medix.svg` и восстановлением траектории кисти
@@ -55,15 +64,17 @@ class MedixWaitView extends StatelessWidget {
   /// Пересобирается скриптом `tools/build_logo_webp.py`.
   static const String animationAsset = 'assets/images/logo_animated.webp';
 
-  /// Длительность анимации целиком, вместе с паузой перед повтором.
-  static const Duration animationDuration = Duration(milliseconds: 3399);
-
-  /// Когда след кисти сходит на нет.
+  /// Кадр (по счёту декодирования, с 1), на котором след кисти сходит на
+  /// нет — последний содержательный кадр перед пустым хвостом-паузой.
   ///
-  /// Последние 561 мс анимации пустые — у дизайнера это пауза перед
-  /// повтором. На экранах ожидания она нужна, на заставке ждать её незачем:
-  /// экран просто стоял бы пустым.
-  static const Duration inkGone = Duration(milliseconds: 2838);
+  /// Считаем по кадрам, а не по времени: расчётные 33 мс/кадр — это темп
+  /// исходника, а не гарантия декодера. На реальном телефоне живой замер
+  /// (`debugPrint` на каждый кадр через `ImageStreamListener`) показал
+  /// ~42 мс/кадр — на четверть медленнее; к расчётным 2838 мс декодер
+  /// успевал дойти только до ~68-го кадра из 87, и след обрывался,
+  /// не дойдя до конца. Ждать сам кадр, а не время до него, — единственный
+  /// способ не зависеть от скорости декодирования на конкретном устройстве.
+  static const int inkGoneFrame = 86;
 
   /// Верх логотипа при безопасной зоне 62.
   static const double _logoTop = 388;
@@ -95,11 +106,14 @@ class MedixWaitView extends StatelessWidget {
               // Ставим по центру: смещение в 4 % ширины на телефоне читается
               // как промах вёрстки, а не как замысел.
               if (animated)
-                Image.asset(
-                  animationAsset,
-                  width: animationSize,
-                  height: animationSize,
-                  fit: BoxFit.contain,
+                _AnimatedLogo(
+                  asset: animationAsset,
+                  size: animationSize,
+                  onFrame: onInkGone == null
+                      ? null
+                      : (frame) {
+                          if (frame >= inkGoneFrame) onInkGone!();
+                        },
                 )
               else
                 SvgPicture.asset(
@@ -122,6 +136,72 @@ class MedixWaitView extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Проигрывает анимированный WebP кадр за кадром через `ImageStream`
+/// напрямую, а не `Image.asset`: нужен сам факт прихода кадра — сколько их
+/// уже показано, — а не только картинка.
+class _AnimatedLogo extends StatefulWidget {
+  const _AnimatedLogo({required this.asset, required this.size, this.onFrame});
+
+  final String asset;
+  final double size;
+
+  /// Зовётся на каждый декодированный кадр, начиная с 1.
+  final ValueChanged<int>? onFrame;
+
+  @override
+  State<_AnimatedLogo> createState() => _AnimatedLogoState();
+}
+
+class _AnimatedLogoState extends State<_AnimatedLogo> {
+  ImageStream? _stream;
+  ImageStreamListener? _listener;
+  ui.Image? _image;
+  int _frameCount = 0;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final newStream = AssetImage(
+      widget.asset,
+    ).resolve(createLocalImageConfiguration(context));
+    if (newStream.key != _stream?.key) {
+      _stream?.removeListener(_listener!);
+      _listener = ImageStreamListener(_handleFrame, onError: _handleError);
+      _stream = newStream;
+      _stream!.addListener(_listener!);
+    }
+  }
+
+  void _handleFrame(ImageInfo info, bool sync) {
+    _frameCount++;
+    widget.onFrame?.call(_frameCount);
+    setState(() => _image = info.image);
+  }
+
+  /// Без картинки анимация не показывается, но экран не должен падать
+  /// из-за этого — молча остаёмся на пустом месте нужного размера.
+  void _handleError(Object error, StackTrace? stack) {}
+
+  @override
+  void dispose() {
+    _stream?.removeListener(_listener!);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_image == null) {
+      return SizedBox(width: widget.size, height: widget.size);
+    }
+    return RawImage(
+      image: _image,
+      width: widget.size,
+      height: widget.size,
+      fit: BoxFit.contain,
     );
   }
 }
