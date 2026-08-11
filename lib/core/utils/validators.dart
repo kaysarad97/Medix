@@ -49,6 +49,17 @@ abstract final class Validators {
     return null;
   }
 
+  /// Родство с владельцем аккаунта: «сын», «мама».
+  ///
+  /// Проверяем только то, что поле заполнено: словаря значений у бэкенда
+  /// нет, он принимает любую строку, и придумывать свой список за него —
+  /// значит запретить «племянник» на ровном месте.
+  static String? familyRelation(String? value) {
+    final v = value?.trim() ?? '';
+    if (v.isEmpty) return 'Укажите родство';
+    return null;
+  }
+
   /// Одноразовый код из письма: [length] цифр.
   static String? otpCode(
     String? value, {

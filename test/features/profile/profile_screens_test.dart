@@ -37,9 +37,7 @@ void main() {
           profileRepositoryProvider.overrideWithValue(
             const FakeProfileRepository(),
           ),
-          familyRepositoryProvider.overrideWithValue(
-            const FakeFamilyRepository(),
-          ),
+          familyRepositoryProvider.overrideWithValue(FakeFamilyRepository()),
         ],
         child: MaterialApp(
           theme: AppTheme.light,

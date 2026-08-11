@@ -76,10 +76,24 @@ abstract final class Routes {
   /// История консультаций: «Предыдущие процедуры».
   static const String procedures = '/profile/procedures';
 
+  /// Список близких — «Моя Семья».
+  static const String family = '/profile/family';
+
+  /// Форма нового члена семьи.
+  ///
+  /// Объявляется в роутере раньше [familyMember]: go_router разбирает пути
+  /// по порядку, и `:id` иначе поймал бы «new» как идентификатор.
+  static const String familyMemberNew = '/profile/family/new';
+
   /// Карточка члена семьи — «Моя Семья».
   static const String familyMember = '/profile/family/:id';
 
+  /// Правка члена семьи: та же форма, что и добавление.
+  static const String familyMemberEdit = '/profile/family/:id/edit';
+
   static String familyMemberOf(String id) => '/profile/family/$id';
+
+  static String familyMemberEditOf(String id) => '/profile/family/$id/edit';
 
   /// Настройки приложения.
   static const String settings = '/profile/settings';

@@ -27,6 +27,17 @@ abstract final class ApiEndpoints {
   /// Профиль текущего пользователя.
   static const String me = '/users/me';
 
+  /// Члены семьи: список и добавление.
+  static const String family = '/users/me/family';
+
+  /// Один член семьи: чтение, правка, удаление.
+  static String familyMember(String id) => '$family/$id';
+
+  /// Мед-карта члена семьи. Чужой идентификатор отдаёт 404 и попадает в
+  /// журнал доступа на сервере.
+  static String familyMedicalRecords(String id) =>
+      '${familyMember(id)}/medical-records';
+
   /// Запросы к этой ветке уходят без токена доступа и не перезапрашиваются
   /// после 401: часть из них анонимна, а `/auth/refresh` и `/auth/logout`
   /// носят refresh-токен в теле. Единое правило избавляет от рекурсии в

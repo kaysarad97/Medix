@@ -12,6 +12,8 @@ import '../../features/auth/presentation/screens/verify_code_screen.dart';
 import '../../features/calls/presentation/screens/call_screen.dart';
 import '../../features/chats/presentation/screens/chats_list_screen.dart';
 import '../../features/chats/presentation/screens/doctor_chat_screen.dart';
+import '../../features/family_access/presentation/screens/family_list_screen.dart';
+import '../../features/family_access/presentation/screens/family_member_form_screen.dart';
 import '../../features/family_access/presentation/screens/family_member_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/lab_chatbot/presentation/screens/chatbot_screen.dart';
@@ -205,9 +207,24 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const ProceduresScreen(),
       ),
       GoRoute(
+        path: Routes.family,
+        builder: (context, state) => const FamilyListScreen(),
+      ),
+      // Раньше карточки члена семьи: иначе `:id` поймает «new» как
+      // идентификатор и вместо формы откроется пустая карточка.
+      GoRoute(
+        path: Routes.familyMemberNew,
+        builder: (context, state) => const FamilyMemberFormScreen(),
+      ),
+      GoRoute(
         path: Routes.familyMember,
         builder: (context, state) =>
             FamilyMemberScreen(memberId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: Routes.familyMemberEdit,
+        builder: (context, state) =>
+            FamilyMemberFormScreen(memberId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: Routes.settings,

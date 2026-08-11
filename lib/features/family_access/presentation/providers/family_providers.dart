@@ -1,15 +1,17 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/network/api_mode.dart';
+import '../../../../core/network/dio_client.dart';
 import '../../../../shared/models/analysis_result.dart';
 import '../../../../shared/models/family_member.dart';
 import '../../../../shared/models/my_doctor.dart';
 import '../../data/repositories/family_repository.dart';
 
-final familyRepositoryProvider = Provider<FamilyRepository>(
-  // Бэкенда пока нет; переключение появится вместе с реальными эндпоинтами,
-  // как в authRepositoryProvider.
-  (ref) => const MockFamilyRepository(),
-);
+final familyRepositoryProvider = Provider<FamilyRepository>((ref) {
+  if (useMocks) return MockFamilyRepository();
+
+  return RemoteFamilyRepository(ref.watch(dioClientProvider));
+});
 
 final familyMembersProvider = FutureProvider<List<FamilyMember>>(
   (ref) => ref.watch(familyRepositoryProvider).members(),

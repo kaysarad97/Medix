@@ -64,12 +64,18 @@ class FamilyCard extends StatelessWidget {
     required this.title,
     this.rowStyle = FamilyRowStyle.name,
     this.onMemberTap,
+    this.onTitleTap,
   });
 
   final List<FamilyMember> members;
   final String title;
   final FamilyRowStyle rowStyle;
   final ValueChanged<FamilyMember>? onMemberTap;
+
+  /// Переход к списку целиком. Задан — в заголовке появляется шеврон, как у
+  /// «Мед-карты» и «Ваших анализов». На главной не задаётся: там карточка
+  /// сама и есть вход в профили близких.
+  final VoidCallback? onTitleTap;
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +86,11 @@ class FamilyCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
-          SectionHeader(icon: MedixIcon.family, title: title),
+          SectionHeader(
+            icon: MedixIcon.family,
+            title: title,
+            onTap: onTitleTap,
+          ),
           for (final member in members) ...[
             const SizedBox(height: FamilyCardMetrics.rowGap),
             _MemberRow(

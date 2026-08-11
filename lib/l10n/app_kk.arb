@@ -182,5 +182,14 @@
   "audioCallLabel": "Аудио-қоңырау",
   "chatAppointmentLabel": "Чат",
   "inPersonAppointmentLabel": "Тікелей қабылдау",
-  "callEndedLabel": "Қоңырау аяқталды"
+  "callEndedLabel": "Қоңырау аяқталды",
+  "familyAddTitle": "Отбасының жаңа мүшесі",
+  "familyEditTitle": "Деректерді өзгерту",
+  "familyAddButton": "Отбасы мүшесін қосу",
+  "familyEmptyHint": "Мұнда сіз қосқан жақындарыңыз көрінеді",
+  "familyDeleteButton": "Отбасынан жою",
+  "familyDeleteConfirmTitle": "Отбасы мүшесін жою керек пе?",
+  "familyDeleteConfirmMessage": "Оның картасы мен мед-картасына қолжетімділік қосымшадан жоғалады.",
+  "cancelButtonLabel": "Болдырмау",
+  "deleteButtonLabel": "Жою"
 }

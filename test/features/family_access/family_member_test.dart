@@ -21,9 +21,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          familyRepositoryProvider.overrideWithValue(
-            const FakeFamilyRepository(),
-          ),
+          familyRepositoryProvider.overrideWithValue(FakeFamilyRepository()),
         ],
         child: MaterialApp(
           theme: AppTheme.light,

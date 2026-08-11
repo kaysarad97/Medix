@@ -813,5 +813,41 @@
   "callEndedLabel": "Вызов завершен",
   "@callEndedLabel": {
     "description": "Статус экрана звонка после завершения."
+  },
+  "familyAddTitle": "Новый член семьи",
+  "@familyAddTitle": {
+    "description": "Заголовок формы добавления члена семьи."
+  },
+  "familyEditTitle": "Изменить данные",
+  "@familyEditTitle": {
+    "description": "Заголовок той же формы при правке существующего члена семьи."
+  },
+  "familyAddButton": "Добавить члена семьи",
+  "@familyAddButton": {
+    "description": "Кнопка под списком близких на экране «Моя Семья»."
+  },
+  "familyEmptyHint": "Здесь появятся близкие, которых вы добавите",
+  "@familyEmptyHint": {
+    "description": "Подсказка на экране «Моя Семья», когда никого не добавлено."
+  },
+  "familyDeleteButton": "Удалить из семьи",
+  "@familyDeleteButton": {
+    "description": "Кнопка удаления члена семьи в форме правки."
+  },
+  "familyDeleteConfirmTitle": "Удалить члена семьи?",
+  "@familyDeleteConfirmTitle": {
+    "description": "Заголовок подтверждения удаления."
+  },
+  "familyDeleteConfirmMessage": "Карточка и доступ к его мед-карте пропадут из приложения.",
+  "@familyDeleteConfirmMessage": {
+    "description": "Пояснение в подтверждении удаления члена семьи."
+  },
+  "cancelButtonLabel": "Отмена",
+  "@cancelButtonLabel": {
+    "description": "Отказ в диалоге подтверждения."
+  },
+  "deleteButtonLabel": "Удалить",
+  "@deleteButtonLabel": {
+    "description": "Согласие в диалоге подтверждения удаления."
   }
 }

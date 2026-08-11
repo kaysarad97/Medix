@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/routes.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
@@ -56,6 +59,18 @@ class FamilyMemberScreen extends ConsumerWidget {
                     ScreenTopBar(
                       title: l10n.familyScreenTitle,
                       onBack: () => Navigator.of(context).maybePop(),
+                      // Карандаш из Material: своей иконки правки дизайнер
+                      // не присылал, а заводить её в MedixIcons без
+                      // исходника нельзя — см. icon_chip.dart.
+                      trailing: GestureDetector(
+                        onTap: () =>
+                            context.push(Routes.familyMemberEditOf(memberId)),
+                        child: const Icon(
+                          Icons.edit_outlined,
+                          size: 22,
+                          color: AppColors.textOnPrimary,
+                        ),
+                      ),
                     ),
                     const SizedBox(height: ProfileMetrics.topBarToHeader),
                     _MemberHeader(member: member),
@@ -143,7 +158,7 @@ class _MemberHeader extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _MetaColumn(
-                        value: member.gender.label,
+                        value: member.genderLabel,
                         label: l10n.genderLabel,
                       ),
                     ),

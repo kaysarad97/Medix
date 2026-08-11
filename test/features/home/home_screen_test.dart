@@ -32,9 +32,7 @@ void main() {
           upcomingAppointmentsProvider.overrideWith((ref) => const []),
           // По той же причине: заглушка семьи отдаёт данные через
           // Future.delayed, и таймер переживает тест.
-          familyRepositoryProvider.overrideWithValue(
-            const FakeFamilyRepository(),
-          ),
+          familyRepositoryProvider.overrideWithValue(FakeFamilyRepository()),
           // Экран смотрит на тариф: семейный доступ входит в Gold.
           profileRepositoryProvider.overrideWithValue(
             const FakeProfileRepository(),

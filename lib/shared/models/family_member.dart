@@ -17,9 +17,9 @@ class FamilyMember {
     required this.id,
     required this.firstName,
     required this.lastName,
-    required this.gender,
     required this.birthDate,
     required this.relation,
+    this.gender,
     this.relationshipLabel,
     this.registrationAddress,
     this.heightCm,
@@ -30,9 +30,15 @@ class FamilyMember {
   final String id;
   final String firstName;
   final String lastName;
-  final Gender gender;
   final DateTime birthDate;
   final FamilyRelation relation;
+
+  /// Пол. Необязателен, потому что бэкенд его не хранит: у члена семьи есть
+  /// только имя, дата рождения и родство. С сервера всегда приходит `null`,
+  /// и в карточке на этом месте прочерк — спрашивать пол в форме, чтобы тут
+  /// же его потерять, честнее не заводить вовсе. Поле останется, пока не
+  /// ответит дизайнер, показывать ли его вообще.
+  final Gender? gender;
 
   /// «Сын», «Дочь», «Мама» — поле «Родство с Вами» в мед-карте. В обоих
   /// макетах не заполнено, поэтому мок оставляет `null`, как и с
@@ -49,7 +55,16 @@ class FamilyMember {
   final String? avatarAsset;
 
   /// «Имя Фамилия».
-  String get fullName => '$firstName $lastName';
+  ///
+  /// Через фильтр, а не склейкой: с бэкенда приходит одно поле `full_name`,
+  /// и в нём может не оказаться фамилии — тогда склейка дала бы висящий
+  /// пробел.
+  String get fullName =>
+      [firstName, lastName].where((part) => part.isNotEmpty).join(' ');
+
+  /// Прочерк — тем же знаком, что у роста и веса, которых на сервере тоже
+  /// нет: в карточке это одна строка сведений, и разнобой в ней заметен.
+  String get genderLabel => gender?.label ?? '—';
 
   /// «7/10/2020» — тот же формат, что в шапке профиля пользователя.
   String get birthDateLabel =>

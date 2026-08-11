@@ -11,6 +11,7 @@ import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../core/widgets/section_header.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../shared/models/subscription_tier.dart';
 import '../../../family_access/presentation/providers/family_providers.dart';
 import '../providers/profile_providers.dart';
 import '../widgets/analyses_card.dart';
@@ -38,6 +39,11 @@ class MedicalCardScreen extends ConsumerWidget {
     final filter = ref.watch(analysesFilterProvider);
     final family = ref.watch(familyMembersProvider).value ?? const [];
     final l10n = AppLocalizations.of(context)!;
+
+    // Семейный доступ входит в Gold. Без подписки обе ссылки «Моей Семьи»
+    // ведут на экран тарифов — там цены и что даёт подписка.
+    final isGold = profile?.subscription == SubscriptionTier.gold;
+    const gate = Routes.subscription;
 
     return AppScaffold(
       background: AppBackgroundStyle.main,
@@ -89,17 +95,32 @@ class MedicalCardScreen extends ConsumerWidget {
                         title: l10n.myDoctorsTitle,
                       ),
                     ),
-                    if (family.isNotEmpty) ...[
-                      const SizedBox(height: ProfileMetrics.cardGap),
-                      _Section(
-                        child: FamilyCard(
-                          members: family,
-                          title: l10n.familyScreenTitle,
-                          onMemberTap: (member) =>
-                              context.push(Routes.familyMemberOf(member.id)),
+                    // Карточка рисуется и с пустым списком, в отличие от
+                    // главной: это единственный вход в «Мою Семью», и без
+                    // неё добавить первого близкого было бы неоткуда.
+                    const SizedBox(height: ProfileMetrics.cardGap),
+                    _Section(
+                      child: FamilyCard(
+                        members: family,
+                        title: l10n.familyScreenTitle,
+                        // Шеврон в заголовке ведёт на список целиком —
+                        // там же добавление. Так устроены и остальные
+                        // карточки этого экрана: «Мед-карта», «Предыдущие
+                        // процедуры», «Ваши анализы». В макете это место
+                        // закрыто наложенным таб-баром, свериться не с чем.
+                        //
+                        // Обе ссылки под подпиской, как на главной: семейный
+                        // доступ входит в Gold, и без него оба пути ведут на
+                        // экран тарифов. Раньше строка участника отсюда
+                        // открывалась без проверки — обход платного раздела
+                        // в обход собственной же двери на главной.
+                        onTitleTap: () =>
+                            context.push(isGold ? Routes.family : gate),
+                        onMemberTap: (member) => context.push(
+                          isGold ? Routes.familyMemberOf(member.id) : gate,
                         ),
                       ),
-                    ],
+                    ),
                     const SizedBox(height: ProfileMetrics.cardGap),
                     _Section(
                       child: _ProceduresCard(
