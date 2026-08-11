@@ -146,6 +146,32 @@ enum MedixIcon {
 
   /// Телефонная трубка с крестиком, красная. Кнопка завершения звонка.
   callDecline,
+
+  /// Значок процента в фигурной рамке. Строка «Скидки на анализы» в
+  /// таблице «Подписка».
+  planDiscount,
+
+  /// Доллар в кружке. Строка «Скидка на консультации» там же.
+  planPrice,
+
+  /// Планшет с уголком-пометкой. Строка «Очередь к врачу» там же.
+  planQueue,
+
+  /// Восходящий график. Строка «Аналитика здоровья» там же.
+  planAnalytics,
+
+  /// Двое в кружках. Строка «Семейный доступ» там же.
+  planFamily,
+
+  /// Перечёркнутый кружок. Ячейка недоступной на тарифе возможности там же.
+  planUnavailable,
+
+  /// Корзина с ручками. Счётчик корзины и кнопка «Сделать заказ» в
+  /// «Перечень услуг».
+  cart,
+
+  /// Стрелки вниз/вверх с «Z». Сортировка в «Поиск врача».
+  sort,
 }
 
 abstract final class MedixIcons {
@@ -199,6 +225,14 @@ abstract final class MedixIcons {
     MedixIcon.navProfile: 'assets/icons/nav_profile.svg',
     MedixIcon.videoOff: 'assets/icons/video_off.svg',
     MedixIcon.callDecline: 'assets/icons/call_decline.svg',
+    MedixIcon.planDiscount: 'assets/icons/plan_discount.svg',
+    MedixIcon.planPrice: 'assets/icons/plan_price.svg',
+    MedixIcon.planQueue: 'assets/icons/plan_queue.svg',
+    MedixIcon.planAnalytics: 'assets/icons/plan_analytics.svg',
+    MedixIcon.planFamily: 'assets/icons/plan_family.svg',
+    MedixIcon.planUnavailable: 'assets/icons/plan_unavailable.svg',
+    MedixIcon.cart: 'assets/icons/cart.svg',
+    MedixIcon.sort: 'assets/icons/sort.svg',
   };
 
   /// Иконки, экспорта которых ещё нет.

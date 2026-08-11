@@ -125,9 +125,8 @@ class _CartBadge extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
-                // Тележки в наборе дизайнера нет — глиф материальный.
-                Icons.shopping_cart_outlined,
+              const AppIcon(
+                icon: MedixIcon.cart,
                 size: iconSize,
                 color: AppColors.brandIndigo,
               ),

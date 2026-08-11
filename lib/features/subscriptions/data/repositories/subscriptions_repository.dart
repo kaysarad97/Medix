@@ -1,3 +1,4 @@
+import '../../../../core/widgets/icon_chip.dart';
 import '../../../../shared/models/subscription_tier.dart';
 import '../../domain/entities/payment_method.dart';
 import '../../domain/entities/subscription_plan.dart';
@@ -50,6 +51,7 @@ class MockSubscriptionsRepository implements SubscriptionsRepository {
     PlanFeature(
       title: 'Скидки на анализы',
       subtitle: 'в партнерских лабораториях',
+      icon: MedixIcon.planDiscount,
       values: {
         SubscriptionTier.free: null,
         SubscriptionTier.silver: '5-7%',
@@ -59,6 +61,7 @@ class MockSubscriptionsRepository implements SubscriptionsRepository {
     PlanFeature(
       title: 'Скидка на консультации',
       subtitle: 'у проверенных врачей',
+      icon: MedixIcon.planPrice,
       values: {
         SubscriptionTier.free: null,
         SubscriptionTier.silver: '10%',
@@ -68,6 +71,7 @@ class MockSubscriptionsRepository implements SubscriptionsRepository {
     PlanFeature(
       title: 'Очередь к врачу',
       subtitle: 'время ожидания приема',
+      icon: MedixIcon.planQueue,
       values: {
         SubscriptionTier.free: 'Общая',
         SubscriptionTier.silver: 'Общая',
@@ -77,6 +81,7 @@ class MockSubscriptionsRepository implements SubscriptionsRepository {
     PlanFeature(
       title: 'Аналитика здоровья',
       subtitle: 'история заболевания',
+      icon: MedixIcon.planAnalytics,
       values: {
         SubscriptionTier.free: null,
         SubscriptionTier.silver: 'Графики\n(история)',
@@ -86,6 +91,7 @@ class MockSubscriptionsRepository implements SubscriptionsRepository {
     PlanFeature(
       title: 'Семейный доступ',
       subtitle: 'мед-карты для',
+      icon: MedixIcon.planFamily,
       values: {
         SubscriptionTier.free: null,
         SubscriptionTier.silver: null,

@@ -161,9 +161,11 @@ class _SortIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Своей иконки сортировки в экспорте дизайнера нет — берём системную,
-    // как стрелка «назад» в ScreenTopBar.
-    return const Icon(Icons.sort, size: 20, color: AppColors.textSecondary);
+    return const AppIcon(
+      icon: MedixIcon.sort,
+      size: 20,
+      color: AppColors.textSecondary,
+    );
   }
 }
 

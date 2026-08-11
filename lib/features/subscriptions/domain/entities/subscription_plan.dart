@@ -1,3 +1,4 @@
+import '../../../../core/widgets/icon_chip.dart';
 import '../../../../shared/models/subscription_tier.dart';
 
 /// Строка таблицы сравнения тарифов на `design/Подписка.png`.
@@ -8,6 +9,7 @@ class PlanFeature {
   const PlanFeature({
     required this.title,
     required this.subtitle,
+    required this.icon,
     required this.values,
   });
 
@@ -16,6 +18,9 @@ class PlanFeature {
 
   /// Синяя приписка под ним: «в партнерских лабораториях».
   final String subtitle;
+
+  /// Глиф слева от подписи.
+  final MedixIcon icon;
 
   /// Что стоит в колонке тарифа. `null` — возможности нет.
   final Map<SubscriptionTier, String?> values;

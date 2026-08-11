@@ -7,6 +7,7 @@ import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/icon_chip.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/lab_service.dart';
 import '../providers/lab_services_providers.dart';
@@ -117,7 +118,11 @@ class CartSheet extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: _CartAction(
-                      icon: Icons.shopping_cart_outlined,
+                      icon: const AppIcon(
+                        icon: MedixIcon.cart,
+                        size: 18,
+                        color: AppColors.primary,
+                      ),
                       label: l10n.cartPlaceOrder,
                       filled: true,
                       onTap: onOrder,
@@ -126,7 +131,11 @@ class CartSheet extends ConsumerWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: _CartAction(
-                      icon: Icons.percent,
+                      icon: const Icon(
+                        Icons.percent,
+                        size: 18,
+                        color: AppColors.primary,
+                      ),
                       label: l10n.cartComparePrices,
                       filled: false,
                       onTap: onCompare,
@@ -225,7 +234,7 @@ class _CartAction extends StatelessWidget {
     this.onTap,
   });
 
-  final IconData icon;
+  final Widget icon;
   final String label;
 
   /// Залитая — «Сделать заказ», светлая — «Сравнить цены».
@@ -257,7 +266,7 @@ class _CartAction extends StatelessWidget {
                       color: AppColors.surfaceWhite,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(icon, size: 18, color: AppColors.primary),
+                    child: icon,
                   ),
                 ),
                 const SizedBox(width: 10),

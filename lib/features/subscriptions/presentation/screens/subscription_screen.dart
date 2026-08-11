@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_scaffold.dart';
+import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/subscription_tier.dart';
@@ -153,9 +154,7 @@ class _FeatureLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        // Иконки строк таблицы дизайнер пока не отдал: в макете это
-        // процент, доллар, планшет, график и группа людей.
-        const SizedBox(width: 34),
+        AppIcon(icon: feature.icon, size: 34, color: AppColors.primary),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
@@ -183,8 +182,8 @@ class _Cell extends StatelessWidget {
   Widget build(BuildContext context) {
     if (value == null) {
       return const Center(
-        child: Icon(
-          Icons.highlight_off,
+        child: AppIcon(
+          icon: MedixIcon.planUnavailable,
           size: 24,
           color: AppColors.primaryBright,
         ),
