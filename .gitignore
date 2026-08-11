@@ -44,6 +44,9 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+# Кэш инкрементальной сборки Kotlin — появляется от `flutter build apk`.
+/android/.kotlin/
+
 
 # Локальные настройки Claude Code — у каждого свои.
 .claude/settings.local.json

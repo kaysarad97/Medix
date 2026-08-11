@@ -4,4 +4,11 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
+
+    <!-- Локальный бэкенд поднимается по http:// (в эмуляторе это
+         http://10.0.2.2:8000). Начиная с Android 9 незашифрованный трафик
+         запрещён по умолчанию, и запрос падает с «CLEARTEXT communication
+         not permitted» ещё до сервера. Разрешение стоит только в debug —
+         в релизной сборке API ходит по https. -->
+    <application android:usesCleartextTraffic="true"/>
 </manifest>
