@@ -76,9 +76,6 @@ class MedixWaitView extends StatelessWidget {
   /// способ не зависеть от скорости декодирования на конкретном устройстве.
   static const int inkGoneFrame = 86;
 
-  /// Верх логотипа при безопасной зоне 62.
-  static const double _logoTop = 388;
-
   /// Логотип 450…518 → строка «подождите...» 649.
   static const double _logoToTitle = 126;
 
@@ -99,9 +96,14 @@ class MedixWaitView extends StatelessWidget {
         // широкого потомка — содержимое встало бы у левого края.
         child: SizedBox(
           width: double.infinity,
+          height: double.infinity,
           child: Column(
+            // По вертикали — центр экрана, а не фиксированный отступ сверху
+            // из макета: тот был снят под конкретную высоту 956, и на
+            // экране другой высоты (замер на реальном телефоне — 393×830)
+            // логотип съезжал вниз от центра.
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const SizedBox(height: _logoTop),
               // В макете центр логотипа стоит на x 238 при центре экрана 220.
               // Ставим по центру: смещение в 4 % ширины на телефоне читается
               // как промах вёрстки, а не как замысел.
