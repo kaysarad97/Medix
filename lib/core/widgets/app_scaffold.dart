@@ -21,12 +21,19 @@ class AppScaffold extends StatelessWidget {
     super.key,
     required this.child,
     this.background = AppBackgroundStyle.auth,
+    this.backgroundOverride,
     this.resizeToAvoidBottomInset = true,
     this.appBar,
   });
 
   final Widget child;
   final AppBackgroundStyle background;
+
+  /// Подменяет статичную картинку [background] на произвольный виджет —
+  /// нужен экрану ожидания, у которого фон живой (три состояния дизайнера,
+  /// перетекающие друг в друга), а не один PNG.
+  final Widget? backgroundOverride;
+
   final bool resizeToAvoidBottomInset;
   final PreferredSizeWidget? appBar;
 
@@ -46,7 +53,8 @@ class AppScaffold extends StatelessWidget {
           // Никаких фильтров поверх картинки: фоны в `design/` несут чанки
           // gAMA/sRGB, Flutter применяет их сам и попадает в макет с
           // точностью 1–2 уровня яркости (проверено golden-сверкой).
-          Image.asset(_assets[background]!, fit: BoxFit.cover),
+          backgroundOverride ??
+              Image.asset(_assets[background]!, fit: BoxFit.cover),
           Scaffold(
             backgroundColor: Colors.transparent,
             resizeToAvoidBottomInset: resizeToAvoidBottomInset,

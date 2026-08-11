@@ -85,11 +85,9 @@ class MedixWaitView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
-      // ПРИБЛИЖЕНИЕ. У «Загрузка.png» и «Подождите....png» свои градиенты,
-      // не совпадающие ни с фон.png, ни с BG.png, ни друг с другом, а
-      // отдельными файлами их в design/ нет — они вплавлены в макеты.
-      // TODO(design): попросить экспорт обоих фонов, как сделали с иконками.
-      background: AppBackgroundStyle.auth,
+      // Три состояния фона от дизайнера (`States=Start/Mid/End.png`) —
+      // перетекают друг в друга по кругу, см. [_WaitBackground].
+      backgroundOverride: _WaitBackground(animated: animated),
       child: SafeArea(
         // Ширину задаём явно: Scaffold отдаёт телу нежёсткие ограничения по
         // ширине, и Column с выравниванием по центру ужался бы до самого
@@ -204,6 +202,80 @@ class _AnimatedLogoState extends State<_AnimatedLogo> {
       width: widget.size,
       height: widget.size,
       fit: BoxFit.contain,
+    );
+  }
+}
+
+/// Живой фон экрана ожидания: три состояния дизайнера
+/// (`design/States=Start/Mid/End.png`) друг за другом по кругу, с плавным
+/// перетеканием между соседними.
+///
+/// Дизайнер прислал статичные кадры трёх состояний, а не анимацию — тайминг
+/// в макетах не размечен. Темп взят условно, спокойным; уточнить у
+/// дизайнера при случае, как и с радиусом шторки корзины.
+class _WaitBackground extends StatefulWidget {
+  const _WaitBackground({required this.animated});
+
+  final bool animated;
+
+  @override
+  State<_WaitBackground> createState() => _WaitBackgroundState();
+}
+
+class _WaitBackgroundState extends State<_WaitBackground>
+    with SingleTickerProviderStateMixin {
+  static const List<String> _assets = [
+    'assets/images/wait_bg_start.png',
+    'assets/images/wait_bg_mid.png',
+    'assets/images/wait_bg_end.png',
+  ];
+
+  /// Полный круг Start → Mid → End → Start.
+  static const Duration _loopDuration = Duration(seconds: 6);
+
+  AnimationController? _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.animated) {
+      _controller = AnimationController(vsync: this, duration: _loopDuration)
+        ..repeat();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = _controller;
+    if (controller == null) {
+      // Голден-тесты и явное отключение анимации: средний кадр без хода
+      // времени — картинка должна быть детерминированной.
+      return Image.asset(_assets[1], fit: BoxFit.cover);
+    }
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, _) {
+        final position = controller.value * _assets.length;
+        final index = position.floor() % _assets.length;
+        final nextIndex = (index + 1) % _assets.length;
+        final progress = position - position.floor();
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset(_assets[index], fit: BoxFit.cover),
+            Opacity(
+              opacity: progress,
+              child: Image.asset(_assets[nextIndex], fit: BoxFit.cover),
+            ),
+          ],
+        );
+      },
     );
   }
 }
