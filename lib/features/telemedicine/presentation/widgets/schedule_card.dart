@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/utils/ru_dates.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../domain/entities/doctor_schedule.dart';
 import 'action_button_row.dart';
@@ -35,9 +34,9 @@ class ScheduleCard extends StatelessWidget {
   final ActionButtonData secondaryAction;
 
   final ScheduleDay? selectedDay;
-  final DateTime? selectedSlot;
+  final ScheduleSlot? selectedSlot;
   final ValueChanged<ScheduleDay>? onDaySelected;
-  final ValueChanged<DateTime>? onSlotSelected;
+  final ValueChanged<ScheduleSlot>? onSlotSelected;
 
   final VoidCallback? onPreviousMonth;
   final VoidCallback? onNextMonth;
@@ -45,7 +44,7 @@ class ScheduleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final slots = selectedDay?.slots ?? const <DateTime>[];
+    final slots = selectedDay?.slots ?? const <ScheduleSlot>[];
 
     return AppCard(
       padding: DoctorMetrics.cardPadding,
@@ -281,9 +280,9 @@ class _DayPill extends StatelessWidget {
 class _SlotStrip extends StatelessWidget {
   const _SlotStrip({required this.slots, this.selected, this.onSelected});
 
-  final List<DateTime> slots;
-  final DateTime? selected;
-  final ValueChanged<DateTime>? onSelected;
+  final List<ScheduleSlot> slots;
+  final ScheduleSlot? selected;
+  final ValueChanged<ScheduleSlot>? onSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -299,7 +298,9 @@ class _SlotStrip extends StatelessWidget {
                 const SizedBox(width: DoctorMetrics.slotGap),
               _Slot(
                 slot: slot,
-                isSelected: slot == selected,
+                // Сравнение по идентификатору: слоты приходят с сервера
+                // разными объектами при каждом чтении расписания.
+                isSelected: slot.id == selected?.id,
                 onTap: () => onSelected?.call(slot),
               ),
             ],
@@ -317,7 +318,7 @@ class _Slot extends StatelessWidget {
     required this.onTap,
   });
 
-  final DateTime slot;
+  final ScheduleSlot slot;
   final bool isSelected;
   final VoidCallback onTap;
 
@@ -342,10 +343,7 @@ class _Slot extends StatelessWidget {
               horizontal: DoctorMetrics.slotPaddingH,
             ),
             child: Center(
-              child: Text(
-                RuDates.time(slot),
-                style: AppTypography.calendarLabel,
-              ),
+              child: Text(slot.timeLabel, style: AppTypography.calendarLabel),
             ),
           ),
         ),

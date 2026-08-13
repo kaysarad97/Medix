@@ -65,6 +65,26 @@ class FakeDoctorsRepository implements DoctorsRepository {
     goldPrice: 10000,
   );
 
+  /// Что ушло в [book] — форме записи проверять больше нечего.
+  static final List<({ScheduleSlot slot, AppointmentKind kind})> booked = [];
+
+  @override
+  Future<Appointment> book({
+    required Doctor doctor,
+    required ScheduleSlot slot,
+    required AppointmentKind kind,
+    String? familyMemberId,
+  }) async {
+    booked.add((slot: slot, kind: kind));
+    return Appointment(
+      id: 'a1',
+      specialty: doctor.specialty,
+      kind: kind,
+      startsAt: slot.startsAt,
+      doctorId: doctor.id,
+    );
+  }
+
   @override
   Future<List<DoctorSpecialty>> specialties() async =>
       MockDoctorsRepository.mockSpecialties;

@@ -167,32 +167,16 @@ class _Dots extends StatelessWidget {
 /// Заливка в макете — не белая: замер даёт ровно чёрный с прозрачностью 4 %
 /// поверх градиента (204→196, 211→203, 230→221 по трём каналам).
 ///
-/// Отправка идёт клавишей на клавиатуре, а не отдельной кнопкой: в макете
-/// рядом с полем ничего нет, и добавлять туда кнопку — уже не макет.
-class ReviewComposer extends StatefulWidget {
-  const ReviewComposer({super.key, this.onSubmit});
+/// Печатать прямо здесь нельзя: с приездом `design/Оставьте отзыв.png` у
+/// отзыва появилась оценка звёздами, а её в одну строку не спросить. Поле
+/// осталось таким же на вид — это по-прежнему макет профиля врача, — но
+/// работает кнопкой и открывает экран отзыва целиком.
+class ReviewComposer extends StatelessWidget {
+  const ReviewComposer({super.key, this.onTap});
 
-  /// Получает написанное. Пусто — поле только рисуется, как в голден-тестах.
-  final ValueChanged<String>? onSubmit;
-
-  @override
-  State<ReviewComposer> createState() => _ReviewComposerState();
-}
-
-class _ReviewComposerState extends State<ReviewComposer> {
-  final _controller = TextEditingController();
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _submit(String value) {
-    if (value.trim().isEmpty) return;
-    widget.onSubmit?.call(value);
-    _controller.clear();
-  }
+  /// Открыть экран отзыва. Пусто — поле только рисуется, как в
+  /// голден-тестах.
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -202,34 +186,30 @@ class _ReviewComposerState extends State<ReviewComposer> {
         color: AppColors.textPrimary.withValues(alpha: 0.04),
         borderRadius: DoctorMetrics.allRadius,
         clipBehavior: Clip.antiAlias,
-        child: Row(
-          children: [
-            const SizedBox(width: 14),
-            const AppIcon(
-              icon: MedixIcon.reviewCompose,
-              size: 28,
-              color: AppColors.primary,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: TextField(
-                controller: _controller,
-                style: AppTypography.bodyMd,
-                cursorColor: AppColors.accent,
-                textInputAction: TextInputAction.send,
-                onSubmitted: _submit,
-                decoration: InputDecoration(
-                  isCollapsed: true,
-                  border: InputBorder.none,
-                  hintText: AppLocalizations.of(
-                    context,
-                  )!.writeReviewPlaceholder,
-                  hintStyle: AppTypography.placeholder,
+        child: InkWell(
+          onTap: onTap,
+          child: Row(
+            children: [
+              const SizedBox(width: 14),
+              const AppIcon(
+                icon: MedixIcon.reviewCompose,
+                size: 28,
+                color: AppColors.primary,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                // Не `TextField`, а его подпись: настоящее поле здесь
+                // перехватывало бы нажатие себе и открывало клавиатуру.
+                child: Text(
+                  AppLocalizations.of(context)!.writeReviewPlaceholder,
+                  style: AppTypography.placeholder,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-            ),
-            const SizedBox(width: 14),
-          ],
+              const SizedBox(width: 14),
+            ],
+          ),
         ),
       ),
     );

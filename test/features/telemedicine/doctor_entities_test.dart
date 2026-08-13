@@ -87,7 +87,7 @@ void main() {
       ScheduleDay(date: DateTime(2026, 7, 25), slots: const []),
       ScheduleDay(
         date: DateTime(2026, 7, 26),
-        slots: [DateTime(2026, 7, 26, 9, 30)],
+        slots: [ScheduleSlot(id: 's1', startsAt: DateTime(2026, 7, 26, 9, 30))],
       ),
     ];
 
@@ -137,12 +137,12 @@ void main() {
       // Полдень: 9:30 и 10:30 позади, 12:30 и 15:30 ещё впереди.
       final days = MockDoctorsRepository.weekFrom(DateTime(2026, 8, 12, 12));
 
-      expect(days.first.slots, [
+      expect(days.first.slots.map((s) => s.startsAt), [
         DateTime(2026, 8, 12, 12, 30),
         DateTime(2026, 8, 12, 15, 30),
       ]);
       // Следующий день урезать нечего.
-      expect(days[1].slots.first, DateTime(2026, 8, 13, 9, 30));
+      expect(days[1].slots.first.startsAt, DateTime(2026, 8, 13, 9, 30));
     });
 
     test('день, в котором приём уже кончился, недоступен', () {

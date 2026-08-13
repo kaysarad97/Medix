@@ -42,6 +42,11 @@ abstract final class RuDates {
   static String dayMonth(DateTime date) =>
       '${_two(date.day)}.${_two(date.month)}';
 
+  /// «10.08.26» — дата отзыва. Год двумя цифрами: так в макете
+  /// `design/Оставьте отзыв.png`.
+  static String dayMonthShortYear(DateTime date) =>
+      '${dayMonth(date)}.${_two(date.year % 100)}';
+
   /// «13:30», «9:30».
   ///
   /// Час без ведущего нуля — так в макете расписания: слот «9:30» уже

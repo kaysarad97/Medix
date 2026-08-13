@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:medix/features/telemedicine/domain/entities/doctor_schedule.dart';
 import 'package:medix/features/telemedicine/presentation/providers/telemedicine_providers.dart';
 
 void main() {
@@ -50,8 +51,8 @@ void main() {
       final ref = container();
       final notifier = ref.read(composedReviewsProvider.notifier);
 
-      notifier.add(text: 'Первый', authorName: 'Имя Фамилия');
-      notifier.add(text: 'Второй', authorName: 'Имя Фамилия');
+      notifier.add(text: 'Первый', authorName: 'Имя Фамилия', rating: 4);
+      notifier.add(text: 'Второй', authorName: 'Имя Фамилия', rating: 5);
 
       final reviews = ref.read(composedReviewsProvider);
       expect(reviews.map((r) => r.text), ['Второй', 'Первый']);
@@ -63,7 +64,7 @@ void main() {
 
       ref
           .read(composedReviewsProvider.notifier)
-          .add(text: '   ', authorName: 'Имя Фамилия');
+          .add(text: '   ', authorName: 'Имя Фамилия', rating: 5);
 
       expect(ref.read(composedReviewsProvider), isEmpty);
     });
@@ -73,9 +74,22 @@ void main() {
 
       ref
           .read(composedReviewsProvider.notifier)
-          .add(text: '  Хороший врач  ', authorName: 'Имя Фамилия');
+          .add(text: '  Хороший врач  ', authorName: 'Имя Фамилия', rating: 5);
 
       expect(ref.read(composedReviewsProvider).single.text, 'Хороший врач');
+    });
+
+    test('оценка и дата попадают в отзыв', () {
+      final ref = container();
+
+      ref
+          .read(composedReviewsProvider.notifier)
+          .add(text: 'Хороший врач', authorName: 'Имя Фамилия', rating: 3);
+
+      final review = ref.read(composedReviewsProvider).single;
+      expect(review.rating, 3);
+      // Дата проставляется сама: в макете она стоит под текстом отзыва.
+      expect(review.dateLabel, isNotNull);
     });
   });
 
@@ -84,7 +98,9 @@ void main() {
       final ref = container();
       final selection = ref.read(scheduleSelectionProvider.notifier);
 
-      selection.selectSlot(DateTime(2026, 8, 12, 12, 30));
+      selection.selectSlot(
+        ScheduleSlot(id: 's1', startsAt: DateTime(2026, 8, 12, 12, 30)),
+      );
       expect(ref.read(scheduleSelectionProvider).slot, isNotNull);
 
       selection.reset();

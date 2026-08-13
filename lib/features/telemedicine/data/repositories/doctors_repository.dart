@@ -25,6 +25,20 @@ abstract interface class DoctorsRepository {
 
   /// Результаты поиска по специальности или свободному запросу.
   Future<List<Doctor>> search(String query);
+
+  /// Записывает на выбранный слот и возвращает созданную запись.
+  ///
+  /// Врач и слот передаются целиком, а не одними идентификаторами: сервер в
+  /// ответ на запись отдаёт только `id`, `slot_id`, `type` и `status` — ни
+  /// времени, ни специальности, ни цены. Всё это уже есть у вызывающего, и
+  /// собрать [Appointment] проще здесь, чем тянуть с сервера то, чего он не
+  /// отдаёт.
+  Future<Appointment> book({
+    required Doctor doctor,
+    required ScheduleSlot slot,
+    required AppointmentKind kind,
+    String? familyMemberId,
+  });
 }
 
 /// Заглушка на время разработки бэкенда. Данные — с макетов
@@ -100,6 +114,27 @@ class MockDoctorsRepository implements DoctorsRepository {
       // 10 000 с Gold — как на `design/Предоплата - GOLD.png`.
       basePrice: 15000,
       goldPrice: 10000,
+    );
+  }
+
+  @override
+  Future<Appointment> book({
+    required Doctor doctor,
+    required ScheduleSlot slot,
+    required AppointmentKind kind,
+    String? familyMemberId,
+  }) async {
+    await Future<void>.delayed(_latency);
+    // Заглушка ничего не бронирует, но запись собирает из настоящего выбора:
+    // иначе экран «Ваша Запись» показывал бы не то время, которое выбрали.
+    return Appointment(
+      id: 'a1',
+      specialty: doctor.specialty,
+      kind: kind,
+      startsAt: slot.startsAt,
+      doctorId: doctor.id,
+      basePrice: doctor.priceBeforeDiscount ?? doctor.price,
+      goldPrice: doctor.priceBeforeDiscount == null ? null : doctor.price,
     );
   }
 
@@ -200,17 +235,26 @@ class MockDoctorsRepository implements DoctorsRepository {
     final isWeekend =
         date.weekday == DateTime.saturday || date.weekday == DateTime.sunday;
 
-    final slots = <DateTime>[];
+    final slots = <ScheduleSlot>[];
     if (!isWeekend) {
       for (final time in _workingHours) {
-        final slot = DateTime(
+        final startsAt = DateTime(
           date.year,
           date.month,
           date.day,
           time.hour,
           time.minute,
         );
-        if (slot.isAfter(notBefore)) slots.add(slot);
+        if (startsAt.isAfter(notBefore)) {
+          // Идентификатор у заглушки свой: на сервере это uuid слота, а
+          // здесь достаточно того, что он не повторяется.
+          slots.add(
+            ScheduleSlot(
+              id: 'mock-${startsAt.toIso8601String()}',
+              startsAt: startsAt,
+            ),
+          );
+        }
       }
     }
 

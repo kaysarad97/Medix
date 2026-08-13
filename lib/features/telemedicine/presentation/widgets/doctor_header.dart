@@ -54,7 +54,9 @@ class DoctorHeader extends StatelessWidget {
                   ),
                   const SizedBox(height: DoctorMetrics.specialtyToClinic),
                   Text(
-                    doctor.clinic,
+                    // Пусто — строка остаётся, но пустая: без неё подписи
+                    // выше сдвинулись бы вниз, а шапка фиксированной высоты.
+                    doctor.clinic ?? '',
                     style: AppTypography.doctorClinic,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -119,8 +121,10 @@ class _Chips extends StatelessWidget {
             ),
             label: doctor.ratingLabel,
           ),
-          const SizedBox(width: DoctorMetrics.chipGap),
-          Flexible(child: _Chip(label: doctor.experienceLabel)),
+          if (doctor.experienceLabel != null) ...[
+            const SizedBox(width: DoctorMetrics.chipGap),
+            Flexible(child: _Chip(label: doctor.experienceLabel!)),
+          ],
         ],
       ),
     );

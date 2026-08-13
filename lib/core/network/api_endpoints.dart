@@ -27,6 +27,15 @@ abstract final class ApiEndpoints {
   /// Профиль текущего пользователя.
   static const String me = '/users/me';
 
+  /// Мед-карта: записи о здоровье. Хранятся дописыванием — правка заводит
+  /// новую версию и помечает старую `superseded_by`.
+  static const String medicalRecords = '$me/medical-records';
+
+  static String medicalRecord(String id) => '$medicalRecords/$id';
+
+  /// Действующая подписка. Её нет — сервер отвечает 404, и это не ошибка.
+  static const String mySubscription = '/subscriptions/me';
+
   /// Члены семьи: список и добавление.
   static const String family = '/users/me/family';
 
@@ -37,6 +46,20 @@ abstract final class ApiEndpoints {
   /// журнал доступа на сервере.
   static String familyMedicalRecords(String id) =>
       '${familyMember(id)}/medical-records';
+
+  /// Каталог врачей. Токен не обязателен, но с ним сервер считает цену с
+  /// учётом подписки — см. `price_for_user` в ответе.
+  static const String doctors = '/doctors';
+
+  static String doctor(String id) => '$doctors/$id';
+
+  /// Свободные слоты врача. Обязательные `from` и `to` — в ISO.
+  static String doctorSlots(String id) => '${doctor(id)}/slots';
+
+  /// Записи на приём: создание, свои записи, перенос и отмена.
+  static const String appointments = '/appointments';
+
+  static String appointment(String id) => '$appointments/$id';
 
   /// Запросы к этой ветке уходят без токена доступа и не перезапрашиваются
   /// после 401: часть из них анонимна, а `/auth/refresh` и `/auth/logout`

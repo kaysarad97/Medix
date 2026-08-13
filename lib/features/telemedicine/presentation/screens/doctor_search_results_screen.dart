@@ -61,7 +61,12 @@ class _DoctorSearchResultsScreenState
       case _SortBy.rating:
         sorted.sort((a, b) => b.rating.compareTo(a.rating));
       case _SortBy.experience:
-        sorted.sort((a, b) => b.experienceYears.compareTo(a.experienceYears));
+        // Врачи без стажа уходят вниз: бэкенд его не хранит, и пустое
+        // значение — «не знаем», а не «ноль лет».
+        sorted.sort(
+          (a, b) =>
+              (b.experienceYears ?? -1).compareTo(a.experienceYears ?? -1),
+        );
       case _SortBy.price:
         sorted.sort((a, b) => (a.price ?? 0).compareTo(b.price ?? 0));
     }
@@ -274,13 +279,15 @@ class _ResultCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      doctor.clinic,
-                      style: AppTypography.doctorClinic,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
+                    if (doctor.clinic != null) ...[
+                      Text(
+                        doctor.clinic!,
+                        style: AppTypography.doctorClinic,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                    ],
                     Text(
                       doctor.fullName,
                       style: AppTypography.cardItemTitle,
@@ -321,12 +328,13 @@ class _ResultCard extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      doctor.experienceLabel,
-                      style: AppTypography.cardItemMeta,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    if (doctor.experienceLabel != null)
+                      Text(
+                        doctor.experienceLabel!,
+                        style: AppTypography.cardItemMeta,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                   ],
                 ),
               ),

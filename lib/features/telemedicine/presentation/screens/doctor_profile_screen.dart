@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/network/api_exception.dart';
 import '../../../../core/router/routes.dart';
 import '../../../../core/widgets/app_scaffold.dart';
+import '../../../../core/widgets/form_error_snack_bar.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../profile/presentation/providers/profile_providers.dart';
+import '../../../../shared/models/appointment.dart';
 import '../../domain/entities/doctor.dart';
 import '../../domain/entities/doctor_review.dart';
 import '../../domain/entities/doctor_schedule.dart';
@@ -70,8 +72,6 @@ class _Content extends ConsumerWidget {
         ? null
         : ref.watch(scheduleSelectionProvider).resolve(schedule!);
     final weekOffset = ref.watch(scheduleWeekOffsetProvider);
-    // Своим отзывом подписывается имя из профиля.
-    final profile = ref.watch(profileProvider).value;
     final l10n = AppLocalizations.of(context)!;
 
     return SingleChildScrollView(
@@ -117,13 +117,10 @@ class _Content extends ConsumerWidget {
                   icon: MedixIcon.audioCall,
                   title: l10n.createAppointmentTitle,
                   subtitle: l10n.videoCallSubtitle,
-                  // Активна только после выбора дня и времени. Настоящего
-                  // бронирования нет — заглушка `DoctorsRepository.appointment`
-                  // игнорирует id и всегда отдаёт один и тот же мок-приём,
-                  // тот же, что и в «Предстоящих записях» на главной.
+                  // Активна только после выбора дня и времени.
                   onTap: selected?.slot == null
                       ? null
-                      : () => context.push(Routes.appointmentOf('a1')),
+                      : () => _book(context, ref, doctor, selected!.slot!),
                 ),
                 secondaryAction: ActionButtonData(
                   icon: MedixIcon.mail,
@@ -146,19 +143,37 @@ class _Content extends ConsumerWidget {
           const SizedBox(height: DoctorMetrics.composerTop),
           _Section(
             child: ReviewComposer(
-              // Пока профиль не загрузился, отзыв нечем подписать —
-              // отправка молчит, а печатать уже можно.
-              onSubmit: profile == null
-                  ? null
-                  : (text) => ref
-                        .read(composedReviewsProvider.notifier)
-                        .add(text: text, authorName: profile.fullName),
+              onTap: () => context.push(Routes.doctorReviewOf(doctor.id)),
             ),
           ),
           const SizedBox(height: DoctorMetrics.screenH),
         ],
       ),
     );
+  }
+}
+
+/// Оформляет запись на выбранный слот и открывает её.
+///
+/// Формат — видео-звонок: так подписана кнопка в макете. Сервер знает ещё
+/// аудио и очный приём, но выбирать формат на этом экране негде.
+Future<void> _book(
+  BuildContext context,
+  WidgetRef ref,
+  Doctor doctor,
+  ScheduleSlot slot,
+) async {
+  try {
+    final appointment = await ref
+        .read(doctorsRepositoryProvider)
+        .book(doctor: doctor, slot: slot, kind: AppointmentKind.videoCall);
+    if (context.mounted) {
+      context.push(Routes.appointmentOf(appointment.id));
+    }
+  } on ApiException catch (e) {
+    // Слот мог занять кто-то другой между чтением расписания и нажатием —
+    // сервер отвечает 409, и это единственный способ о нём узнать.
+    if (context.mounted) showFormErrorSnackBar(context, e.message);
   }
 }
 

@@ -1,18 +1,21 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/network/api_mode.dart';
+import '../../../../core/network/dio_client.dart';
 import '../../../../shared/models/appointment.dart';
 import '../../../../shared/models/doctor_specialty.dart';
 import '../../../../shared/models/my_doctor.dart';
 import '../../data/repositories/doctors_repository.dart';
+import '../../data/repositories/remote_doctors_repository.dart';
 import '../../domain/entities/doctor.dart';
 import '../../domain/entities/doctor_review.dart';
 import '../../domain/entities/doctor_schedule.dart';
 
-final doctorsRepositoryProvider = Provider<DoctorsRepository>(
-  // Бэкенда пока нет; переключение появится вместе с реальными эндпоинтами,
-  // как в authRepositoryProvider.
-  (ref) => const MockDoctorsRepository(),
-);
+final doctorsRepositoryProvider = Provider<DoctorsRepository>((ref) {
+  if (useMocks) return const MockDoctorsRepository();
+
+  return RemoteDoctorsRepository(ref.watch(dioClientProvider));
+});
 
 final doctorProvider = FutureProvider.family<Doctor, String>(
   (ref, id) => ref.watch(doctorsRepositoryProvider).doctor(id),
@@ -87,20 +90,22 @@ class ComposedReviews extends Notifier<List<DoctorReview>> {
   @override
   List<DoctorReview> build() => const [];
 
-  void add({required String text, required String authorName}) {
+  void add({
+    required String text,
+    required String authorName,
+    required double rating,
+  }) {
     final trimmed = text.trim();
     if (trimmed.isEmpty) return;
 
+    final now = DateTime.now();
     state = [
       DoctorReview(
-        id: 'own-${DateTime.now().microsecondsSinceEpoch}',
+        id: 'own-${now.microsecondsSinceEpoch}',
         authorName: authorName,
-        // ОЦЕНКУ СПРОСИТЬ НЕГДЕ. У поля отзыва в макете нет ни звёзд, ни
-        // чего-либо ещё для оценки, а `DoctorReview` без неё не бывает.
-        // Ставим пять; нужен ответ дизайнера — либо звёзды в поле, либо
-        // отзывы без оценки.
-        rating: 5,
+        rating: rating,
         text: trimmed,
+        createdAt: now,
       ),
       ...state,
     ];
@@ -122,11 +127,11 @@ class ScheduleSelection {
 
   /// Слот выбранного дня. Сбрасывается при переключении дня: время из
   /// вторника в среде не действует.
-  final DateTime? slot;
+  final ScheduleSlot? slot;
 
   /// Что показать выбранным: сначала выбор пользователя, иначе первый
   /// доступный день и его первый слот.
-  ({ScheduleDay? day, DateTime? slot}) resolve(DoctorSchedule schedule) {
+  ({ScheduleDay? day, ScheduleSlot? slot}) resolve(DoctorSchedule schedule) {
     final effectiveDay = day ?? schedule.firstAvailable;
     return (day: effectiveDay, slot: slot ?? effectiveDay?.firstSlot);
   }
@@ -144,7 +149,7 @@ class ScheduleSelectionNotifier extends Notifier<ScheduleSelection> {
     state = ScheduleSelection(day: day);
   }
 
-  void selectSlot(DateTime slot) =>
+  void selectSlot(ScheduleSlot slot) =>
       state = ScheduleSelection(day: state.day, slot: slot);
 
   /// Сбрасывается при листании недель: выбранный день остался в предыдущей

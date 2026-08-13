@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:medix/core/router/routes.dart';
 import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/features/profile/presentation/providers/profile_providers.dart';
 import 'package:medix/features/telemedicine/presentation/providers/telemedicine_providers.dart';
 import 'package:medix/features/telemedicine/presentation/screens/doctor_profile_screen.dart';
-import 'package:medix/features/telemedicine/presentation/widgets/reviews_card.dart';
 import 'package:medix/l10n/app_localizations.dart';
 
 import '../../helpers/fake_doctors_repository.dart';
@@ -15,6 +16,8 @@ import '../../helpers/test_fonts.dart';
 void main() {
   setUpAll(loadAppFonts);
 
+  /// Роутер, а не `home:`: поле «Оставьте свой отзыв…» открывает отдельный
+  /// экран, и без роутера этот переход было бы не проверить.
   Future<void> pumpProfile(WidgetTester tester) async {
     // Макет 440×956 — гоняем тест в тех же размерах, что и дизайн.
     tester.view.physicalSize = const Size(440, 956);
@@ -22,23 +25,37 @@ void main() {
     tester.view.padding = const FakeViewPadding(top: 62);
     addTearDown(tester.view.reset);
 
+    final router = GoRouter(
+      routes: [
+        GoRoute(
+          path: '/',
+          builder: (context, state) =>
+              const DoctorProfileScreen(doctorId: 'd1'),
+        ),
+        GoRoute(
+          path: Routes.doctorReview,
+          builder: (context, state) => const Text('экран отзыва'),
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
           doctorsRepositoryProvider.overrideWithValue(
             const FakeDoctorsRepository(),
           ),
-          // Экран берёт отсюда имя, которым подписывается свой отзыв.
           profileRepositoryProvider.overrideWithValue(
             const FakeProfileRepository(),
           ),
         ],
-        child: MaterialApp(
+        child: MaterialApp.router(
           theme: AppTheme.light,
           locale: const Locale('ru'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: const DoctorProfileScreen(doctorId: 'd1'),
+          routerConfig: router,
         ),
       ),
     );
@@ -108,25 +125,15 @@ void main() {
     );
   });
 
-  testWidgets('написанный отзыв появляется в карусели первым', (tester) async {
+  testWidgets('поле отзыва открывает экран отзыва', (tester) async {
     await pumpProfile(tester);
 
-    // Поле отзыва — единственный ввод на экране.
-    await tester.enterText(find.byType(TextField), 'Спасибо, всё объяснил');
-    await tester.testTextInput.receiveAction(TextInputAction.send);
-    await tester.pump();
+    // Печатать прямо в поле больше нельзя: у отзыва появилась оценка
+    // звёздами, и её спрашивают на отдельном экране.
+    await tester.tap(find.text('Оставьте свой отзыв...'));
+    await tester.pumpAndSettle();
 
-    expect(find.text('Спасибо, всё объяснил'), findsOneWidget);
-    // Подписан именем из профиля, а не «Пользователь 1» из заглушки. Ищем
-    // внутри карточки отзывов: врача в заглушке зовут так же, и по всему
-    // экрану совпадений два.
-    expect(
-      find.descendant(
-        of: find.byType(ReviewsCard),
-        matching: find.text('Имя Фамилия'),
-      ),
-      findsOneWidget,
-    );
+    expect(find.text('экран отзыва'), findsOneWidget);
   });
 
   testWidgets(

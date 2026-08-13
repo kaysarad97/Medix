@@ -170,8 +170,8 @@ class _Content extends ConsumerWidget {
                               SnackBar(
                                 content: Text(
                                   l10n.appointmentRescheduledSnackbar(
-                                    RuDates.dayMonth(slot),
-                                    RuDates.time(slot),
+                                    RuDates.dayMonth(slot.startsAt),
+                                    slot.timeLabel,
                                   ),
                                   style: AppTypography.bodyMd.copyWith(
                                     color: AppColors.textOnPrimary,

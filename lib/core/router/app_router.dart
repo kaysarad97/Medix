@@ -36,6 +36,7 @@ import '../../features/telemedicine/presentation/screens/appointment_screen.dart
 import '../../features/telemedicine/presentation/screens/doctor_profile_screen.dart';
 import '../../features/telemedicine/presentation/screens/doctor_search_results_screen.dart';
 import '../../features/telemedicine/presentation/screens/doctor_search_screen.dart';
+import '../../features/telemedicine/presentation/screens/leave_review_screen.dart';
 import 'app_shell.dart';
 import 'routes.dart';
 
@@ -142,6 +143,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: Routes.doctor,
         builder: (context, state) =>
             DoctorProfileScreen(doctorId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: Routes.doctorReview,
+        builder: (context, state) =>
+            LeaveReviewScreen(doctorId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: Routes.doctorSearch,

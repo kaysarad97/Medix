@@ -14,6 +14,7 @@ class RatingStars extends StatelessWidget {
     this.size = 16,
     this.gap = 2,
     this.color = AppColors.primaryBright,
+    this.count = starCount,
   });
 
   /// Оценка 0…5.
@@ -23,6 +24,11 @@ class RatingStars extends StatelessWidget {
   final double gap;
   final Color color;
 
+  /// Сколько звёзд рисовать. Меньше пяти нужно там, где каждая звезда
+  /// нажимается отдельно: на `design/Оставьте отзыв.png` оценку ставят
+  /// пальцем, и звёзды приходится разносить по своим кнопкам.
+  final int count;
+
   static const int starCount = 5;
 
   @override
@@ -30,7 +36,7 @@ class RatingStars extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        for (var i = 0; i < starCount; i++) ...[
+        for (var i = 0; i < count; i++) ...[
           if (i > 0) SizedBox(width: gap),
           AppIcon(icon: _iconFor(i), size: size, color: color),
         ],

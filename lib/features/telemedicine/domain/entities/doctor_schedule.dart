@@ -1,5 +1,20 @@
 import '../../../../core/utils/ru_dates.dart';
 
+/// Свободное время приёма.
+///
+/// Не голая дата, как раньше: записываются на конкретный слот по его
+/// идентификатору (`POST /appointments {"slot_id": …}`), и время само по
+/// себе серверу ничего не говорит.
+class ScheduleSlot {
+  const ScheduleSlot({required this.id, required this.startsAt});
+
+  final String id;
+  final DateTime startsAt;
+
+  /// «9:30».
+  String get timeLabel => RuDates.time(startsAt);
+}
+
 /// День в недельной ленте расписания.
 class ScheduleDay {
   const ScheduleDay({required this.date, required this.slots});
@@ -8,7 +23,7 @@ class ScheduleDay {
 
   /// Свободные слоты этого дня. Пусто — день недоступен и рисуется серым
   /// (на макете так выглядят суббота и воскресенье).
-  final List<DateTime> slots;
+  final List<ScheduleSlot> slots;
 
   bool get isAvailable => slots.isNotEmpty;
 
@@ -19,7 +34,7 @@ class ScheduleDay {
   String get dayLabel => date.day.toString();
 
   /// Ближайшее свободное время этого дня.
-  DateTime? get firstSlot => slots.isEmpty ? null : slots.first;
+  ScheduleSlot? get firstSlot => slots.isEmpty ? null : slots.first;
 }
 
 /// Неделя приёма врача: заголовок месяца и семь дней.

@@ -40,6 +40,9 @@ abstract final class Routes {
   /// Профиль врача с записью на приём.
   static const String doctor = '/doctor/:id';
 
+  /// «Оставьте отзыв» — оценка и текст отзыва о враче.
+  static const String doctorReview = '/doctor/:id/review';
+
   /// Поиск врача: «Мои Врачи» и грид специальностей.
   static const String doctorSearch = '/doctor-search';
 
@@ -123,6 +126,8 @@ abstract final class Routes {
       '/subscription/payment/result/$outcome';
 
   static String doctorOf(String id) => '/doctor/$id';
+
+  static String doctorReviewOf(String id) => '/doctor/$id/review';
 
   static String appointmentOf(String id) => '/appointment/$id';
 }
