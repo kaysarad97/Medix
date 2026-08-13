@@ -79,7 +79,7 @@ class _Info extends StatelessWidget {
           children: [
             Expanded(
               child: _MetaColumn(
-                value: profile.gender.label,
+                value: profile.genderLabel,
                 label: l10n.genderLabel,
               ),
             ),

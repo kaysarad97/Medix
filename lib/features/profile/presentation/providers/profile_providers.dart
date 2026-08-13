@@ -1,19 +1,22 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/network/api_mode.dart';
+import '../../../../core/network/dio_client.dart';
 import '../../../../shared/models/analysis_result.dart';
 import '../../../../shared/models/app_language.dart';
 import '../../../../shared/models/my_doctor.dart';
 import '../../../../shared/services/preferences_service.dart';
 import '../../data/repositories/profile_repository.dart';
+import '../../data/repositories/remote_profile_repository.dart';
 import '../../domain/entities/medical_card.dart';
 import '../../domain/entities/medical_procedure.dart';
 import '../../domain/entities/user_profile.dart';
 
-final profileRepositoryProvider = Provider<ProfileRepository>(
-  // Бэкенда пока нет; переключение появится вместе с реальными эндпоинтами,
-  // как в authRepositoryProvider.
-  (ref) => const MockProfileRepository(),
-);
+final profileRepositoryProvider = Provider<ProfileRepository>((ref) {
+  if (useMocks) return const MockProfileRepository();
+
+  return RemoteProfileRepository(ref.watch(dioClientProvider));
+});
 
 final profileProvider = FutureProvider<UserProfile>(
   (ref) => ref.watch(profileRepositoryProvider).profile(),

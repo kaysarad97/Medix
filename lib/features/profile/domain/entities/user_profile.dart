@@ -9,9 +9,9 @@ class UserProfile {
     required this.id,
     required this.firstName,
     required this.lastName,
-    required this.gender,
-    required this.birthDate,
     required this.subscription,
+    this.gender,
+    this.birthDate,
     this.email,
     this.registrationAddress,
     this.heightCm,
@@ -23,8 +23,15 @@ class UserProfile {
   final String id;
   final String firstName;
   final String lastName;
-  final Gender gender;
-  final DateTime birthDate;
+
+  /// Пол. Необязателен: бэкенд его не хранит — в шапке на этом месте
+  /// прочерк, как у роста и веса.
+  final Gender? gender;
+
+  /// Дата рождения. Необязательна не потому, что её не спрашивают — её
+  /// принимает `PATCH /users/me`, — а потому, что `GET /users/me` её не
+  /// возвращает. Вопрос бэкенду задан.
+  final DateTime? birthDate;
   final SubscriptionTier subscription;
 
   /// Почта — она же логин: вход идёт по коду, присланному на неё.
@@ -43,25 +50,38 @@ class UserProfile {
   /// «Имя Фамилия» — в макете в две строки, перенос делает вёрстка.
   String get fullName => '$firstName $lastName';
 
+  /// Пол в шапке, либо прочерк — тем же знаком, что у роста и веса.
+  String get genderLabel => gender?.label ?? '—';
+
   /// Дата рождения в шапке: «6/12/1996».
   ///
   /// Без ведущих нулей и через косую черту — так в макете, в отличие от
   /// «10.07» в записях к врачу.
-  String get birthDateLabel =>
-      '${birthDate.day}/${birthDate.month}/${birthDate.year}';
+  String get birthDateLabel {
+    final date = birthDate;
+    if (date == null) return '—';
+    return '${date.day}/${date.month}/${date.year}';
+  }
 
   /// Полных лет на сегодня. Плитка «Возраст» в карточке мед-карты.
-  int ageAt(DateTime now) {
-    var years = now.year - birthDate.year;
+  /// `null` — даты рождения не знаем.
+  int? ageAt(DateTime now) {
+    final date = birthDate;
+    if (date == null) return null;
+
+    var years = now.year - date.year;
     final hadBirthday =
-        now.month > birthDate.month ||
-        (now.month == birthDate.month && now.day >= birthDate.day);
+        now.month > date.month ||
+        (now.month == date.month && now.day >= date.day);
     if (!hadBirthday) years -= 1;
     return years;
   }
 
-  /// «30 лет» — с русским числительным.
-  String ageLabel(DateTime now) => RuPlurals.years(ageAt(now));
+  /// «30 лет» — с русским числительным, либо прочерк.
+  String ageLabel(DateTime now) {
+    final years = ageAt(now);
+    return years == null ? '—' : RuPlurals.years(years);
+  }
 
   /// «176 см», либо прочерк, пока рост не заполнен.
   String get heightLabel => heightCm == null ? '—' : '$heightCm см';
