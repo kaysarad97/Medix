@@ -127,18 +127,21 @@ class RemoteFamilyRepository implements FamilyRepository {
     );
   }
 
-  /// ФИО приходит одной строкой в порядке «Фамилия Имя Отчество» — так же,
-  /// как его вводят на шаге регистрации. В карточке имя и фамилия стоят
-  /// разными строками, поэтому первое слово считаем фамилией, остальное —
-  /// именем: отчество остаётся при имени и не теряется.
+  /// Имя приходит одной строкой, а карточка ставит имя и фамилию разными
+  /// строками — режем по первому пробелу.
+  ///
+  /// Порядок «Имя Фамилия», а не «Фамилия Имя»: так подписано поле в
+  /// `design/Данные о родственниках.png`. У самого пользователя на шаге
+  /// регистрации порядок обратный («ФИО»), но это другая форма и другая
+  /// сущность — важно, чтобы разбор совпадал с тем, что мы же и отправили.
   static String _firstName(String fullName) {
     final space = fullName.indexOf(' ');
-    return space == -1 ? fullName : fullName.substring(space + 1).trim();
+    return space == -1 ? fullName : fullName.substring(0, space);
   }
 
   static String _lastName(String fullName) {
     final space = fullName.indexOf(' ');
-    return space == -1 ? '' : fullName.substring(0, space);
+    return space == -1 ? '' : fullName.substring(space + 1).trim();
   }
 
   /// Возраст, при котором член семьи перестаёт быть «ребёнком» в подписях

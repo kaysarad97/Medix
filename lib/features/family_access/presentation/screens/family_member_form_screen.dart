@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/network/api_exception.dart';
-import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -21,13 +19,32 @@ import '../providers/family_providers.dart';
 
 /// Форма члена семьи: добавление и правка одним экраном.
 ///
-/// МАКЕТА НЕТ — см. [FamilyListScreen]. Поля собраны как на шаге регистрации
-/// (`design/Ваши Данные.png`): карточка с полями и кнопка под ней.
+/// Свёрстан по `design/Данные о родственниках.png` (440×956). Это шаг
+/// регистрации без прогресс-бара: замеры совпали до пикселя — заголовок с
+/// 260, карточка 355…585 с полями по 59 и шагом 14, кнопка 330×55 через 45
+/// после карточки.
 ///
-/// Полей ровно три, потому что столько принимает бэкенд: ФИО, дата рождения
-/// и родство. Пол, рост и вес, которые показывает карточка члена семьи,
-/// здесь не спрашиваются: сервер их не хранит, и введённое пропало бы при
-/// первом же чтении списка.
+/// Полей ровно три, и макет это подтвердил: имя, дата рождения и родство —
+/// ровно то, что принимает бэкенд. Пол, рост и вес, которые показывает
+/// карточка члена семьи, не спрашиваются: сервер их не хранит.
+///
+/// РАСХОЖДЕНИЕ С МАКЕТОМ, ОСОЗНАННОЕ. Подпись поля даты обещает формат
+/// «dd/mm/yyyy», будто его набирают руками, но открывается календарь — как
+/// на шаге регистрации, где решение то же и по той же причине: вслепую
+/// набранная дата отдаёт 422 с сервера, а промахнуться в календаре нельзя.
+/// Подпись оставлена дизайнерская: она описывает вид значения, и календарь
+/// заполняет поле ровно в этом формате.
+///
+/// ВТОРОЕ РАСХОЖДЕНИЕ. В макете заголовок стоит в одну строку, у нас
+/// переносится на две, и всё под ним съезжает на высоту строки. Причина не в
+/// вёрстке: [AppTypography.h1] несёт межбуквенный интервал 0,5, и «Данные
+/// родственника» перестаёт влезать в 400 точек ровно на нём. Ломать общий
+/// стиль ради одного экрана хуже, чем перенос: на реальном телефоне (393
+/// точки против макетных 440) заголовок такой длины переносится в любом
+/// случае.
+///
+/// Правка и удаление своего макета не имеют — та же форма с подставленными
+/// значениями плюс кнопка удаления под основной.
 ///
 /// Состояние живёт в самом экране, а не в Notifier'е, как у логина и
 /// регистрации: там форма размазана по нескольким экранам и должна их
@@ -59,11 +76,23 @@ class _FamilyMemberFormScreenState
   /// сохранения, и без этого флага правка затиралась бы на полпути.
   bool _prefilled = false;
 
-  /// Отступы — как на шаге регистрации.
-  static const double _topBarTop = 36;
-  static const double _topBarToCard = 26;
-  static const double _cardToButton = 44;
+  /// Стрелка «назад» стоит там же, где на остальных внутренних экранах.
+  static const double _backArrowTop = 36;
+
+  /// Низ строки со стрелкой (132) → заголовок 260.
+  static const double _backArrowToTitle = 128;
+
+  /// Заголовок 260…304 → карточка 355.
+  static const double _titleToCard = 50;
+
+  /// Карточка 355…585 → кнопка 630.
+  static const double _cardToButton = 45;
+
+  /// Низ поля → верх следующего: поля 368…426, 441…499, 514…572.
   static const double _fieldGap = 14;
+
+  /// Карточка 17…420 при полях 32…405.
+  static const EdgeInsets _cardPadding = EdgeInsets.fromLTRB(13, 14, 13, 14);
 
   bool get _isEditing => widget.memberId != null;
 
@@ -92,24 +121,40 @@ class _FamilyMemberFormScreenState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: _topBarTop),
+              const SizedBox(height: _backArrowTop),
+              // РАСХОЖДЕНИЕ С МАКЕТОМ, ОСОЗНАННОЕ. Стрелки «назад» в макете
+              // нет — он повторяет шаг регистрации, а там уходят вперёд, и
+              // возвращаться некуда. Здесь же форма открывается из списка
+              // семьи и из карточки близкого: без стрелки экран становится
+              // тупиком, из которого выбираются только системным жестом.
+              // Строка без заголовка: он ниже, крупный, как в макете.
               ScreenTopBar(
-                title: _isEditing ? l10n.familyEditTitle : l10n.familyAddTitle,
+                title: '',
                 onBack: () => Navigator.of(context).maybePop(),
               ),
-              const SizedBox(height: _topBarToCard),
+              const SizedBox(height: _backArrowToTitle),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.screenH,
+                ),
+                child: Text(
+                  _isEditing ? l10n.familyEditTitle : l10n.relativeDataTitle,
+                  style: AppTypography.h1,
+                ),
+              ),
+              const SizedBox(height: _titleToCard),
               Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.screenH,
                 ),
                 child: AppCard(
-                  padding: const EdgeInsets.all(20),
+                  padding: _cardPadding,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       AppTextField(
-                        hint: l10n.fullNameHint,
+                        hint: l10n.relativeNameHint,
                         height: AppTextField.compactFieldHeight,
                         controller: _fullNameController,
                         keyboardType: TextInputType.name,
@@ -118,13 +163,13 @@ class _FamilyMemberFormScreenState
                         onChanged: (_) => setState(() => _fullNameError = null),
                       ),
                       const SizedBox(height: _fieldGap),
-                      // Дата выбирается календарём, как при регистрации:
-                      // формат сервера «ГГГГ-ММ-ДД» вслепую не набрать.
+                      // Календарь вместо ручного ввода — см. расхождение с
+                      // макетом в описании экрана.
                       GestureDetector(
                         onTap: _pickBirthDate,
                         child: AbsorbPointer(
                           child: AppTextField(
-                            hint: l10n.birthDateHint,
+                            hint: l10n.relativeBirthDateHint,
                             height: AppTextField.compactFieldHeight,
                             controller: _birthDateController,
                             errorText: _birthDateError,
@@ -146,14 +191,18 @@ class _FamilyMemberFormScreenState
                 ),
               ),
               const SizedBox(height: _cardToButton),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.screenH,
-                ),
-                child: PrimaryButton(
-                  label: l10n.saveButtonLabel,
-                  isLoading: _isSaving,
-                  onPressed: _save,
+              // Кнопка в макете не во всю ширину: 330 по центру, как на
+              // шагах регистрации. Надпись там же — «Далее» со стрелкой,
+              // хотя шаг последний и следующего экрана нет.
+              Center(
+                child: SizedBox(
+                  width: PrimaryButton.mediumWidth,
+                  child: PrimaryButton(
+                    label: l10n.nextButtonLabel,
+                    trailingIcon: Icons.arrow_forward,
+                    isLoading: _isSaving,
+                    onPressed: _save,
+                  ),
                 ),
               ),
               if (_isEditing) ...[
@@ -180,19 +229,17 @@ class _FamilyMemberFormScreenState
 
   void _prefill(FamilyMember member) {
     _prefilled = true;
-    _fullNameController.text = [
-      member.lastName,
-      member.firstName,
-    ].where((part) => part.isNotEmpty).join(' ');
+    _fullNameController.text = member.fullName;
     _relationController.text = member.relationshipLabel ?? '';
     _birthDate = member.birthDate;
     _birthDateController.text = _displayDate(member.birthDate);
   }
 
+  /// Через косые черты — в том виде, который обещает подпись поля.
   static String _displayDate(DateTime date) {
     final month = date.month.toString().padLeft(2, '0');
     final day = date.day.toString().padLeft(2, '0');
-    return '$day.$month.${date.year}';
+    return '$day/$month/${date.year}';
   }
 
   /// Календарь открывается на десяти годах назад: члены семьи — чаще всего
@@ -264,7 +311,13 @@ class _FamilyMemberFormScreenState
     // Список перечитывается после любой правки: карточка члена семьи и обе
     // карточки «Моя Семья» читают его же.
     ref.invalidate(familyMembersProvider);
-    if (mounted) Navigator.of(context).maybePop();
+    if (!mounted) return;
+
+    // Закрывать нечего — снимаем ожидание с кнопки, чтобы она не осталась
+    // крутиться навсегда. Так бывает по прямой ссылке и в тестах.
+    if (!await Navigator.of(context).maybePop() && mounted) {
+      setState(() => _isSaving = false);
+    }
   }
 
   Future<void> _confirmDelete() async {
@@ -302,8 +355,25 @@ class _FamilyMemberFormScreenState
     }
 
     ref.invalidate(familyMembersProvider);
-    // Не `pop`: под формой лежит карточка удалённого члена семьи, и
-    // возвращаться на неё некуда.
-    if (mounted) context.go(Routes.family);
+    if (!mounted) return;
+
+    // Закрываем и форму, и карточку удалённого: возвращаться на неё некуда.
+    //
+    // Раньше здесь был `context.go` на список семьи, и это ломало возврат:
+    // `go` не складывает стек из вложенных путей, список оставался
+    // единственным экраном, и его собственная стрелка «назад» переставала
+    // что-либо делать. `pop` возвращает туда, откуда карточку открыли, —
+    // это может быть и список, и «Ваша Мед-Карта», и главная.
+    final navigator = Navigator.of(context);
+    if (!navigator.canPop()) {
+      // Закрывать нечего: форма открыта сама по себе — по прямой ссылке или
+      // в тесте. Хотя бы снимаем ожидание с кнопок, иначе они так и
+      // останутся крутиться.
+      setState(() => _isSaving = false);
+      return;
+    }
+
+    navigator.pop();
+    if (navigator.canPop()) navigator.pop();
   }
 }

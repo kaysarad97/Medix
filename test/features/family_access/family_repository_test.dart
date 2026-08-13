@@ -23,21 +23,15 @@ void main() {
     );
   }
 
-  test(
-    'ФИО раскладывается на фамилию и имя, отчество остаётся при имени',
-    () async {
-      final member = await added(
-        fullName: 'Иванов Пётр Сергеевич',
-        relation: 'сын',
-      );
+  test('имя и фамилия режутся по первому пробелу', () async {
+    final member = await added(fullName: 'Пётр Иванов', relation: 'сын');
 
-      expect(member.lastName, 'Иванов');
-      expect(member.firstName, 'Пётр Сергеевич');
-      expect(member.fullName, 'Пётр Сергеевич Иванов');
-    },
-  );
+    expect(member.firstName, 'Пётр');
+    expect(member.lastName, 'Иванов');
+    expect(member.fullName, 'Пётр Иванов');
+  });
 
-  test('одно слово в ФИО не даёт висящего пробела', () async {
+  test('одно слово в имени не даёт висящего пробела', () async {
     final member = await added(fullName: 'Пётр', relation: 'сын');
 
     expect(member.lastName, isEmpty);

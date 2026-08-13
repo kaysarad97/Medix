@@ -7,6 +7,7 @@ import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/features/family_access/presentation/providers/family_providers.dart';
 import 'package:medix/features/family_access/presentation/screens/family_list_screen.dart';
 import 'package:medix/features/family_access/presentation/screens/family_member_form_screen.dart';
+import 'package:medix/features/family_access/presentation/screens/family_member_screen.dart';
 import 'package:medix/l10n/app_localizations.dart';
 
 import '../../helpers/fake_family_repository.dart';
@@ -37,6 +38,11 @@ void main() {
         GoRoute(
           path: Routes.familyMemberNew,
           builder: (context, state) => const FamilyMemberFormScreen(),
+        ),
+        GoRoute(
+          path: Routes.familyMember,
+          builder: (context, state) =>
+              FamilyMemberScreen(memberId: state.pathParameters['id']!),
         ),
         GoRoute(
           path: Routes.familyMemberEdit,
@@ -70,7 +76,7 @@ void main() {
 
       await tester.enterText(find.byType(TextField).first, 'Иванов Пётр');
       await tester.enterText(find.byType(TextField).last, 'сын');
-      await tester.tap(find.text('Сохранить'));
+      await tester.tap(find.text('Далее'));
       await tester.pump();
 
       expect(find.text('Укажите дату рождения'), findsOneWidget);
@@ -81,7 +87,7 @@ void main() {
       final repository = await pumpForm(tester, Routes.familyMemberNew);
 
       await tester.enterText(find.byType(TextField).first, 'Пётр');
-      await tester.tap(find.text('Сохранить'));
+      await tester.tap(find.text('Далее'));
       await tester.pump();
 
       expect(find.text('Укажите фамилию и имя'), findsOneWidget);
@@ -94,8 +100,11 @@ void main() {
     testWidgets('подставляет данные члена семьи', (tester) async {
       await pumpForm(tester, Routes.familyMemberEditOf('f1'));
 
-      expect(find.text('Фамилия Имя'), findsOneWidget);
-      expect(find.text('07.10.2020'), findsOneWidget);
+      // По содержимому поля, а не по find.text: подпись поля в макете —
+      // тоже «Имя Фамилия», и текст нашёлся бы дважды.
+      final name = tester.widget<TextField>(find.byType(TextField).first);
+      expect(name.controller?.text, 'Имя Фамилия');
+      expect(find.text('07/10/2020'), findsOneWidget);
       expect(find.text('Изменить данные'), findsOneWidget);
     });
 
@@ -107,7 +116,7 @@ void main() {
 
       await tester.enterText(find.byType(TextField).first, 'Иванов Пётр');
       await tester.enterText(find.byType(TextField).last, 'сын');
-      await tester.tap(find.text('Сохранить'));
+      await tester.tap(find.text('Далее'));
       await tester.pump();
 
       expect(repository.updated, hasLength(1));
@@ -136,8 +145,46 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(repository.removed, ['f1']);
-      // После удаления возвращаемся на список, а не на карточку удалённого.
+    });
+  });
+
+  group('возврат', () {
+    testWidgets('стрелка закрывает форму добавления', (tester) async {
+      await pumpForm(tester, Routes.family);
+
+      await tester.tap(find.text('Добавить профиль'));
+      await tester.pumpAndSettle();
+      expect(find.byType(FamilyMemberFormScreen), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.arrow_back));
+      await tester.pumpAndSettle();
+
+      // Без стрелки экран был тупиком: уйти можно было только системным
+      // жестом, которого на части устройств нет.
       expect(find.byType(FamilyListScreen), findsOneWidget);
+    });
+
+    testWidgets('после удаления возврат ведёт на список, а не в никуда', (
+      tester,
+    ) async {
+      final repository = await pumpForm(tester, Routes.family);
+
+      // Полный путь пользователя: список → карточка близкого → правка.
+      await tester.tap(find.text('Имя Фамилия').first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.edit_outlined));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Удалить из семьи'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Удалить'));
+      await tester.pumpAndSettle();
+
+      expect(repository.removed, ['f1']);
+      // И форма, и карточка удалённого закрыты, список на месте — раньше
+      // сюда приходили через `go`, и стрелка на списке переставала работать.
+      expect(find.byType(FamilyListScreen), findsOneWidget);
+      expect(find.byType(FamilyMemberScreen), findsNothing);
     });
   });
 }

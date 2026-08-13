@@ -73,6 +73,15 @@ abstract final class AppTypography {
   static TextStyle get cardItemMeta =>
       _style(size: 12, weight: 400, color: AppColors.textMuted);
 
+  /// Подпись на пилюле плитки семьи. «Имя Фамилия», «Добавить профиль».
+  ///
+  /// Кегль выведен по длине подписи, а не взят из общих: «Добавить профиль»
+  /// занимает 99 из 138 пикселей пилюли в `design/Профили семьи.png`. При
+  /// 14, как у [cardItemTitle], подпись обрезается многоточием уже на
+  /// макетной ширине, при 12 влезает целиком с запасом.
+  static TextStyle get familyTileLabel =>
+      _style(size: 12, weight: 400, color: AppColors.textPrimary);
+
   /// Готовый вопрос в чат-боте. «Хочу загрузить анализы».
   ///
   /// Кегль выведен по двум пилюлям разной длины: при отбивке p и кегле f

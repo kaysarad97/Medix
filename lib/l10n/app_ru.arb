@@ -518,6 +518,28 @@
   "@writeReviewPlaceholder": {
     "description": "Плейсхолдер поля написания отзыва."
   },
+  "yourRatingLabel": "Ваша оценка: {rating}",
+  "@yourRatingLabel": {
+    "description": "Подпись на плашке оценки экрана «Оставьте отзыв».",
+    "placeholders": {
+      "rating": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewDateLabel": "от {date}",
+  "@reviewDateLabel": {
+    "description": "Дата под текстом отзыва: «от 10.08.26».",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "leaveReviewButton": "Оставить отзыв",
+  "@leaveReviewButton": {
+    "description": "Кнопка отправки отзыва о враче."
+  },
   "aboutDoctorTitle": "О враче",
   "@aboutDoctorTitle": {
     "description": "Заголовок экрана профиля врача."
@@ -814,21 +836,25 @@
   "@callEndedLabel": {
     "description": "Статус экрана звонка после завершения."
   },
-  "familyAddTitle": "Новый член семьи",
-  "@familyAddTitle": {
-    "description": "Заголовок формы добавления члена семьи."
+  "relativeDataTitle": "Данные родственника",
+  "@relativeDataTitle": {
+    "description": "Заголовок формы нового члена семьи."
   },
   "familyEditTitle": "Изменить данные",
   "@familyEditTitle": {
     "description": "Заголовок той же формы при правке существующего члена семьи."
   },
-  "familyAddButton": "Добавить члена семьи",
-  "@familyAddButton": {
-    "description": "Кнопка под списком близких на экране «Моя Семья»."
+  "relativeNameHint": "Имя Фамилия",
+  "@relativeNameHint": {
+    "description": "Подсказка поля имени в форме родственника. Порядок обратный «ФИО» на регистрации — так подписано в макете."
   },
-  "familyEmptyHint": "Здесь появятся близкие, которых вы добавите",
-  "@familyEmptyHint": {
-    "description": "Подсказка на экране «Моя Семья», когда никого не добавлено."
+  "relativeBirthDateHint": "Дата рождения (dd/mm/yyyy)",
+  "@relativeBirthDateHint": {
+    "description": "Подсказка поля даты рождения в форме родственника: формат значения, а не приглашение набирать руками — дата выбирается календарём."
+  },
+  "addProfileButton": "Добавить профиль",
+  "@addProfileButton": {
+    "description": "Подпись плитки добавления на экране «Моя Семья»."
   },
   "familyDeleteButton": "Удалить из семьи",
   "@familyDeleteButton": {
