@@ -26,6 +26,9 @@ abstract final class Routes {
 
   static const String home = '/';
 
+  /// Уведомления — колокольчик в шапке главной.
+  static const String notifications = '/notifications';
+
   /// Лабораторный чат-бот.
   static const String chatbot = '/chatbot';
 

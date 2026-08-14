@@ -197,5 +197,12 @@
   "familyDeleteConfirmTitle": "Отбасы мүшесін жою керек пе?",
   "familyDeleteConfirmMessage": "Оның картасы мен мед-картасына қолжетімділік қосымшадан жоғалады.",
   "cancelButtonLabel": "Болдырмау",
-  "deleteButtonLabel": "Жою"
+  "deleteButtonLabel": "Жою",
+  "notificationsTitle": "Хабарламалар",
+  "notificationsFilterSchedule": "Кесте",
+  "notificationsFilterMessages": "Дәрігерлердің хабарламалары",
+  "notificationAppointmentTitle": "Жазылуыңыз расталды",
+  "notificationAppointmentBody": "{name} {time} уақытына жазылуды растады",
+  "notificationMessageTitle": "Сізге хабарлама келді",
+  "notificationMessageBody": "{name} Сізге хабарлама жіберді"
 }

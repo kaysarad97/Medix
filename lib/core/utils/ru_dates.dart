@@ -20,6 +20,22 @@ abstract final class RuDates {
     'Декабрь',
   ];
 
+  /// Родительный падеж — «27 июля» в подписи уведомления.
+  static const List<String> monthsGenitive = [
+    'января',
+    'февраля',
+    'марта',
+    'апреля',
+    'мая',
+    'июня',
+    'июля',
+    'августа',
+    'сентября',
+    'октября',
+    'ноября',
+    'декабря',
+  ];
+
   /// Сокращения дней недели в порядке [DateTime.weekday] (1 — понедельник).
   static const List<String> weekdaysShort = [
     'Пн',
@@ -47,11 +63,20 @@ abstract final class RuDates {
   static String dayMonthShortYear(DateTime date) =>
       '${dayMonth(date)}.${_two(date.year % 100)}';
 
+  /// «27 июля».
+  static String dayAndMonth(DateTime date) =>
+      '${date.day} ${monthsGenitive[date.month - 1]}';
+
   /// «13:30», «9:30».
   ///
   /// Час без ведущего нуля — так в макете расписания: слот «9:30» уже
   /// соседних, и по ширине это видно.
   static String time(DateTime date) => '${date.hour}:${_two(date.minute)}';
+
+  /// «13:44» — с ведущим нулём, в отличие от [time]: так подписано время
+  /// прихода в списке чатов и в уведомлениях.
+  static String hourMinute(DateTime date) =>
+      '${_two(date.hour)}:${_two(date.minute)}';
 
   static String _two(int value) => value.toString().padLeft(2, '0');
 }

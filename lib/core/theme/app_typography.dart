@@ -107,6 +107,17 @@ abstract final class AppTypography {
   static TextStyle get buttonSm =>
       _style(size: 14, weight: 400, color: AppColors.textOnPrimary);
 
+  /// Подпись под заголовком строки уведомления: «Имя Фамилия подтвердил
+  /// запись в 13:30, 27 июля». Серая и без утолщения, в отличие от
+  /// [tileSubtitle] — та синяя и полужирная.
+  static TextStyle get notificationBody =>
+      _style(size: 12, weight: 400, color: AppColors.textSecondary);
+
+  /// Время прихода уведомления в правом верхнем углу строки. Мельче и бледнее
+  /// [cardItemMeta]: в макете это самая незаметная надпись на экране.
+  static TextStyle get notificationTime =>
+      _style(size: 10, weight: 400, color: AppColors.textDisabled);
+
   /// Заголовок карточки.
   static TextStyle get titleMd =>
       _style(size: 18, weight: 500, color: AppColors.textPrimary);

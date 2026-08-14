@@ -20,6 +20,7 @@ import '../../features/lab_chatbot/presentation/screens/chatbot_screen.dart';
 import '../../features/lab_services/presentation/screens/lab_offers_screen.dart';
 import '../../features/lab_services/presentation/screens/lab_services_screen.dart';
 import '../../features/map_search/presentation/screens/map_search_screen.dart';
+import '../../features/notifications/presentation/screens/notifications_screen.dart';
 import '../../features/profile/presentation/screens/avatar_picker_screen.dart';
 import '../../features/profile/presentation/screens/contact_screen.dart';
 import '../../features/profile/presentation/screens/medical_card_form_screen.dart';
@@ -121,6 +122,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             ],
           ),
         ],
+      ),
+      GoRoute(
+        path: Routes.notifications,
+        builder: (context, state) => const NotificationsScreen(),
       ),
       GoRoute(
         path: Routes.chatbot,

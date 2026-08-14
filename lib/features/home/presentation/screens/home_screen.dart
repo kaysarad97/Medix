@@ -59,6 +59,7 @@ class HomeScreen extends ConsumerWidget {
                 // поднимает вторую копию оболочки, и навигатор падает на
                 // повторных глобальных ключах.
                 onAvatarTap: () => context.go(Routes.profile),
+                onNotificationsTap: () => context.push(Routes.notifications),
               ),
               const SizedBox(height: HomeMetrics.headerToGreeting),
               _Section(

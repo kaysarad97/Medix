@@ -197,5 +197,12 @@
   "familyDeleteConfirmTitle": "Remove this family member?",
   "familyDeleteConfirmMessage": "Their card and access to their medical record will disappear from the app.",
   "cancelButtonLabel": "Cancel",
-  "deleteButtonLabel": "Delete"
+  "deleteButtonLabel": "Delete",
+  "notificationsTitle": "Notifications",
+  "notificationsFilterSchedule": "Schedule",
+  "notificationsFilterMessages": "Messages from doctors",
+  "notificationAppointmentTitle": "Your appointment is confirmed",
+  "notificationAppointmentBody": "{name} confirmed the appointment at {time}",
+  "notificationMessageTitle": "You have a new message",
+  "notificationMessageBody": "{name} sent you a message"
 }
