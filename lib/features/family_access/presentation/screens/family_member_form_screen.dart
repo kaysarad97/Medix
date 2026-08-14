@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/network/api_exception.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/validators.dart';
@@ -43,8 +42,10 @@ import '../providers/family_providers.dart';
 /// точки против макетных 440) заголовок такой длины переносится в любом
 /// случае.
 ///
-/// Правка и удаление своего макета не имеют — та же форма с подставленными
-/// значениями плюс кнопка удаления под основной.
+/// Правка своего макета не имеет — та же форма с подставленными значениями
+/// и другим заголовком. Удаление здесь когда-то было красной надписью под
+/// кнопкой «Далее», но в обновлённых макетах «Моя Семья» дизайнер поставил
+/// его кнопкой внизу карточки члена семьи — там оно теперь и живёт.
 ///
 /// Состояние живёт в самом экране, а не в Notifier'е, как у логина и
 /// регистрации: там форма размазана по нескольким экранам и должна их
@@ -205,20 +206,6 @@ class _FamilyMemberFormScreenState
                   ),
                 ),
               ),
-              if (_isEditing) ...[
-                const SizedBox(height: 20),
-                Center(
-                  child: TextButton(
-                    onPressed: _isSaving ? null : _confirmDelete,
-                    child: Text(
-                      l10n.familyDeleteButton,
-                      style: AppTypography.bodyMd.copyWith(
-                        color: AppColors.error,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
               const SizedBox(height: 32),
             ],
           ),
@@ -318,62 +305,5 @@ class _FamilyMemberFormScreenState
     if (!await Navigator.of(context).maybePop() && mounted) {
       setState(() => _isSaving = false);
     }
-  }
-
-  Future<void> _confirmDelete() async {
-    final l10n = AppLocalizations.of(context)!;
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.familyDeleteConfirmTitle),
-        content: Text(l10n.familyDeleteConfirmMessage),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.cancelButtonLabel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text(
-              l10n.deleteButtonLabel,
-              style: const TextStyle(color: AppColors.error),
-            ),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true || !mounted) return;
-
-    setState(() => _isSaving = true);
-    try {
-      await ref.read(familyRepositoryProvider).remove(widget.memberId!);
-    } on ApiException catch (e) {
-      if (!mounted) return;
-      setState(() => _isSaving = false);
-      showFormErrorSnackBar(context, e.message);
-      return;
-    }
-
-    ref.invalidate(familyMembersProvider);
-    if (!mounted) return;
-
-    // Закрываем и форму, и карточку удалённого: возвращаться на неё некуда.
-    //
-    // Раньше здесь был `context.go` на список семьи, и это ломало возврат:
-    // `go` не складывает стек из вложенных путей, список оставался
-    // единственным экраном, и его собственная стрелка «назад» переставала
-    // что-либо делать. `pop` возвращает туда, откуда карточку открыли, —
-    // это может быть и список, и «Ваша Мед-Карта», и главная.
-    final navigator = Navigator.of(context);
-    if (!navigator.canPop()) {
-      // Закрывать нечего: форма открыта сама по себе — по прямой ссылке или
-      // в тесте. Хотя бы снимаем ожидание с кнопок, иначе они так и
-      // останутся крутиться.
-      setState(() => _isSaving = false);
-      return;
-    }
-
-    navigator.pop();
-    if (navigator.canPop()) navigator.pop();
   }
 }

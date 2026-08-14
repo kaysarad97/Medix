@@ -16,8 +16,8 @@ import '../../helpers/test_fonts.dart';
 void main() {
   setUpAll(loadAppFonts);
 
-  /// Роутер настоящий, а не `home:`: после удаления форма уходит на список
-  /// через `context.go`, и без роутера этот путь было бы не проверить.
+  /// Роутер настоящий, а не `home:`: проверяется возврат по стеку экранов —
+  /// список → карточка близкого → форма, — а с одним `home:` стека нет.
   Future<FakeFamilyRepository> pumpForm(
     WidgetTester tester,
     String location,
@@ -127,24 +127,14 @@ void main() {
       expect(draft.birthDate, DateTime(2020, 10, 7));
     });
 
-    testWidgets('удаляет только после подтверждения', (tester) async {
-      final repository = await pumpForm(
-        tester,
-        Routes.familyMemberEditOf('f1'),
-      );
+    testWidgets('удаления в форме больше нет — оно на карточке', (
+      tester,
+    ) async {
+      await pumpForm(tester, Routes.familyMemberEditOf('f1'));
 
-      await tester.tap(find.text('Удалить из семьи'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Отмена'));
-      await tester.pumpAndSettle();
-      expect(repository.removed, isEmpty);
-
-      await tester.tap(find.text('Удалить из семьи'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Удалить'));
-      await tester.pumpAndSettle();
-
-      expect(repository.removed, ['f1']);
+      // Красная надпись под «Далее» была нашей выдумкой, пока у удаления не
+      // было макета. Теперь оно кнопкой внизу карточки члена семьи.
+      expect(find.text('Удалить профиль'), findsNothing);
     });
   });
 
@@ -169,20 +159,23 @@ void main() {
     ) async {
       final repository = await pumpForm(tester, Routes.family);
 
-      // Полный путь пользователя: список → карточка близкого → правка.
+      // Полный путь пользователя: список → карточка близкого → удаление.
       await tester.tap(find.text('Имя Фамилия').first);
       await tester.pumpAndSettle();
-      await tester.tap(find.byIcon(Icons.edit_outlined));
-      await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Удалить из семьи'));
+      await tester.scrollUntilVisible(
+        find.text('Удалить профиль'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(find.text('Удалить профиль'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Удалить'));
       await tester.pumpAndSettle();
 
       expect(repository.removed, ['f1']);
-      // И форма, и карточка удалённого закрыты, список на месте — раньше
-      // сюда приходили через `go`, и стрелка на списке переставала работать.
+      // Карточка удалённого закрыта, список на месте — раньше сюда приходили
+      // через `go`, и стрелка на списке переставала работать.
       expect(find.byType(FamilyListScreen), findsOneWidget);
       expect(find.byType(FamilyMemberScreen), findsNothing);
     });

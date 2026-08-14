@@ -666,6 +666,14 @@
   "@familyRoleSenior": {
     "description": "Подпись под именем в карточке «Моя Семья»: профиль старшего."
   },
+  "familyMemberTitleChild": "Профиль ребёнка",
+  "@familyMemberTitleChild": {
+    "description": "Заголовок верхней строки на карточке члена семьи-ребёнка."
+  },
+  "familyMemberTitleSenior": "Профиль родителя",
+  "@familyMemberTitleSenior": {
+    "description": "Заголовок верхней строки на карточке члена семьи-старшего."
+  },
   "familyDoctorsCardTitleChild": "Врачи моего ребёнка",
   "@familyDoctorsCardTitleChild": {
     "description": "Заголовок карточки врачей на карточке члена семьи-ребёнка."
@@ -856,9 +864,9 @@
   "@addProfileButton": {
     "description": "Подпись плитки добавления на экране «Моя Семья»."
   },
-  "familyDeleteButton": "Удалить из семьи",
+  "familyDeleteButton": "Удалить профиль",
   "@familyDeleteButton": {
-    "description": "Кнопка удаления члена семьи в форме правки."
+    "description": "Кнопка удаления члена семьи внизу его карточки."
   },
   "familyDeleteConfirmTitle": "Удалить члена семьи?",
   "@familyDeleteConfirmTitle": {

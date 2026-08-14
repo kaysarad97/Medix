@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/network/api_exception.dart';
 import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_radius.dart';
+import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_scaffold.dart';
+import '../../../../core/widgets/form_error_snack_bar.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../core/widgets/user_avatar.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -16,13 +20,19 @@ import '../../../profile/presentation/widgets/my_doctors_card.dart';
 import '../../../profile/presentation/widgets/profile_metrics.dart';
 import '../providers/family_providers.dart';
 
-/// Карточка члена семьи — «Моя Семья».
+/// Карточка члена семьи — «Профиль ребёнка» и «Профиль родителя».
 ///
 /// Свёрстан по `design/Моя Семья Ребенок.png` и `design/Моя Семья
-/// Старшие.png`: один экран на оба макета, различие только в подписях
-/// карточек (собираются здесь по `member.relation`, см. ниже) и аватаре.
-/// Верхняя строка проще, чем на «Ваша Мед-Карта»: без шестерёнки настроек
-/// и без значка Gold — у члена семьи нет ни того, ни другого.
+/// Старшие.png` (440×1673): один экран на оба макета, различие только в
+/// заголовке, подписях карточек (собираются здесь по `member.relation`,
+/// см. ниже) и аватаре. Верхняя строка проще, чем на «Ваша Мед-Карта»: без
+/// шестерёнки настроек и без значка Gold — у члена семьи нет ни того, ни
+/// другого.
+///
+/// Внизу — кнопка «Удалить профиль» из обновлённых макетов. До них удаление
+/// жило в форме правки красной надписью под кнопкой «Далее»: своего макета
+/// у него не было, и оно стояло там, где его удалось приткнуть. Теперь
+/// удаление там, где его нарисовал дизайнер, и в форме его больше нет.
 ///
 /// Карточки «Мед-карта», «Врачи…» и «Анализы…» — те же виджеты, что и на
 /// экране пользователя (`MedicalCardSummary`, `MyDoctorsCard`,
@@ -57,7 +67,10 @@ class FamilyMemberScreen extends ConsumerWidget {
                   children: [
                     const SizedBox(height: 36),
                     ScreenTopBar(
-                      title: l10n.familyScreenTitle,
+                      title: switch (member.relation) {
+                        FamilyRelation.child => l10n.familyMemberTitleChild,
+                        FamilyRelation.senior => l10n.familyMemberTitleSenior,
+                      },
                       onBack: () => Navigator.of(context).maybePop(),
                       // Карандаш из Material: своей иконки правки дизайнер
                       // не присылал, а заводить её в MedixIcons без
@@ -98,7 +111,7 @@ class FamilyMemberScreen extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: ProfileMetrics.cardGap),
-                    if (analyses.isNotEmpty)
+                    if (analyses.isNotEmpty) ...[
                       _Section(
                         child: AnalysesCard(
                           analyses: analyses,
@@ -116,7 +129,10 @@ class FamilyMemberScreen extends ConsumerWidget {
                               .select,
                         ),
                       ),
-                    const SizedBox(height: ProfileMetrics.cardGap),
+                      const SizedBox(height: ProfileMetrics.cardGap),
+                    ],
+                    _Section(child: _DeleteProfileButton(memberId: memberId)),
+                    const SizedBox(height: AppSpacing.xxl),
                   ],
                 ),
               ),
@@ -177,6 +193,135 @@ class _MemberHeader extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+/// Кнопка «Удалить профиль» под карточками.
+///
+/// Замеры по `design/Моя Семья Ребенок.png` (440×1673): кнопка x 21…419
+/// (те же поля, что у карточек) и y 1500…1556 через 31 после карточки
+/// анализов — тот же шаг, что между карточками. Внутри белая подложка
+/// значка 48×38 на 13 от левого края, до надписи 20.
+///
+/// Подтверждение спрашивается диалогом, хотя в макете его нет: удаление
+/// необратимо и на сервере (`DELETE /family-members/{id}`), а промахнуться
+/// по кнопке во всю ширину экрана легко.
+class _DeleteProfileButton extends ConsumerStatefulWidget {
+  const _DeleteProfileButton({required this.memberId});
+
+  final String memberId;
+
+  @override
+  ConsumerState<_DeleteProfileButton> createState() =>
+      _DeleteProfileButtonState();
+}
+
+class _DeleteProfileButtonState extends ConsumerState<_DeleteProfileButton> {
+  static const double _height = 56;
+  static const Size _chipSize = Size(48, 38);
+  static const double _chipLeft = 13;
+  static const double _chipToLabel = 20;
+  static const double _glyphSize = 22;
+
+  bool _isDeleting = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return SizedBox(
+      height: _height,
+      child: Material(
+        color: AppColors.accent,
+        borderRadius: AppRadius.allMd,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: _isDeleting ? null : _confirmDelete,
+          child: Row(
+            children: [
+              const SizedBox(width: _chipLeft),
+              SizedBox.fromSize(
+                size: _chipSize,
+                child: DecoratedBox(
+                  decoration: const BoxDecoration(
+                    color: AppColors.surfaceWhite,
+                    borderRadius: AppRadius.allPill,
+                  ),
+                  child: Center(
+                    child: _isDeleting
+                        ? const SizedBox(
+                            width: _glyphSize,
+                            height: _glyphSize,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              color: AppColors.accent,
+                            ),
+                          )
+                        // Корзины в экспорте дизайнера нет — как и карандаша
+                        // правки выше, берём ближайшую из Material.
+                        : const Icon(
+                            Icons.delete_forever_outlined,
+                            size: _glyphSize,
+                            color: AppColors.brandIndigo,
+                          ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: _chipToLabel),
+              Text(l10n.familyDeleteButton, style: AppTypography.buttonSm),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _confirmDelete() async {
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.familyDeleteConfirmTitle),
+        content: Text(l10n.familyDeleteConfirmMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.cancelButtonLabel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(
+              l10n.deleteButtonLabel,
+              style: const TextStyle(color: AppColors.error),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    setState(() => _isDeleting = true);
+    try {
+      await ref.read(familyRepositoryProvider).remove(widget.memberId);
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      setState(() => _isDeleting = false);
+      showFormErrorSnackBar(context, e.message);
+      return;
+    }
+
+    // Список перечитывается после любой правки: обе карточки «Моя Семья» и
+    // экран списка читают его же.
+    ref.invalidate(familyMembersProvider);
+    if (!mounted) return;
+
+    // Карточки больше нет — возвращаемся туда, откуда её открыли: это и
+    // список семьи, и «Ваша Мед-Карта», и главная. Закрывать нечего —
+    // снимаем ожидание с кнопки, иначе она останется крутиться навсегда;
+    // так бывает по прямой ссылке и в тестах.
+    if (!await Navigator.of(context).maybePop() && mounted) {
+      setState(() => _isDeleting = false);
+    }
   }
 }
 

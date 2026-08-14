@@ -101,6 +101,12 @@ abstract final class AppTypography {
   static TextStyle get buttonMd =>
       _style(size: 17, weight: 500, color: AppColors.textOnPrimary);
 
+  /// Надпись на кнопке со значком слева. «Удалить профиль» внизу карточки
+  /// члена семьи: там надпись мельче обычной кнопочной — размах краски по
+  /// макету 13 против 16 у «Далее».
+  static TextStyle get buttonSm =>
+      _style(size: 14, weight: 400, color: AppColors.textOnPrimary);
+
   /// Заголовок карточки.
   static TextStyle get titleMd =>
       _style(size: 18, weight: 500, color: AppColors.textPrimary);
