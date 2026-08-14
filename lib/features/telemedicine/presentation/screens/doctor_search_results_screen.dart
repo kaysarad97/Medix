@@ -7,6 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_scaffold.dart';
+import '../../../../core/widgets/doctor_photo.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -273,7 +274,7 @@ class _ResultCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const _Photo(),
+              _Photo(doctor: doctor),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -356,22 +357,27 @@ class _ResultCard extends StatelessWidget {
 }
 
 class _Photo extends StatelessWidget {
-  const _Photo();
+  const _Photo({required this.doctor});
+
+  final Doctor doctor;
 
   static const double _size = 56;
 
   @override
   Widget build(BuildContext context) {
-    // accentSoft, а не accentSofter: на подсвеченной топ-карточке фон уже
-    // accentSofter — тем же цветом кружок сливался бы с ним.
-    return const SizedBox(
+    // Под портретом — та же подложка, что стояла на месте фотографии:
+    // accentSoft, а не accentSofter, потому что на подсвеченной топ-карточке
+    // фон уже accentSofter и тем же цветом кружок сливался бы с ним. Видна
+    // она теперь только по краям выреза.
+    return SizedBox(
       width: _size,
       height: _size,
       child: DecoratedBox(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: AppColors.accentSoft,
           shape: BoxShape.circle,
         ),
+        child: DoctorPhoto(seed: doctor.id, url: doctor.photoUrl),
       ),
     );
   }

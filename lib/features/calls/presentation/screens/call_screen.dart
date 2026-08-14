@@ -9,6 +9,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_scaffold.dart';
+import '../../../../core/widgets/doctor_photo.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../core/widgets/user_avatar.dart';
@@ -178,7 +179,7 @@ class _VideoBody extends StatelessWidget {
           const SizedBox(height: CallMetrics.statusToPhoto),
           SizedBox(
             height: CallMetrics.videoPhotoHeight,
-            child: _Photo(url: doctor.photoUrl, radius: AppRadius.allLg),
+            child: _Photo(doctor: doctor, radius: AppRadius.allLg),
           ),
           const SizedBox(height: CallMetrics.photoToName),
           Text(doctor.fullName, style: AppTypography.titleMd),
@@ -211,7 +212,7 @@ class _AudioBody extends StatelessWidget {
         SizedBox(
           width: CallMetrics.audioPhotoSize.width,
           height: CallMetrics.audioPhotoSize.height,
-          child: _Photo(url: doctor.photoUrl, radius: AppRadius.allLg),
+          child: _Photo(doctor: doctor, radius: AppRadius.allLg),
         ),
         const SizedBox(height: CallMetrics.audioPhotoToName),
         Text(doctor.fullName, style: AppTypography.titleMd),
@@ -225,9 +226,9 @@ class _AudioBody extends StatelessWidget {
 /// Фотография врача — тот же плейсхолдер, что и в `DoctorHeader`: фото с
 /// бэкенда пока не приходит.
 class _Photo extends StatelessWidget {
-  const _Photo({required this.url, required this.radius});
+  const _Photo({required this.doctor, required this.radius});
 
-  final String? url;
+  final Doctor doctor;
   final BorderRadius radius;
 
   @override
@@ -237,12 +238,11 @@ class _Photo extends StatelessWidget {
         color: AppColors.accentSoft.withValues(alpha: 0.5),
         borderRadius: radius,
       ),
-      child: url == null
-          ? null
-          : ClipRRect(
-              borderRadius: radius,
-              child: Image.network(url!, fit: BoxFit.cover),
-            ),
+      child: DoctorPhoto(
+        seed: doctor.id,
+        url: doctor.photoUrl,
+        borderRadius: radius,
+      ),
     );
   }
 }

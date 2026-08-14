@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/doctor_photo.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../domain/entities/doctor.dart';
 import 'doctor_metrics.dart';
@@ -27,7 +28,7 @@ class DoctorHeader extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(width: DoctorMetrics.photoLeft),
-          _Photo(url: doctor.photoUrl),
+          _Photo(doctor: doctor),
           const SizedBox(width: photoToInfo),
           Expanded(
             child: Padding(
@@ -78,23 +79,20 @@ class DoctorHeader extends StatelessWidget {
 /// обводки. Пока фото не приходит с бэкенда — подложка, как у аватара
 /// на главной.
 class _Photo extends StatelessWidget {
-  const _Photo({this.url});
+  const _Photo({required this.doctor});
 
-  final String? url;
+  final Doctor doctor;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: DoctorMetrics.photoSize.width,
       height: DoctorMetrics.photoSize.height,
-      child: url == null
-          ? DecoratedBox(
-              decoration: BoxDecoration(
-                color: AppColors.accentSoft.withValues(alpha: 0.5),
-                borderRadius: AppRadius.allLg,
-              ),
-            )
-          : Image.network(url!, fit: BoxFit.contain),
+      child: DoctorPhoto(
+        seed: doctor.id,
+        url: doctor.photoUrl,
+        borderRadius: AppRadius.allLg,
+      ),
     );
   }
 }

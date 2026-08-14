@@ -7,6 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_scaffold.dart';
+import '../../../../core/widgets/doctor_photo.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -209,7 +210,7 @@ class _ThreadRow extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 13),
             child: Row(
               children: [
-                _Avatar(url: thread.doctorPhotoUrl, size: _avatarSize),
+                _Avatar(thread: thread, size: _avatarSize),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -259,9 +260,9 @@ class _ThreadRow extends StatelessWidget {
 }
 
 class _Avatar extends StatelessWidget {
-  const _Avatar({required this.url, required this.size});
+  const _Avatar({required this.thread, required this.size});
 
-  final String? url;
+  final ChatThread thread;
   final double size;
 
   @override
@@ -274,10 +275,9 @@ class _Avatar extends StatelessWidget {
           color: AppColors.accentSoft,
           shape: BoxShape.circle,
         ),
-        // Фото врача приходит с бэкенда; пока подложка.
-        child: url == null
-            ? null
-            : ClipOval(child: Image.network(url!, fit: BoxFit.cover)),
+        // Фото врача с бэкенда не приходит — портрет из набора дизайнера по
+        // имени, чтобы в списке чатов и на звонке было одно лицо.
+        child: DoctorPhoto(seed: thread.doctorName, url: thread.doctorPhotoUrl),
       ),
     );
   }

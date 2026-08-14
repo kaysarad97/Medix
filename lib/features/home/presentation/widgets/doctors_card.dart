@@ -4,6 +4,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_card.dart';
+import '../../../../core/widgets/doctor_photo.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/doctor_specialty.dart';
 import 'home_metrics.dart';
@@ -104,13 +105,16 @@ class _SpecialtyCard extends StatelessWidget {
           onTap: onTap,
           child: Row(
             children: [
-              // Фото врача приходит с бэкенда; пока подложка.
-              Container(
+              // Своей фотографии у специальности нет — берётся портрет из
+              // набора дизайнера по её названию, чтобы у «Терапевта» на всех
+              // экранах было одно и то же лицо.
+              SizedBox(
                 width: _photoWidth,
-                color: AppColors.accentSofter,
-                child: specialty.photoUrl == null
-                    ? null
-                    : Image.network(specialty.photoUrl!, fit: BoxFit.cover),
+                child: DoctorPhoto(
+                  seed: specialty.title,
+                  url: specialty.photoUrl,
+                  borderRadius: BorderRadius.zero,
+                ),
               ),
               Expanded(
                 child: Padding(

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_card.dart';
+import '../../../../core/widgets/doctor_photo.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/my_doctor.dart';
 import 'profile_metrics.dart';
@@ -106,7 +107,7 @@ class _DoctorCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Row(
               children: [
-                _Photo(url: doctor.photoUrl),
+                _Photo(doctor: doctor),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Column(
@@ -140,22 +141,16 @@ class _DoctorCard extends StatelessWidget {
 
 /// Фотография врача — круглая, в отличие от вырезки на экране профиля врача.
 class _Photo extends StatelessWidget {
-  const _Photo({this.url});
+  const _Photo({required this.doctor});
 
-  final String? url;
+  final MyDoctor doctor;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: ProfileMetrics.doctorPhotoSize,
       height: ProfileMetrics.doctorPhotoSize,
-      child: ClipOval(
-        child: url == null
-            ? const DecoratedBox(
-                decoration: BoxDecoration(color: AppColors.accentSofter),
-              )
-            : Image.network(url!, fit: BoxFit.cover),
-      ),
+      child: DoctorPhoto(seed: doctor.id, url: doctor.photoUrl),
     );
   }
 }

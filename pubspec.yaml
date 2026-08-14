@@ -68,6 +68,7 @@ flutter:
   assets:
     - assets/images/
     - assets/images/avatars/
+    - assets/images/doctors/
     - assets/icons/
 
   # Golos Text поставляется Google Fonts только вариативным файлом (одна ось
