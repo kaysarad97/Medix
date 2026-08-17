@@ -64,7 +64,9 @@ void main() {
       expect(find.text('7/10/2020'), findsOneWidget);
       expect(find.text('5 лет'), findsOneWidget);
       expect(find.text('106 см'), findsOneWidget);
-      expect(find.text('Родство с Вами'), findsOneWidget);
+      // Родство теперь приходит перечислением и подставляется в поле — до
+      // 17 августа 2026 сервер хранил свободный текст, и поле было пустым.
+      expect(find.text('Ребёнок'), findsOneWidget);
       expect(find.text('Врачи моего ребёнка'), findsOneWidget);
       expect(find.text('Педиатр'), findsOneWidget);
       expect(find.text('Анализы ребёнка'), findsOneWidget);
@@ -81,6 +83,7 @@ void main() {
       await pumpScreen(tester, screen);
 
       expect(find.text('Профиль родителя'), findsOneWidget);
+      expect(find.text('Родитель'), findsOneWidget);
       expect(find.text('женщина'), findsOneWidget);
       expect(find.text('68 лет'), findsOneWidget);
       expect(find.text('Врачи для старших'), findsOneWidget);

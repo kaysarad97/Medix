@@ -11,8 +11,6 @@ import '../../../../core/widgets/doctor_photo.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../../shared/models/subscription_tier.dart';
-import '../../../profile/presentation/providers/profile_providers.dart';
 import '../../domain/entities/doctor.dart';
 import '../providers/telemedicine_providers.dart';
 import '../widgets/city_chip.dart';
@@ -23,10 +21,13 @@ enum _SortBy { rating, experience, price }
 ///
 /// Свёрстан по `design/Поиск врача результаты - Gold.png`. Фильтр «Близко к
 /// Вам» переключается визуально, но не сортирует — координат пользователя и
-/// клиник в моках нет. Скидка и подпись «для пользователей Gold» показаны,
-/// только когда `profile.subscription == SubscriptionTier.gold` — на макете
-/// эта подпись не как раскраска цены, а обещание тарифа, поэтому без
-/// подписки та же цена показана без зачёркнутой «до скидки».
+/// клиник в моках нет.
+///
+/// Скидку и зачёркнутую цену показывает сервер, а не клиент: в ответе
+/// каталога `price_for_user` и `discount_percent` посчитаны для того, кто
+/// спрашивает. До 17 августа 2026 клиент гейтил показ по
+/// `SubscriptionTier.gold` — и подписчик Silver видел полную цену, хотя
+/// списывалась с него скидочная.
 class DoctorSearchResultsScreen extends ConsumerStatefulWidget {
   const DoctorSearchResultsScreen({super.key, required this.query});
 
@@ -79,8 +80,6 @@ class _DoctorSearchResultsScreenState
     final results =
         ref.watch(doctorSearchResultsProvider(_query)).value ?? const [];
     final sorted = _sorted(results);
-    final isGold =
-        ref.watch(profileProvider).value?.subscription == SubscriptionTier.gold;
     final l10n = AppLocalizations.of(context)!;
 
     return AppScaffold(
@@ -122,7 +121,6 @@ class _DoctorSearchResultsScreenState
                     return _ResultCard(
                       doctor: doctor,
                       isTopMatch: index == 0 && _sortBy == _SortBy.rating,
-                      isGold: isGold,
                       onTap: () => context.push(Routes.doctorOf(doctor.id)),
                     );
                   },
@@ -252,13 +250,11 @@ class _ResultCard extends StatelessWidget {
   const _ResultCard({
     required this.doctor,
     required this.isTopMatch,
-    required this.isGold,
     required this.onTap,
   });
 
   final Doctor doctor;
   final bool isTopMatch;
-  final bool isGold;
   final VoidCallback onTap;
 
   @override
@@ -342,11 +338,7 @@ class _ResultCard extends StatelessWidget {
               const SizedBox(width: 8),
               SizedBox(
                 width: 96,
-                child: _Price(
-                  doctor: doctor,
-                  isTopMatch: isTopMatch,
-                  isGold: isGold,
-                ),
+                child: _Price(doctor: doctor, isTopMatch: isTopMatch),
               ),
             ],
           ),
@@ -384,19 +376,18 @@ class _Photo extends StatelessWidget {
 }
 
 class _Price extends StatelessWidget {
-  const _Price({
-    required this.doctor,
-    required this.isTopMatch,
-    required this.isGold,
-  });
+  const _Price({required this.doctor, required this.isTopMatch});
 
   final Doctor doctor;
   final bool isTopMatch;
-  final bool isGold;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    // Скидку и её обоснование считает сервер: зачёркнутая цена приходит
+    // только тому, кому скидка положена.
+    final hasDiscount = doctor.priceBeforeDiscountLabel != null;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
@@ -406,7 +397,7 @@ class _Price extends StatelessWidget {
             style: AppTypography.cardItemMeta,
             textAlign: TextAlign.right,
           ),
-        if (isGold && doctor.priceBeforeDiscountLabel != null)
+        if (hasDiscount)
           Text(
             '${doctor.priceBeforeDiscountLabel} ₸',
             style: AppTypography.cardItemMeta.copyWith(
@@ -416,7 +407,7 @@ class _Price extends StatelessWidget {
             textAlign: TextAlign.right,
           ),
         Text(
-          '${isGold ? doctor.priceLabel : doctor.priceBeforeDiscountLabel} ₸',
+          '${doctor.priceLabel} ₸',
           style: AppTypography.cardItemTitle,
           textAlign: TextAlign.right,
         ),
@@ -425,9 +416,9 @@ class _Price extends StatelessWidget {
           style: AppTypography.cardItemMeta,
           textAlign: TextAlign.right,
         ),
-        if (isGold)
+        if (hasDiscount)
           Text(
-            l10n.forGoldUsersLabel,
+            l10n.forSubscribersLabel,
             style: AppTypography.goldLabel.copyWith(fontSize: 11),
             textAlign: TextAlign.right,
           ),

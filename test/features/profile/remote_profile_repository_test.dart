@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/features/profile/data/repositories/remote_profile_repository.dart';
 import 'package:medix/features/profile/domain/entities/medical_card.dart';
+import 'package:medix/shared/models/gender.dart';
 import 'package:medix/shared/models/subscription_tier.dart';
 
 import '../../helpers/canned_dio.dart';
@@ -17,6 +18,9 @@ void main() {
       'id': 'u1',
       'email': 'user@medix.kz',
       'full_name': 'Фамилия Имя',
+      'birth_date': '1996-12-06',
+      'sex': 'male',
+      'iin': '961206300123',
       'role': 'patient',
       'phone': null,
       'phone_verified_at': null,
@@ -58,17 +62,17 @@ void main() {
       expect(profile.subscription, SubscriptionTier.free);
     });
 
-    test('чего сервер не хранит, того в профиле и нет', () async {
+    test('пол, дата рождения и ИИН приходят с сервера', () async {
+      // До 17 августа 2026 их не было в ответе, и в шапке стоял прочерк.
       final (:dio, adapter: _) = cannedDio({'/users/me': me()});
 
       final profile = await RemoteProfileRepository(dio).profile();
 
-      expect(profile.gender, isNull);
-      expect(profile.genderLabel, '—');
-      // Дату рождения PATCH принимает, а GET не возвращает.
-      expect(profile.birthDate, isNull);
-      expect(profile.birthDateLabel, '—');
-      expect(profile.ageLabel(DateTime(2026, 8, 13)), '—');
+      expect(profile.gender, Gender.male);
+      expect(profile.genderLabel, 'мужчина');
+      expect(profile.birthDate, DateTime(1996, 12, 6));
+      expect(profile.iin, '961206300123');
+      expect(profile.ageLabel(DateTime(2026, 8, 13)), '29 лет');
     });
   });
 
@@ -97,8 +101,13 @@ void main() {
         {
           'id': 'r3',
           'family_member_id': null,
-          'record_type': 'note',
-          'payload': {'title': 'Рост', 'details': '176'},
+          'record_type': 'measurement',
+          'payload': {
+            'kind': 'height',
+            'value': 176,
+            'unit': 'cm',
+            'measured_at': '2026-08-09T10:00:00',
+          },
           'created_by': 'u1',
           'superseded_by': null,
           'created_at': '2026-08-09T10:00:00',
@@ -126,7 +135,7 @@ void main() {
       expect(card.rhesus, RhesusFactor.negative);
     });
 
-    test('остальное разбирается по типу и заголовку заметки', () async {
+    test('рост приходит замером, остальное — по типу и заголовку', () async {
       final (:dio, adapter: _) = cannedDio({
         '/users/me/medical-records': records(),
       });
@@ -184,8 +193,13 @@ void main() {
 
       expect(writes.last.$1, 'POST');
       expect(writes.last.$2, '/users/me/medical-records');
-      expect(writes.last.$3['record_type'], 'note');
-      expect(writes.last.$3['payload'], {'title': 'Рост', 'details': '176'});
+      expect(writes.last.$3['record_type'], 'measurement');
+      final payload = writes.last.$3['payload'] as Map;
+      expect(payload['kind'], 'height');
+      expect(payload['value'], 176);
+      expect(payload['unit'], 'cm');
+      // Время замера ставится само: в макете мед-карты его не спрашивают.
+      expect(payload['measured_at'], isNotEmpty);
     });
 
     test('пустые поля не отправляются вовсе', () async {

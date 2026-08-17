@@ -36,6 +36,12 @@ abstract final class ApiEndpoints {
   /// Действующая подписка. Её нет — сервер отвечает 404, и это не ошибка.
   static const String mySubscription = '/subscriptions/me';
 
+  /// Лента уведомлений.
+  static const String notifications = '/notifications';
+
+  /// Отметить уведомление прочитанным.
+  static String notification(String id) => '$notifications/$id';
+
   /// Члены семьи: список и добавление.
   static const String family = '/users/me/family';
 
@@ -55,6 +61,9 @@ abstract final class ApiEndpoints {
 
   /// Свободные слоты врача. Обязательные `from` и `to` — в ISO.
   static String doctorSlots(String id) => '${doctor(id)}/slots';
+
+  /// Отзывы о враче. Единственный эндпоинт каталога без токена.
+  static String doctorReviews(String id) => '${doctor(id)}/reviews';
 
   /// Записи на приём: создание, свои записи, перенос и отмена.
   static const String appointments = '/appointments';

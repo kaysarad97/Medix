@@ -43,9 +43,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          profileRepositoryProvider.overrideWithValue(
-            const FakeProfileRepository(),
-          ),
+          profileRepositoryProvider.overrideWithValue(FakeProfileRepository()),
           familyRepositoryProvider.overrideWithValue(FakeFamilyRepository()),
         ],
         child: MaterialApp(

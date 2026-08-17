@@ -1,16 +1,25 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/network/api_mode.dart';
+import '../../../../core/network/dio_client.dart';
 import '../../data/repositories/notifications_repository.dart';
 import '../../domain/entities/app_notification.dart';
 
-/// Провайдера с выбором `useMocks` здесь нет намеренно: боевой реализации не
-/// существует, на сервере модуль уведомлений — заготовка. См.
-/// [MockNotificationsRepository].
-final notificationsRepositoryProvider = Provider<NotificationsRepository>(
-  (ref) => const MockNotificationsRepository(),
-);
+final notificationsRepositoryProvider = Provider<NotificationsRepository>((
+  ref,
+) {
+  if (useMocks) return const MockNotificationsRepository();
 
-final notificationsProvider = FutureProvider<List<AppNotification>>(
+  return RemoteNotificationsRepository(ref.watch(dioClientProvider));
+});
+
+/// Лента перечитывается каждый раз, когда экран открывают заново.
+///
+/// `autoDispose` здесь не оптимизация памяти, а исправление: без него список
+/// читался один раз за запуск приложения. Уведомления приходят на сервере
+/// сами по себе (напоминание о приёме, сообщение врача), и пришедшее после
+/// первого открытия не появлялось до перезапуска — поймано на живом API.
+final notificationsProvider = FutureProvider.autoDispose<List<AppNotification>>(
   (ref) => ref.watch(notificationsRepositoryProvider).notifications(),
 );
 
@@ -36,19 +45,22 @@ class NotificationsFilterNotifier extends Notifier<NotificationsFilter> {
 }
 
 /// Список под выбранной вкладкой.
-final visibleNotificationsProvider = Provider<List<AppNotification>>((ref) {
-  final all = ref.watch(notificationsProvider).value ?? const [];
-  final filter = ref.watch(notificationsFilterProvider);
+///
+/// Тоже `autoDispose` — иначе он пережил бы [notificationsProvider] и держал
+/// его в памяти, обнуляя весь смысл перечитывания.
+final visibleNotificationsProvider =
+    Provider.autoDispose<List<AppNotification>>((ref) {
+      final all = ref.watch(notificationsProvider).value ?? const [];
+      final filter = ref.watch(notificationsFilterProvider);
 
-  return [
-    for (final notification in all)
-      if (_matches(notification.kind, filter)) notification,
-  ];
-});
+      return [
+        for (final notification in all)
+          if (_matches(notification.kind, filter)) notification,
+      ];
+    });
 
 bool _matches(NotificationKind kind, NotificationsFilter filter) =>
     switch (filter) {
-      NotificationsFilter.schedule =>
-        kind == NotificationKind.appointmentConfirmed,
-      NotificationsFilter.messages => kind == NotificationKind.doctorMessage,
+      NotificationsFilter.schedule => kind == NotificationKind.schedule,
+      NotificationsFilter.messages => kind == NotificationKind.message,
     };

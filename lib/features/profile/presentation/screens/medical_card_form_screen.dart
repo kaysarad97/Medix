@@ -80,6 +80,12 @@ class _MedicalCardFormScreenState extends ConsumerState<MedicalCardFormScreen> {
       hasBadHabits: _hasBadHabits,
     );
     await ref.read(profileRepositoryProvider).saveMedicalCard(card);
+
+    // Перечитываем карту после записи: без этого сохранённое видно только
+    // после перезапуска приложения. На заглушке дефект не виден — она
+    // хранит карту в памяти и отдаёт уже изменённую; поймано на живом API,
+    // где рост и вес ушли на сервер, а карточка осталась с прочерками.
+    ref.invalidate(medicalCardProvider);
     if (!mounted) return;
     setState(() => _saving = false);
     Navigator.of(context).maybePop();

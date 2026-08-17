@@ -20,9 +20,7 @@ void main() {
 
     final container = ProviderContainer(
       overrides: [
-        profileRepositoryProvider.overrideWithValue(
-          const FakeProfileRepository(),
-        ),
+        profileRepositoryProvider.overrideWithValue(FakeProfileRepository()),
       ],
     );
     addTearDown(container.dispose);

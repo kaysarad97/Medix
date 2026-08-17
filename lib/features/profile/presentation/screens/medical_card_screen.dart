@@ -34,15 +34,26 @@ class MedicalCardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(profileProvider).value;
+    // Рост и вес живут не в профиле, а в мед-карте: на сервере это записи
+    // с типом `measurement`, а не поля аккаунта. Раньше здесь стояли
+    // `profile.heightLabel`/`weightLabel` — с заглушкой они совпадали, а на
+    // живом API оставались прочерками, сколько бы раз их ни сохранили.
+    final card = ref.watch(medicalCardProvider).value;
     final doctors = ref.watch(myDoctorsProvider).value ?? const [];
     final analyses = ref.watch(analysesProvider).value ?? const [];
     final filter = ref.watch(analysesFilterProvider);
     final family = ref.watch(familyMembersProvider).value ?? const [];
     final l10n = AppLocalizations.of(context)!;
 
-    // Семейный доступ входит в Gold. Без подписки обе ссылки «Моей Семьи»
-    // ведут на экран тарифов — там цены и что даёт подписка.
-    final isGold = profile?.subscription == SubscriptionTier.gold;
+    // Семейный доступ платный: без подписки обе ссылки «Моей Семьи» ведут
+    // на экран тарифов — там цены и что даёт подписка.
+    //
+    // Проверяем «есть ли подписка вообще», а не «Gold ли это»: с 17 августа
+    // 2026 Gold на сервере отключён, `GET /plans` отдаёт только Silver — и
+    // прежняя проверка закрывала раздел вообще всем, включая тех, кто
+    // заплатил. Поймано на живом API.
+    final hasSubscription =
+        profile != null && profile.subscription != SubscriptionTier.free;
     const gate = Routes.subscription;
 
     return AppScaffold(
@@ -76,13 +87,18 @@ class MedicalCardScreen extends ConsumerWidget {
                     const SizedBox(height: ProfileMetrics.cardGap),
                     _Section(
                       child: MedicalCardSummary(
-                        // Раньше здесь был ИИН. Его больше нет ни в профиле,
-                        // ни на бэкенде, а почта — то, по чему аккаунт
-                        // опознаётся при входе.
-                        topFieldValue: profile.email,
-                        topFieldPlaceholder: 'E-mail',
-                        heightLabel: profile.heightLabel,
-                        weightLabel: profile.weightLabel,
+                        // В макете здесь ИИН. Сервер снова его хранит (с
+                        // 17 августа 2026), но заполнить пока нечем:
+                        // регистрация ИИН не спрашивает, а правка профиля
+                        // никуда не сохраняется — в её макете нет ни кнопки
+                        // сохранения, ни самого поля. Пока ИИН пуст, на его
+                        // месте почта: по ней аккаунт опознаётся при входе.
+                        topFieldValue: profile.iin ?? profile.email,
+                        topFieldPlaceholder: profile.iin == null
+                            ? 'E-mail'
+                            : 'ИИН',
+                        heightLabel: card?.heightLabel ?? profile.heightLabel,
+                        weightLabel: card?.weightLabel ?? profile.weightLabel,
                         ageLabel: profile.ageLabel(now ?? DateTime.now()),
                         registrationAddress: profile.registrationAddress,
                         onOpen: () => context.push(Routes.medicalCardForm),
@@ -114,10 +130,13 @@ class MedicalCardScreen extends ConsumerWidget {
                         // экран тарифов. Раньше строка участника отсюда
                         // открывалась без проверки — обход платного раздела
                         // в обход собственной же двери на главной.
-                        onTitleTap: () =>
-                            context.push(isGold ? Routes.family : gate),
+                        onTitleTap: () => context.push(
+                          hasSubscription ? Routes.family : gate,
+                        ),
                         onMemberTap: (member) => context.push(
-                          isGold ? Routes.familyMemberOf(member.id) : gate,
+                          hasSubscription
+                              ? Routes.familyMemberOf(member.id)
+                              : gate,
                         ),
                       ),
                     ),

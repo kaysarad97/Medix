@@ -18,7 +18,7 @@ class Appointment {
     required this.startsAt,
     this.doctorId,
     this.basePrice,
-    this.goldPrice,
+    this.subscriberPrice,
   });
 
   final String id;
@@ -33,10 +33,13 @@ class Appointment {
   /// (у моков главной, где карточка записи компактная, цены нет вообще).
   final int? basePrice;
 
-  /// Цена со скидкой Gold — `design/Предоплата - GOLD.png`. `null`, если
-  /// скидки на эту запись нет: тогда `basePrice` показывается как есть,
-  /// без сравнения и кнопки «Оформить подписку».
-  final int? goldPrice;
+  /// Цена со скидкой по подписке — ту, что сервер посчитал этому
+  /// пользователю (`price_for_user`). `null`, если скидки на эту запись
+  /// нет: тогда `basePrice` показывается как есть.
+  ///
+  /// В макете `design/Предоплата - GOLD.png` эта цена подписана «Gold», но
+  /// Gold на сервере отключён с 17 августа 2026 — скидку даёт Silver.
+  final int? subscriberPrice;
 
   /// Дата в пилюле справа на главной: «13.08».
   String get shortDate => RuDates.dayMonth(startsAt);
@@ -47,5 +50,5 @@ class Appointment {
 
   String? get basePriceLabel => RuMoney.withThousands(basePrice);
 
-  String? get goldPriceLabel => RuMoney.withThousands(goldPrice);
+  String? get subscriberPriceLabel => RuMoney.withThousands(subscriberPrice);
 }

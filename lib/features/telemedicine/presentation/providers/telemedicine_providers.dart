@@ -17,7 +17,7 @@ final doctorsRepositoryProvider = Provider<DoctorsRepository>((ref) {
   return RemoteDoctorsRepository(ref.watch(dioClientProvider));
 });
 
-final doctorProvider = FutureProvider.family<Doctor, String>(
+final doctorProvider = FutureProvider.autoDispose.family<Doctor, String>(
   (ref, id) => ref.watch(doctorsRepositoryProvider).doctor(id),
 );
 
@@ -32,9 +32,10 @@ final myDoctorsProvider = FutureProvider<List<MyDoctor>>(
 );
 
 /// Результаты поиска по специальности/запросу.
-final doctorSearchResultsProvider = FutureProvider.family<List<Doctor>, String>(
-  (ref, query) => ref.watch(doctorsRepositoryProvider).search(query),
-);
+final doctorSearchResultsProvider = FutureProvider.autoDispose
+    .family<List<Doctor>, String>(
+      (ref, query) => ref.watch(doctorsRepositoryProvider).search(query),
+    );
 
 /// На сколько недель вперёд отлистана лента расписания. Ноль — текущая.
 ///
@@ -55,26 +56,33 @@ final scheduleWeekOffsetProvider = NotifierProvider<ScheduleWeekOffset, int>(
   ScheduleWeekOffset.new,
 );
 
-final doctorScheduleProvider = FutureProvider.family<DoctorSchedule, String>((
-  ref,
-  doctorId,
-) {
-  final weeks = ref.watch(scheduleWeekOffsetProvider);
-  final now = DateTime.now();
+/// Расписание перечитывается при каждом открытии экрана врача.
+///
+/// `autoDispose` — не оптимизация памяти, а исправление: без него лента
+/// слотов читалась один раз за запуск, и занятые кем-то (или, наоборот,
+/// открытые врачом) слоты обновлялись только после перезапуска приложения.
+/// Поймано на живом API.
+final doctorScheduleProvider = FutureProvider.autoDispose
+    .family<DoctorSchedule, String>((ref, doctorId) {
+      final weeks = ref.watch(scheduleWeekOffsetProvider);
+      final now = DateTime.now();
 
-  // На текущей неделе отсчёт от «сейчас», чтобы отпало уже прошедшее время.
-  // На будущих — от начала дня: там отсекать нечего, а от времени суток
-  // набор часов зависеть не должен.
-  final from = weeks == 0
-      ? now
-      : DateTime(now.year, now.month, now.day + weeks * 7);
+      // На текущей неделе отсчёт от «сейчас», чтобы отпало уже прошедшее время.
+      // На будущих — от начала дня: там отсекать нечего, а от времени суток
+      // набор часов зависеть не должен.
+      final from = weeks == 0
+          ? now
+          : DateTime(now.year, now.month, now.day + weeks * 7);
 
-  return ref.watch(doctorsRepositoryProvider).schedule(doctorId, from: from);
-});
+      return ref
+          .watch(doctorsRepositoryProvider)
+          .schedule(doctorId, from: from);
+    });
 
-final doctorReviewsProvider = FutureProvider.family<List<DoctorReview>, String>(
-  (ref, doctorId) => ref.watch(doctorsRepositoryProvider).reviews(doctorId),
-);
+final doctorReviewsProvider = FutureProvider.autoDispose
+    .family<List<DoctorReview>, String>(
+      (ref, doctorId) => ref.watch(doctorsRepositoryProvider).reviews(doctorId),
+    );
 
 final appointmentProvider = FutureProvider.family<Appointment, String>(
   (ref, id) => ref.watch(doctorsRepositoryProvider).appointment(id),
@@ -82,8 +90,12 @@ final appointmentProvider = FutureProvider.family<Appointment, String>(
 
 /// Отзывы, написанные пользователем на экране врача.
 ///
-/// Отправлять некуда: эндпоинта отзывов у бэкенда нет. Написанное встаёт
-/// первым в карусели — как своя реплика в переписке, — и живёт до
+/// ОТПРАВЛЯТЬ ПО-ПРЕЖНЕМУ НЕКУДА, но причина сменилась. Читать отзывы уже
+/// есть откуда (`GET /doctors/{id}/reviews`), а вот пишутся они не врачу, а
+/// консультации: `POST /consultations/{id}/review`. Оценить можно только ту
+/// консультацию, которая состоялась, а консультации в приложении пока нет
+/// вовсе — ни созвона, ни идентификатора. Пока её не будет, написанное
+/// встаёт первым в карусели, как своя реплика в переписке, и живёт до
 /// перезапуска. Отдельно от [doctorReviewsProvider], чтобы не подменять
 /// собой то, что придёт с сервера.
 class ComposedReviews extends Notifier<List<DoctorReview>> {

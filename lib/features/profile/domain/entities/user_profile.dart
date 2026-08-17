@@ -13,6 +13,7 @@ class UserProfile {
     this.gender,
     this.birthDate,
     this.email,
+    this.iin,
     this.registrationAddress,
     this.heightCm,
     this.weightKg,
@@ -24,18 +25,22 @@ class UserProfile {
   final String firstName;
   final String lastName;
 
-  /// Пол. Необязателен: бэкенд его не хранит — в шапке на этом месте
-  /// прочерк, как у роста и веса.
+  /// Пол. С 17 августа 2026 сервер его хранит (`sex`), но необязательным —
+  /// у заведённых раньше аккаунтов его нет, и в шапке остаётся прочерк.
   final Gender? gender;
 
-  /// Дата рождения. Необязательна не потому, что её не спрашивают — её
-  /// принимает `PATCH /users/me`, — а потому, что `GET /users/me` её не
-  /// возвращает. Вопрос бэкенду задан.
+  /// Дата рождения. Приходит с `GET /users/me` — до 17 августа 2026 сервер
+  /// её принимал, но не возвращал, и в шапке стоял прочерк.
   final DateTime? birthDate;
   final SubscriptionTier subscription;
 
   /// Почта — она же логин: вход идёт по коду, присланному на неё.
   final String? email;
+
+  /// ИИН — верхнее поле карточки «Мед-карта» в макете. С 17 августа 2026
+  /// сервер снова его хранит, но заполнить может только правка профиля:
+  /// регистрация ИИН не принимает.
+  final String? iin;
 
   final String? registrationAddress;
   final int? heightCm;

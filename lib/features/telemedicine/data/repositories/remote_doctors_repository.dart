@@ -16,9 +16,10 @@ import 'doctors_repository.dart';
 /// — с учётом подписки, плюс `discount_percent` и `discount_reason`. Клиент
 /// свою скидку не выводит, иначе показанное и списанное разошлись бы.
 ///
-/// Чего у сервера нет: клиники по имени (приходит только `clinic_id`),
-/// стажа, числа отзывов, города и фотографии врача. Эти поля остаются
-/// пустыми, и экраны их не рисуют.
+/// С 17 августа 2026 сервер отдаёт и клинику с названием, и стаж, и число
+/// отзывов — до этого в карточках стояли захардкоженные «4.5», «100
+/// отзывов», «Стаж 10 лет» и «Название клиники». Чего по-прежнему нет:
+/// города и фотографии врача.
 class RemoteDoctorsRepository implements DoctorsRepository {
   RemoteDoctorsRepository(this._dio);
 
@@ -164,7 +165,9 @@ class RemoteDoctorsRepository implements DoctorsRepository {
         startsAt: slot.startsAt,
         doctorId: doctor.id,
         basePrice: doctor.priceBeforeDiscount ?? doctor.price,
-        goldPrice: doctor.priceBeforeDiscount == null ? null : doctor.price,
+        subscriberPrice: doctor.priceBeforeDiscount == null
+            ? null
+            : doctor.price,
       );
       _booked[appointment.id] = appointment;
       return appointment;
@@ -197,10 +200,37 @@ class RemoteDoctorsRepository implements DoctorsRepository {
     );
   }
 
-  /// ЭНДПОИНТА НЕТ. Отзывов у бэкенда нет вовсе — приходит только средний
-  /// рейтинг числом. Свои отзывы живут в `composedReviewsProvider`.
+  /// Отзывы о враче.
+  ///
+  /// Имени автора сервер не отдаёт — только `author_id`. Подставлять его в
+  /// карточку нельзя (это чужой идентификатор), поэтому автор подписан так
+  /// же, как в макете: «Пользователь N» по порядку в списке.
   @override
-  Future<List<DoctorReview>> reviews(String doctorId) async => const [];
+  Future<List<DoctorReview>> reviews(String doctorId) async {
+    try {
+      final response = await _dio.get<List<dynamic>>(
+        ApiEndpoints.doctorReviews(doctorId),
+      );
+      final items = response.data ?? const [];
+      return [
+        for (final (index, item) in items.indexed)
+          () {
+            final json = item as Map<String, dynamic>;
+            return DoctorReview(
+              id: json['id'] as String,
+              authorName: 'Пользователь ${index + 1}',
+              rating: (json['rating'] as num?)?.toDouble() ?? 0,
+              text: (json['body'] as String? ?? '').trim(),
+              createdAt: DateTime.tryParse(
+                json['created_at'] as String? ?? '',
+              )?.toLocal(),
+            );
+          }(),
+      ];
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
 
   /// ЭНДПОИНТА НЕТ. Специальности сервер списком не отдаёт; собрать их из
   /// каталога можно, но количество врачей в каждой — уже нет, а на макете
@@ -218,11 +248,16 @@ class RemoteDoctorsRepository implements DoctorsRepository {
     final full = (json['consult_price'] as num?)?.round();
     final forUser = (json['price_for_user'] as num?)?.round();
 
+    final clinic = json['clinic'] as Map<String, dynamic>?;
+
     return Doctor(
       id: json['id'] as String,
       fullName: (json['full_name'] as String? ?? '').trim(),
       specialty: (json['specialty'] as String? ?? '').trim(),
       rating: (json['rating'] as num?)?.toDouble() ?? 0,
+      reviewsCount: (json['reviews_count'] as num?)?.toInt() ?? 0,
+      experienceYears: (json['experience_years'] as num?)?.toInt(),
+      clinic: (clinic?['name'] as String?)?.trim(),
       price: forUser ?? full,
       // Зачёркнутая цена нужна, только когда скидка есть: без неё в макете
       // рисуется одна цена.

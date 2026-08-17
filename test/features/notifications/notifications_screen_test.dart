@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/theme/app_theme.dart';
+import 'package:medix/features/notifications/data/repositories/notifications_repository.dart';
+import 'package:medix/features/notifications/presentation/providers/notifications_providers.dart';
 import 'package:medix/features/notifications/presentation/screens/notifications_screen.dart';
 import 'package:medix/l10n/app_localizations.dart';
 
@@ -16,11 +18,15 @@ void main() {
     tester.view.padding = const FakeViewPadding(top: 62, bottom: 34);
     addTearDown(tester.view.reset);
 
-    // Репозиторий не подменяется: заглушка отдаёт данные синхронно и без
-    // таймеров, а боевой реализации не существует — на сервере модуль
-    // уведомлений пока заготовка.
+    // Заглушка отдаёт данные синхронно и без таймеров; боевая реализация
+    // ходит в сеть, и без подмены экран остался бы пустым.
     await tester.pumpWidget(
       ProviderScope(
+        overrides: [
+          notificationsRepositoryProvider.overrideWithValue(
+            const MockNotificationsRepository(),
+          ),
+        ],
         child: MaterialApp(
           theme: AppTheme.light,
           locale: const Locale('ru'),
@@ -45,7 +51,7 @@ void main() {
     expect(find.text('Вам пришло сообщение'), findsNothing);
   });
 
-  testWidgets('подпись и время собираются из данных', (tester) async {
+  testWidgets('текст приходит с сервера готовым', (tester) async {
     await pumpScreen(tester);
 
     expect(

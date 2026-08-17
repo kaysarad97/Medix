@@ -24,9 +24,7 @@ void main() {
         doctorsRepositoryProvider.overrideWithValue(
           const FakeDoctorsRepository(),
         ),
-        profileRepositoryProvider.overrideWithValue(
-          const FakeProfileRepository(),
-        ),
+        profileRepositoryProvider.overrideWithValue(FakeProfileRepository()),
         if (profile != null)
           profileProvider.overrideWith((ref) async => profile),
       ],
@@ -91,21 +89,23 @@ void main() {
       expect(find.text('Имя Фамилия'), findsNWidgets(4));
     });
 
-    testWidgets('подписчику Gold показывает скидку и подпись тарифа', (
-      tester,
-    ) async {
+    testWidgets('скидку показывает, когда её посчитал сервер', (tester) async {
+      // Цена со скидкой и зачёркнутая полная приходят в ответе каталога —
+      // клиент не смотрит на тариф профиля сам.
       await pumpScreen(
         tester,
         const DoctorSearchResultsScreen(query: 'Гастроэнтеролог'),
         buildContainer(),
       );
 
-      expect(find.text('для пользователей Gold'), findsWidgets);
+      expect(find.text('для пользователей Silver'), findsWidgets);
       expect(find.textContaining('10 000'), findsWidgets);
       expect(find.textContaining('15 000'), findsWidgets);
     });
 
-    testWidgets('без подписки показывает цену без скидки', (tester) async {
+    testWidgets('тариф профиля на цену больше не влияет', (tester) async {
+      // Раньше клиент прятал скидку у всех, кроме Gold, — и подписчик
+      // Silver видел полную цену, хотя списывалась с него скидочная.
       final freeProfile = UserProfile(
         id: 'u1',
         firstName: 'Имя',
@@ -121,8 +121,7 @@ void main() {
         buildContainer(profile: freeProfile),
       );
 
-      expect(find.text('для пользователей Gold'), findsNothing);
-      expect(find.textContaining('10 000'), findsNothing);
+      expect(find.textContaining('10 000'), findsWidgets);
       expect(find.textContaining('15 000'), findsWidgets);
     });
 

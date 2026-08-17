@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/models/family_member.dart';
 import '../theme/app_colors.dart';
+import '../utils/family_relation_labels.dart';
 import '../theme/app_typography.dart';
 import 'app_card.dart';
 import 'icon_chip.dart';
@@ -112,20 +113,6 @@ class _MemberRow extends StatelessWidget {
   final FamilyRowStyle style;
   final VoidCallback? onTap;
 
-  /// Кем участник приходится владельцу аккаунта — подпись под именем.
-  static String _roleLabel(FamilyRelation relation, AppLocalizations l10n) =>
-      switch (relation) {
-        FamilyRelation.child => l10n.familyRoleChild,
-        FamilyRelation.senior => l10n.familyRoleSenior,
-      };
-
-  /// Заголовок входа в чужой профиль — вместо имени.
-  static String _entryLabel(FamilyRelation relation, AppLocalizations l10n) =>
-      switch (relation) {
-        FamilyRelation.child => l10n.familyProfileChild,
-        FamilyRelation.senior => l10n.familyProfileSenior,
-      };
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -156,8 +143,7 @@ class _MemberRow extends StatelessWidget {
                     Text(
                       switch (style) {
                         FamilyRowStyle.name => member.fullName,
-                        FamilyRowStyle.entry => _entryLabel(
-                          member.relation,
+                        FamilyRowStyle.entry => member.relation.entryLabel(
                           l10n,
                         ),
                       },
@@ -168,10 +154,7 @@ class _MemberRow extends StatelessWidget {
                     const SizedBox(height: FamilyCardMetrics.titleToSubtitle),
                     Text(
                       switch (style) {
-                        FamilyRowStyle.name => _roleLabel(
-                          member.relation,
-                          l10n,
-                        ),
+                        FamilyRowStyle.name => member.relation.roleLabel(l10n),
                         FamilyRowStyle.entry => l10n.familyProfileHint,
                       },
                       style: AppTypography.tileSubtitle,

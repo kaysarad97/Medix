@@ -38,8 +38,7 @@ class FakeFamilyRepository implements FamilyRepository {
       firstName: draft.fullName,
       lastName: '',
       birthDate: draft.birthDate,
-      relation: FamilyRelation.child,
-      relationshipLabel: draft.relation,
+      relation: draft.relation,
     );
     _members.add(member);
     return member;
@@ -49,14 +48,12 @@ class FakeFamilyRepository implements FamilyRepository {
   Future<FamilyMember> update(String id, FamilyMemberDraft draft) async {
     updated.add((id, draft));
     final index = _members.indexWhere((member) => member.id == id);
-    final old = _members[index];
     _members[index] = FamilyMember(
       id: id,
       firstName: draft.fullName,
       lastName: '',
       birthDate: draft.birthDate,
-      relation: old.relation,
-      relationshipLabel: draft.relation,
+      relation: draft.relation,
     );
     return _members[index];
   }

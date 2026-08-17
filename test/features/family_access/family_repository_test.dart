@@ -2,16 +2,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/features/family_access/data/repositories/family_repository.dart';
 import 'package:medix/features/family_access/domain/entities/family_member_draft.dart';
 import 'package:medix/shared/models/family_member.dart';
+import 'package:medix/shared/models/gender.dart';
 
-/// Разбор ответа сервера: ФИО приходит одной строкой, родство — свободным
-/// текстом, а карточке нужны отдельные имя с фамилией и одна из двух групп.
+/// Разбор ответа сервера: ФИО приходит одной строкой, родство —
+/// перечислением, а карточке нужны отдельные имя с фамилией.
 ///
 /// Проверяется через заглушку: разбор у неё и у боевой реализации общий,
 /// а сеть для этого поднимать незачем.
 void main() {
   Future<FamilyMember> added({
     required String fullName,
-    required String relation,
+    FamilyRelation relation = FamilyRelation.child,
     DateTime? birthDate,
   }) {
     return MockFamilyRepository().add(
@@ -24,7 +25,7 @@ void main() {
   }
 
   test('имя и фамилия режутся по первому пробелу', () async {
-    final member = await added(fullName: 'Пётр Иванов', relation: 'сын');
+    final member = await added(fullName: 'Пётр Иванов');
 
     expect(member.firstName, 'Пётр');
     expect(member.lastName, 'Иванов');
@@ -32,57 +33,55 @@ void main() {
   });
 
   test('одно слово в имени не даёт висящего пробела', () async {
-    final member = await added(fullName: 'Пётр', relation: 'сын');
+    final member = await added(fullName: 'Пётр');
 
     expect(member.lastName, isEmpty);
     expect(member.fullName, 'Пётр');
   });
 
-  test('знакомое родство определяет группу, а не возраст', () async {
-    // Мама 1980 года рождения — взрослая и по возрасту, но проверяем именно
-    // слово: с ним разбор не зависит от даты.
+  test('родство доходит до сервера и обратно как есть', () async {
+    // Раньше группу угадывали по слову и по возрасту: сервер хранил
+    // свободный текст. С 17 августа 2026 угадывать нечего.
     final mother = await added(
       fullName: 'Иванова Мария',
-      relation: 'мама',
+      relation: FamilyRelation.parent,
       birthDate: DateTime(1980, 3, 12),
     );
     final son = await added(
       fullName: 'Иванов Пётр',
-      relation: 'сын',
-      birthDate: DateTime(2018, 4, 2),
+      relation: FamilyRelation.child,
     );
 
-    expect(mother.relation, FamilyRelation.senior);
+    expect(mother.relation, FamilyRelation.parent);
     expect(son.relation, FamilyRelation.child);
+    expect(son.relation.isChild, isTrue);
+    expect(mother.relation.isChild, isFalse);
   });
 
-  test('незнакомое родство раскладывается по возрасту', () async {
-    final now = DateTime.now();
-    final child = await added(
-      fullName: 'Иванов Тимур',
-      relation: 'племянник',
-      birthDate: DateTime(now.year - 7, now.month, now.day),
+  test('незнакомое значение родства не роняет разбор', () {
+    // Сервер может завести новую степень родства раньше, чем приложение о
+    // ней узнает.
+    expect(FamilyRelation.fromApi('grandparent'), FamilyRelation.other);
+    expect(FamilyRelation.fromApi(null), FamilyRelation.other);
+    expect(FamilyRelation.fromApi('sibling'), FamilyRelation.sibling);
+  });
+
+  test('пол читается из ответа, а без него — прочерк', () {
+    final member = MockFamilyRepository.mockMembers.first;
+    expect(member.gender, Gender.male);
+
+    // У заведённых через форму пола нет: она его не спрашивает.
+    expect(
+      MockFamilyRepository()
+          .add(
+            FamilyMemberDraft(
+              fullName: 'Иванов Пётр',
+              birthDate: DateTime(2018, 4, 2),
+              relation: FamilyRelation.child,
+            ),
+          )
+          .then((m) => m.genderLabel),
+      completion('—'),
     );
-    final adult = await added(
-      fullName: 'Иванов Тимур',
-      relation: 'племянник',
-      birthDate: DateTime(now.year - 40, now.month, now.day),
-    );
-
-    expect(child.relation, FamilyRelation.child);
-    expect(adult.relation, FamilyRelation.senior);
-  });
-
-  test('исходное слово сохраняется для поля «Родство с Вами»', () async {
-    final member = await added(fullName: 'Иванов Пётр', relation: 'племянник');
-
-    expect(member.relationshipLabel, 'племянник');
-  });
-
-  test('пол с сервера не приходит — в карточке прочерк', () async {
-    final member = await added(fullName: 'Иванов Пётр', relation: 'сын');
-
-    expect(member.gender, isNull);
-    expect(member.genderLabel, '—');
   });
 }

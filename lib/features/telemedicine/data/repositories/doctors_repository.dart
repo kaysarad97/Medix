@@ -113,7 +113,7 @@ class MockDoctorsRepository implements DoctorsRepository {
       // Совпадает с ценой того же врача в search(): 15 000 без подписки,
       // 10 000 с Gold — как на `design/Предоплата - GOLD.png`.
       basePrice: 15000,
-      goldPrice: 10000,
+      subscriberPrice: 10000,
     );
   }
 
@@ -134,7 +134,7 @@ class MockDoctorsRepository implements DoctorsRepository {
       startsAt: slot.startsAt,
       doctorId: doctor.id,
       basePrice: doctor.priceBeforeDiscount ?? doctor.price,
-      goldPrice: doctor.priceBeforeDiscount == null ? null : doctor.price,
+      subscriberPrice: doctor.priceBeforeDiscount == null ? null : doctor.price,
     );
   }
 

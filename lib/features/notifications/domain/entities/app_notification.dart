@@ -1,50 +1,59 @@
 import '../../../../core/utils/ru_dates.dart';
 
-/// О чём уведомление.
+/// О чём уведомление — на это разбиты вкладки экрана.
 ///
-/// Ровно два вида — столько в макете `design/Нотификации.png`, и на них же
-/// разбиты вкладки: «Расписание» и «Сообщения от врачей».
+/// На сервере `kind` — свободная строка, а не перечисление: сегодня он
+/// присылает `appointment_reminder` и `general`, завтра заведёт что-то ещё.
+/// Поэтому здесь не разбор один-в-один, а раскладка по двум вкладкам
+/// макета: всё про приёмы — в «Расписание», всё про переписку — в
+/// «Сообщения от врачей».
 enum NotificationKind {
-  /// «Ваша запись подтверждена».
-  appointmentConfirmed,
+  /// «Ваша запись подтверждена», напоминание о приёме, освободившийся слот.
+  schedule,
 
   /// «Вам пришло сообщение».
-  doctorMessage,
+  message;
+
+  /// Незнакомое значение уходит в «Расписание»: это вкладка по умолчанию,
+  /// и потерять уведомление там нельзя — в отличие от третьей вкладки,
+  /// которой в макете нет.
+  static NotificationKind fromApi(String? kind) {
+    final value = kind?.toLowerCase() ?? '';
+    if (value.contains('message') || value.contains('chat')) return message;
+    return schedule;
+  }
 }
 
 /// Строка списка уведомлений.
 ///
-/// Хранит не готовую фразу, а её части: врача и время приёма. Текст
-/// собирается на экране через `AppLocalizations` — иначе при переключении
-/// языка уведомления остались бы русскими.
+/// Текст приходит с сервера готовым (`title` и `body`), а не собирается из
+/// частей: сервер шлёт то же самое письмом и пушем, и расходиться экрану с
+/// письмом незачем. ЦЕНА РЕШЕНИЯ: текст всегда русский, языка в API нет —
+/// на казахском и английском список останется русским, пока сервер не
+/// научится локализовать.
 class AppNotification {
   const AppNotification({
     required this.id,
     required this.kind,
-    required this.doctorName,
+    required this.title,
+    required this.body,
     required this.createdAt,
-    this.appointmentAt,
+    this.isRead = false,
   });
 
   final String id;
   final NotificationKind kind;
-
-  /// «Имя Фамилия» — тот, о ком уведомление.
-  final String doctorName;
+  final String title;
+  final String body;
 
   /// Когда пришло: время в правом верхнем углу строки.
   final DateTime createdAt;
 
-  /// Время приёма. Только у [NotificationKind.appointmentConfirmed] — у
-  /// сообщения его нет.
-  final DateTime? appointmentAt;
+  /// В макете непрочитанные ничем не выделены — поле есть, но экран его
+  /// пока не показывает.
+  final bool isRead;
 
   /// «21.07, 13:44» — как в списке чатов.
   String get timeLabel =>
       '${RuDates.dayMonth(createdAt)}, ${RuDates.hourMinute(createdAt)}';
-
-  /// «13:30, 27 июля» — время приёма в подписи подтверждения.
-  String get appointmentLabel => appointmentAt == null
-      ? ''
-      : '${RuDates.time(appointmentAt!)}, ${RuDates.dayAndMonth(appointmentAt!)}';
 }

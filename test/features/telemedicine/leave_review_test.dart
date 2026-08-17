@@ -29,9 +29,7 @@ void main() {
             const FakeDoctorsRepository(),
           ),
           // Отсюда берётся имя, которым подписывается отзыв.
-          profileRepositoryProvider.overrideWithValue(
-            const FakeProfileRepository(),
-          ),
+          profileRepositoryProvider.overrideWithValue(FakeProfileRepository()),
         ],
         child: MaterialApp(
           theme: AppTheme.light,

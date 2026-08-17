@@ -48,6 +48,12 @@ class MedicalCard {
   final int? heightCm;
   final int? weightKg;
 
+  /// «176 см», либо прочерк — тем же знаком, что и в остальных полях
+  /// карточки. На сервере это записи `measurement`, а не поля профиля.
+  String get heightLabel => heightCm == null ? '—' : '$heightCm см';
+
+  String get weightLabel => weightKg == null ? '—' : '$weightKg кг';
+
   /// «Аллергии (пищевые, лекарственные, прочие)».
   final String? allergies;
 

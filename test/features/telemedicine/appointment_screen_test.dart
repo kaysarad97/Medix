@@ -7,7 +7,6 @@ import 'package:medix/features/profile/presentation/providers/profile_providers.
 import 'package:medix/features/telemedicine/presentation/providers/telemedicine_providers.dart';
 import 'package:medix/features/telemedicine/presentation/screens/appointment_screen.dart';
 import 'package:medix/l10n/app_localizations.dart';
-import 'package:medix/shared/models/gender.dart';
 import 'package:medix/shared/models/subscription_tier.dart';
 
 import '../../helpers/fake_doctors_repository.dart';
@@ -20,6 +19,7 @@ void main() {
   Future<void> pumpAppointment(
     WidgetTester tester, {
     UserProfile? profile,
+    int? subscriberPrice = 10000,
   }) async {
     tester.view.physicalSize = const Size(440, 1300);
     tester.view.devicePixelRatio = 1.0;
@@ -30,11 +30,9 @@ void main() {
       ProviderScope(
         overrides: [
           doctorsRepositoryProvider.overrideWithValue(
-            const FakeDoctorsRepository(),
+            FakeDoctorsRepository(appointmentSubscriberPrice: subscriberPrice),
           ),
-          profileRepositoryProvider.overrideWithValue(
-            const FakeProfileRepository(),
-          ),
+          profileRepositoryProvider.overrideWithValue(FakeProfileRepository()),
           if (profile != null)
             profileProvider.overrideWith((ref) async => profile),
         ],
@@ -94,45 +92,59 @@ void main() {
     );
   });
 
+  final freeProfile = UserProfile(
+    id: 'u1',
+    firstName: 'Имя',
+    lastName: 'Фамилия',
+    birthDate: DateTime(1996, 12, 6),
+    subscription: SubscriptionTier.free,
+  );
+
   group('предоплата записи', () {
-    testWidgets('подписчику Gold показывает цену со скидкой и без кнопки', (
+    testWidgets('со скидкой с сервера показывает её и прячет кнопку', (
       tester,
     ) async {
-      // FakeProfileRepository отдаёт Gold-профиль по умолчанию.
+      // Скидку считает сервер: заглушка отдаёт запись с `subscriberPrice`.
       await pumpAppointment(tester);
 
       expect(find.text('Предоплата записи'), findsOneWidget);
       expect(find.text('10 000 ₸'), findsOneWidget);
       expect(find.text('15 000 ₸'), findsOneWidget);
-      expect(find.text('Цена с подпиской Gold'), findsOneWidget);
+      expect(find.text('Цена с подпиской Silver'), findsOneWidget);
       expect(find.text('Оплата через Kaspi.kz'), findsOneWidget);
       expect(find.text('Оплата через Apple Pay'), findsOneWidget);
       expect(find.text('Оформить подписку'), findsNothing);
     });
 
-    testWidgets('без подписки показывает полную цену и кнопку подписки', (
-      tester,
-    ) async {
-      final freeProfile = UserProfile(
-        id: 'u1',
-        firstName: 'Имя',
-        lastName: 'Фамилия',
-        gender: Gender.male,
-        birthDate: DateTime(1996, 12, 6),
-        subscription: SubscriptionTier.free,
+    testWidgets('без скидки и без подписки зовёт оформить её', (tester) async {
+      await pumpAppointment(
+        tester,
+        subscriberPrice: null,
+        profile: freeProfile,
       );
 
-      await pumpAppointment(tester, profile: freeProfile);
-
-      expect(find.text('Цена с подпиской Gold'), findsNothing);
+      expect(find.text('Цена с подпиской Silver'), findsNothing);
       expect(
         find.text('или оформите подписку и получите скидку'),
         findsOneWidget,
       );
       expect(find.text('Оформить подписку'), findsOneWidget);
-      // Полная цена стоит и крупно сверху, и зачёркнутой рядом со скидкой.
-      expect(find.text('15 000 ₸'), findsNWidgets(2));
-      expect(find.text('10 000 ₸'), findsOneWidget);
+      expect(find.text('15 000 ₸'), findsOneWidget);
+      // Цены со скидкой нет: сервер считает её только подписчику.
+      expect(find.text('10 000 ₸'), findsNothing);
+    });
+
+    testWidgets('подписчику без скидки подписку не предлагают', (tester) async {
+      // Скидка бывает не на всё: тариф может её на эту запись не давать, а
+      // звать оформить подписку того, кто её уже оформил, — бессмыслица.
+      await pumpAppointment(tester, subscriberPrice: null);
+
+      expect(find.text('15 000 ₸'), findsOneWidget);
+      expect(find.text('Оформить подписку'), findsNothing);
+      expect(
+        find.text('или оформите подписку и получите скидку'),
+        findsNothing,
+      );
     });
   });
 }

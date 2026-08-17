@@ -10,9 +10,9 @@ import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../../shared/models/appointment.dart';
 import '../../../../shared/models/subscription_tier.dart';
 import '../../../profile/presentation/providers/profile_providers.dart';
+import '../../../../shared/models/appointment.dart';
 import '../../domain/entities/doctor.dart';
 import '../../domain/entities/doctor_schedule.dart';
 import '../providers/telemedicine_providers.dart';
@@ -84,8 +84,12 @@ class _Content extends ConsumerWidget {
     final selected = schedule == null
         ? null
         : ref.watch(scheduleSelectionProvider).resolve(schedule!);
-    final isGold =
-        ref.watch(profileProvider).value?.subscription == SubscriptionTier.gold;
+    // Скидку на конкретную запись считает сервер, и её может не быть даже у
+    // подписчика — тариф даёт её не на всё. Тариф нужен здесь только затем,
+    // чтобы не предлагать оформить подписку тому, кто её уже оформил.
+    final subscription = ref.watch(profileProvider).value?.subscription;
+    final hasSubscription =
+        subscription != null && subscription != SubscriptionTier.free;
     final l10n = AppLocalizations.of(context)!;
 
     return SingleChildScrollView(
@@ -128,7 +132,7 @@ class _Content extends ConsumerWidget {
             _Section(
               child: PrepaymentCard(
                 appointment: appointment,
-                isGold: isGold,
+                hasSubscription: hasSubscription,
                 // Kaspi и Apple Pay проводят оплату своим интерфейсом — SDK
                 // ещё нет, поэтому оба ведут в один и тот же мок-результат,
                 // как кнопки на PaymentMethodScreen.

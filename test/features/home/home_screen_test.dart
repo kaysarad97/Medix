@@ -34,9 +34,7 @@ void main() {
           // Future.delayed, и таймер переживает тест.
           familyRepositoryProvider.overrideWithValue(FakeFamilyRepository()),
           // Экран смотрит на тариф: семейный доступ входит в Gold.
-          profileRepositoryProvider.overrideWithValue(
-            const FakeProfileRepository(),
-          ),
+          profileRepositoryProvider.overrideWithValue(FakeProfileRepository()),
         ],
         child: MaterialApp(
           theme: AppTheme.light,

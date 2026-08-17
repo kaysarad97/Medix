@@ -9,6 +9,7 @@ import 'package:medix/features/family_access/presentation/screens/family_list_sc
 import 'package:medix/features/family_access/presentation/screens/family_member_form_screen.dart';
 import 'package:medix/features/family_access/presentation/screens/family_member_screen.dart';
 import 'package:medix/l10n/app_localizations.dart';
+import 'package:medix/shared/models/family_member.dart';
 
 import '../../helpers/fake_family_repository.dart';
 import '../../helpers/test_fonts.dart';
@@ -70,12 +71,20 @@ void main() {
     return repository;
   }
 
+  /// Родство больше не набирается руками: поле открывает список.
+  Future<void> pickRelation(WidgetTester tester, String label) async {
+    await tester.tap(find.text('Родство с Вами'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(label).last);
+    await tester.pumpAndSettle();
+  }
+
   group('добавление', () {
     testWidgets('без даты рождения не сохраняет', (tester) async {
       final repository = await pumpForm(tester, Routes.familyMemberNew);
 
       await tester.enterText(find.byType(TextField).first, 'Иванов Пётр');
-      await tester.enterText(find.byType(TextField).last, 'сын');
+      await pickRelation(tester, 'Ребёнок');
       await tester.tap(find.text('Далее'));
       await tester.pump();
 
@@ -108,6 +117,19 @@ void main() {
       expect(find.text('Изменить данные'), findsOneWidget);
     });
 
+    testWidgets('родство выбирается из пяти значений сервера', (tester) async {
+      final repository = await pumpForm(
+        tester,
+        Routes.familyMemberEditOf('f1'),
+      );
+
+      await pickRelation(tester, 'Родитель');
+      await tester.tap(find.text('Далее'));
+      await tester.pump();
+
+      expect(repository.updated.single.$2.relation, FamilyRelation.parent);
+    });
+
     testWidgets('сохраняет изменённое ФИО', (tester) async {
       final repository = await pumpForm(
         tester,
@@ -115,7 +137,6 @@ void main() {
       );
 
       await tester.enterText(find.byType(TextField).first, 'Иванов Пётр');
-      await tester.enterText(find.byType(TextField).last, 'сын');
       await tester.tap(find.text('Далее'));
       await tester.pump();
 
@@ -123,7 +144,8 @@ void main() {
       final (id, draft) = repository.updated.single;
       expect(id, 'f1');
       expect(draft.fullName, 'Иванов Пётр');
-      expect(draft.relation, 'сын');
+      // Родство подставилось из карточки и не потерялось при сохранении.
+      expect(draft.relation, FamilyRelation.child);
       expect(draft.birthDate, DateTime(2020, 10, 7));
     });
 

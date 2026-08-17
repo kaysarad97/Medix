@@ -12,20 +12,18 @@ import '../../../subscriptions/domain/entities/payment_method.dart';
 import 'doctor_metrics.dart';
 
 /// «Предоплата записи» — оплата приёма картой/Kaspi/Apple Pay, со скидкой
-/// для Gold.
+/// по подписке.
 ///
 /// Два макета — `design/Предоплата - GOLD.png` и
-/// `design/Предоплата без подписки.png` — тот же гейт, что и на результатах
-/// поиска врача (`DoctorSearchResultsScreen._Price`): скидка и зачёркнутая
-/// цена показываются только реальным подписчикам Gold, а не всем подряд.
-/// Без подписки — полная цена и кнопка «Оформить подписку» с ценой со
-/// скидкой рядом, которая ведёт в общую подписку (это же и закрывает вход
-/// в подписку — до сих пор её некуда было открыть нажатием).
+/// `design/Предоплата без подписки.png`. Что из них показать, решает не
+/// клиент, а сервер: цена со скидкой (`price_for_user`) приходит только
+/// тому, кому она положена, и `Appointment.subscriberPrice` у остальных
+/// пуст. Так же устроены и результаты поиска врача
+/// (`DoctorSearchResultsScreen._Price`).
 ///
 /// Третий макет, `design/Предоплата.png`, — более ранний черновик без
 /// сравнения цены и кнопки подписки; он полностью совпадает с состоянием
-/// «нет скидки» ([Appointment.goldPriceLabel] == null), отдельно не
-/// реализован.
+/// «нет скидки», отдельно не реализован.
 ///
 /// Kaspi и Apple Pay проводят оплату своим интерфейсом (см.
 /// `PaymentMethod`) — SDK ещё не подключены, поэтому оба ведут в один и тот
@@ -34,13 +32,17 @@ class PrepaymentCard extends StatelessWidget {
   const PrepaymentCard({
     super.key,
     required this.appointment,
-    required this.isGold,
+    this.hasSubscription = false,
     this.onPay,
     this.onSubscribe,
   });
 
   final Appointment appointment;
-  final bool isGold;
+
+  /// Есть ли у пользователя действующая подписка. Нужен только затем, чтобы
+  /// не предлагать оформить её тому, кто уже оформил: скидки на эту запись
+  /// может не быть и у подписчика — тариф даёт её не на всё.
+  final bool hasSubscription;
   final ValueChanged<PaymentMethod>? onPay;
   final VoidCallback? onSubscribe;
 
@@ -56,8 +58,11 @@ class PrepaymentCard extends StatelessWidget {
     final base = appointment.basePriceLabel;
     if (base == null) return const SizedBox.shrink();
 
-    final gold = appointment.goldPriceLabel;
-    final showDiscount = gold != null && !isGold;
+    // Скидку считает сервер: цена со скидкой приходит только тому, кому она
+    // положена. Клиент больше не смотрит на тариф сам — до 17 августа 2026
+    // он гейтил показ по `SubscriptionTier.gold`, и подписчик Silver видел
+    // полную цену, хотя списывалась с него скидочная.
+    final discounted = appointment.subscriberPriceLabel;
     final l10n = AppLocalizations.of(context)!;
 
     return AppCard(
@@ -68,12 +73,14 @@ class PrepaymentCard extends StatelessWidget {
         children: [
           Text(l10n.prepaymentCardTitle, style: AppTypography.cardTitleAccent),
           const SizedBox(height: 16),
-          if (isGold && gold != null) ...[
+          if (discounted != null) ...[
             _StrikedPrice(label: base),
             const SizedBox(height: 4),
-            Center(child: Text('$gold ₸', style: AppTypography.priceHero)),
+            Center(
+              child: Text('$discounted ₸', style: AppTypography.priceHero),
+            ),
             const SizedBox(height: 10),
-            const Center(child: _GoldPricePill()),
+            const Center(child: _SubscriberPricePill()),
             const SizedBox(height: 16),
           ] else ...[
             Center(child: Text('$base ₸', style: AppTypography.priceHero)),
@@ -86,7 +93,7 @@ class PrepaymentCard extends StatelessWidget {
               onTap: onPay == null ? null : () => onPay!(method),
             ),
           ],
-          if (showDiscount) ...[
+          if (discounted == null && !hasSubscription) ...[
             const SizedBox(height: 16),
             Center(
               child: Text(
@@ -95,16 +102,9 @@ class PrepaymentCard extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
             ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                _StrikedPrice(label: base),
-                const SizedBox(width: 12),
-                Text('$gold ₸', style: AppTypography.priceHero),
-              ],
-            ),
+            // Цены со скидкой здесь нет, хотя в макете она есть: сервер
+            // считает цену только тому, у кого подписка уже оформлена, и
+            // показать «сколько было бы» неоткуда.
             const SizedBox(height: 16),
             PrimaryButton(
               label: l10n.subscribeButtonLabel,
@@ -137,8 +137,8 @@ class _StrikedPrice extends StatelessWidget {
 }
 
 /// Пилюля «Цена с подпиской Gold» под крупной ценой.
-class _GoldPricePill extends StatelessWidget {
-  const _GoldPricePill();
+class _SubscriberPricePill extends StatelessWidget {
+  const _SubscriberPricePill();
 
   @override
   Widget build(BuildContext context) {
@@ -150,7 +150,7 @@ class _GoldPricePill extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Text(
-          AppLocalizations.of(context)!.goldPricePillLabel,
+          AppLocalizations.of(context)!.subscriberPricePillLabel,
           style: AppTypography.goldLabel.copyWith(fontSize: 13),
         ),
       ),

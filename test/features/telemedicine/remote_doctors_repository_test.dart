@@ -62,7 +62,44 @@ void main() {
       expect(doctor.priceBeforeDiscount, 15000);
     });
 
-    test('полей, которых у сервера нет, у врача не появляется', () async {
+    test('стаж, отзывы и клиника приходят с сервера', () async {
+      // До 17 августа 2026 их не было в ответе, и в карточках стояли
+      // захардкоженные «4.5», «100 отзывов», «Стаж 10 лет» и «Название
+      // клиники».
+      final (:dio, adapter: _) = cannedDio({
+        '/doctors/d1': (
+          statusCode: 200,
+          body: {
+            'id': 'd1',
+            'full_name': 'Имя Фамилия',
+            'specialty': 'Гастроэнтеролог',
+            'consult_price': 15000.0,
+            'price_for_user': 15000.0,
+            'discount_percent': 0,
+            'discount_reason': null,
+            'rating': 4.7,
+            'reviews_count': 12,
+            'experience_years': 8,
+            'clinic': {
+              'id': '11111111-1111-1111-1111-111111111111',
+              'name': 'Клиника «Здоровье»',
+            },
+          },
+        ),
+      });
+
+      final doctor = await RemoteDoctorsRepository(dio).doctor('d1');
+
+      expect(doctor.rating, 4.7);
+      expect(doctor.reviewsCount, 12);
+      expect(doctor.experienceYears, 8);
+      expect(doctor.clinic, 'Клиника «Здоровье»');
+      // Города и фотографии у сервера по-прежнему нет.
+      expect(doctor.city, isNull);
+      expect(doctor.photoUrl, isNull);
+    });
+
+    test('без клиники и стажа поля остаются пустыми', () async {
       final (:dio, adapter: _) = cannedDio({
         '/doctors/d1': (
           statusCode: 200,
@@ -75,20 +112,47 @@ void main() {
             'discount_percent': 0,
             'discount_reason': null,
             'rating': 4.5,
-            'clinic_id': '11111111-1111-1111-1111-111111111111',
+            'reviews_count': 0,
+            'experience_years': null,
+            'clinic': null,
           },
         ),
       });
 
       final doctor = await RemoteDoctorsRepository(dio).doctor('d1');
 
-      // Клиника приходит идентификатором, развернуть его нечем; стажа,
-      // города и фотографии у сервера нет вовсе.
       expect(doctor.clinic, isNull);
       expect(doctor.experienceYears, isNull);
       expect(doctor.experienceLabel, isNull);
-      expect(doctor.city, isNull);
       expect(doctor.price, isNull);
+    });
+
+    test('отзывы приходят своим эндпоинтом', () async {
+      final (:dio, :adapter) = cannedDio({
+        '/doctors/d1/reviews': (
+          statusCode: 200,
+          body: [
+            {
+              'id': 'r1',
+              'doctor_id': 'd1',
+              'author_id': 'u9',
+              'consultation_id': 'c1',
+              'rating': 5,
+              'body': 'Внимательный врач',
+              'created_at': '2026-08-10T09:00:00',
+            },
+          ],
+        ),
+      });
+
+      final reviews = await RemoteDoctorsRepository(dio).reviews('d1');
+
+      expect(reviews.single.rating, 5);
+      expect(reviews.single.text, 'Внимательный врач');
+      // Имени автора сервер не отдаёт — только идентификатор, подставлять
+      // его в карточку нельзя.
+      expect(reviews.single.authorName, 'Пользователь 1');
+      expect(adapter.requests.single.path, '/doctors/d1/reviews');
     });
   });
 
@@ -232,7 +296,7 @@ void main() {
       expect(appointment.startsAt, DateTime(2026, 8, 13, 12, 30));
       expect(appointment.specialty, 'Гастроэнтеролог');
       expect(appointment.basePrice, 15000);
-      expect(appointment.goldPrice, 13500);
+      expect(appointment.subscriberPrice, 13500);
     });
 
     test('созданную запись потом можно открыть по идентификатору', () async {

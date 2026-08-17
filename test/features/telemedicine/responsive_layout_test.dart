@@ -39,9 +39,7 @@ void main() {
           doctorsRepositoryProvider.overrideWithValue(
             const FakeDoctorsRepository(),
           ),
-          profileRepositoryProvider.overrideWithValue(
-            const FakeProfileRepository(),
-          ),
+          profileRepositoryProvider.overrideWithValue(FakeProfileRepository()),
         ],
         child: MaterialApp(
           theme: AppTheme.light,

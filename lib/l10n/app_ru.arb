@@ -590,8 +590,8 @@
   "@perConsultationLabel": {
     "description": "Подпись под ценой врача в результатах поиска."
   },
-  "forGoldUsersLabel": "для пользователей Gold",
-  "@forGoldUsersLabel": {
+  "forSubscribersLabel": "для пользователей Silver",
+  "@forSubscribersLabel": {
     "description": "Подпись скидочной цены для подписчиков Gold."
   },
   "prepaymentCardTitle": "Предоплата записи",
@@ -606,8 +606,8 @@
   "@subscribeButtonLabel": {
     "description": "Кнопка подписки в блоке предоплаты."
   },
-  "goldPricePillLabel": "Цена с подпиской Gold",
-  "@goldPricePillLabel": {
+  "subscriberPricePillLabel": "Цена с подпиской Silver",
+  "@subscriberPricePillLabel": {
     "description": "Пилюля под ценой со скидкой в блоке предоплаты."
   },
   "yourMedicalCardTitle": "Ваша Мед-Карта",
@@ -665,6 +665,42 @@
   "familyRoleSenior": "профиль для старшего поколения",
   "@familyRoleSenior": {
     "description": "Подпись под именем в карточке «Моя Семья»: профиль старшего."
+  },
+  "familyRelationSpouse": "Супруг(а)",
+  "@familyRelationSpouse": {
+    "description": "Степень родства члена семьи: супруг или супруга."
+  },
+  "familyRelationChild": "Ребёнок",
+  "@familyRelationChild": {
+    "description": "Степень родства члена семьи: ребёнок."
+  },
+  "familyRelationParent": "Родитель",
+  "@familyRelationParent": {
+    "description": "Степень родства члена семьи: родитель."
+  },
+  "familyRelationSibling": "Брат или сестра",
+  "@familyRelationSibling": {
+    "description": "Степень родства члена семьи: брат или сестра."
+  },
+  "familyRelationOther": "Другое",
+  "@familyRelationOther": {
+    "description": "Степень родства члена семьи: всё остальное."
+  },
+  "familyMemberTitleRelative": "Профиль близкого",
+  "@familyMemberTitleRelative": {
+    "description": "Заголовок карточки члена семьи, который не ребёнок и не родитель."
+  },
+  "familyDoctorsCardTitleRelative": "Врачи близкого",
+  "@familyDoctorsCardTitleRelative": {
+    "description": "Заголовок карточки врачей у члена семьи, который не ребёнок и не родитель."
+  },
+  "familyRoleRelative": "профиль близкого",
+  "@familyRoleRelative": {
+    "description": "Подпись под именем в карточке «Моя Семья» для остальных степеней родства."
+  },
+  "familyProfileRelative": "Профиль близкого",
+  "@familyProfileRelative": {
+    "description": "Строка «Моя Семья» на главной: вход в профиль близкого."
   },
   "familyMemberTitleChild": "Профиль ребёнка",
   "@familyMemberTitleChild": {
@@ -895,34 +931,5 @@
   "notificationsFilterMessages": "Сообщения от врачей",
   "@notificationsFilterMessages": {
     "description": "Вкладка уведомлений о сообщениях врачей."
-  },
-  "notificationAppointmentTitle": "Ваша запись подтверждена",
-  "@notificationAppointmentTitle": {
-    "description": "Заголовок уведомления о подтверждённой записи."
-  },
-  "notificationAppointmentBody": "{name} подтвердил запись в {time}",
-  "@notificationAppointmentBody": {
-    "description": "Подпись уведомления о записи: врач и время приёма («13:30, 27 июля»).",
-    "placeholders": {
-      "name": {
-        "type": "String"
-      },
-      "time": {
-        "type": "String"
-      }
-    }
-  },
-  "notificationMessageTitle": "Вам пришло сообщение",
-  "@notificationMessageTitle": {
-    "description": "Заголовок уведомления о сообщении врача."
-  },
-  "notificationMessageBody": "{name} отправил Вам сообщение",
-  "@notificationMessageBody": {
-    "description": "Подпись уведомления о сообщении врача.",
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
   }
 }

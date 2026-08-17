@@ -26,10 +26,10 @@ abstract interface class FamilyRepository {
 
 /// Боевая реализация поверх FastAPI-бэкенда.
 ///
-/// Сервер хранит о члене семьи три поля: `full_name`, `birth_date` и
-/// `relation` свободным текстом. Пол, рост, вес и аватар, которые есть в
-/// макетах карточки, на сервере отсутствуют — они приходят пустыми, и
-/// карточка показывает на их месте прочерк.
+/// Сервер хранит о члене семьи `full_name`, `birth_date`, `relation`
+/// (перечисление из пяти значений), `sex` и `iin`. Рост, вес и аватар из
+/// макетов карточки он не хранит — они приходят пустыми, и карточка
+/// показывает на их месте прочерк.
 class RemoteFamilyRepository implements FamilyRepository {
   const RemoteFamilyRepository(this._dio);
 
@@ -90,17 +90,17 @@ class RemoteFamilyRepository implements FamilyRepository {
   @override
   Future<List<MyDoctor>> doctorsOf(String memberId) async => const [];
 
-  /// ЭНДПОИНТА НЕТ, по той же причине. Анализ — это число с единицей
-  /// измерения и границами нормы, а `record_type` знает только
-  /// `allergy·chronic_condition·medication·note·diagnosis`. Карточка
-  /// анализов при пустом списке не рисуется вовсе.
+  /// ПОКА НЕ ПОДКЛЮЧЕНО. С 17 августа 2026 у сервера есть лабораторная
+  /// ветка: `GET /lab/results?family_member_id=` отдаёт результаты анализов
+  /// члена семьи. Это отдельная работа со своими экранами — до неё карточка
+  /// анализов при пустом списке просто не рисуется.
   @override
   Future<List<AnalysisResult>> analysesOf(String memberId) async => const [];
 
   static Map<String, dynamic> _body(FamilyMemberDraft draft) => {
     'full_name': draft.fullName,
     'birth_date': _formatDate(draft.birthDate),
-    'relation': draft.relation,
+    'relation': draft.relation.api,
   };
 
   /// Дата в формате, который ждёт бэкенд: `2018-04-02`.
@@ -112,18 +112,20 @@ class RemoteFamilyRepository implements FamilyRepository {
 
   static FamilyMember _member(Map<String, dynamic> json) {
     final fullName = (json['full_name'] as String? ?? '').trim();
-    final relation = (json['relation'] as String? ?? '').trim();
-    final birthDate =
-        DateTime.tryParse(json['birth_date'] as String? ?? '') ??
-        DateTime(1900);
 
     return FamilyMember(
       id: json['id'] as String,
       firstName: _firstName(fullName),
       lastName: _lastName(fullName),
-      birthDate: birthDate,
-      relation: _relation(relation, birthDate),
-      relationshipLabel: relation.isEmpty ? null : relation,
+      birthDate:
+          DateTime.tryParse(json['birth_date'] as String? ?? '') ??
+          DateTime(1900),
+      relation: FamilyRelation.fromApi(json['relation'] as String?),
+      gender: switch (json['sex']) {
+        'male' => Gender.male,
+        'female' => Gender.female,
+        _ => null,
+      },
     );
   }
 
@@ -142,51 +144,6 @@ class RemoteFamilyRepository implements FamilyRepository {
   static String _lastName(String fullName) {
     final space = fullName.indexOf(' ');
     return space == -1 ? '' : fullName.substring(space + 1).trim();
-  }
-
-  /// Возраст, при котором член семьи перестаёт быть «ребёнком» в подписях
-  /// карточек. Совершеннолетие в РК.
-  static const int _adultAge = 18;
-
-  /// В приложении две группы — дети и старшее поколение, от них зависят
-  /// подписи карточек и аватар по умолчанию. На сервере вместо групп
-  /// свободный текст («сын», «мама»), поэтому разбираем знакомые слова, а
-  /// незнакомые раскладываем по возрасту.
-  ///
-  /// ВОПРОС БЭКЕНДУ: будет ли у `relation` словарь значений. Со словарём
-  /// разбор строк здесь не нужен.
-  static FamilyRelation _relation(String relation, DateTime birthDate) {
-    const child = {
-      'сын',
-      'дочь',
-      'дочка',
-      'ребенок',
-      'ребёнок',
-      'внук',
-      'внучка',
-    };
-    const senior = {
-      'мама',
-      'мать',
-      'папа',
-      'отец',
-      'бабушка',
-      'дедушка',
-      'бабуля',
-      'дедуля',
-    };
-
-    final word = relation.toLowerCase();
-    if (child.contains(word)) return FamilyRelation.child;
-    if (senior.contains(word)) return FamilyRelation.senior;
-
-    final now = DateTime.now();
-    var years = now.year - birthDate.year;
-    final hadBirthday =
-        now.month > birthDate.month ||
-        (now.month == birthDate.month && now.day >= birthDate.day);
-    if (!hadBirthday) years -= 1;
-    return years < _adultAge ? FamilyRelation.child : FamilyRelation.senior;
   }
 }
 
@@ -246,8 +203,8 @@ class MockFamilyRepository implements FamilyRepository {
     if (index == -1) {
       throw const ApiException('Член семьи не найден', statusCode: 404);
     }
-    // Пол, рост, вес и аватар форма не трогает — их на сервере нет, и
-    // сохранились они только у моков с макетов. Переносим как были.
+    // Пол, рост, вес и аватар форма не трогает — их в ней нет. Переносим
+    // как были.
     final old = _members[index];
     final member = _fromDraft(id, draft);
     _members[index] = FamilyMember(
@@ -256,7 +213,6 @@ class MockFamilyRepository implements FamilyRepository {
       lastName: member.lastName,
       birthDate: member.birthDate,
       relation: member.relation,
-      relationshipLabel: member.relationshipLabel,
       gender: old.gender,
       registrationAddress: old.registrationAddress,
       heightCm: old.heightCm,
@@ -279,7 +235,7 @@ class MockFamilyRepository implements FamilyRepository {
         'id': id,
         'full_name': draft.fullName,
         'birth_date': draft.birthDate.toIso8601String(),
-        'relation': draft.relation,
+        'relation': draft.relation.api,
       });
 
   static final List<FamilyMember> mockMembers = [
@@ -300,7 +256,7 @@ class MockFamilyRepository implements FamilyRepository {
       lastName: 'Фамилия',
       gender: Gender.female,
       birthDate: DateTime(1957, 12, 9),
-      relation: FamilyRelation.senior,
+      relation: FamilyRelation.parent,
       heightCm: 168,
       weightKg: 64,
       avatarAsset: MedixAvatars.all[1],

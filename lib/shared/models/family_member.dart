@@ -1,10 +1,35 @@
 import '../../core/utils/ru_plurals.dart';
 import 'gender.dart';
 
-/// Кто это по отношению к владельцу аккаунта. Определяет и обращение в
-/// заголовках карточек («Врачи моего ребёнка» / «Врачи для старших»), и
-/// аватар по умолчанию.
-enum FamilyRelation { child, senior }
+/// Кем член семьи приходится владельцу аккаунта.
+///
+/// Значения — перечисление бэкенда (`FamilyRelation` в OpenAPI). До
+/// 17 августа 2026 сервер хранил здесь свободный текст, и приложение
+/// угадывало группу по словам («сын», «мама») и по возрасту; теперь угадывать
+/// нечего.
+///
+/// Макетов на пять степеней родства нет — их два, детский и взрослый,
+/// поэтому подписи карточек и аватар по умолчанию различают только [isChild].
+enum FamilyRelation {
+  spouse('spouse'),
+  child('child'),
+  parent('parent'),
+  sibling('sibling'),
+  other('other');
+
+  const FamilyRelation(this.api);
+
+  /// Значение, которым родство ходит по API.
+  final String api;
+
+  /// Незнакомое значение — [other], а не исключение: сервер может завести
+  /// новую степень родства раньше, чем приложение о ней узнает, и падать
+  /// из-за этого весь список семьи не должен.
+  static FamilyRelation fromApi(String? value) =>
+      values.firstWhere((r) => r.api == value, orElse: () => other);
+
+  bool get isChild => this == FamilyRelation.child;
+}
 
 /// Член семьи в «Моя Семья» (`design/Моя Семья Ребенок.png`,
 /// `design/Моя Семья Старшие.png`).
@@ -20,7 +45,6 @@ class FamilyMember {
     required this.birthDate,
     required this.relation,
     this.gender,
-    this.relationshipLabel,
     this.registrationAddress,
     this.heightCm,
     this.weightKg,
@@ -33,17 +57,10 @@ class FamilyMember {
   final DateTime birthDate;
   final FamilyRelation relation;
 
-  /// Пол. Необязателен, потому что бэкенд его не хранит: у члена семьи есть
-  /// только имя, дата рождения и родство. С сервера всегда приходит `null`,
-  /// и в карточке на этом месте прочерк — спрашивать пол в форме, чтобы тут
-  /// же его потерять, честнее не заводить вовсе. Поле останется, пока не
-  /// ответит дизайнер, показывать ли его вообще.
+  /// Пол. С 17 августа 2026 сервер его хранит (`sex` в `FamilyMemberOut`),
+  /// но необязательным — у заведённых раньше членов семьи его нет, и в
+  /// карточке на этом месте по-прежнему прочерк.
   final Gender? gender;
-
-  /// «Сын», «Дочь», «Мама» — поле «Родство с Вами» в мед-карте. В обоих
-  /// макетах не заполнено, поэтому мок оставляет `null`, как и с
-  /// [registrationAddress].
-  final String? relationshipLabel;
 
   final String? registrationAddress;
   final int? heightCm;

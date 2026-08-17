@@ -9,7 +9,7 @@ import 'package:medix/shared/models/subscription_tier.dart';
 /// Те же данные, что у [MockProfileRepository], но без задержки: таймер вне
 /// `runAsync` роняет виджет-тест на «timersPending».
 class FakeProfileRepository implements ProfileRepository {
-  const FakeProfileRepository({this.subscription});
+  FakeProfileRepository({this.subscription});
 
   /// Чем подменить тариф из мока. Нужен экранам, где что-то доступно
   /// только по Gold: у мок-профиля он как раз Gold, и бесплатную ветку
@@ -36,16 +36,22 @@ class FakeProfileRepository implements ProfileRepository {
     );
   }
 
+  /// Сохранённая карта. Заглушка не выбрасывает записанное, как раньше:
+  /// иначе не поймать, что экран не перечитал карту после сохранения.
+  MedicalCard? _saved;
+
   @override
   // Ответы «да» — как в макете `Медкарта.png`, где обе кнопки залиты.
-  Future<MedicalCard> medicalCard() async => const MedicalCard(
-    bloodGroup: BloodGroup.first,
-    rhesus: RhesusFactor.positive,
-    hasChronicDiseases: true,
-    hasBadHabits: true,
-    heightCm: 176,
-    weightKg: 77,
-  );
+  Future<MedicalCard> medicalCard() async =>
+      _saved ??
+      const MedicalCard(
+        bloodGroup: BloodGroup.first,
+        rhesus: RhesusFactor.positive,
+        hasChronicDiseases: true,
+        hasBadHabits: true,
+        heightCm: 176,
+        weightKg: 77,
+      );
 
   @override
   Future<List<MyDoctor>> myDoctors() async => MockProfileRepository.mockDoctors;
@@ -59,5 +65,5 @@ class FakeProfileRepository implements ProfileRepository {
       MockProfileRepository.mockProcedures;
 
   @override
-  Future<void> saveMedicalCard(MedicalCard card) async {}
+  Future<void> saveMedicalCard(MedicalCard card) async => _saved = card;
 }

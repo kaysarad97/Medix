@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/network/api_exception.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/family_relation_labels.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_scaffold.dart';
@@ -68,6 +71,7 @@ class _FamilyMemberFormScreenState
   final _birthDateController = TextEditingController();
 
   DateTime? _birthDate;
+  FamilyRelation? _relation;
   String? _fullNameError;
   String? _birthDateError;
   String? _relationError;
@@ -178,14 +182,19 @@ class _FamilyMemberFormScreenState
                         ),
                       ),
                       const SizedBox(height: _fieldGap),
-                      AppTextField(
-                        hint: l10n.relationshipPlaceholder,
-                        height: AppTextField.compactFieldHeight,
-                        controller: _relationController,
-                        textInputAction: TextInputAction.done,
-                        errorText: _relationError,
-                        onChanged: (_) => setState(() => _relationError = null),
-                        onSubmitted: (_) => _save(),
+                      // Родство с 17 августа 2026 — перечисление сервера из
+                      // пяти значений, а не свободный текст. Поле осталось
+                      // тем же на вид, но открывает список, как и дата.
+                      GestureDetector(
+                        onTap: _pickRelation,
+                        child: AbsorbPointer(
+                          child: AppTextField(
+                            hint: l10n.relationshipPlaceholder,
+                            height: AppTextField.compactFieldHeight,
+                            controller: _relationController,
+                            errorText: _relationError,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -217,7 +226,7 @@ class _FamilyMemberFormScreenState
   void _prefill(FamilyMember member) {
     _prefilled = true;
     _fullNameController.text = member.fullName;
-    _relationController.text = member.relationshipLabel ?? '';
+    _relation = member.relation;
     _birthDate = member.birthDate;
     _birthDateController.text = _displayDate(member.birthDate);
   }
@@ -252,13 +261,47 @@ class _FamilyMemberFormScreenState
     });
   }
 
+  /// Родство выбирается из списка, а не набирается: пять значений сервера.
+  Future<void> _pickRelation() async {
+    final l10n = AppLocalizations.of(context)!;
+    final picked = await showModalBottomSheet<FamilyRelation>(
+      context: context,
+      backgroundColor: AppColors.surfaceWhite,
+      shape: const RoundedRectangleBorder(borderRadius: AppRadius.allLg),
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final relation in FamilyRelation.values)
+              ListTile(
+                title: Text(relation.name(l10n), style: AppTypography.bodyMd),
+                trailing: relation == _relation
+                    ? const Icon(Icons.check, color: AppColors.accent)
+                    : null,
+                onTap: () => Navigator.of(context).pop(relation),
+              ),
+          ],
+        ),
+      ),
+    );
+    if (picked == null || !mounted) return;
+
+    setState(() {
+      _relation = picked;
+      _relationError = null;
+      _relationController.text = picked.name(l10n);
+    });
+  }
+
   Future<void> _save() async {
     if (_isSaving) return;
 
     final fullName = _fullNameController.text.trim();
-    final relation = _relationController.text.trim();
+    final relation = _relation;
     final fullNameError = Validators.fullName(fullName);
-    final relationError = Validators.familyRelation(relation);
+    final relationError = relation == null
+        ? Validators.familyRelation(null)
+        : null;
     final birthDateError = _birthDate == null
         ? Validators.birthDate(null)
         : null;
@@ -279,7 +322,7 @@ class _FamilyMemberFormScreenState
     final draft = FamilyMemberDraft(
       fullName: fullName,
       birthDate: _birthDate!,
-      relation: relation,
+      relation: relation!,
     );
 
     try {

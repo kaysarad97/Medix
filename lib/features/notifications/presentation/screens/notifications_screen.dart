@@ -175,21 +175,6 @@ class _NotificationRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final (title, subtitle) = switch (notification.kind) {
-      NotificationKind.appointmentConfirmed => (
-        l10n.notificationAppointmentTitle,
-        l10n.notificationAppointmentBody(
-          notification.doctorName,
-          notification.appointmentLabel,
-        ),
-      ),
-      NotificationKind.doctorMessage => (
-        l10n.notificationMessageTitle,
-        l10n.notificationMessageBody(notification.doctorName),
-      ),
-    };
-
     return SizedBox(
       height: height,
       child: DecoratedBox(
@@ -220,7 +205,7 @@ class _NotificationRow extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              title,
+                              notification.title,
                               style: AppTypography.cardItemTitle,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -235,7 +220,7 @@ class _NotificationRow extends StatelessWidget {
                       ),
                       const SizedBox(height: _titleToSubtitle),
                       Text(
-                        subtitle,
+                        notification.body,
                         style: AppTypography.notificationBody,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -261,7 +246,7 @@ class _KindIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (kind == NotificationKind.doctorMessage) {
+    if (kind == NotificationKind.message) {
       return AppIconChip(
         icon: MedixIcon.chat,
         size: size,

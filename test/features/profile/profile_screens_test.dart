@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:medix/core/router/routes.dart';
 import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/core/widgets/icon_chip.dart';
 import 'package:medix/core/widgets/user_avatar.dart';
@@ -34,9 +36,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          profileRepositoryProvider.overrideWithValue(
-            const FakeProfileRepository(),
-          ),
+          profileRepositoryProvider.overrideWithValue(FakeProfileRepository()),
           familyRepositoryProvider.overrideWithValue(FakeFamilyRepository()),
         ],
         child: MaterialApp(
@@ -241,6 +241,64 @@ void main() {
       }
       expect(find.text('Rh+'), findsOneWidget);
       expect(find.text('Rh-'), findsOneWidget);
+    });
+
+    testWidgets('сохранённое видно на карточке сразу', (tester) async {
+      // Ловушка живого API: карта читается провайдером и кэшируется, а
+      // форма её меняет на сервере. Без `invalidate` рост и вес появлялись
+      // на «Ваша Мед-Карта» только после перезапуска приложения.
+      final router = GoRouter(
+        initialLocation: Routes.profile,
+        routes: [
+          GoRoute(
+            path: Routes.profile,
+            builder: (context, state) =>
+                MedicalCardScreen(now: DateTime(2026, 8, 6)),
+          ),
+          GoRoute(
+            path: Routes.medicalCardForm,
+            builder: (context, state) => const MedicalCardFormScreen(),
+          ),
+        ],
+      );
+      addTearDown(router.dispose);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            profileRepositoryProvider.overrideWithValue(
+              FakeProfileRepository(),
+            ),
+            familyRepositoryProvider.overrideWithValue(FakeFamilyRepository()),
+          ],
+          child: MaterialApp.router(
+            theme: AppTheme.light,
+            locale: const Locale('ru'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            routerConfig: router,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('176 см'), findsOneWidget);
+
+      await tester.tap(find.byType(SectionHeader).first);
+      await tester.pumpAndSettle();
+
+      // Поле роста ищем по подставленному значению, а не по месту в
+      // форме: порядок полей меняется чаще, чем содержимое.
+      final fields = tester.widgetList<TextField>(find.byType(TextField));
+      final height = fields.toList().indexWhere(
+        (field) => field.controller?.text == '176',
+      );
+      await tester.enterText(find.byType(TextField).at(height), '181');
+      await tester.ensureVisible(find.text('Сохранить'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Сохранить'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('181 см'), findsOneWidget);
     });
 
     testWidgets('подставляет уже заполненное', (tester) async {

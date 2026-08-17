@@ -38,10 +38,11 @@ class HomeScreen extends ConsumerWidget {
     final specialties = ref.watch(specialtiesProvider);
     final appointments = ref.watch(upcomingAppointmentsProvider);
     final family = ref.watch(familyMembersProvider).value ?? const [];
-    // Семейный доступ — возможность Gold: без подписки «Моя Семья» ведёт
-    // на экран тарифов, а не в профиль близкого.
-    final isGold =
-        ref.watch(profileProvider).value?.subscription == SubscriptionTier.gold;
+    // Тот же платный гейт, что и на «Ваша Мед-Карта»: проверяем наличие
+    // подписки, а не тариф Gold — его на сервере больше нет.
+    final subscription = ref.watch(profileProvider).value?.subscription;
+    final hasSubscription =
+        subscription != null && subscription != SubscriptionTier.free;
     final l10n = AppLocalizations.of(context)!;
 
     return AppScaffold(
@@ -110,11 +111,10 @@ class HomeScreen extends ConsumerWidget {
                     // На главной строка — вход в чужой профиль, а не сведения
                     // о человеке: «Профиль для ребенка» вместо имени.
                     rowStyle: FamilyRowStyle.entry,
-                    // Семейный доступ входит в Gold. Без подписки строка
-                    // ведёт не в профиль близкого, а на экран тарифов —
-                    // там цены и что даёт подписка.
+                    // Семейный доступ платный: без подписки строка ведёт не
+                    // в профиль близкого, а на экран тарифов.
                     onMemberTap: (member) => context.push(
-                      isGold
+                      hasSubscription
                           ? Routes.familyMemberOf(member.id)
                           : Routes.subscription,
                     ),

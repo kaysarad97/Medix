@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import '../../../../core/network/api_endpoints.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../../../shared/models/analysis_result.dart';
+import '../../../../shared/models/gender.dart';
 import '../../../../shared/models/my_doctor.dart';
 import '../../../../shared/models/subscription_tier.dart';
 import '../../domain/entities/medical_card.dart';
@@ -38,9 +39,18 @@ class RemoteProfileRepository implements ProfileRepository {
             : fullName.substring(space + 1).trim(),
         lastName: space == -1 ? '' : fullName.substring(0, space),
         email: json['email'] as String?,
+        iin: json['iin'] as String?,
+        birthDate: DateTime.tryParse(json['birth_date'] as String? ?? ''),
+        gender: switch (json['sex']) {
+          'male' => Gender.male,
+          'female' => Gender.female,
+          _ => null,
+        },
         subscription: await _subscription(),
-        // Пол, рост, вес и аватар сервер не хранит; даты рождения нет в
-        // ответе, хотя PATCH её принимает.
+        // Рост и вес — не здесь: они лежат в мед-карте отдельными записями
+        // (`record_type: measurement`). Аватар сервер хранит ключом в S3
+        // (`avatar_s3_key`), но отдельной ссылкой на скачивание его пока не
+        // отдаёт — до неё аватарка берётся из набора в сборке.
       );
     } on DioException catch (e) {
       throw ApiException.fromDio(e);
@@ -89,6 +99,13 @@ class RemoteProfileRepository implements ProfileRepository {
             hasChronicDiseases: true,
             chronicDiseases: details,
           );
+        case 'measurement':
+          final value = (payload['value'] as num?)?.round();
+          card = switch (payload['kind']) {
+            'height' => card.copyWith(heightCm: value),
+            'weight' => card.copyWith(weightKg: value),
+            _ => card,
+          };
         case 'note':
           card = _applyNote(card, payload['title'] as String?, details);
       }
@@ -96,25 +113,28 @@ class RemoteProfileRepository implements ProfileRepository {
     return card;
   }
 
-  /// Поля, которым на сервере нет своего типа, лежат заметками с известным
-  /// заголовком.
+  /// Полям, которым на сервере нет своего типа, остаются заметки с
+  /// известным заголовком.
   ///
-  /// ЭТО НАША ДОГОВОРЁННОСТЬ, А НЕ КОНТРАКТ. `record_type` знает про кровь,
-  /// аллергии, хронические, лекарства, диагнозы и заметки — ни роста, ни
-  /// веса, ни операций, ни вредных привычек среди них нет, а в макете
-  /// мед-карты они есть. Вопрос бэкенду: заводить ли им отдельные типы.
-  static const String _heightTitle = 'Рост';
-  static const String _weightTitle = 'Вес';
+  /// ЭТО НАША ДОГОВОРЁННОСТЬ, А НЕ КОНТРАКТ, и осталась она только для
+  /// операций и вредных привычек: у роста с весом с 17 августа 2026 есть
+  /// свой `record_type: measurement`, и они переехали туда.
   static const String _surgeriesTitle = 'Операции';
   static const String _habitsTitle = 'Вредные привычки';
+
+  /// Заголовки, которыми рост и вес лежали в заметках до появления
+  /// `measurement`. Читаются, но больше не пишутся: у кого-то из тестовых
+  /// аккаунтов такие заметки остались, и терять их при чтении незачем.
+  static const String _legacyHeightTitle = 'Рост';
+  static const String _legacyWeightTitle = 'Вес';
 
   static MedicalCard _applyNote(
     MedicalCard card,
     String? title,
     String? details,
   ) => switch (title) {
-    _heightTitle => card.copyWith(heightCm: int.tryParse(details ?? '')),
-    _weightTitle => card.copyWith(weightKg: int.tryParse(details ?? '')),
+    _legacyHeightTitle => card.copyWith(heightCm: int.tryParse(details ?? '')),
+    _legacyWeightTitle => card.copyWith(weightKg: int.tryParse(details ?? '')),
     _surgeriesTitle => card.copyWith(surgeries: details),
     _habitsTitle => card.copyWith(hasBadHabits: details == 'да'),
     _ => card,
@@ -161,7 +181,10 @@ class RemoteProfileRepository implements ProfileRepository {
         if (title == null) return record['id'] as String;
 
         final payload = record['payload'] as Map<String, dynamic>? ?? const {};
-        if (payload['title'] == title) return record['id'] as String;
+        // У замеров различает не заголовок, а `kind`: рост и вес — записи
+        // одного типа.
+        final key = type == 'measurement' ? 'kind' : 'title';
+        if (payload[key] == title) return record['id'] as String;
       }
       return null;
     }
@@ -189,8 +212,8 @@ class RemoteProfileRepository implements ProfileRepository {
       );
     }
     await _putText(put, 'note', _surgeriesTitle, card.surgeries);
-    await _putText(put, 'note', _heightTitle, card.heightCm?.toString());
-    await _putText(put, 'note', _weightTitle, card.weightKg?.toString());
+    await _putMeasurement(put, 'height', card.heightCm, 'cm');
+    await _putMeasurement(put, 'weight', card.weightKg, 'kg');
     if (card.hasBadHabits != null) {
       await _putText(
         put,
@@ -199,6 +222,27 @@ class RemoteProfileRepository implements ProfileRepository {
         card.hasBadHabits! ? 'да' : 'нет',
       );
     }
+  }
+
+  /// Замер: у сервера свой тип записи со значением, единицей и временем.
+  ///
+  /// `measured_at` — момент сохранения, а не отдельное поле формы: в макете
+  /// мед-карты рост и вес вводятся числом, без даты. По этой же метке
+  /// строится история (`/users/me/medical-records/history?kind=`), так что
+  /// каждая правка ложится в неё новой точкой.
+  static Future<void> _putMeasurement(
+    Future<void> Function(String, Map<String, dynamic>, [String?]) put,
+    String kind,
+    int? value,
+    String unit,
+  ) async {
+    if (value == null) return;
+    await put('measurement', {
+      'kind': kind,
+      'value': value,
+      'unit': unit,
+      'measured_at': DateTime.now().toUtc().toIso8601String(),
+    }, kind);
   }
 
   static Future<void> _putText(

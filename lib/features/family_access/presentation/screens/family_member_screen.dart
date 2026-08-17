@@ -8,6 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/family_relation_labels.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/form_error_snack_bar.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
@@ -67,10 +68,7 @@ class FamilyMemberScreen extends ConsumerWidget {
                   children: [
                     const SizedBox(height: 36),
                     ScreenTopBar(
-                      title: switch (member.relation) {
-                        FamilyRelation.child => l10n.familyMemberTitleChild,
-                        FamilyRelation.senior => l10n.familyMemberTitleSenior,
-                      },
+                      title: member.relation.screenTitle(l10n),
                       onBack: () => Navigator.of(context).maybePop(),
                       // Карандаш из Material: своей иконки правки дизайнер
                       // не присылал, а заводить её в MedixIcons без
@@ -90,7 +88,7 @@ class FamilyMemberScreen extends ConsumerWidget {
                     const SizedBox(height: ProfileMetrics.cardGap),
                     _Section(
                       child: MedicalCardSummary(
-                        topFieldValue: member.relationshipLabel,
+                        topFieldValue: member.relation.name(l10n),
                         topFieldPlaceholder: l10n.relationshipPlaceholder,
                         heightLabel: member.heightLabel,
                         weightLabel: member.weightLabel,
@@ -102,12 +100,7 @@ class FamilyMemberScreen extends ConsumerWidget {
                     _Section(
                       child: MyDoctorsCard(
                         doctors: doctors,
-                        title: switch (member.relation) {
-                          FamilyRelation.child =>
-                            l10n.familyDoctorsCardTitleChild,
-                          FamilyRelation.senior =>
-                            l10n.familyDoctorsCardTitleSenior,
-                        },
+                        title: member.relation.doctorsCardTitle(l10n),
                       ),
                     ),
                     const SizedBox(height: ProfileMetrics.cardGap),
@@ -116,14 +109,13 @@ class FamilyMemberScreen extends ConsumerWidget {
                         child: AnalysesCard(
                           analyses: analyses,
                           filter: filter,
-                          title: switch (member.relation) {
-                            FamilyRelation.child =>
-                              l10n.familyAnalysesCardTitleChild,
-                            FamilyRelation.senior =>
-                              l10n.familyAnalysesCardTitleSenior(
-                                member.fullName,
-                              ),
-                          },
+                          // У всех, кроме ребёнка, заголовок с именем: он
+                          // одинаково годится и родителю, и супругу, и брату.
+                          title: member.relation.isChild
+                              ? l10n.familyAnalysesCardTitleChild
+                              : l10n.familyAnalysesCardTitleSenior(
+                                  member.fullName,
+                                ),
                           onFilterChanged: ref
                               .read(familyAnalysesFilterProvider.notifier)
                               .select,
