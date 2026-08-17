@@ -160,11 +160,14 @@ class _Tile extends StatelessWidget {
                   AppIcon(icon: icon, size: 18, color: AppColors.textPrimary),
                   const SizedBox(width: 6),
                   Flexible(
-                    child: Text(
-                      label,
-                      style: AppTypography.chipLabel,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        label,
+                        style: AppTypography.chipLabel,
+                        maxLines: 1,
+                      ),
                     ),
                   ),
                 ],
@@ -203,11 +206,13 @@ class _ValuePill extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        child: Text(
-          value,
-          style: AppTypography.chipLabel,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
+        // Через FittedBox, а не многоточием: значение здесь короткое («176
+        // см», «29 лет»), и обрезать его нельзя — плитка ради него и стоит.
+        // На экране уже макетного (393 точки против 440) многоточие съедало
+        // единицу измерения: «176…» вместо «176 см».
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(value, style: AppTypography.chipLabel, maxLines: 1),
         ),
       ),
     );

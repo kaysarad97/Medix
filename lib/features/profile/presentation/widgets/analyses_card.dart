@@ -144,6 +144,14 @@ class _Tab extends StatelessWidget {
 }
 
 /// Строка результата: название с референсом, значение и шкала.
+/// Доля строки, которую занимает шкала, и её нижняя граница: уже — и
+/// цветные отрезки перестают читаться.
+const double _scaleShare = 0.3;
+const double _minScaleWidth = 84;
+
+/// Сколько отдаём значению: остаток строки достаётся названию анализа.
+const double _maxValueWidth = 120;
+
 class _AnalysisRow extends StatelessWidget {
   const _AnalysisRow({required this.analysis});
 
@@ -160,32 +168,62 @@ class _AnalysisRow extends StatelessWidget {
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(analysis.name, style: AppTypography.analysisName),
-                    const SizedBox(height: 6),
-                    Text(
-                      analysis.referenceLabel,
-                      style: AppTypography.analysisReference,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+          // Шкала ужимается на узком экране: макет снят на 440 точках, а на
+          // реальных 393 её постоянные 118 съедали название — «Железо в
+          // сыворотке» ломалось посреди слова.
+          child: LayoutBuilder(
+            builder: (context, constraints) => Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Две строки максимум: у строки анализа постоянная
+                      // высота по макету, и третья её распирала — на узком
+                      // экране «Железо в сыворотке» переносилось трижды.
+                      Text(
+                        analysis.name,
+                        style: AppTypography.analysisName,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        analysis.referenceLabel,
+                        style: AppTypography.analysisReference,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              // Не Expanded: значение занимает столько, сколько нужно, а
-              // остаток достаётся названию. Поровну не делим — «24.8
-              // мкмоль/л» тогда не помещается и обрезается многоточием.
-              Text(analysis.valueLabel, style: AppTypography.analysisValue),
-              const SizedBox(width: 8),
-              ReferenceScale(position: analysis.position),
-            ],
+                const SizedBox(width: 8),
+                // Не Expanded, а с потолком ширины: значение занимает
+                // столько, сколько нужно, но не больше — нашим шрифтом
+                // «24.8 мкмоль/л» шире макетного и в паре с фиксированной
+                // шкалой не оставляло названию ничего.
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: _maxValueWidth),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      analysis.valueLabel,
+                      style: AppTypography.analysisValue,
+                      maxLines: 1,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                ReferenceScale(
+                  position: analysis.position,
+                  width: (constraints.maxWidth * _scaleShare).clamp(
+                    _minScaleWidth,
+                    ProfileMetrics.scaleWidth,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -198,15 +236,19 @@ class _AnalysisRow extends StatelessWidget {
 /// Три отрезка равной длины: в макете зелёная середина такая же, как
 /// жёлтый и красный края, хотя по значениям интервал нормы шире.
 class ReferenceScale extends StatelessWidget {
-  const ReferenceScale({super.key, required this.position});
+  const ReferenceScale({super.key, required this.position, this.width});
 
   /// 0…1 вдоль всей шкалы.
   final double position;
 
+  /// Ширина шкалы. По умолчанию макетная; строка анализа ужимает её на
+  /// узких экранах — см. [_AnalysisRow].
+  final double? width;
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: ProfileMetrics.scaleWidth,
+      width: width ?? ProfileMetrics.scaleWidth,
       height: ProfileMetrics.scaleDotSize,
       child: Stack(
         alignment: Alignment.centerLeft,

@@ -102,12 +102,30 @@ class _ComparisonTable extends StatelessWidget {
 
   final List<PlanFeature> features;
 
-  /// Ширина колонки тарифа. Левая часть забирает остаток.
+  /// Ширина колонки тарифа по макету. Левая часть забирает остаток.
   static const double columnWidth = 74;
+
+  /// Ширина содержимого в макете: 440 минус поля экрана.
+  static const double designWidth = 400;
+
   static const double rowHeight = 72;
+
+  /// Колонки ужимаются пропорционально экрану: макет снят на 440 точках,
+  /// реальный телефон — 393, и там макетные 74 съедали подпись возможности
+  /// («Скидки на анализы» переносилось на две строки). Ниже 60 не опускаем —
+  /// дальше нечитаемо становится уже значение в ячейке.
+  static double _columnWidthFor(double available) =>
+      (available / designWidth * columnWidth).clamp(60.0, columnWidth);
 
   @override
   Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) =>
+          _table(_columnWidthFor(constraints.maxWidth)),
+    );
+  }
+
+  Widget _table(double columnWidth) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -161,7 +179,13 @@ class _FeatureLabel extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(feature.title, style: AppTypography.cardItemTitle),
+              // Тот же кегль, что и в ячейках справа: на 393 точках
+              // «Скидки на анализы» четырнадцатым переносилось на две
+              // строки, а в макете заголовок возможности — одна строка.
+              Text(
+                feature.title,
+                style: AppTypography.cardItemTitle.copyWith(fontSize: 13),
+              ),
               const SizedBox(height: 2),
               Text(feature.subtitle, style: AppTypography.tileSubtitle),
             ],
@@ -189,13 +213,19 @@ class _Cell extends StatelessWidget {
         ),
       );
     }
+    // Через FittedBox: на узком экране колонка ужимается, и «Приоритет»
+    // ломался посреди слова — «Приорит/ет». Уменьшить значение на пару
+    // процентов честнее, чем разорвать слово.
     return Center(
-      child: Text(
-        value!,
-        textAlign: TextAlign.center,
-        // Мельче подписи слева: «Приоритет» и «До 3-5 профилей» иначе
-        // переносятся посреди слова.
-        style: AppTypography.cardItemTitle.copyWith(fontSize: 13),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          value!,
+          textAlign: TextAlign.center,
+          // Мельче подписи слева: «Приоритет» и «До 3-5 профилей» иначе
+          // переносятся посреди слова.
+          style: AppTypography.cardItemTitle.copyWith(fontSize: 13),
+        ),
       ),
     );
   }
@@ -239,11 +269,20 @@ class _PlanCard extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
+                    // Через FittedBox, а не Flexible с maxLines: цена
+                    // четырёхзначная, и на экране уже макетного (393 точки
+                    // против 440) последняя цифра просто обрезалась —
+                    // «9999 ₸» читалось как «999 ₸». Лучше уменьшить кегль,
+                    // чем показать цену вдесятеро меньше настоящей.
                     Flexible(
-                      child: Text(
-                        plan.priceLabel,
-                        style: AppTypography.h1.copyWith(color: accent),
-                        maxLines: 1,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.bottomLeft,
+                        child: Text(
+                          plan.priceLabel,
+                          style: AppTypography.h1.copyWith(color: accent),
+                          maxLines: 1,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 4),
