@@ -16,6 +16,7 @@ import 'package:medix/features/home/presentation/screens/home_screen.dart';
 
 import '../../helpers/fake_family_repository.dart';
 import '../../helpers/fake_profile_repository.dart';
+import '../../helpers/golden_images.dart';
 import '../../helpers/test_fonts.dart';
 
 /// Эталон главной для сверки с `design/Главная.png`.
@@ -70,6 +71,7 @@ void main() {
     });
     await tester.pump();
     await tester.pump();
+    await precacheScreenImages(tester);
 
     await expectLater(
       find.byType(HomeScreen),

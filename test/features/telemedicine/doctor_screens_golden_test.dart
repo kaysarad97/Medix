@@ -13,6 +13,7 @@ import 'package:medix/l10n/app_localizations.dart';
 
 import '../../helpers/fake_doctors_repository.dart';
 import '../../helpers/fake_profile_repository.dart';
+import '../../helpers/golden_images.dart';
 import '../../helpers/test_fonts.dart';
 
 /// Эталоны экранов врача для сверки с `design/Профиль врача + запись.png`
@@ -69,9 +70,10 @@ void main() {
     await tester.pump();
     await tester.pump();
     // На «Ваша Запись» профиль подтягивается только после записи и врача —
-    // третий pump, иначе блок предоплаты застаёт Gold-подписку ещё
-    // незагруженной и рисует состояние «без подписки».
+    // третий pump, иначе блок предоплаты застаёт подписку ещё незагруженной
+    // и рисует состояние «без подписки».
     await tester.pump();
+    await precacheScreenImages(tester);
   }
 
   testWidgets('doctor_profile соответствует эталону', (tester) async {

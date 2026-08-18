@@ -14,6 +14,7 @@ import 'package:medix/shared/models/appointment.dart';
 
 import '../../helpers/fake_doctors_repository.dart';
 import '../../helpers/fake_profile_repository.dart';
+import '../../helpers/golden_images.dart';
 import '../../helpers/test_fonts.dart';
 
 /// Эталоны экрана звонка для сверки с `design/Видео-звонок.png` и
@@ -84,6 +85,7 @@ void main() {
     });
     await tester.pump();
     await tester.pump();
+    await precacheScreenImages(tester);
   }
 
   testWidgets('video_call соответствует эталону', (tester) async {

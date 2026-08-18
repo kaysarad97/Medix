@@ -17,6 +17,7 @@ import 'package:medix/l10n/app_localizations.dart';
 
 import '../../helpers/fake_family_repository.dart';
 import '../../helpers/fake_profile_repository.dart';
+import '../../helpers/golden_images.dart';
 import '../../helpers/test_fonts.dart';
 
 /// Эталоны экранов профиля для сверки с `design/Профиль.png`,
@@ -75,6 +76,7 @@ void main() {
     });
     await tester.pump();
     await tester.pump();
+    await precacheScreenImages(tester);
   }
 
   testWidgets('medical_card соответствует эталону', (tester) async {
