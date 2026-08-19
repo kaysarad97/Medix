@@ -1,7 +1,7 @@
-import '../../../../core/widgets/icon_chip.dart';
 import '../../../../shared/models/subscription_tier.dart';
 import '../../domain/entities/payment_method.dart';
 import '../../domain/entities/subscription_plan.dart';
+import '../plan_features.dart';
 
 /// Чем кончилась попытка оплаты. Экран результата один на оба исхода —
 /// см. `design/Оплата прошла.png` и `design/Оплата НЕ прошла.png`.
@@ -12,9 +12,15 @@ abstract interface class SubscriptionsRepository {
 
   Future<List<SubscriptionPlan>> plans();
 
-  /// Отправляет карту в платёжный шлюз. Данные держателя карты нигде не
+  /// Оплачивает подписку выбранного тарифа. Данные держателя карты нигде не
   /// сохраняются — см. пояснение в [CardDetails].
-  Future<PaymentOutcome> pay(CardDetails card);
+  ///
+  /// Тариф нужен здесь, а не на экране выбора: подписка оформляется в конце
+  /// оплаты, и до неё сервер о выборе не знает.
+  Future<PaymentOutcome> pay(
+    CardDetails card, {
+    required SubscriptionTier tier,
+  });
 }
 
 /// Заглушка на время разработки бэкенда. Данные — с макета
@@ -27,7 +33,7 @@ class MockSubscriptionsRepository implements SubscriptionsRepository {
   @override
   Future<List<PlanFeature>> features() async {
     await Future<void>.delayed(_latency);
-    return mockFeatures;
+    return designPlanFeatures;
   }
 
   @override
@@ -37,7 +43,10 @@ class MockSubscriptionsRepository implements SubscriptionsRepository {
   }
 
   @override
-  Future<PaymentOutcome> pay(CardDetails card) async {
+  Future<PaymentOutcome> pay(
+    CardDetails card, {
+    required SubscriptionTier tier,
+  }) async {
     await Future<void>.delayed(_latency);
     // Сценарий заглушки, как у логина: карта, начинающаяся на 0000, всегда
     // отбивается — иначе экран «Оплата НЕ прошла» не проверить.
@@ -47,63 +56,9 @@ class MockSubscriptionsRepository implements SubscriptionsRepository {
         : PaymentOutcome.success;
   }
 
-  static const List<PlanFeature> mockFeatures = [
-    PlanFeature(
-      title: 'Скидки на анализы',
-      subtitle: 'в партнерских лабораториях',
-      icon: MedixIcon.planDiscount,
-      values: {
-        SubscriptionTier.free: null,
-        SubscriptionTier.silver: '5-7%',
-        SubscriptionTier.gold: '10-15%',
-      },
-    ),
-    PlanFeature(
-      title: 'Скидка на консультации',
-      subtitle: 'у проверенных врачей',
-      icon: MedixIcon.planPrice,
-      values: {
-        SubscriptionTier.free: null,
-        SubscriptionTier.silver: '10%',
-        SubscriptionTier.gold: 'Пакет\nуслуг',
-      },
-    ),
-    PlanFeature(
-      title: 'Очередь к врачу',
-      subtitle: 'время ожидания приема',
-      icon: MedixIcon.planQueue,
-      values: {
-        SubscriptionTier.free: 'Общая',
-        SubscriptionTier.silver: 'Общая',
-        SubscriptionTier.gold: 'Приоритет',
-      },
-    ),
-    PlanFeature(
-      title: 'Аналитика здоровья',
-      subtitle: 'история заболевания',
-      icon: MedixIcon.planAnalytics,
-      values: {
-        SubscriptionTier.free: null,
-        SubscriptionTier.silver: 'Графики\n(история)',
-        SubscriptionTier.gold: 'ИИ-бот,\nграфики',
-      },
-    ),
-    PlanFeature(
-      title: 'Семейный доступ',
-      subtitle: 'мед-карты для',
-      icon: MedixIcon.planFamily,
-      values: {
-        SubscriptionTier.free: null,
-        SubscriptionTier.silver: null,
-        SubscriptionTier.gold: 'До 3-5\nпрофилей',
-      },
-    ),
-  ];
-
-  /// В макете продаются только два тарифа: Gold слева, Silver справа.
-  /// Basic — это отсутствие подписки, его карточки нет.
+  /// Продаётся один тариф: Gold снят, Basic — это отсутствие подписки, и
+  /// карточки с ценой у него нет.
   static const List<SubscriptionPlan> mockPlans = [
-    SubscriptionPlan(tier: SubscriptionTier.gold, pricePerMonth: 9999),
     SubscriptionPlan(tier: SubscriptionTier.silver, pricePerMonth: 5999),
   ];
 }

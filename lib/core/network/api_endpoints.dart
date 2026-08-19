@@ -33,8 +33,15 @@ abstract final class ApiEndpoints {
 
   static String medicalRecord(String id) => '$medicalRecords/$id';
 
+  /// Тарифы с ценами. Единственный эндпоинт подписок без токена.
+  static const String plans = '/plans';
+
+  /// Оформление подписки. Шлюза у сервера нет: в ответе на `POST` платёж
+  /// уже помечен `paid`.
+  static const String subscriptions = '/subscriptions';
+
   /// Действующая подписка. Её нет — сервер отвечает 404, и это не ошибка.
-  static const String mySubscription = '/subscriptions/me';
+  static const String mySubscription = '$subscriptions/me';
 
   /// Лента уведомлений.
   static const String notifications = '/notifications';

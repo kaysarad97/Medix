@@ -10,6 +10,7 @@ import '../../../../core/widgets/medix_wait_view.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../profile/presentation/providers/profile_providers.dart';
 import '../../../profile/presentation/widgets/profile_metrics.dart';
 import '../../data/repositories/subscriptions_repository.dart';
 import '../../domain/entities/payment_method.dart';
@@ -78,7 +79,15 @@ class _CardFormScreenState extends ConsumerState<CardFormScreen> {
     setState(() => _paying = true);
     final started = DateTime.now();
 
-    final outcome = await ref.read(subscriptionsRepositoryProvider).pay(_card);
+    final outcome = await ref
+        .read(subscriptionsRepositoryProvider)
+        .pay(_card, tier: ref.read(selectedPlanProvider));
+
+    // Тариф в шапке профиля и платные разделы (семья, история замеров)
+    // смотрят на подписку из `/users/me`; после оформления её надо
+    // перечитать, иначе до перезапуска приложение считает, что подписки
+    // нет. Ровно так уже терялись данные на живом сервере.
+    if (outcome == PaymentOutcome.success) ref.invalidate(profileProvider);
 
     final left = _minimumWait - DateTime.now().difference(started);
     if (left > Duration.zero) await Future<void>.delayed(left);
@@ -256,9 +265,17 @@ class _CardPreview extends StatelessWidget {
                             const SizedBox(height: 8),
                             _Chip(
                               width: 70,
-                              child: Text(
-                                _maskedExpiry,
-                                style: AppTypography.bodyMd,
+                              // Через FittedBox: плашка снята с макета, где
+                              // в ней стояло «01/01», а единица узкая — с
+                              // настоящим сроком («01/30») текст переносился
+                              // и последняя цифра уезжала на вторую строку.
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  _maskedExpiry,
+                                  maxLines: 1,
+                                  style: AppTypography.bodyMd,
+                                ),
                               ),
                             ),
                           ],

@@ -99,8 +99,6 @@
   "pushConsentText": "I agree to receive push notifications, SMS messages, and emails",
   "policyTitle": "Privacy Policy and Personal Data Processing Terms",
   "policyConsentText": "I consent to the processing of my personal data, including health data, under the terms set out in the Privacy Policy.",
-  "socialAuthCaption": "or sign in with",
-  "googleSignInSemanticLabel": "Sign in with Google",
   "appointmentTitle": "Your appointment",
   "startCallTitle": "Start call",
   "messageActionTitle": "Message",

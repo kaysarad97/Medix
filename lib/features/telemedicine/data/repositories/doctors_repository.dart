@@ -111,7 +111,7 @@ class MockDoctorsRepository implements DoctorsRepository {
       startsAt: DateTime(2026, 7, 10, 13, 30),
       doctorId: 'd1',
       // Совпадает с ценой того же врача в search(): 15 000 без подписки,
-      // 10 000 с Gold — как на `design/Предоплата - GOLD.png`.
+      // 10 000 с подпиской — как на `design/Предоплата - GOLD.png`.
       basePrice: 15000,
       subscriberPrice: 10000,
     );

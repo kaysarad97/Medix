@@ -36,7 +36,7 @@ void main() {
           statusCode: 200,
           body: {
             'id': 's1',
-            'plan_code': 'gold',
+            'plan_code': 'silver',
             'status': 'active',
             'period_end': '2026-09-09T10:00:00',
             'cancel_at_period_end': false,
@@ -50,12 +50,35 @@ void main() {
       expect(profile.lastName, 'Фамилия');
       expect(profile.firstName, 'Имя');
       expect(profile.email, 'user@medix.kz');
-      expect(profile.subscription, SubscriptionTier.gold);
+      expect(profile.subscription, SubscriptionTier.silver);
     });
 
     test('без подписки тариф бесплатный, а не ошибка', () async {
       // 404 на `/subscriptions/me` — нормальный ответ сервера.
       final (:dio, adapter: _) = cannedDio({'/users/me': me()});
+
+      final profile = await RemoteProfileRepository(dio).profile();
+
+      expect(profile.subscription, SubscriptionTier.free);
+    });
+
+    test('незнакомый тариф считается отсутствием подписки', () async {
+      // Gold сняли с продажи, и разбирать его код клиент больше не умеет.
+      // Старый сервер с такой подпиской не должен открывать платные
+      // разделы «на всякий случай» — это решает подписка, а не клиент.
+      final (:dio, adapter: _) = cannedDio({
+        '/users/me': me(),
+        '/subscriptions/me': (
+          statusCode: 200,
+          body: {
+            'id': 's1',
+            'plan_code': 'gold',
+            'status': 'active',
+            'period_end': '2026-09-09T10:00:00',
+            'cancel_at_period_end': false,
+          },
+        ),
+      });
 
       final profile = await RemoteProfileRepository(dio).profile();
 

@@ -78,7 +78,7 @@ class MockProfileRepository implements ProfileRepository {
     lastName: 'Фамилия',
     gender: Gender.male,
     birthDate: DateTime(1996, 12, 6),
-    subscription: SubscriptionTier.gold,
+    subscription: SubscriptionTier.silver,
     email: 'user@medix.kz',
     heightCm: 176,
     weightKg: 77,

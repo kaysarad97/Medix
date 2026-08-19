@@ -60,8 +60,8 @@ class PrepaymentCard extends StatelessWidget {
 
     // Скидку считает сервер: цена со скидкой приходит только тому, кому она
     // положена. Клиент больше не смотрит на тариф сам — до 17 августа 2026
-    // он гейтил показ по `SubscriptionTier.gold`, и подписчик Silver видел
-    // полную цену, хотя списывалась с него скидочная.
+    // он гейтил показ по тарифу Gold, и подписчик Silver видел полную цену,
+    // хотя списывалась с него скидочная.
     final discounted = appointment.subscriberPriceLabel;
     final l10n = AppLocalizations.of(context)!;
 
@@ -136,7 +136,7 @@ class _StrikedPrice extends StatelessWidget {
   }
 }
 
-/// Пилюля «Цена с подпиской Gold» под крупной ценой.
+/// Пилюля «Цена с подпиской Silver» под крупной ценой.
 class _SubscriberPricePill extends StatelessWidget {
   const _SubscriberPricePill();
 
@@ -151,7 +151,7 @@ class _SubscriberPricePill extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Text(
           AppLocalizations.of(context)!.subscriberPricePillLabel,
-          style: AppTypography.goldLabel.copyWith(fontSize: 13),
+          style: AppTypography.subscriberLabel.copyWith(fontSize: 13),
         ),
       ),
     );

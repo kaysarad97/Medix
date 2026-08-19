@@ -43,7 +43,7 @@ class ProfileHeader extends StatelessWidget {
           ),
           const SizedBox(width: ProfileMetrics.avatarToInfo),
           Expanded(child: _Info(profile: profile)),
-          _GoldBadge(tier: profile.subscription),
+          _SubscriptionBadge(tier: profile.subscription),
           const SizedBox(width: ProfileMetrics.screenH),
         ],
       ),
@@ -72,7 +72,7 @@ class _Info extends StatelessWidget {
         Text(profile.lastName, style: AppTypography.profileName),
         const SizedBox(height: ProfileMetrics.nameToMeta),
         // Колонки в макете разведены на 140, но это ширина макета: вместе
-        // с аватаром и значком Gold фиксированный зазор не помещается уже
+        // с аватаром и значком подписки фиксированный зазор не помещается
         // на 440. Делим остаток поровну — расстояние выходит близким, а на
         // узких экранах вёрстка не рвётся.
         Row(
@@ -117,8 +117,8 @@ class _MetaColumn extends StatelessWidget {
   }
 }
 
-class _GoldBadge extends StatelessWidget {
-  const _GoldBadge({required this.tier});
+class _SubscriptionBadge extends StatelessWidget {
+  const _SubscriptionBadge({required this.tier});
 
   final SubscriptionTier tier;
 
@@ -131,12 +131,12 @@ class _GoldBadge extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           const AppIcon(
-            icon: MedixIcon.subscriptionGold,
-            size: ProfileMetrics.goldIconSize,
+            icon: MedixIcon.subscriptionBadge,
+            size: ProfileMetrics.badgeIconSize,
             color: AppColors.gold,
           ),
-          const SizedBox(height: ProfileMetrics.goldIconToLabel),
-          Text(tier.label, style: AppTypography.goldLabel),
+          const SizedBox(height: ProfileMetrics.badgeIconToLabel),
+          Text(tier.label, style: AppTypography.subscriberLabel),
         ],
       ),
     );

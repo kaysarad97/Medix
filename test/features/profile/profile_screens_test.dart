@@ -66,7 +66,7 @@ void main() {
       expect(find.text('Фамилия'), findsOneWidget);
       expect(find.text('мужчина'), findsOneWidget);
       expect(find.text('6/12/1996'), findsOneWidget);
-      expect(find.text('Gold'), findsOneWidget);
+      expect(find.text('Silver'), findsOneWidget);
     });
 
     testWidgets('рисует карточки мед-карты, врачей и анализов', (tester) async {

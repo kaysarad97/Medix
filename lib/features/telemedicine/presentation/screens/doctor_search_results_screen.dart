@@ -25,9 +25,9 @@ enum _SortBy { rating, experience, price }
 ///
 /// Скидку и зачёркнутую цену показывает сервер, а не клиент: в ответе
 /// каталога `price_for_user` и `discount_percent` посчитаны для того, кто
-/// спрашивает. До 17 августа 2026 клиент гейтил показ по
-/// `SubscriptionTier.gold` — и подписчик Silver видел полную цену, хотя
-/// списывалась с него скидочная.
+/// спрашивает. До 17 августа 2026 клиент гейтил показ по тарифу Gold — и
+/// подписчик Silver видел полную цену, хотя списывалась с него скидочная.
+/// Самого тарифа Gold с тех пор не стало вовсе.
 class DoctorSearchResultsScreen extends ConsumerStatefulWidget {
   const DoctorSearchResultsScreen({super.key, required this.query});
 
@@ -387,6 +387,10 @@ class _Price extends StatelessWidget {
     // Скидку и её обоснование считает сервер: зачёркнутая цена приходит
     // только тому, кому скидка положена.
     final hasDiscount = doctor.priceBeforeDiscountLabel != null;
+    // Цены может не быть вовсе: у врача на сервере `consult_price` пустой.
+    // Без этой проверки карточка писала «null ₸ за консультацию» — поймано
+    // на живом каталоге.
+    final price = doctor.priceLabel;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -406,20 +410,23 @@ class _Price extends StatelessWidget {
             ),
             textAlign: TextAlign.right,
           ),
-        Text(
-          '${doctor.priceLabel} ₸',
-          style: AppTypography.cardItemTitle,
-          textAlign: TextAlign.right,
-        ),
-        Text(
-          l10n.perConsultationLabel,
-          style: AppTypography.cardItemMeta,
-          textAlign: TextAlign.right,
-        ),
+        if (price != null) ...[
+          Text(
+            '$price ₸',
+            style: AppTypography.cardItemTitle,
+            textAlign: TextAlign.right,
+          ),
+          // Подпись без цены не значит ничего, поэтому уходит вместе с ней.
+          Text(
+            l10n.perConsultationLabel,
+            style: AppTypography.cardItemMeta,
+            textAlign: TextAlign.right,
+          ),
+        ],
         if (hasDiscount)
           Text(
             l10n.forSubscribersLabel,
-            style: AppTypography.goldLabel.copyWith(fontSize: 11),
+            style: AppTypography.subscriberLabel.copyWith(fontSize: 11),
             textAlign: TextAlign.right,
           ),
       ],

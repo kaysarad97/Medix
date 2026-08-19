@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/features/profile/domain/entities/user_profile.dart';
 import 'package:medix/features/profile/presentation/providers/profile_providers.dart';
+import 'package:medix/features/telemedicine/domain/entities/doctor.dart';
 import 'package:medix/features/telemedicine/presentation/providers/telemedicine_providers.dart';
 import 'package:medix/features/telemedicine/presentation/screens/doctor_search_results_screen.dart';
 import 'package:medix/features/telemedicine/presentation/screens/doctor_search_screen.dart';
@@ -18,7 +19,11 @@ import '../../helpers/test_fonts.dart';
 void main() {
   setUpAll(loadAppFonts);
 
-  ProviderContainer buildContainer({UserProfile? profile}) {
+  ProviderContainer buildContainer({
+    UserProfile? profile,
+    List<Doctor>? results,
+    String query = 'Гастроэнтеролог',
+  }) {
     final container = ProviderContainer(
       overrides: [
         doctorsRepositoryProvider.overrideWithValue(
@@ -27,6 +32,10 @@ void main() {
         profileRepositoryProvider.overrideWithValue(FakeProfileRepository()),
         if (profile != null)
           profileProvider.overrideWith((ref) async => profile),
+        if (results != null)
+          doctorSearchResultsProvider(
+            query,
+          ).overrideWith((ref) async => results),
       ],
     );
     return container;
@@ -123,6 +132,31 @@ void main() {
 
       expect(find.textContaining('10 000'), findsWidgets);
       expect(find.textContaining('15 000'), findsWidgets);
+    });
+
+    testWidgets('без цены карточка не пишет «null ₸»', (tester) async {
+      // У врача на сервере `consult_price` может быть пустым, и карточка
+      // печатала подстановку null прямо в цену. Поймано на живом каталоге.
+      const priceless = [
+        Doctor(
+          id: 'd9',
+          fullName: 'Врач Тестов',
+          specialty: 'Терапевт',
+          rating: 0,
+          reviewsCount: 0,
+        ),
+      ];
+
+      await pumpScreen(
+        tester,
+        const DoctorSearchResultsScreen(query: 'Терапевт'),
+        buildContainer(results: priceless, query: 'Терапевт'),
+      );
+
+      expect(find.text('Врач Тестов'), findsOneWidget);
+      expect(find.textContaining('null'), findsNothing);
+      // Подпись без цены не значит ничего и уходит вместе с ней.
+      expect(find.text('за консультацию'), findsNothing);
     });
 
     testWidgets('сортировка по стажу переставляет карточки', (tester) async {

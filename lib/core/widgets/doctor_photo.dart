@@ -8,12 +8,17 @@ import '../../shared/models/medix_doctor_photos.dart';
 /// Размер задаёт родитель: на карточке каталога это круг 56, в шапке профиля
 /// врача — 137×155, на звонке — во весь экран.
 ///
-/// Кадрируется по-разному, и это не прихоть. В круглой аватарке портрет
-/// вписывается целиком и садится на нижний край: исходники сняты по пояс, и
-/// при обрезке «по размеру круга» халат упирался в кромку — снизу выходил
-/// прямой срез вместо круга, как и заметили на живом телефоне. В прямоугольном
-/// вырезе шапки врача, наоборот, портрет должен закрывать всё поле, поэтому
-/// там обрезка по верхнему краю: иначе голова уезжает вверх.
+/// Кадрируется всегда одинаково: портрет закрывает всё поле, лишнее снизу
+/// срезается. Выравнивание по верхнему краю — иначе голова уезжает за кромку.
+///
+/// ДВАЖДЫ ПРАВЛЕНО, ЧИТАТЬ ПЕРЕД ТРЕТЬИМ РАЗОМ. Сначала в круге стояла та же
+/// обрезка, но по нижнему краю, и халат упирался в кромку — снизу выходил
+/// прямой срез. Лечили это вписыванием целиком (`contain`) — и стало хуже:
+/// исходник снят на белом фоне со скруглёнными углами, и в круге вместо
+/// портрета появлялась белая табличка с прямыми боками, из-за которой круг
+/// и читался «каким-то овальным». Оба раза виноват был не круг, а
+/// выравнивание. Белый фон исходника при обрезке во всё поле работает как
+/// студийная подложка и заполняет круг целиком.
 class DoctorPhoto extends StatelessWidget {
   const DoctorPhoto({
     super.key,
@@ -32,9 +37,8 @@ class DoctorPhoto extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isRound = borderRadius == null;
-    final fit = isRound ? BoxFit.contain : BoxFit.cover;
-    final alignment = isRound ? Alignment.bottomCenter : Alignment.topCenter;
+    const fit = BoxFit.cover;
+    const alignment = Alignment.topCenter;
 
     final image = url == null
         ? Image.asset(
@@ -44,7 +48,7 @@ class DoctorPhoto extends StatelessWidget {
           )
         : Image.network(url!, fit: fit, alignment: alignment);
 
-    return isRound
+    return borderRadius == null
         ? ClipOval(child: image)
         : ClipRRect(borderRadius: borderRadius!, child: image);
   }

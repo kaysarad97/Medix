@@ -256,8 +256,8 @@ abstract final class AppTypography {
   static TextStyle get profileMetaLabel =>
       _style(size: 13, weight: 400, color: AppColors.surfaceChip);
 
-  /// Подпись уровня подписки под ромбом.
-  static TextStyle get goldLabel =>
+  /// Подпись уровня подписки под ромбом и приписки к цене со скидкой.
+  static TextStyle get subscriberLabel =>
       _style(size: 15, weight: 400, color: AppColors.gold);
 
   /// Название анализа в списке. В макете переносится на две строки.

@@ -19,8 +19,8 @@ class SubscriptionScreen extends ConsumerWidget {
   final ValueChanged<SubscriptionPlan>? onSelectPlan;
   final VoidCallback? onSkip;
 
-  /// Колонки таблицы. Basic — отсутствие подписки, карточки с ценой у него
-  /// нет, но в сравнении он участвует.
+  /// Колонки таблицы: Basic и Silver. Basic — отсутствие подписки, карточки
+  /// с ценой у него нет, но в сравнении он участвует.
   static const List<SubscriptionTier> columns = SubscriptionTier.values;
 
   @override
@@ -69,7 +69,15 @@ class SubscriptionScreen extends ConsumerWidget {
                       Expanded(
                         child: _PlanCard(
                           plan: plan,
-                          onTap: () => onSelectPlan?.call(plan),
+                          // Выбор запоминается здесь, а не в роутере: он
+                          // нужен только на последнем шаге оплаты, где
+                          // подписка и оформляется.
+                          onTap: () {
+                            ref
+                                .read(selectedPlanProvider.notifier)
+                                .select(plan.tier);
+                            onSelectPlan?.call(plan);
+                          },
                         ),
                       ),
                     ],
@@ -87,7 +95,12 @@ class SubscriptionScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 40),
+              // Отступ снизу с запасом на системную панель: на телефоне
+              // (в отличие от макета) её высота съедала ссылку целиком, и
+              // нажать «продолжить без подписки» было нечем. SafeArea здесь
+              // не помогает — она отключена снизу, чтобы фон уходил под
+              // панель, как на остальных экранах.
+              SizedBox(height: 40 + MediaQuery.paddingOf(context).bottom),
             ],
           ),
         ),
@@ -96,7 +109,7 @@ class SubscriptionScreen extends ConsumerWidget {
   }
 }
 
-/// Таблица сравнения: слева иконка с описанием, справа три колонки.
+/// Таблица сравнения: слева иконка с описанием, справа колонки тарифов.
 class _ComparisonTable extends StatelessWidget {
   const _ComparisonTable({required this.features});
 
@@ -231,7 +244,13 @@ class _Cell extends StatelessWidget {
   }
 }
 
-/// Карточка тарифа с ценой. Gold залита синим, Silver белая.
+/// Карточка тарифа с ценой.
+///
+/// РАСХОЖДЕНИЕ С МАКЕТОМ, ВЫНУЖДЕННОЕ. В `design/Подписка.png` карточек две:
+/// Gold залита синим, Silver рядом белая. Gold сняли с продажи, и осталась
+/// одна карточка на всю ширину. Залита синим — в макете синим выделена та,
+/// которую предлагают купить, а не конкретный тариф; белая карточка на почти
+/// белом низу фона не читалась бы как кнопка. Дизайнеру отдано на пересмотр.
 class _PlanCard extends StatelessWidget {
   const _PlanCard({required this.plan, this.onTap});
 
@@ -240,18 +259,16 @@ class _PlanCard extends StatelessWidget {
 
   static const double height = 136;
 
-  bool get _filled => plan.tier == SubscriptionTier.gold;
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final onCard = _filled ? AppColors.textOnPrimary : AppColors.textPrimary;
-    final accent = _filled ? AppColors.textOnPrimary : AppColors.primaryBright;
+    const onCard = AppColors.textOnPrimary;
+    const accent = AppColors.textOnPrimary;
 
     return SizedBox(
       height: height,
       child: Material(
-        color: _filled ? AppColors.primaryBright : AppColors.surface,
+        color: AppColors.primaryBright,
         borderRadius: ProfileMetrics.allRadius,
         clipBehavior: Clip.antiAlias,
         child: InkWell(

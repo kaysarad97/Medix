@@ -5,6 +5,7 @@ import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/core/widgets/medix_wait_view.dart';
 import 'package:medix/core/widgets/primary_button.dart';
 import 'package:medix/features/subscriptions/data/repositories/subscriptions_repository.dart';
+import 'package:medix/shared/models/subscription_tier.dart';
 import 'package:medix/features/subscriptions/domain/entities/payment_method.dart';
 import 'package:medix/features/subscriptions/presentation/providers/subscriptions_providers.dart';
 import 'package:medix/features/subscriptions/presentation/screens/card_form_screen.dart';
@@ -52,8 +53,9 @@ void main() {
     expect(find.text('Basic'), findsOneWidget);
     expect(find.text('Silver'), findsNWidgets(2)); // колонка и карточка
     expect(find.text('Скидки на анализы'), findsOneWidget);
-    expect(find.text('9999'), findsOneWidget);
+    // Тариф остался один: карточка с ценой только у Silver.
     expect(find.text('5999'), findsOneWidget);
+    expect(find.text('Gold'), findsNothing);
     expect(find.text('или продолжить без подписки'), findsOneWidget);
   });
 
@@ -188,7 +190,10 @@ void main() {
         expiry: '0130',
         cvv: '123',
       );
-      expect(await repo.pay(bad), PaymentOutcome.failure);
+      expect(
+        await repo.pay(bad, tier: SubscriptionTier.silver),
+        PaymentOutcome.failure,
+      );
     });
   });
 }

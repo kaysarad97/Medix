@@ -64,11 +64,7 @@ class RemoteProfileRepository implements ProfileRepository {
       final response = await _dio.get<Map<String, dynamic>>(
         ApiEndpoints.mySubscription,
       );
-      return switch (response.data?['plan_code']) {
-        'gold' => SubscriptionTier.gold,
-        'silver' => SubscriptionTier.silver,
-        _ => SubscriptionTier.free,
-      };
+      return SubscriptionTier.fromCode(response.data?['plan_code']);
     } on DioException catch (e) {
       if (e.response?.statusCode == 404) return SubscriptionTier.free;
       throw ApiException.fromDio(e);

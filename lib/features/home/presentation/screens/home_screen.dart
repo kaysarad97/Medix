@@ -39,7 +39,7 @@ class HomeScreen extends ConsumerWidget {
     final appointments = ref.watch(upcomingAppointmentsProvider);
     final family = ref.watch(familyMembersProvider).value ?? const [];
     // Тот же платный гейт, что и на «Ваша Мед-Карта»: проверяем наличие
-    // подписки, а не тариф Gold — его на сервере больше нет.
+    // подписки, а не её уровень — тариф остался один.
     final subscription = ref.watch(profileProvider).value?.subscription;
     final hasSubscription =
         subscription != null && subscription != SubscriptionTier.free;

@@ -13,7 +13,6 @@ import '../../../../core/widgets/form_error_snack_bar.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../providers/login_controller.dart';
-import '../widgets/social_auth_row.dart';
 
 /// Экран входа — шаг 1: почта.
 ///
@@ -39,11 +38,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   /// Заголовок 172…215 → карточка 303.
   static const double _titleToCard = 88;
 
-  /// Карточка 303…537 → «или авторизоваться через» 566.
-  static const double _cardToSocial = 28;
-
-  /// Блок соцсетей 566…616 → кнопка 652.
-  static const double _socialToButton = 29;
+  /// Карточка → кнопка. В макете между ними стоял блок «или авторизоваться
+  /// через» с иконкой Google (566…616), и разрыв делился на 28 + 50 + 29.
+  /// Вход через Google исключён из объёма MVP решением от 20 августа 2026 —
+  /// сам блок снят, а зазор взят обычным межсекционным, а не суммой трёх:
+  /// иначе посреди экрана осталась бы пустая полоса в треть высоты карточки.
+  static const double _cardToButton = 44;
 
   /// Кнопка 652…722 → ссылка 765.
   static const double _buttonToLink = 35;
@@ -102,14 +102,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: _cardToSocial),
-              SocialAuthRow(
-                onGooglePressed: () {
-                  // TODO(auth): подключить Google Sign-In, когда будет
-                  // готов эндпоинт /auth/google на бэкенде.
-                },
-              ),
-              const SizedBox(height: _socialToButton),
+              const SizedBox(height: _cardToButton),
               Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.screenH,

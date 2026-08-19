@@ -450,14 +450,6 @@
   "@policyConsentText": {
     "description": "Текст согласия на обработку персональных данных."
   },
-  "socialAuthCaption": "или авторизоваться через",
-  "@socialAuthCaption": {
-    "description": "Подпись над иконками соцвхода на экране логина."
-  },
-  "googleSignInSemanticLabel": "Войти через Google",
-  "@googleSignInSemanticLabel": {
-    "description": "Метка для скринридера на иконке входа через Google."
-  },
   "appointmentTitle": "Ваша запись",
   "@appointmentTitle": {
     "description": "Заголовок экрана записи и подпись под форматом приёма в карточке записи."
@@ -592,7 +584,7 @@
   },
   "forSubscribersLabel": "для пользователей Silver",
   "@forSubscribersLabel": {
-    "description": "Подпись скидочной цены для подписчиков Gold."
+    "description": "Подпись скидочной цены для подписчиков Silver."
   },
   "prepaymentCardTitle": "Предоплата записи",
   "@prepaymentCardTitle": {

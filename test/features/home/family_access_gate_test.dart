@@ -16,7 +16,7 @@ import '../../helpers/fake_family_repository.dart';
 import '../../helpers/fake_profile_repository.dart';
 import '../../helpers/test_fonts.dart';
 
-/// Семейный доступ входит в Gold: без подписки «Моя Семья» ведёт на экран
+/// Семейный доступ платный: без подписки «Моя Семья» ведёт на экран
 /// тарифов, а не в профиль близкого и не в список семьи. Проверяются оба
 /// входа — с главной и с «Ваша Мед-Карта».
 ///
@@ -99,10 +99,10 @@ void main() {
       expect(find.text('профиль близкого'), findsNothing);
     });
 
-    testWidgets('с Gold открывается профиль близкого', (tester) async {
+    testWidgets('с подпиской открывается профиль близкого', (tester) async {
       await pumpScreen(
         tester,
-        SubscriptionTier.gold,
+        SubscriptionTier.silver,
         screen: const HomeScreen(),
       );
       await tapText(tester, 'Профиль для ребенка');
@@ -124,8 +124,8 @@ void main() {
       expect(find.text('список семьи'), findsNothing);
     });
 
-    testWidgets('с Gold заголовок ведёт на список семьи', (tester) async {
-      await pumpScreen(tester, SubscriptionTier.gold, screen: screen);
+    testWidgets('с подпиской заголовок ведёт на список семьи', (tester) async {
+      await pumpScreen(tester, SubscriptionTier.silver, screen: screen);
       await tapText(tester, 'Моя Семья');
 
       expect(find.text('список семьи'), findsOneWidget);

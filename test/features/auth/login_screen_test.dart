@@ -38,7 +38,6 @@ void main() {
 
     expect(find.text('Логин'), findsOneWidget);
     expect(find.text('Ваш E-mail:'), findsOneWidget);
-    expect(find.text('или авторизоваться через'), findsOneWidget);
     expect(find.text('Получить код'), findsOneWidget);
     expect(find.text('или создать профиль'), findsOneWidget);
 

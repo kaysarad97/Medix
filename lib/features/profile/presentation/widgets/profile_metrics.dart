@@ -39,9 +39,9 @@ abstract final class ProfileMetrics {
   /// Вторая колонка подписей начинается на x 300, то есть 140 от первой.
   static const double metaColumnGap = 140;
 
-  /// Значок Gold: ромб 21 и подпись под ним.
-  static const double goldIconSize = 21;
-  static const double goldIconToLabel = 12;
+  /// Значок подписки: ромб 21 и подпись под ним.
+  static const double badgeIconSize = 21;
+  static const double badgeIconToLabel = 12;
 
   /// Шапка → первая карточка (низ аватара 315 → карточка 308).
   static const double headerToCards = 0;
