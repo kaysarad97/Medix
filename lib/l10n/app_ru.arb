@@ -1072,5 +1072,101 @@
   "doctorOtherReviewsTitle": "Остальные отзывы",
   "@doctorOtherReviewsTitle": {
     "description": "Заголовок списка отзывов под каруселью «Топ отзывов»."
+  },
+  "doctorHistoryTitle": "История записей",
+  "@doctorHistoryTitle": {
+    "description": "Заголовок экрана «История записей» в кабинете врача. Тот же заголовок стоит и на «О прошлой записи» — так в макете."
+  },
+  "doctorHistorySearchHint": "Поиск по имени",
+  "@doctorHistorySearchHint": {
+    "description": "Плейсхолдер поиска по имени пациента на «Истории записей»."
+  },
+  "doctorHistoryPreviousTitle": "Предыдущая запись",
+  "@doctorHistoryPreviousTitle": {
+    "description": "Заголовок выделенной карточки с последней прошедшей записью."
+  },
+  "doctorHistoryOthersTitle": "Другие записи",
+  "@doctorHistoryOthersTitle": {
+    "description": "Заголовок списка прошедших записей за отлистанную неделю."
+  },
+  "doctorHistoryWithPatient": "с {name}",
+  "@doctorHistoryWithPatient": {
+    "description": "Подпись под видом записи в строке истории: «с Имя Фамилия».",
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "doctorPastWithPatient": "С {name}",
+  "@doctorPastWithPatient": {
+    "description": "То же на карточке «О прошлой записи», но с прописной буквы — так в макете.",
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "doctorPastPatientProfileLabel": "Профиль пациента",
+  "@doctorPastPatientProfileLabel": {
+    "description": "Подпись строки перехода в профиль пациента на «О прошлой записи»."
+  },
+  "doctorPastConclusionTitle": "Об {name}",
+  "@doctorPastConclusionTitle": {
+    "description": "Заголовок блока заключения: «Об Имя Фамилия».",
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "doctorPastConclusionDate": "Заключение от {date}",
+  "@doctorPastConclusionDate": {
+    "description": "Дата заключения справа в шапке блока.",
+    "placeholders": { "date": { "type": "String" } }
+  },
+  "doctorPastConclusionPlaceholder": "Временный текст о пациенте. Так как это первая запись, анамнез и общая информация не введена Вами. После проведения консультации, пожалуйста, загрузите заключение о пациенте и оно появится здесь.",
+  "@doctorPastConclusionPlaceholder": {
+    "description": "Текст на месте незагруженного заключения — дословно из макета «О прошлой записи»."
+  },
+  "doctorPastUploadConclusion": "Загрузить заключение",
+  "@doctorPastUploadConclusion": {
+    "description": "Кнопка загрузки заключения под текстом."
+  },
+  "doctorAnalyticsTitle": "Аналитика Работы",
+  "@doctorAnalyticsTitle": {
+    "description": "Заголовок экрана аналитики в кабинете врача."
+  },
+  "doctorAnalyticsWeekTitle": "Записи за эту неделю",
+  "@doctorAnalyticsWeekTitle": {
+    "description": "Заголовок верхней карточки аналитики."
+  },
+  "doctorAnalyticsWeekCardTitle": "Аналитика недели",
+  "@doctorAnalyticsWeekCardTitle": {
+    "description": "Заголовок вложенной карточки с показателями недели."
+  },
+  "doctorAnalyticsMonthCardTitle": "Аналитика месяца",
+  "@doctorAnalyticsMonthCardTitle": {
+    "description": "Заголовок нижней карточки — показатели за месяц."
+  },
+  "doctorAnalyticsAppointments": "{count} записей",
+  "@doctorAnalyticsAppointments": {
+    "description": "Крупное число записей за период. Склонения нет — как и везде в приложении, см. HANDOFF.",
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "doctorAnalyticsDeltaMore": "на {count} больше\nчем обычно",
+  "@doctorAnalyticsDeltaMore": {
+    "description": "Плашка сравнения с обычным числом записей, рост.",
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "doctorAnalyticsDeltaLess": "на {count} меньше\nчем обычно",
+  "@doctorAnalyticsDeltaLess": {
+    "description": "То же при падении. В макете нарисован только рост — вариант со снижением дописан по смыслу.",
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "doctorAnalyticsMinutes": "{count} минут",
+  "@doctorAnalyticsMinutes": {
+    "description": "Средняя длина записи в плитке показателей.",
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "doctorAnalyticsAverageLabel": "средняя\nдлина записи",
+  "@doctorAnalyticsAverageLabel": {
+    "description": "Подпись плитки средней длины записи."
+  },
+  "doctorAnalyticsRatingLabel": "повышение\nрейтинга",
+  "@doctorAnalyticsRatingLabel": {
+    "description": "Подпись плитки прироста рейтинга."
+  },
+  "doctorAnalyticsEarningsLabel": "повышение\nзаработка",
+  "@doctorAnalyticsEarningsLabel": {
+    "description": "Подпись плитки прироста заработка."
   }
 }

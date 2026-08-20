@@ -31,7 +31,9 @@ class DoctorAppointment {
     required this.patientName,
     required this.kind,
     required this.startsAt,
+    this.endsAt,
     this.patientAvatarAsset,
+    this.conclusion,
   });
 
   final String id;
@@ -39,14 +41,31 @@ class DoctorAppointment {
   final AppointmentKind kind;
   final DateTime startsAt;
 
+  /// Конец приёма. Есть только у прошедших записей — в «Истории записей»
+  /// время подписано промежутком («13:30-14:47»), а в календаре будущих
+  /// записей одной точкой начала.
+  final DateTime? endsAt;
+
   /// Аватар пациента в строке календаря. На главной не используется.
   final String? patientAvatarAsset;
+
+  /// Заключение врача о приёме — «О прошлой записи.png». `null` — врач его
+  /// ещё не загрузил, и на месте текста стоит объяснение из макета.
+  final String? conclusion;
 
   /// «13.08» — пилюля в карточке «Предстоящие записи» на главной.
   String get shortDate => RuDates.dayMonth(startsAt);
 
   /// «10:30» — пилюля в строке календаря.
   String get timeLabel => RuDates.time(startsAt);
+
+  /// «10.07, 13:30-14:47» — строка в «Истории записей». Без конца приёма
+  /// («10.07, 13:30») — так подписана карточка на «О прошлой записи».
+  String get historyLabel {
+    final end = endsAt;
+    final start = '$shortDate, ${RuDates.hourMinute(startsAt)}';
+    return end == null ? start : '$start-${RuDates.hourMinute(end)}';
+  }
 
   DoctorDayPeriod get period => DoctorDayPeriod.of(startsAt);
 }

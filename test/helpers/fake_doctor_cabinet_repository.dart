@@ -4,6 +4,7 @@ import 'package:medix/features/doctor_cabinet/domain/entities/doctor_appointment
 import 'package:medix/features/doctor_cabinet/domain/entities/doctor_own_profile.dart';
 import 'package:medix/features/doctor_cabinet/domain/entities/doctor_own_review.dart';
 import 'package:medix/features/doctor_cabinet/domain/entities/regular_patient.dart';
+import 'package:medix/features/doctor_cabinet/domain/entities/work_analytics.dart';
 import 'package:medix/shared/models/appointment.dart';
 import 'package:medix/shared/models/medix_avatars.dart';
 
@@ -100,4 +101,89 @@ class FakeDoctorCabinetRepository implements DoctorCabinetRepository {
       text: 'Временный текст отзыва о враче.',
     ),
   ];
+
+  /// Две прошедшие записи вместо четырёх — тестам хватает, а список
+  /// короче читается в ожиданиях.
+  @override
+  Future<List<DoctorAppointment>> pastAppointments({
+    required DateTime from,
+    required DateTime to,
+  }) async => [
+    _past('h1', from),
+    _past('h2', from.add(const Duration(days: 1))),
+  ];
+
+  @override
+  Future<DoctorAppointment> pastAppointment(String id) async =>
+      _past(id, DateTime(2026, 7, 10));
+
+  static DoctorAppointment _past(String id, DateTime day) {
+    final start = DateTime(day.year, day.month, day.day, 13, 30);
+    return DoctorAppointment(
+      id: id,
+      patientName: 'Имя Фамилия',
+      kind: AppointmentKind.audioCall,
+      startsAt: start,
+      endsAt: start.add(const Duration(minutes: 77)),
+      patientAvatarAsset: MedixAvatars.all[2],
+    );
+  }
+
+  @override
+  Future<DoctorWorkAnalytics> workAnalytics() async => DoctorWorkAnalytics(
+    week: DoctorWeekAnalytics(
+      from: DateTime(2026, 7, 13),
+      to: DateTime(2026, 7, 19),
+      perDay: const [0, 2, 3, 1, 1, 0, 0],
+      stats: const DoctorWorkStats(
+        appointments: 7,
+        deltaVsUsual: 2,
+        averageMinutes: 49,
+        ratingDelta: 0.5,
+        earningsPercent: 20,
+      ),
+    ),
+    month: DoctorMonthAnalytics(
+      month: DateTime(2026, 7),
+      perDay: const [
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        2,
+        1,
+        1,
+        2,
+        2,
+        1,
+        2,
+        3,
+        3,
+        4,
+        4,
+        5,
+        5,
+        6,
+        5,
+        4,
+        3,
+        2,
+        2,
+        3,
+        3,
+        4,
+        5,
+        6,
+      ],
+      stats: const DoctorWorkStats(
+        appointments: 15,
+        deltaVsUsual: 5,
+        averageMinutes: 46,
+        ratingDelta: 1.5,
+        earningsPercent: 23,
+      ),
+    ),
+  );
 }

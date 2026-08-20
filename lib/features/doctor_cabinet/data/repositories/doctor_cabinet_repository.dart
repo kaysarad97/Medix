@@ -5,6 +5,7 @@ import '../../domain/entities/doctor_appointment.dart';
 import '../../domain/entities/doctor_own_profile.dart';
 import '../../domain/entities/doctor_own_review.dart';
 import '../../domain/entities/regular_patient.dart';
+import '../../domain/entities/work_analytics.dart';
 
 abstract interface class DoctorCabinetRepository {
   /// «Предстоящие записи» на главной — ближайшие записи безотносительно дня.
@@ -24,6 +25,18 @@ abstract interface class DoctorCabinetRepository {
 
   /// «Отзывы о Вас».
   Future<List<DoctorOwnReview>> ownReviews();
+
+  /// Прошедшие записи за промежуток — «История записей».
+  Future<List<DoctorAppointment>> pastAppointments({
+    required DateTime from,
+    required DateTime to,
+  });
+
+  /// Одна прошедшая запись с заключением — «О прошлой записи».
+  Future<DoctorAppointment> pastAppointment(String id);
+
+  /// «Аналитика Работы» — неделя и месяц разом.
+  Future<DoctorWorkAnalytics> workAnalytics();
 }
 
 /// Заглушка на время разработки бэкенда — кабинета врача на сервере пока
@@ -171,5 +184,111 @@ class MockDoctorCabinetRepository implements DoctorCabinetRepository {
         text: text,
       ),
     ];
+  }
+
+  /// Четыре записи на промежуток, как в макете. День берётся от начала
+  /// промежутка, чтобы список менялся при перелистывании недели, — иначе
+  /// пейджер выглядел бы сломанным.
+  @override
+  Future<List<DoctorAppointment>> pastAppointments({
+    required DateTime from,
+    required DateTime to,
+  }) async {
+    await Future<void>.delayed(_latency);
+    return [for (var i = 0; i < 4; i++) _past('h${from.day}-$i', from, i)];
+  }
+
+  @override
+  Future<DoctorAppointment> pastAppointment(String id) async {
+    await Future<void>.delayed(_latency);
+    final today = DateTime.now();
+    // Заключения нет: в макете на его месте стоит объяснение, почему поле
+    // пустое, — значит, это и есть состояние по умолчанию.
+    return _past(id, today.subtract(const Duration(days: 7)), 0);
+  }
+
+  /// Строка записи из макета: аудио-звонок, «Имя Фамилия», приём почти
+  /// полтора часа.
+  static DoctorAppointment _past(String id, DateTime day, int index) {
+    final start = DateTime(day.year, day.month, day.day + index, 13, 30);
+    return DoctorAppointment(
+      id: id,
+      patientName: 'Имя Фамилия',
+      kind: AppointmentKind.audioCall,
+      startsAt: start,
+      endsAt: start.add(const Duration(minutes: 77)),
+      patientAvatarAsset: MedixAvatars.all[index % MedixAvatars.all.length],
+    );
+  }
+
+  @override
+  Future<DoctorWorkAnalytics> workAnalytics() async {
+    await Future<void>.delayed(_latency);
+    final today = DateTime.now();
+    final monday = DateTime(
+      today.year,
+      today.month,
+      today.day,
+    ).subtract(Duration(days: today.weekday - 1));
+
+    return DoctorWorkAnalytics(
+      week: DoctorWeekAnalytics(
+        from: monday,
+        to: monday.add(const Duration(days: 6)),
+        // Столбики с макета: понедельник пустой, среда самая высокая.
+        perDay: const [0, 2, 3, 1, 1, 0, 0],
+        stats: const DoctorWorkStats(
+          appointments: 7,
+          deltaVsUsual: 2,
+          averageMinutes: 49,
+          ratingDelta: 0.5,
+          earningsPercent: 20,
+        ),
+      ),
+      month: DoctorMonthAnalytics(
+        month: DateTime(today.year, today.month),
+        // Ломаная с макета: растёт к 20-му, проседает к 25-му и снова
+        // идёт вверх. Тридцать значений — столько же дней на оси.
+        perDay: const [
+          0,
+          0,
+          1,
+          1,
+          0,
+          1,
+          2,
+          1,
+          1,
+          2,
+          2,
+          1,
+          2,
+          3,
+          3,
+          4,
+          4,
+          5,
+          5,
+          6,
+          5,
+          4,
+          3,
+          2,
+          2,
+          3,
+          3,
+          4,
+          5,
+          6,
+        ],
+        stats: const DoctorWorkStats(
+          appointments: 15,
+          deltaVsUsual: 5,
+          averageMinutes: 46,
+          ratingDelta: 1.5,
+          earningsPercent: 23,
+        ),
+      ),
+    );
   }
 }

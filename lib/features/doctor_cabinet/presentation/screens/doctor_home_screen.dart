@@ -67,6 +67,8 @@ class DoctorHomeScreen extends ConsumerWidget {
                   analyticsTitle: l10n.doctorAnalyticsTileTitle,
                   analyticsSubtitle: l10n.doctorAnalyticsTileSubtitle,
                   onSchedule: () => context.push(Routes.doctorCalendar),
+                  onHistory: () => context.push(Routes.doctorHistory),
+                  onAnalytics: () => context.push(Routes.doctorAnalytics),
                 ),
               ),
               const SizedBox(height: DoctorHomeMetrics.cardGap),

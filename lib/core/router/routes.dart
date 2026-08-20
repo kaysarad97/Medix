@@ -74,6 +74,17 @@ abstract final class Routes {
   /// пациентским «Оставьте отзыв» на профиле врача, это другой экран.
   static const String doctorOwnReviews = '/doctor-reviews';
 
+  /// «История записей» — плитка на главной кабинета врача.
+  static const String doctorHistory = '/doctor-history';
+
+  /// «О прошлой записи» — строка истории.
+  static const String doctorPastAppointment = '/doctor-history/:id';
+
+  static String doctorPastAppointmentOf(String id) => '/doctor-history/$id';
+
+  /// «Аналитика Работы» — третья плитка на главной кабинета врача.
+  static const String doctorAnalytics = '/doctor-analytics';
+
   /// Оформленная запись к врачу.
   static const String appointment = '/appointment/:id';
 
