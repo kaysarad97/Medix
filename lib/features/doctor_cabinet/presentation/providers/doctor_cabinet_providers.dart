@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/repositories/doctor_cabinet_repository.dart';
@@ -6,6 +7,7 @@ import '../../domain/entities/doctor_appointment.dart';
 import '../../domain/entities/doctor_own_profile.dart';
 import '../../domain/entities/doctor_own_review.dart';
 import '../../domain/entities/doctor_patient.dart';
+import '../../domain/entities/patient_chat.dart';
 import '../../domain/entities/regular_patient.dart';
 import '../../domain/entities/work_analytics.dart';
 
@@ -180,4 +182,94 @@ final doctorWorkAnalyticsProvider = FutureProvider<DoctorWorkAnalytics>(
 final doctorPatientProvider = FutureProvider.autoDispose
     .family<DoctorPatient, String>(
       (ref, id) => ref.watch(doctorCabinetRepositoryProvider).patient(id),
+    );
+
+/// Переписки с пациентами.
+final doctorPatientChatsProvider = FutureProvider<List<PatientChatThread>>(
+  (ref) => ref.watch(doctorCabinetRepositoryProvider).patientChats(),
+);
+
+/// Строка поиска в списке чатов врача. Своя, а не общая с пациентской:
+/// экраны разные, и чужой ввод не должен фильтровать этот список.
+class DoctorChatSearchQuery extends Notifier<String> {
+  @override
+  String build() => '';
+
+  void update(String value) => state = value;
+}
+
+final doctorChatSearchQueryProvider =
+    NotifierProvider<DoctorChatSearchQuery, String>(DoctorChatSearchQuery.new);
+
+/// Список с учётом поиска — по имени пациента и по тексту последней реплики.
+final visibleDoctorChatsProvider = Provider<List<PatientChatThread>>((ref) {
+  final threads = ref.watch(doctorPatientChatsProvider).value ?? const [];
+  final query = ref.watch(doctorChatSearchQueryProvider).trim().toLowerCase();
+  if (query.isEmpty) return threads;
+
+  return [
+    for (final thread in threads)
+      if (thread.patientName.toLowerCase().contains(query) ||
+          thread.lastMessage.toLowerCase().contains(query))
+        thread,
+  ];
+});
+
+@immutable
+class PatientChatState {
+  const PatientChatState({this.messages = const [], this.isSending = false});
+
+  final List<PatientMessage> messages;
+  final bool isSending;
+
+  PatientChatState copyWith({List<PatientMessage>? messages, bool? isSending}) {
+    return PatientChatState(
+      messages: messages ?? this.messages,
+      isSending: isSending ?? this.isSending,
+    );
+  }
+}
+
+/// Открытая переписка с пациентом.
+///
+/// Без family, как и на пациентской стороне: одновременно открыт всегда
+/// один чат, а экран сам сообщает, какой именно, через [open].
+class PatientChatController extends Notifier<PatientChatState> {
+  String? _threadId;
+
+  @override
+  PatientChatState build() => const PatientChatState();
+
+  Future<void> open(String threadId) async {
+    if (_threadId == threadId) return;
+    _threadId = threadId;
+    state = const PatientChatState();
+
+    final loaded = await ref
+        .read(doctorCabinetRepositoryProvider)
+        .patientMessages(threadId);
+    // Пока грузили, могли открыть другой чат — тогда ответ уже не нужен.
+    if (_threadId != threadId) return;
+    state = state.copyWith(messages: loaded);
+  }
+
+  Future<void> send(String text) async {
+    final trimmed = text.trim();
+    final threadId = _threadId;
+    if (trimmed.isEmpty || threadId == null || state.isSending) return;
+
+    state = state.copyWith(isSending: true);
+    final sent = await ref
+        .read(doctorCabinetRepositoryProvider)
+        .sendPatientMessage(threadId, trimmed);
+    state = state.copyWith(
+      messages: [...state.messages, sent],
+      isSending: false,
+    );
+  }
+}
+
+final patientChatControllerProvider =
+    NotifierProvider<PatientChatController, PatientChatState>(
+      PatientChatController.new,
     );

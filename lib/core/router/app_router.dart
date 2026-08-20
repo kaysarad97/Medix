@@ -12,6 +12,7 @@ import '../../features/auth/presentation/screens/verify_code_screen.dart';
 import '../../features/calls/presentation/screens/call_screen.dart';
 import '../../features/chats/presentation/screens/chats_list_screen.dart';
 import '../../features/chats/presentation/screens/doctor_chat_screen.dart';
+import '../../features/doctor_cabinet/presentation/screens/doctor_chats_screen.dart';
 import '../../features/doctor_cabinet/presentation/screens/doctor_calendar_screen.dart';
 import '../../features/doctor_cabinet/presentation/screens/doctor_certificates_screen.dart';
 import '../../features/doctor_cabinet/presentation/screens/doctor_home_screen.dart';
@@ -21,6 +22,7 @@ import '../../features/doctor_cabinet/presentation/screens/doctor_history_screen
 import '../../features/doctor_cabinet/presentation/screens/doctor_past_appointment_screen.dart';
 import '../../features/doctor_cabinet/presentation/screens/doctor_patient_appointment_screen.dart';
 import '../../features/doctor_cabinet/presentation/screens/doctor_patient_screen.dart';
+import '../../features/doctor_cabinet/presentation/screens/doctor_patient_chat_screen.dart';
 import '../../features/doctor_cabinet/presentation/screens/doctor_reviews_screen.dart';
 import '../../features/family_access/presentation/screens/family_list_screen.dart';
 import '../../features/family_access/presentation/screens/family_member_form_screen.dart';
@@ -207,6 +209,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.doctorAnalytics,
         builder: (context, state) => const DoctorAnalyticsScreen(),
+      ),
+      GoRoute(
+        path: Routes.doctorChats,
+        builder: (context, state) => const DoctorChatsScreen(),
+      ),
+      GoRoute(
+        path: Routes.doctorPatientChat,
+        builder: (context, state) =>
+            DoctorPatientChatScreen(threadId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: Routes.doctorPatient,

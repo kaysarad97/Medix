@@ -4,6 +4,7 @@ import 'package:medix/features/doctor_cabinet/domain/entities/doctor_appointment
 import 'package:medix/features/doctor_cabinet/domain/entities/doctor_own_profile.dart';
 import 'package:medix/features/doctor_cabinet/domain/entities/doctor_own_review.dart';
 import 'package:medix/features/doctor_cabinet/domain/entities/doctor_patient.dart';
+import 'package:medix/features/doctor_cabinet/domain/entities/patient_chat.dart';
 import 'package:medix/features/doctor_cabinet/domain/entities/regular_patient.dart';
 import 'package:medix/features/doctor_cabinet/domain/entities/work_analytics.dart';
 import 'package:medix/shared/models/analysis_result.dart';
@@ -215,5 +216,55 @@ class FakeDoctorCabinetRepository implements DoctorCabinetRepository {
           takenAt: DateTime(2026, 7, 20 - i),
         ),
     ],
+  );
+
+  /// Две переписки: первая непрочитанная, вторая своя — этого хватает,
+  /// чтобы проверить и подсветку строки, и приставку «Вы: ».
+  @override
+  Future<List<PatientChatThread>> patientChats() async => [
+    PatientChatThread(
+      id: 'pc1',
+      patientName: 'Имя Фамилия',
+      lastMessage: 'Здравствуйте! Какие анализы мне нужны перед приёмом?',
+      lastMessageAt: DateTime(2026, 7, 21, 13, 44),
+      lastMessageIsMine: false,
+      isRead: false,
+      patientAvatarAsset: MedixAvatars.all[2],
+    ),
+    PatientChatThread(
+      id: 'pc2',
+      patientName: 'Имя Фамилия',
+      lastMessage: 'Спасибо за обращение, на здоровье!',
+      lastMessageAt: DateTime(2026, 7, 21, 13, 44),
+      lastMessageIsMine: true,
+      patientAvatarAsset: MedixAvatars.all[5],
+    ),
+  ];
+
+  @override
+  Future<List<PatientMessage>> patientMessages(String threadId) async => [
+    PatientMessage(
+      id: '$threadId-1',
+      text: 'Здравствуйте! Как Вы себя чувствуете сегодня?',
+      isMine: true,
+      sentAt: DateTime(2026, 7, 21, 13, 40),
+    ),
+    PatientMessage(
+      id: '$threadId-2',
+      text: 'Спасибо, все хорошо!',
+      isMine: false,
+      sentAt: DateTime(2026, 7, 21, 13, 44),
+    ),
+  ];
+
+  @override
+  Future<PatientMessage> sendPatientMessage(
+    String threadId,
+    String text,
+  ) async => PatientMessage(
+    id: '$threadId-sent',
+    text: text,
+    isMine: true,
+    sentAt: DateTime(2026, 7, 21, 13, 45),
   );
 }

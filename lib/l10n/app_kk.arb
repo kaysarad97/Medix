@@ -278,5 +278,7 @@
   "doctorPatientAnalysesTitle": "Емделуші талдаулары",
   "doctorAppointmentTitle": "Сіздің жазбаңыз",
   "doctorOwnAppointmentSubtitle": "Сіздің жазбаңыз",
-  "doctorPatientChatSubtitle": "Емделушімен чат"
+  "doctorPatientChatSubtitle": "Емделушімен чат",
+  "doctorBotThreadPreview": "Немен көмектесе аламын?",
+  "doctorPatientChatTitle": "Емделушімен чат"
 }

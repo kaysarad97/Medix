@@ -77,6 +77,7 @@ class DoctorHomeScreen extends ConsumerWidget {
                   title: l10n.doctorMessagesTileTitle,
                   subtitle: l10n.doctorMessagesTileSubtitle,
                   icon: MedixIcon.attachment,
+                  onTap: () => context.push(Routes.doctorChats),
                 ),
               ),
               const SizedBox(height: DoctorHomeMetrics.cardGap),

@@ -278,5 +278,7 @@
   "doctorPatientAnalysesTitle": "Patient tests",
   "doctorAppointmentTitle": "Your appointment",
   "doctorOwnAppointmentSubtitle": "Your appointment",
-  "doctorPatientChatSubtitle": "Chat with the patient"
+  "doctorPatientChatSubtitle": "Chat with the patient",
+  "doctorBotThreadPreview": "How can I help?",
+  "doctorPatientChatTitle": "Chat with the patient"
 }

@@ -6,6 +6,7 @@ import '../../domain/entities/doctor_appointment.dart';
 import '../../domain/entities/doctor_own_profile.dart';
 import '../../domain/entities/doctor_own_review.dart';
 import '../../domain/entities/doctor_patient.dart';
+import '../../domain/entities/patient_chat.dart';
 import '../../domain/entities/regular_patient.dart';
 import '../../domain/entities/work_analytics.dart';
 
@@ -43,6 +44,16 @@ abstract interface class DoctorCabinetRepository {
   /// Пациент с его ближайшей записью, заключением и анализами —
   /// «Профиль пациента» и «Запись с пациентом».
   Future<DoctorPatient> patient(String id);
+
+  /// Список переписок с пациентами — «Чаты с пациентами».
+  Future<List<PatientChatThread>> patientChats();
+
+  /// История одной переписки — «Чат с пациентом».
+  Future<List<PatientMessage>> patientMessages(String threadId);
+
+  /// Отправка реплики. Возвращает то, что реально ушло, — с сервера у
+  /// сообщения будет свой идентификатор и время.
+  Future<PatientMessage> sendPatientMessage(String threadId, String text);
 }
 
 /// Заглушка на время разработки бэкенда — кабинета врача на сервере пока
@@ -329,6 +340,70 @@ class MockDoctorCabinetRepository implements DoctorCabinetRepository {
             takenAt: DateTime(2026, 7, 20 - i),
           ),
       ],
+    );
+  }
+
+  /// Четыре переписки, как в макете: первая непрочитанная, остальные
+  /// прочитаны, реплики чередуются своими и чужими.
+  @override
+  Future<List<PatientChatThread>> patientChats() async {
+    await Future<void>.delayed(_latency);
+    final at = DateTime(2026, 7, 21, 13, 44);
+    const texts = [
+      (
+        text: 'Здравствуйте! Какие анализы мне нужны перед приёмом?',
+        mine: false,
+      ),
+      (text: 'Спасибо за обращение, на здоровье!', mine: true),
+      (text: 'Как можно улучшить результаты по этим показателям?', mine: false),
+      (text: 'Запись подтверждена, спасибо!', mine: true),
+    ];
+    return [
+      for (final (index, line) in texts.indexed)
+        PatientChatThread(
+          id: 'pc${index + 1}',
+          patientName: 'Имя Фамилия',
+          lastMessage: line.text,
+          lastMessageAt: at,
+          lastMessageIsMine: line.mine,
+          isRead: index != 0,
+          patientAvatarAsset: MedixAvatars.all[index % MedixAvatars.all.length],
+        ),
+    ];
+  }
+
+  @override
+  Future<List<PatientMessage>> patientMessages(String threadId) async {
+    await Future<void>.delayed(_latency);
+    final at = DateTime(2026, 7, 21, 13, 40);
+    return [
+      PatientMessage(
+        id: '$threadId-1',
+        text: 'Здравствуйте! Как Вы себя чувствуете сегодня?',
+        isMine: true,
+        sentAt: at,
+      ),
+      PatientMessage(
+        id: '$threadId-2',
+        text: 'Спасибо, все хорошо!',
+        isMine: false,
+        sentAt: at.add(const Duration(minutes: 4)),
+      ),
+    ];
+  }
+
+  @override
+  Future<PatientMessage> sendPatientMessage(
+    String threadId,
+    String text,
+  ) async {
+    await Future<void>.delayed(_latency);
+    final now = DateTime.now();
+    return PatientMessage(
+      id: '$threadId-${now.microsecondsSinceEpoch}',
+      text: text,
+      isMine: true,
+      sentAt: now,
     );
   }
 }

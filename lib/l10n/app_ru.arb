@@ -1217,5 +1217,13 @@
   "doctorPatientChatSubtitle": "Чат с пациентом",
   "@doctorPatientChatSubtitle": {
     "description": "Подпись кнопки «Сообщение» на «Записи с пациентом»."
+  },
+  "doctorBotThreadPreview": "Чем я могу помочь?",
+  "@doctorBotThreadPreview": {
+    "description": "Подпись строки чат-бота в списке чатов врача. У пациента там плейсхолдер про симптомы, у врача — вопрос бота."
+  },
+  "doctorPatientChatTitle": "Чат с пациентом",
+  "@doctorPatientChatTitle": {
+    "description": "Заголовок экрана переписки с пациентом в кабинете врача."
   }
 }

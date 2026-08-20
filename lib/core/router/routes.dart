@@ -94,6 +94,14 @@ abstract final class Routes {
   static String doctorPatientAppointmentOf(String id) =>
       '/doctor-appointment/$id';
 
+  /// «Чаты с пациентами» — плитка «Мои сообщения» на главной кабинета.
+  static const String doctorChats = '/doctor-chats';
+
+  /// «Чат с пациентом».
+  static const String doctorPatientChat = '/doctor-chats/:id';
+
+  static String doctorPatientChatOf(String id) => '/doctor-chats/$id';
+
   /// «Аналитика Работы» — третья плитка на главной кабинета врача.
   static const String doctorAnalytics = '/doctor-analytics';
 

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -134,6 +136,10 @@ class _ConfirmCard extends StatelessWidget {
           _MessageRow(
             title: l10n.doctorWritePatientTitle,
             subtitle: l10n.doctorWritePatientSubtitle,
+            // Переписка в заглушке заведена на тот же идентификатор, что и
+            // пациент: своих идентификаторов у веток пока нет.
+            onTap: () =>
+                context.push(Routes.doctorPatientChatOf(appointment.id)),
           ),
         ],
       ),
@@ -168,45 +174,45 @@ class _TimePill extends StatelessWidget {
 }
 
 /// Белая строка «Сообщение / Написать пациенту».
-///
-/// Вести пока некуда: чата со стороны врача в приложении нет — это
-/// следующий кусок кабинета.
 class _MessageRow extends StatelessWidget {
-  const _MessageRow({required this.title, required this.subtitle});
+  const _MessageRow({required this.title, required this.subtitle, this.onTap});
 
   final String title;
   final String subtitle;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: DoctorPatientMetrics.rowHeight,
-      child: DecoratedBox(
-        decoration: const BoxDecoration(
-          color: AppColors.surfaceWhite,
-          borderRadius: AppRadius.allMd,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 13),
-          child: Row(
-            children: [
-              const AppIconChip(
-                icon: MedixIcon.mail,
-                size: 32,
-                background: AppColors.accentSofter,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title, style: AppTypography.cardItemTitle),
-                    Text(subtitle, style: AppTypography.linkSmall),
-                  ],
+      child: Material(
+        color: AppColors.surfaceWhite,
+        borderRadius: AppRadius.allMd,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 13),
+            child: Row(
+              children: [
+                const AppIconChip(
+                  icon: MedixIcon.mail,
+                  size: 32,
+                  background: AppColors.accentSofter,
                 ),
-              ),
-            ],
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(title, style: AppTypography.cardItemTitle),
+                      Text(subtitle, style: AppTypography.linkSmall),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -80,6 +82,9 @@ class DoctorPatientAppointmentScreen extends ConsumerWidget {
                           icon: MedixIcon.mail,
                           title: l10n.doctorWritePatientTitle,
                           subtitle: l10n.doctorPatientChatSubtitle,
+                          onTap: () => context.push(
+                            Routes.doctorPatientChatOf(appointment.id),
+                          ),
                         ),
                       ),
                     ),
