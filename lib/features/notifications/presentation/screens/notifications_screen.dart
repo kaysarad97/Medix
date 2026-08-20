@@ -187,12 +187,14 @@ class _NotificationRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: height,
-      child: Material(
-        color: AppColors.surfaceWhite,
-        borderRadius: AppRadius.allSm,
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onTap,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: DecoratedBox(
+          decoration: const BoxDecoration(
+            color: AppColors.surfaceWhite,
+            borderRadius: AppRadius.allSm,
+          ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: _padding),
             child: Row(
