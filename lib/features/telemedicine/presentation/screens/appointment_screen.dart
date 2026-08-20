@@ -16,7 +16,7 @@ import '../../../../shared/models/appointment.dart';
 import '../../domain/entities/doctor.dart';
 import '../../domain/entities/doctor_schedule.dart';
 import '../providers/telemedicine_providers.dart';
-import '../widgets/action_button_row.dart';
+import '../../../../core/widgets/action_button_row.dart';
 import '../widgets/appointment_summary_card.dart';
 import '../widgets/doctor_header.dart';
 import '../widgets/doctor_metrics.dart';

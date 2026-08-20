@@ -138,7 +138,7 @@ class _MonthCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return AppCard(
-      color: AppColors.accentSoft,
+      color: AppColors.accentSofter,
       padding: const EdgeInsets.all(DoctorAnalyticsMetrics.cardPadding),
       child: Column(
         mainAxisSize: MainAxisSize.min,

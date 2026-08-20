@@ -15,10 +15,12 @@ class DoctorAppointmentBucket extends StatelessWidget {
     super.key,
     required this.title,
     required this.appointments,
+    this.onAppointmentTap,
   });
 
   final String title;
   final List<DoctorAppointment> appointments;
+  final ValueChanged<DoctorAppointment>? onAppointmentTap;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +40,13 @@ class DoctorAppointmentBucket extends StatelessWidget {
         else
           for (final (index, appointment) in appointments.indexed) ...[
             if (index > 0) const SizedBox(height: DoctorCalendarMetrics.rowGap),
-            _Row(number: index + 1, appointment: appointment),
+            _Row(
+              number: index + 1,
+              appointment: appointment,
+              onTap: onAppointmentTap == null
+                  ? null
+                  : () => onAppointmentTap!(appointment),
+            ),
           ],
       ],
     );
@@ -46,10 +54,11 @@ class DoctorAppointmentBucket extends StatelessWidget {
 }
 
 class _Row extends StatelessWidget {
-  const _Row({required this.number, required this.appointment});
+  const _Row({required this.number, required this.appointment, this.onTap});
 
   final int number;
   final DoctorAppointment appointment;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -62,30 +71,32 @@ class _Row extends StatelessWidget {
             child: Text('$number', style: AppTypography.cardItemMeta),
           ),
           Expanded(
-            child: DecoratedBox(
-              decoration: const BoxDecoration(
-                color: AppColors.surfaceWhite,
-                borderRadius: AppRadius.allMd,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 13),
-                child: Row(
-                  children: [
-                    UserAvatar(
-                      asset: appointment.patientAvatarAsset,
-                      size: const Size.square(36),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        appointment.patientName,
-                        style: AppTypography.bodyMd,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+            child: Material(
+              color: AppColors.surfaceWhite,
+              borderRadius: AppRadius.allMd,
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(
+                onTap: onTap,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 13),
+                  child: Row(
+                    children: [
+                      UserAvatar(
+                        asset: appointment.patientAvatarAsset,
+                        size: const Size.square(36),
                       ),
-                    ),
-                    _TimePill(text: appointment.timeLabel),
-                  ],
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          appointment.patientName,
+                          style: AppTypography.bodyMd,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      _TimePill(text: appointment.timeLabel),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -108,7 +119,7 @@ class _TimePill extends StatelessWidget {
       height: 38,
       child: DecoratedBox(
         decoration: const BoxDecoration(
-          color: AppColors.accentSoft,
+          color: AppColors.accentSofter,
           borderRadius: AppRadius.allPill,
         ),
         child: Center(

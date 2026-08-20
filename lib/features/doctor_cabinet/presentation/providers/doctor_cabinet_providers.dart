@@ -5,6 +5,7 @@ import '../../domain/entities/certificate.dart';
 import '../../domain/entities/doctor_appointment.dart';
 import '../../domain/entities/doctor_own_profile.dart';
 import '../../domain/entities/doctor_own_review.dart';
+import '../../domain/entities/doctor_patient.dart';
 import '../../domain/entities/regular_patient.dart';
 import '../../domain/entities/work_analytics.dart';
 
@@ -174,3 +175,9 @@ final doctorPastAppointmentProvider = FutureProvider.autoDispose
 final doctorWorkAnalyticsProvider = FutureProvider<DoctorWorkAnalytics>(
   (ref) => ref.watch(doctorCabinetRepositoryProvider).workAnalytics(),
 );
+
+/// Пациент по идентификатору — «Профиль пациента» и «Запись с пациентом».
+final doctorPatientProvider = FutureProvider.autoDispose
+    .family<DoctorPatient, String>(
+      (ref, id) => ref.watch(doctorCabinetRepositoryProvider).patient(id),
+    );

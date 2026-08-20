@@ -19,6 +19,8 @@ import '../../features/doctor_cabinet/presentation/screens/doctor_profile_screen
 import '../../features/doctor_cabinet/presentation/screens/doctor_analytics_screen.dart';
 import '../../features/doctor_cabinet/presentation/screens/doctor_history_screen.dart';
 import '../../features/doctor_cabinet/presentation/screens/doctor_past_appointment_screen.dart';
+import '../../features/doctor_cabinet/presentation/screens/doctor_patient_appointment_screen.dart';
+import '../../features/doctor_cabinet/presentation/screens/doctor_patient_screen.dart';
 import '../../features/doctor_cabinet/presentation/screens/doctor_reviews_screen.dart';
 import '../../features/family_access/presentation/screens/family_list_screen.dart';
 import '../../features/family_access/presentation/screens/family_member_form_screen.dart';
@@ -205,6 +207,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.doctorAnalytics,
         builder: (context, state) => const DoctorAnalyticsScreen(),
+      ),
+      GoRoute(
+        path: Routes.doctorPatient,
+        builder: (context, state) =>
+            DoctorPatientScreen(patientId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: Routes.doctorPatientAppointment,
+        builder: (context, state) => DoctorPatientAppointmentScreen(
+          patientId: state.pathParameters['id']!,
+        ),
       ),
       GoRoute(
         path: Routes.appointment,

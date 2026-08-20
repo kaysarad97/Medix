@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/ru_dates.dart';
 import '../../../../core/widgets/app_card.dart';
@@ -90,16 +92,19 @@ class DoctorCalendarScreen extends ConsumerWidget {
                       DoctorAppointmentBucket(
                         title: l10n.doctorCalendarMorningTitle,
                         appointments: byPeriod[DoctorDayPeriod.morning]!,
+                        onAppointmentTap: _openAppointment(context),
                       ),
                       const SizedBox(height: DoctorCalendarMetrics.bucketGap),
                       DoctorAppointmentBucket(
                         title: l10n.doctorCalendarAfternoonTitle,
                         appointments: byPeriod[DoctorDayPeriod.afternoon]!,
+                        onAppointmentTap: _openAppointment(context),
                       ),
                       const SizedBox(height: DoctorCalendarMetrics.bucketGap),
                       DoctorAppointmentBucket(
                         title: l10n.doctorCalendarEveningTitle,
                         appointments: byPeriod[DoctorDayPeriod.evening]!,
+                        onAppointmentTap: _openAppointment(context),
                       ),
                     ],
                   ),
@@ -117,6 +122,13 @@ class DoctorCalendarScreen extends ConsumerWidget {
     );
   }
 }
+
+/// Строка записи ведёт на «Запись с пациентом». Идентификатор пациента в
+/// заглушке совпадает с идентификатором записи — своего у пациента в ленте
+/// календаря пока нет, и брать его неоткуда, пока нет бэкенда.
+ValueChanged<DoctorAppointment> _openAppointment(BuildContext context) =>
+    (appointment) =>
+        context.push(Routes.doctorPatientAppointmentOf(appointment.id));
 
 class _Section extends StatelessWidget {
   const _Section({required this.child});

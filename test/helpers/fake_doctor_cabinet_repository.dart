@@ -3,8 +3,10 @@ import 'package:medix/features/doctor_cabinet/domain/entities/certificate.dart';
 import 'package:medix/features/doctor_cabinet/domain/entities/doctor_appointment.dart';
 import 'package:medix/features/doctor_cabinet/domain/entities/doctor_own_profile.dart';
 import 'package:medix/features/doctor_cabinet/domain/entities/doctor_own_review.dart';
+import 'package:medix/features/doctor_cabinet/domain/entities/doctor_patient.dart';
 import 'package:medix/features/doctor_cabinet/domain/entities/regular_patient.dart';
 import 'package:medix/features/doctor_cabinet/domain/entities/work_analytics.dart';
+import 'package:medix/shared/models/analysis_result.dart';
 import 'package:medix/shared/models/appointment.dart';
 import 'package:medix/shared/models/medix_avatars.dart';
 
@@ -185,5 +187,33 @@ class FakeDoctorCabinetRepository implements DoctorCabinetRepository {
         earningsPercent: 23,
       ),
     ),
+  );
+
+  @override
+  Future<DoctorPatient> patient(String id) async => DoctorPatient(
+    id: id,
+    fullName: 'Имя Фамилия',
+    heightCm: 170,
+    weightKg: 77,
+    age: 30,
+    avatarAsset: MedixAvatars.all[2],
+    appointment: DoctorAppointment(
+      id: 'p-$id',
+      patientName: 'Имя Фамилия',
+      kind: AppointmentKind.audioCall,
+      startsAt: DateTime(2026, 7, 21, 10, 30),
+    ),
+    analyses: [
+      for (var i = 0; i < 2; i++)
+        AnalysisResult(
+          id: 'pa$i',
+          name: 'Железо\nв сыворотке',
+          value: 24.8,
+          unit: 'мкмоль/л',
+          referenceLow: 10.7,
+          referenceHigh: 32.2,
+          takenAt: DateTime(2026, 7, 20 - i),
+        ),
+    ],
   );
 }

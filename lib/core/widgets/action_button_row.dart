@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_typography.dart';
-import '../../../../core/widgets/icon_chip.dart';
-import 'doctor_metrics.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_typography.dart';
+import 'icon_chip.dart';
 
-/// Пара кнопок «действие + сообщение», которая встречается на макетах врача
-/// трижды: в карточке расписания, в карточке переноса и на экране записи.
+/// Пара кнопок «действие + сообщение».
+///
+/// Лежит в `core/`, потому что понадобилась второй фиче: в телемедицине это
+/// карточка расписания, карточка переноса и экран записи, а в кабинете врача
+/// — «Запись с пациентом». Тот же случай, что и с `RatingStars`.
 ///
 /// Кнопки в карточке неравной ширины (188 и 161), а на экране записи —
 /// одинаковой, поэтому пропорция задаётся снаружи.
@@ -16,8 +18,8 @@ class ActionButtonRow extends StatelessWidget {
     required this.primary,
     required this.secondary,
     required this.height,
-    this.primaryFlex = DoctorMetrics.cardActionLeftFlex,
-    this.secondaryFlex = DoctorMetrics.cardActionRightFlex,
+    this.primaryFlex = defaultPrimaryFlex,
+    this.secondaryFlex = defaultSecondaryFlex,
   });
 
   final ActionButtonData primary;
@@ -25,6 +27,16 @@ class ActionButtonRow extends StatelessWidget {
   final double height;
   final int primaryFlex;
   final int secondaryFlex;
+
+  /// Ширины кнопок в карточке расписания: 188 и 161 по макету врача.
+  static const int defaultPrimaryFlex = 188;
+  static const int defaultSecondaryFlex = 161;
+
+  /// Зазор между кнопками — там же.
+  static const double gap = 15;
+
+  /// Скругление кнопки: 14 по макетам врача — своё, не из [AppRadius].
+  static const BorderRadius radius = BorderRadius.all(Radius.circular(14));
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +51,7 @@ class ActionButtonRow extends StatelessWidget {
             flex: primaryFlex,
             child: _ActionButton(data: primary, filled: true),
           ),
-          const SizedBox(width: DoctorMetrics.actionGap),
+          const SizedBox(width: gap),
           Expanded(
             flex: secondaryFlex,
             child: _ActionButton(data: secondary, filled: false),
@@ -92,7 +104,7 @@ class _ActionButton extends StatelessWidget {
 
     return Material(
       color: filled ? AppColors.primaryBright : AppColors.surfaceWhite,
-      borderRadius: DoctorMetrics.allRadius,
+      borderRadius: ActionButtonRow.radius,
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: data.onTap,

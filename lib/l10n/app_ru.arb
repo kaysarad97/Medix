@@ -1168,5 +1168,54 @@
   "doctorAnalyticsEarningsLabel": "повышение\nзаработка",
   "@doctorAnalyticsEarningsLabel": {
     "description": "Подпись плитки прироста заработка."
+  },
+  "patientHeightMetaLabel": "рост",
+  "@patientHeightMetaLabel": {
+    "description": "Подпись под ростом в шапке пациента у врача. Строчная, как и «пол» с «датой рождения» в пациентском профиле."
+  },
+  "patientWeightMetaLabel": "вес",
+  "@patientWeightMetaLabel": {
+    "description": "Подпись под весом там же."
+  },
+  "patientAgeMetaLabel": "возраст",
+  "@patientAgeMetaLabel": {
+    "description": "Подпись под возрастом там же."
+  },
+  "doctorPatientTitle": "О пациенте",
+  "@doctorPatientTitle": {
+    "description": "Заголовок экрана «Профиль пациента» в кабинете врача."
+  },
+  "doctorConfirmAppointmentTitle": "Подтвердите запись",
+  "@doctorConfirmAppointmentTitle": {
+    "description": "Заголовок карточки с ближайшей записью на «Профиле пациента»."
+  },
+  "doctorAppointmentDateAt": "{date} в",
+  "@doctorAppointmentDateAt": {
+    "description": "«21 Июля, Четверг в» — строка перед пилюлей со временем.",
+    "placeholders": { "date": { "type": "String" } }
+  },
+  "doctorWritePatientTitle": "Сообщение",
+  "@doctorWritePatientTitle": {
+    "description": "Заголовок строки перехода в переписку с пациентом."
+  },
+  "doctorWritePatientSubtitle": "Написать пациенту",
+  "@doctorWritePatientSubtitle": {
+    "description": "Подпись под ней на «Профиле пациента»."
+  },
+  "doctorPatientAnalysesTitle": "Анализы пациента",
+  "@doctorPatientAnalysesTitle": {
+    "description": "Заголовок карточки анализов на «Профиле пациента»."
+  },
+  "doctorAppointmentTitle": "Ваша запись",
+  "@doctorAppointmentTitle": {
+    "description": "Заголовок экрана «Запись с пациентом» в кабинете врача."
+  },
+  "doctorOwnAppointmentSubtitle": "Ваша запись",
+  "@doctorOwnAppointmentSubtitle": {
+    "description": "Подпись под видом записи в строке на «Записи с пациентом» — в отличие от истории, где там имя пациента."
+  },
+  "doctorPatientChatSubtitle": "Чат с пациентом",
+  "@doctorPatientChatSubtitle": {
+    "description": "Подпись кнопки «Сообщение» на «Записи с пациентом»."
   }
 }

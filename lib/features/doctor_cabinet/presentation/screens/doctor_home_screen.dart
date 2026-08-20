@@ -92,6 +92,8 @@ class DoctorHomeScreen extends ConsumerWidget {
               _Section(
                 child: RegularPatientsCard(
                   patients: patients.value ?? const [],
+                  onPatientTap: (patient) =>
+                      context.push(Routes.doctorPatientOf(patient.id)),
                 ),
               ),
               if (showAdminTile) ...[

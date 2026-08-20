@@ -266,5 +266,17 @@
   "doctorAnalyticsMinutes": "{count} минут",
   "doctorAnalyticsAverageLabel": "жазбаның\nорташа ұзақтығы",
   "doctorAnalyticsRatingLabel": "рейтингтің\nөсуі",
-  "doctorAnalyticsEarningsLabel": "табыстың\nөсуі"
+  "doctorAnalyticsEarningsLabel": "табыстың\nөсуі",
+  "patientHeightMetaLabel": "бойы",
+  "patientWeightMetaLabel": "салмағы",
+  "patientAgeMetaLabel": "жасы",
+  "doctorPatientTitle": "Емделуші туралы",
+  "doctorConfirmAppointmentTitle": "Жазбаны растаңыз",
+  "doctorAppointmentDateAt": "{date} сағат",
+  "doctorWritePatientTitle": "Хабарлама",
+  "doctorWritePatientSubtitle": "Емделушіге жазу",
+  "doctorPatientAnalysesTitle": "Емделуші талдаулары",
+  "doctorAppointmentTitle": "Сіздің жазбаңыз",
+  "doctorOwnAppointmentSubtitle": "Сіздің жазбаңыз",
+  "doctorPatientChatSubtitle": "Емделушімен чат"
 }

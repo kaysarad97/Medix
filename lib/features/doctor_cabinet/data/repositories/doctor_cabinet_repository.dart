@@ -1,9 +1,11 @@
+import '../../../../shared/models/analysis_result.dart';
 import '../../../../shared/models/appointment.dart';
 import '../../../../shared/models/medix_avatars.dart';
 import '../../domain/entities/certificate.dart';
 import '../../domain/entities/doctor_appointment.dart';
 import '../../domain/entities/doctor_own_profile.dart';
 import '../../domain/entities/doctor_own_review.dart';
+import '../../domain/entities/doctor_patient.dart';
 import '../../domain/entities/regular_patient.dart';
 import '../../domain/entities/work_analytics.dart';
 
@@ -37,6 +39,10 @@ abstract interface class DoctorCabinetRepository {
 
   /// «Аналитика Работы» — неделя и месяц разом.
   Future<DoctorWorkAnalytics> workAnalytics();
+
+  /// Пациент с его ближайшей записью, заключением и анализами —
+  /// «Профиль пациента» и «Запись с пациентом».
+  Future<DoctorPatient> patient(String id);
 }
 
 /// Заглушка на время разработки бэкенда — кабинета врача на сервере пока
@@ -289,6 +295,40 @@ class MockDoctorCabinetRepository implements DoctorCabinetRepository {
           earningsPercent: 23,
         ),
       ),
+    );
+  }
+
+  @override
+  Future<DoctorPatient> patient(String id) async {
+    await Future<void>.delayed(_latency);
+    final today = DateTime.now();
+
+    return DoctorPatient(
+      id: id,
+      fullName: 'Имя Фамилия',
+      heightCm: 170,
+      weightKg: 77,
+      age: 30,
+      avatarAsset: MedixAvatars.all[2],
+      appointment: DoctorAppointment(
+        id: 'p-$id',
+        patientName: 'Имя Фамилия',
+        kind: AppointmentKind.audioCall,
+        startsAt: DateTime(today.year, today.month, today.day + 1, 10, 30),
+      ),
+      // Заключения нет: в макете на его месте стоит объяснение, почему.
+      analyses: [
+        for (var i = 0; i < 4; i++)
+          AnalysisResult(
+            id: 'pa$i',
+            name: 'Железо\nв сыворотке',
+            value: 24.8,
+            unit: 'мкмоль/л',
+            referenceLow: 10.7,
+            referenceHigh: 32.2,
+            takenAt: DateTime(2026, 7, 20 - i),
+          ),
+      ],
     );
   }
 }

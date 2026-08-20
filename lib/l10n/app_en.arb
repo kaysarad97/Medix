@@ -266,5 +266,17 @@
   "doctorAnalyticsMinutes": "{count} minutes",
   "doctorAnalyticsAverageLabel": "average\nappointment length",
   "doctorAnalyticsRatingLabel": "rating\ngrowth",
-  "doctorAnalyticsEarningsLabel": "earnings\ngrowth"
+  "doctorAnalyticsEarningsLabel": "earnings\ngrowth",
+  "patientHeightMetaLabel": "height",
+  "patientWeightMetaLabel": "weight",
+  "patientAgeMetaLabel": "age",
+  "doctorPatientTitle": "About the patient",
+  "doctorConfirmAppointmentTitle": "Confirm the appointment",
+  "doctorAppointmentDateAt": "{date} at",
+  "doctorWritePatientTitle": "Message",
+  "doctorWritePatientSubtitle": "Write to the patient",
+  "doctorPatientAnalysesTitle": "Patient tests",
+  "doctorAppointmentTitle": "Your appointment",
+  "doctorOwnAppointmentSubtitle": "Your appointment",
+  "doctorPatientChatSubtitle": "Chat with the patient"
 }

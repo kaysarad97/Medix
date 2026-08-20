@@ -4,7 +4,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../domain/entities/doctor_schedule.dart';
-import 'action_button_row.dart';
+import '../../../../core/widgets/action_button_row.dart';
 import 'doctor_metrics.dart';
 
 /// Карточка расписания: месяц, недельная лента, слоты времени и пара кнопок.

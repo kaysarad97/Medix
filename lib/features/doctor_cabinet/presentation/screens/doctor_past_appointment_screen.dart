@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -12,6 +14,7 @@ import '../../../../core/widgets/user_avatar.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/doctor_appointment.dart';
 import '../providers/doctor_cabinet_providers.dart';
+import '../widgets/doctor_conclusion_card.dart';
 import '../widgets/doctor_history_metrics.dart';
 import '../widgets/doctor_history_row.dart';
 
@@ -52,11 +55,29 @@ class DoctorPastAppointmentScreen extends ConsumerWidget {
                     const SizedBox(
                       height: DoctorHistoryMetrics.summaryToPatientRow,
                     ),
-                    _Section(child: _PatientRow(appointment: appointment)),
+                    _Section(
+                      child: _PatientRow(
+                        appointment: appointment,
+                        // Пациент в заглушке один, и его идентификатор
+                        // совпадает с идентификатором записи.
+                        onTap: () => context.push(
+                          Routes.doctorPatientOf(appointment.id),
+                        ),
+                      ),
+                    ),
                     const SizedBox(
                       height: DoctorHistoryMetrics.patientRowToConclusion,
                     ),
-                    _Section(child: _ConclusionCard(appointment: appointment)),
+                    _Section(
+                      child: DoctorConclusionCard(
+                        patientName: appointment.patientName,
+                        date: appointment.startsAt,
+                        conclusion: appointment.conclusion,
+                        // На этом макете у строки загрузки шеврона нет, в
+                        // отличие от «Профиля пациента».
+                        showUploadChevron: false,
+                      ),
+                    ),
                     SizedBox(
                       height:
                           DoctorHistoryMetrics.screenH +
@@ -118,14 +139,11 @@ class _SummaryCard extends StatelessWidget {
 }
 
 /// Строка перехода в профиль пациента.
-///
-/// Вести пока некуда: «Профиль пациента» — отдельный макет, он в следующем
-/// слайсе кабинета. Строка нажимается, но обработчика у неё нет — как
-/// плитки на главной до этого захода.
 class _PatientRow extends StatelessWidget {
-  const _PatientRow({required this.appointment});
+  const _PatientRow({required this.appointment, this.onTap});
 
   final DoctorAppointment appointment;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -133,122 +151,50 @@ class _PatientRow extends StatelessWidget {
 
     return AppCard(
       color: AppColors.surfaceWhite,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding: EdgeInsets.zero,
       child: SizedBox(
         height: DoctorHistoryMetrics.patientRowHeight,
-        child: Row(
-          children: [
-            UserAvatar(
-              asset: appointment.patientAvatarAsset,
-              size: const Size.square(44),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
+        child: Material(
+          color: AppColors.surfaceWhite,
+          borderRadius: AppRadius.allMd,
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Row(
                 children: [
-                  Text(
-                    appointment.patientName,
-                    style: AppTypography.cardTitleAccent,
+                  UserAvatar(
+                    asset: appointment.patientAvatarAsset,
+                    size: const Size.square(44),
                   ),
-                  Text(
-                    l10n.doctorPastPatientProfileLabel,
-                    style: AppTypography.tileSubtitle,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          appointment.patientName,
+                          style: AppTypography.cardTitleAccent,
+                        ),
+                        Text(
+                          l10n.doctorPastPatientProfileLabel,
+                          style: AppTypography.tileSubtitle,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Icon(
+                    Icons.chevron_right,
+                    size: 20,
+                    color: AppColors.primaryBright,
                   ),
                 ],
               ),
             ),
-            const Icon(
-              Icons.chevron_right,
-              size: 20,
-              color: AppColors.primaryBright,
-            ),
-          ],
+          ),
         ),
-      ),
-    );
-  }
-}
-
-/// Заключение врача о приёме либо объяснение, почему его ещё нет.
-class _ConclusionCard extends StatelessWidget {
-  const _ConclusionCard({required this.appointment});
-
-  final DoctorAppointment appointment;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-
-    return AppCard(
-      color: AppColors.accentSoft,
-      padding: const EdgeInsets.all(DoctorHistoryMetrics.cardPadding),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SizedBox(
-            height:
-                DoctorHistoryMetrics.conclusionHeaderHeight -
-                DoctorHistoryMetrics.cardPadding,
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    l10n.doctorPastConclusionTitle(appointment.patientName),
-                    style: AppTypography.cardItemTitle,
-                  ),
-                ),
-                Text(
-                  l10n.doctorPastConclusionDate(
-                    RuDates.dayMonthShortYear(appointment.startsAt),
-                  ),
-                  style: AppTypography.cardItemMeta,
-                ),
-              ],
-            ),
-          ),
-          DecoratedBox(
-            decoration: const BoxDecoration(
-              color: AppColors.surfaceWhite,
-              borderRadius: AppRadius.allMd,
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(14),
-              child: Text(
-                appointment.conclusion ?? l10n.doctorPastConclusionPlaceholder,
-                style: appointment.conclusion == null
-                    ? AppTypography.placeholder
-                    : AppTypography.bodyMd,
-              ),
-            ),
-          ),
-          const SizedBox(height: DoctorHistoryMetrics.conclusionBodyToUpload),
-          SizedBox(
-            height: DoctorHistoryMetrics.uploadRowHeight,
-            child: Material(
-              color: AppColors.surfaceWhite,
-              borderRadius: AppRadius.allMd,
-              clipBehavior: Clip.antiAlias,
-              child: InkWell(
-                // Загружать пока некуда: файлового хранилища у кабинета
-                // врача нет, как и самого бэкенда под него.
-                onTap: null,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 14),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      l10n.doctorPastUploadConclusion,
-                      style: AppTypography.linkSmall,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

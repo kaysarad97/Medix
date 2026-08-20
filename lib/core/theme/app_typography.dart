@@ -165,6 +165,17 @@ abstract final class AppTypography {
   static TextStyle get placeholder =>
       _style(size: 16, weight: 400, color: AppColors.textSecondary);
 
+  /// Текст заключения врача о пациенте — «О прошлой записи.png» и парные
+  /// экраны. Мельче обычного плейсхолдера: в макете абзац укладывается в
+  /// четыре строки шириной 346, строки идут через 19.5 — отсюда и кегль, и
+  /// межстрочный.
+  static TextStyle get conclusionBody => _style(
+    size: 11,
+    weight: 400,
+    color: AppColors.textSecondary,
+    height: 1.77,
+  );
+
   /// Подпись над полем ввода. «Ваш E-mail или ИИН:».
   static TextStyle get label =>
       _style(size: 14, weight: 500, color: AppColors.textPrimary);
@@ -255,6 +266,13 @@ abstract final class AppTypography {
   /// начертания нет — см. пояснение в ProfileHeader.
   static TextStyle get profileName =>
       _style(size: 34, weight: 400, color: AppColors.textOnPrimary);
+
+  /// Имя пациента в шапке у врача — «Профиль пациента.png» и «Запись с
+  /// пациентом.png». Мельче пациентского [profileName]: там имя набрано в
+  /// две строки крупно, здесь стоит в одну. Кегль восстановлен по ширине
+  /// краски: «Имя Фамилия» занимает в макете 153 px.
+  static TextStyle get patientName =>
+      _style(size: 23, weight: 400, color: AppColors.textOnPrimary);
 
   /// Значение под именем: «мужчина», «6/12/1996».
   static TextStyle get profileMetaValue =>

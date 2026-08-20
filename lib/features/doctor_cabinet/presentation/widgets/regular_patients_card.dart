@@ -12,10 +12,16 @@ import 'doctor_home_metrics.dart';
 /// «Все» (форма — та же, что у пациентской `DoctorsCard`) и грид 2×2 из
 /// карточек-заглушек с именем.
 class RegularPatientsCard extends StatelessWidget {
-  const RegularPatientsCard({super.key, required this.patients, this.onSeeAll});
+  const RegularPatientsCard({
+    super.key,
+    required this.patients,
+    this.onSeeAll,
+    this.onPatientTap,
+  });
 
   final List<RegularPatient> patients;
   final VoidCallback? onSeeAll;
+  final ValueChanged<RegularPatient>? onPatientTap;
 
   @override
   Widget build(BuildContext context) {
@@ -48,11 +54,19 @@ class RegularPatientsCard extends StatelessWidget {
               const SizedBox(height: DoctorHomeMetrics.patientRowGap),
             Row(
               children: [
-                Expanded(child: _PatientChip(patient: patients[row * 2])),
+                Expanded(
+                  child: _PatientChip(
+                    patient: patients[row * 2],
+                    onTap: onPatientTap,
+                  ),
+                ),
                 const SizedBox(width: DoctorHomeMetrics.patientChipGap),
                 Expanded(
                   child: row * 2 + 1 < patients.length
-                      ? _PatientChip(patient: patients[row * 2 + 1])
+                      ? _PatientChip(
+                          patient: patients[row * 2 + 1],
+                          onTap: onPatientTap,
+                        )
                       : const SizedBox.shrink(),
                 ),
               ],
@@ -65,25 +79,28 @@ class RegularPatientsCard extends StatelessWidget {
 }
 
 class _PatientChip extends StatelessWidget {
-  const _PatientChip({required this.patient});
+  const _PatientChip({required this.patient, this.onTap});
 
   final RegularPatient patient;
+  final ValueChanged<RegularPatient>? onTap;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: DoctorHomeMetrics.patientChipHeight,
-      child: DecoratedBox(
-        decoration: const BoxDecoration(
-          color: AppColors.surfaceWhite,
-          borderRadius: AppRadius.allMd,
-        ),
-        child: Center(
-          child: Text(
-            patient.fullName,
-            style: AppTypography.tileSubtitle,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+      child: Material(
+        color: AppColors.surfaceWhite,
+        borderRadius: AppRadius.allMd,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap == null ? null : () => onTap!(patient),
+          child: Center(
+            child: Text(
+              patient.fullName,
+              style: AppTypography.tileSubtitle,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ),
       ),

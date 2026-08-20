@@ -90,6 +90,15 @@ abstract final class RuDates {
   static String dayAndMonth(DateTime date) =>
       '${date.day} ${monthsGenitive[date.month - 1]}';
 
+  /// «21 Июля, Четверг» — строка записи на «Профиле пациента» у врача.
+  /// Месяц с прописной: так в макете, хотя во всех остальных датах он
+  /// строчный.
+  static String dayMonthWeekday(DateTime date) {
+    final month = monthsGenitive[date.month - 1];
+    final capitalized = '${month[0].toUpperCase()}${month.substring(1)}';
+    return '${date.day} $capitalized, ${weekdayFull(date)}';
+  }
+
   /// «13:30», «9:30».
   ///
   /// Час без ведущего нуля — так в макете расписания: слот «9:30» уже

@@ -82,6 +82,18 @@ abstract final class Routes {
 
   static String doctorPastAppointmentOf(String id) => '/doctor-history/$id';
 
+  /// «Профиль пациента» — вход из «Постоянных пациентов» и из строки
+  /// пациента на «О прошлой записи».
+  static const String doctorPatient = '/doctor-patient/:id';
+
+  static String doctorPatientOf(String id) => '/doctor-patient/$id';
+
+  /// «Запись с пациентом» — вход из строки календаря врача.
+  static const String doctorPatientAppointment = '/doctor-appointment/:id';
+
+  static String doctorPatientAppointmentOf(String id) =>
+      '/doctor-appointment/$id';
+
   /// «Аналитика Работы» — третья плитка на главной кабинета врача.
   static const String doctorAnalytics = '/doctor-analytics';
 

@@ -52,6 +52,9 @@ class DoctorHistoryRow extends StatelessWidget {
                 const AppIconChip(
                   icon: MedixIcon.mail,
                   size: DoctorHistoryMetrics.rowIconSize,
+                  // Кружок в макетах врача светлее, чем по умолчанию у
+                  // AppIconChip: пипетка даёт C0DDFF, а не 9CCAFF.
+                  background: AppColors.accentSofter,
                 ),
                 const SizedBox(width: DoctorHistoryMetrics.rowIconGap),
                 Expanded(

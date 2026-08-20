@@ -40,7 +40,9 @@ class DoctorAnalyticsStatTile extends StatelessWidget {
         : AppColors.surfaceWhite;
     final pillColor = onLightCard
         ? AppColors.surfaceWhite
-        : AppColors.primaryBright;
+        // Пилюля на синей карточке месяца — accent, а не primaryBright:
+        // замер по макету даёт 4787FA.
+        : AppColors.accent;
     final pillTextColor = onLightCard
         ? AppColors.primaryBright
         : AppColors.textOnPrimary;
