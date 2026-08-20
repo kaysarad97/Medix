@@ -923,5 +923,154 @@
   "notificationsFilterMessages": "Сообщения от врачей",
   "@notificationsFilterMessages": {
     "description": "Вкладка уведомлений о сообщениях врачей."
+  },
+  "doctorHomeGreeting": "Здравствуйте, {name}!",
+  "@doctorHomeGreeting": {
+    "description": "Приветствие под шапкой главного экрана кабинета врача.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "doctorScheduleTileTitle": "График\nработы",
+  "@doctorScheduleTileTitle": {
+    "description": "Заголовок плитки перехода в календарь на главной кабинета врача."
+  },
+  "doctorScheduleTileSubtitle": "все записи и пациенты",
+  "@doctorScheduleTileSubtitle": {
+    "description": "Подзаголовок плитки «График работы»."
+  },
+  "doctorHistoryTileTitle": "История\nзаписей",
+  "@doctorHistoryTileTitle": {
+    "description": "Заголовок плитки истории записей на главной кабинета врача."
+  },
+  "doctorHistoryTileSubtitle": "прошедшие записи",
+  "@doctorHistoryTileSubtitle": {
+    "description": "Подзаголовок плитки «История записей»."
+  },
+  "doctorAnalyticsTileTitle": "Аналитика активности",
+  "@doctorAnalyticsTileTitle": {
+    "description": "Заголовок плитки аналитики на главной кабинета врача."
+  },
+  "doctorAnalyticsTileSubtitle": "график заработка",
+  "@doctorAnalyticsTileSubtitle": {
+    "description": "Подзаголовок плитки «Аналитика активности»."
+  },
+  "doctorMessagesTileTitle": "Мои сообщения",
+  "@doctorMessagesTileTitle": {
+    "description": "Заголовок плитки чатов на главной кабинета врача."
+  },
+  "doctorMessagesTileSubtitle": "чаты с пациентами",
+  "@doctorMessagesTileSubtitle": {
+    "description": "Подзаголовок плитки «Мои сообщения»."
+  },
+  "doctorMediBotHint": "Напишите Medi-bot...",
+  "@doctorMediBotHint": {
+    "description": "Плейсхолдер поля Medi-bot на главной кабинета врача."
+  },
+  "doctorRegularPatientsTitle": "Постоянные пациенты",
+  "@doctorRegularPatientsTitle": {
+    "description": "Заголовок секции постоянных пациентов на главной кабинета врача."
+  },
+  "doctorAdminTileTitle": "Администрация",
+  "@doctorAdminTileTitle": {
+    "description": "Заголовок плитки администрации — только у врача от клиники."
+  },
+  "doctorAdminTileSubtitle": "смена расписания, отпуски, и т.д.",
+  "@doctorAdminTileSubtitle": {
+    "description": "Подзаголовок плитки «Администрация»."
+  },
+  "doctorCalendarMorningTitle": "Утренние записи",
+  "@doctorCalendarMorningTitle": {
+    "description": "Заголовок утренней корзины записей в календаре врача."
+  },
+  "doctorCalendarAfternoonTitle": "Дневные записи",
+  "@doctorCalendarAfternoonTitle": {
+    "description": "Заголовок дневной корзины записей в календаре врача."
+  },
+  "doctorCalendarEveningTitle": "Вечерние записи",
+  "@doctorCalendarEveningTitle": {
+    "description": "Заголовок вечерней корзины записей в календаре врача."
+  },
+  "doctorCalendarEmptyLabel": "Записей пока нет",
+  "@doctorCalendarEmptyLabel": {
+    "description": "Плейсхолдер пустой корзины записей в календаре врача."
+  },
+  "doctorOwnProfileTitle": "Ваш Профиль",
+  "@doctorOwnProfileTitle": {
+    "description": "Заголовок экрана собственного профиля врача."
+  },
+  "doctorIdLabel": "ID врача",
+  "@doctorIdLabel": {
+    "description": "Подпись под идентификатором врача в шапке профиля."
+  },
+  "doctorStatusLabel": "статус",
+  "@doctorStatusLabel": {
+    "description": "Подпись под статусом аккаунта в шапке профиля врача."
+  },
+  "doctorRatingLabel": "рейтинг",
+  "@doctorRatingLabel": {
+    "description": "Подпись под рейтингом в шапке профиля врача."
+  },
+  "doctorInfoTitle": "Ваша Информация",
+  "@doctorInfoTitle": {
+    "description": "Заголовок карточки данных врача в профиле."
+  },
+  "doctorSpecializationHint": "Специализация",
+  "@doctorSpecializationHint": {
+    "description": "Плейсхолдер поля специализации в профиле врача."
+  },
+  "doctorExperienceHint": "Опыт работы",
+  "@doctorExperienceHint": {
+    "description": "Плейсхолдер поля опыта работы в профиле врача."
+  },
+  "doctorCategoryHint": "Категория",
+  "@doctorCategoryHint": {
+    "description": "Плейсхолдер поля категории в профиле врача."
+  },
+  "doctorAddressHint": "Адрес приема",
+  "@doctorAddressHint": {
+    "description": "Плейсхолдер поля адреса приёма в профиле врача."
+  },
+  "doctorConsultationTypesLabel": "Доступные виды приема:",
+  "@doctorConsultationTypesLabel": {
+    "description": "Подпись над переключателем видов приёма в профиле врача."
+  },
+  "doctorOnlineConsultationLabel": "Онлайн-прием",
+  "@doctorOnlineConsultationLabel": {
+    "description": "Онлайн-сегмент переключателя видов приёма."
+  },
+  "doctorOfflineConsultationLabel": "Оффлайн-прием",
+  "@doctorOfflineConsultationLabel": {
+    "description": "Оффлайн-сегмент переключателя видов приёма."
+  },
+  "doctorContactsTitle": "Ваши Контакты",
+  "@doctorContactsTitle": {
+    "description": "Заголовок карточки контактов в профиле врача."
+  },
+  "doctorCertificatesTitle": "Ваши сертификаты",
+  "@doctorCertificatesTitle": {
+    "description": "Строка-ссылка на сертификаты в профиле врача."
+  },
+  "doctorReviewsAboutYouTitle": "Отзывы о Вас",
+  "@doctorReviewsAboutYouTitle": {
+    "description": "Строка-ссылка на отзывы о враче в его профиле."
+  },
+  "doctorAdminRequestsTitle": "Запросы в администрацию",
+  "@doctorAdminRequestsTitle": {
+    "description": "Строка-ссылка на заявки в администрацию — только у врача от клиники."
+  },
+  "doctorUploadCertificateTitle": "Загрузить Сертификат",
+  "@doctorUploadCertificateTitle": {
+    "description": "Строка загрузки файла на экране «Ваши сертификаты» — только у врача-фрилансера."
+  },
+  "doctorReviewsScreenTitle": "Отзывы",
+  "@doctorReviewsScreenTitle": {
+    "description": "Заголовок экрана «Отзывы о Вас» в кабинете врача."
+  },
+  "doctorOtherReviewsTitle": "Остальные отзывы",
+  "@doctorOtherReviewsTitle": {
+    "description": "Заголовок списка отзывов под каруселью «Топ отзывов»."
   }
 }

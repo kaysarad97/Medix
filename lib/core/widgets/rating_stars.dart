@@ -1,12 +1,16 @@
 import 'package:flutter/widgets.dart';
 
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/widgets/icon_chip.dart';
+import '../theme/app_colors.dart';
+import 'icon_chip.dart';
 
 /// Оценка звёздами: закрашенные, одна половинная, остальные контуром.
 ///
 /// На макете рейтинг 4.5 нарисован как четыре звезды и половина пятой —
 /// поэтому округления до целого недостаточно.
+///
+/// В `core/`, а не в фиче: нужна и телемедицине (отзывы о враче), и
+/// кабинету врача (собственные отзывы) — тот же случай, что и с моделями,
+/// понадобившимися второй фиче.
 class RatingStars extends StatelessWidget {
   const RatingStars({
     super.key,

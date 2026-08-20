@@ -7,7 +7,7 @@ import '../../../../core/widgets/icon_chip.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/doctor_review.dart';
 import 'doctor_metrics.dart';
-import 'rating_stars.dart';
+import '../../../../core/widgets/rating_stars.dart';
 
 /// «Топ отзывов»: голубая карточка с каруселью белых карточек отзывов
 /// и точками-индикатором под ними.

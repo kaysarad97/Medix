@@ -5,7 +5,7 @@ import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/features/profile/presentation/providers/profile_providers.dart';
 import 'package:medix/features/telemedicine/presentation/providers/telemedicine_providers.dart';
 import 'package:medix/features/telemedicine/presentation/screens/leave_review_screen.dart';
-import 'package:medix/features/telemedicine/presentation/widgets/rating_stars.dart';
+import 'package:medix/core/widgets/rating_stars.dart';
 import 'package:medix/l10n/app_localizations.dart';
 
 import '../../helpers/fake_doctors_repository.dart';

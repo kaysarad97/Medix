@@ -173,6 +173,26 @@ enum MedixIcon {
 
   /// Стрелки вниз/вверх с «Z». Сортировка в «Поиск врача».
   sort,
+
+  /// Пульс в сердце, без подложки. Строка записи в «Предстоящие записи» и
+  /// в календаре кабинета врача.
+  ///
+  /// Не [appointment] — тот несёт свою заливку-кружок внутри самого SVG и
+  /// задвоился бы с кружком [AppIconChip]. Источник — `icons/heart-pulse.svg`,
+  /// подобран по смыслу и стилю (голая обводка, тот же цвет), макет
+  /// Figma не сверялся — при случае проверить у дизайнера.
+  appointmentPulse,
+
+  /// Клипборд со списком. Плитка «График работы» на главной кабинета врача.
+  ///
+  /// Источник — `icons/clipboard-list.svg`, тот же случай, что и у
+  /// [appointmentPulse]: подобран по смыслу, не сверен с макетом Figma.
+  doctorSchedule,
+
+  /// Телефонная трубка с волнами сигнала. Плитка «История записей» на
+  /// главной кабинета врача. Источник — `icons/phone-call.svg`, тот же
+  /// случай, что и у [appointmentPulse].
+  appointmentHistory,
 }
 
 abstract final class MedixIcons {
@@ -234,6 +254,9 @@ abstract final class MedixIcons {
     MedixIcon.planUnavailable: 'assets/icons/plan_unavailable.svg',
     MedixIcon.cart: 'assets/icons/cart.svg',
     MedixIcon.sort: 'assets/icons/sort.svg',
+    MedixIcon.appointmentPulse: 'assets/icons/appointment_pulse.svg',
+    MedixIcon.doctorSchedule: 'assets/icons/doctor_schedule.svg',
+    MedixIcon.appointmentHistory: 'assets/icons/appointment_history.svg',
   };
 
   /// Иконки, экспорта которых ещё нет.

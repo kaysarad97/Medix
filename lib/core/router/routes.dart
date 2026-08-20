@@ -55,6 +55,25 @@ abstract final class Routes {
   static String doctorSearchResultsOf(String query) =>
       '$doctorSearchResults?q=${Uri.encodeQueryComponent(query)}';
 
+  /// Главная кабинета врача. Не связана с флоу входа/ролей — прямой
+  /// маршрут для первого слайса, пока роль и авторизация врача не
+  /// реализованы (см. HANDOFF.md, «Кабинет врача»).
+  static const String doctorHome = '/doctor-home';
+
+  /// Календарь на день — вход по шеврону «Предстоящие записи» с главной
+  /// кабинета врача.
+  static const String doctorCalendar = '/doctor-calendar';
+
+  /// «Ваш Профиль» — кабинет врача.
+  static const String doctorProfile = '/doctor-profile';
+
+  /// «Ваши сертификаты» — кабинет врача.
+  static const String doctorCertificates = '/doctor-certificates';
+
+  /// «Отзывы о Вас» — кабинет врача. Не путать с [doctorReview] —
+  /// пациентским «Оставьте отзыв» на профиле врача, это другой экран.
+  static const String doctorOwnReviews = '/doctor-reviews';
+
   /// Оформленная запись к врачу.
   static const String appointment = '/appointment/:id';
 

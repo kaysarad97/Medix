@@ -13,7 +13,7 @@ import '../providers/telemedicine_providers.dart';
 import '../widgets/city_chip.dart';
 import '../widgets/doctor_header.dart';
 import '../widgets/doctor_metrics.dart';
-import '../widgets/rating_stars.dart';
+import '../../../../core/widgets/rating_stars.dart';
 
 /// «Оставьте отзыв» — оценка звёздами и текст отзыва о враче.
 ///

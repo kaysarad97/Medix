@@ -233,6 +233,14 @@ abstract final class AppTypography {
   static TextStyle get calendarLabel =>
       _style(size: 15, weight: 400, color: AppColors.textPrimary);
 
+  /// Заголовок дня в календаре врача. «Четверг».
+  static TextStyle get calendarDayHeading =>
+      _style(size: 28, weight: 500, color: AppColors.textOnPrimary);
+
+  /// Подпись под ним. «21-ое июля, 2026 год».
+  static TextStyle get calendarDaySubtitle =>
+      _style(size: 15, weight: 400, color: AppColors.textOnPrimary);
+
   /// Надпись на парных кнопках. «Создать запись», «Сообщение».
   static TextStyle get actionTitle =>
       _style(size: 16, weight: 400, color: AppColors.textPrimary);

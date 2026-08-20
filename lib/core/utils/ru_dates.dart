@@ -47,12 +47,35 @@ abstract final class RuDates {
     'Вс',
   ];
 
+  /// Полные названия дней недели — заголовок календаря врача «Четверг».
+  static const List<String> weekdaysFull = [
+    'Понедельник',
+    'Вторник',
+    'Среда',
+    'Четверг',
+    'Пятница',
+    'Суббота',
+    'Воскресенье',
+  ];
+
   /// «Июль, 2026».
   static String monthAndYear(DateTime date) =>
       '${monthsNominative[date.month - 1]}, ${date.year}';
 
   /// «Пн».
   static String weekdayShort(DateTime date) => weekdaysShort[date.weekday - 1];
+
+  /// «Четверг» — заголовок календаря врача.
+  static String weekdayFull(DateTime date) => weekdaysFull[date.weekday - 1];
+
+  /// «21-е июля, 2026 года» — подзаголовок календаря врача. Суффикс дня
+  /// везде «-е»: это стандартное сокращение порядкового числительного в
+  /// датах («1-е», «3-е», «21-е»), а не буквальное окончание слова
+  /// («первое», «третье») — в макете `design/.../Календарь.png` дата
+  /// подписана «21-ое», это тот случай, где число совпало с окончанием
+  /// случайно, но сокращение всё равно унифицированное.
+  static String dayOrdinalMonthYear(DateTime date) =>
+      '${date.day}-е ${monthsGenitive[date.month - 1]}, ${date.year} года';
 
   /// «10.07».
   static String dayMonth(DateTime date) =>

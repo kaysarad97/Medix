@@ -12,6 +12,11 @@ import '../../features/auth/presentation/screens/verify_code_screen.dart';
 import '../../features/calls/presentation/screens/call_screen.dart';
 import '../../features/chats/presentation/screens/chats_list_screen.dart';
 import '../../features/chats/presentation/screens/doctor_chat_screen.dart';
+import '../../features/doctor_cabinet/presentation/screens/doctor_calendar_screen.dart';
+import '../../features/doctor_cabinet/presentation/screens/doctor_certificates_screen.dart';
+import '../../features/doctor_cabinet/presentation/screens/doctor_home_screen.dart';
+import '../../features/doctor_cabinet/presentation/screens/doctor_profile_screen.dart';
+import '../../features/doctor_cabinet/presentation/screens/doctor_reviews_screen.dart';
 import '../../features/family_access/presentation/screens/family_list_screen.dart';
 import '../../features/family_access/presentation/screens/family_member_form_screen.dart';
 import '../../features/family_access/presentation/screens/family_member_screen.dart';
@@ -163,6 +168,26 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => DoctorSearchResultsScreen(
           query: state.uri.queryParameters['q'] ?? '',
         ),
+      ),
+      GoRoute(
+        path: Routes.doctorHome,
+        builder: (context, state) => const DoctorHomeScreen(),
+      ),
+      GoRoute(
+        path: Routes.doctorCalendar,
+        builder: (context, state) => const DoctorCalendarScreen(),
+      ),
+      GoRoute(
+        path: Routes.doctorProfile,
+        builder: (context, state) => const DoctorOwnProfileScreen(),
+      ),
+      GoRoute(
+        path: Routes.doctorCertificates,
+        builder: (context, state) => const DoctorCertificatesScreen(),
+      ),
+      GoRoute(
+        path: Routes.doctorOwnReviews,
+        builder: (context, state) => const DoctorReviewsScreen(),
       ),
       GoRoute(
         path: Routes.appointment,
