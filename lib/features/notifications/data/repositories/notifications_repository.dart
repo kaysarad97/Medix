@@ -3,10 +3,20 @@ import 'package:dio/dio.dart';
 import '../../../../core/network/api_endpoints.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../domain/entities/app_notification.dart';
+import '../../domain/entities/push_device.dart';
 
 /// Откуда берётся список уведомлений.
 abstract interface class NotificationsRepository {
   Future<List<AppNotification>> notifications();
+
+  Future<AppNotification> setRead(String id, {required bool read});
+
+  Future<PushDevice> registerDevice({
+    required String token,
+    required String platform,
+  });
+
+  Future<void> unregisterDevice(String id);
 }
 
 /// Лента уведомлений поверх FastAPI-бэкенда.
@@ -40,6 +50,50 @@ class RemoteNotificationsRepository implements NotificationsRepository {
     }
   }
 
+  @override
+  Future<AppNotification> setRead(String id, {required bool read}) async {
+    try {
+      final response = await _dio.patch<Map<String, dynamic>>(
+        ApiEndpoints.notification(id),
+        data: {'read': read},
+      );
+      return _notification(response.data!);
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
+
+  @override
+  Future<PushDevice> registerDevice({
+    required String token,
+    required String platform,
+  }) async {
+    try {
+      final response = await _dio.post<Map<String, dynamic>>(
+        ApiEndpoints.devices,
+        data: {'token': token, 'platform': platform},
+      );
+      final json = response.data!;
+      return PushDevice(
+        id: json['id'] as String,
+        platform: json['platform'] as String,
+        createdAt: DateTime.parse(json['created_at'] as String).toLocal(),
+        lastSeenAt: DateTime.parse(json['last_seen_at'] as String).toLocal(),
+      );
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
+
+  @override
+  Future<void> unregisterDevice(String id) async {
+    try {
+      await _dio.delete<void>(ApiEndpoints.device(id));
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
+
   static AppNotification _notification(Map<String, dynamic> json) =>
       AppNotification(
         id: json['id'] as String,
@@ -61,8 +115,38 @@ class RemoteNotificationsRepository implements NotificationsRepository {
 class MockNotificationsRepository implements NotificationsRepository {
   const MockNotificationsRepository();
 
+  static final List<String> readIds = [];
+
   @override
   Future<List<AppNotification>> notifications() async => mockNotifications;
+
+  @override
+  Future<AppNotification> setRead(String id, {required bool read}) async {
+    if (read) readIds.add(id);
+    final current = mockNotifications.firstWhere((item) => item.id == id);
+    return AppNotification(
+      id: current.id,
+      kind: current.kind,
+      title: current.title,
+      body: current.body,
+      createdAt: current.createdAt,
+      isRead: read,
+    );
+  }
+
+  @override
+  Future<PushDevice> registerDevice({
+    required String token,
+    required String platform,
+  }) async => PushDevice(
+    id: 'mock-device',
+    platform: platform,
+    createdAt: DateTime(2026, 8, 21),
+    lastSeenAt: DateTime(2026, 8, 21),
+  );
+
+  @override
+  Future<void> unregisterDevice(String id) async {}
 
   static final List<AppNotification> mockNotifications = [
     _appointment('n1'),

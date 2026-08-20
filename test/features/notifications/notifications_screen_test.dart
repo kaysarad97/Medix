@@ -51,6 +51,16 @@ void main() {
     expect(find.text('Вам пришло сообщение'), findsNothing);
   });
 
+  testWidgets('нажатие отмечает непрочитанное на сервере', (tester) async {
+    MockNotificationsRepository.readIds.clear();
+    await pumpScreen(tester);
+
+    await tester.tap(find.text('Ваша запись подтверждена').first);
+    await tester.pump();
+
+    expect(MockNotificationsRepository.readIds, ['n1']);
+  });
+
   testWidgets('текст приходит с сервера готовым', (tester) async {
     await pumpScreen(tester);
 

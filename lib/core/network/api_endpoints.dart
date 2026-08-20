@@ -49,6 +49,11 @@ abstract final class ApiEndpoints {
   /// Отметить уведомление прочитанным.
   static String notification(String id) => '$notifications/$id';
 
+  /// Push-устройства текущего пользователя.
+  static const String devices = '/devices';
+
+  static String device(String id) => '$devices/$id';
+
   /// Члены семьи: список и добавление.
   static const String family = '/users/me/family';
 

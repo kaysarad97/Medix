@@ -97,6 +97,11 @@ class NotificationsScreen extends ConsumerWidget {
                   itemBuilder: (context, index) => _NotificationRow(
                     notification: notifications[index],
                     height: _rowHeight,
+                    onTap: notifications[index].isRead
+                        ? null
+                        : () => ref
+                              .read(notificationsRepositoryProvider)
+                              .setRead(notifications[index].id, read: true),
                   ),
                 ),
               ),
@@ -153,10 +158,15 @@ class _Tab extends StatelessWidget {
 }
 
 class _NotificationRow extends StatelessWidget {
-  const _NotificationRow({required this.notification, required this.height});
+  const _NotificationRow({
+    required this.notification,
+    required this.height,
+    required this.onTap,
+  });
 
   final AppNotification notification;
   final double height;
+  final VoidCallback? onTap;
 
   /// Кружок значка 34…77 при строке с 21.
   static const double _padding = 13;
@@ -177,64 +187,65 @@ class _NotificationRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: height,
-      child: DecoratedBox(
-        decoration: const BoxDecoration(
-          color: AppColors.surfaceWhite,
-          borderRadius: AppRadius.allSm,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: _padding),
-          child: Row(
-            children: [
-              _KindIcon(kind: notification.kind, size: _chipSize),
-              const SizedBox(width: _chipToText),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: _textLift),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Время делит строку с заголовком, а не с подписью:
-                      // так в макете, и так подписи достаётся вся ширина
-                      // строки. Иначе она не влезает — нашим шрифтом
-                      // «Имя Фамилия подтвердил запись в 13:30, 27 июля»
-                      // занимает 295 против 252 в макете.
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              notification.title,
-                              style: AppTypography.cardItemTitle,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          const SizedBox(width: _textToTime),
-                          Text(
-                            notification.timeLabel,
-                            style: AppTypography.notificationTime,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: _titleToSubtitle),
-                      Text(
-                        notification.body,
-                        style: AppTypography.notificationBody,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+      child: Material(
+        color: AppColors.surfaceWhite,
+        borderRadius: AppRadius.allSm,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: _padding),
+            child: Row(
+              children: [
+                _KindIcon(kind: notification.kind, size: _chipSize),
+                const SizedBox(width: _chipToText),
+                Expanded(child: _NotificationText(notification: notification)),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
+}
+
+class _NotificationText extends StatelessWidget {
+  const _NotificationText({required this.notification});
+
+  final AppNotification notification;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(bottom: _NotificationRow._textLift),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Text(
+                notification.title,
+                style: AppTypography.cardItemTitle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(width: _NotificationRow._textToTime),
+            Text(notification.timeLabel, style: AppTypography.notificationTime),
+          ],
+        ),
+        const SizedBox(height: _NotificationRow._titleToSubtitle),
+        Text(
+          notification.body,
+          style: AppTypography.notificationBody,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
+    ),
+  );
 }
 
 /// Кружок со значком: чемоданчик у записи, облачко у сообщения.

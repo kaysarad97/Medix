@@ -87,4 +87,50 @@ void main() {
     expect(notifications.first.isRead, isFalse);
     expect(notifications.last.isRead, isTrue);
   });
+
+  test('уведомление отмечается прочитанным через PATCH', () async {
+    final (:dio, :adapter) = cannedDio({
+      'PATCH /notifications/n1': (
+        statusCode: 200,
+        body: item(id: 'n1', kind: 'general', readAt: '2026-07-21T14:00:00'),
+      ),
+    });
+
+    final result = await RemoteNotificationsRepository(
+      dio,
+    ).setRead('n1', read: true);
+
+    expect(result.isRead, isTrue);
+    expect(adapter.requests.single.method, 'PATCH');
+    expect(adapter.requests.single.data, {'read': true});
+  });
+
+  test('push-устройство регистрируется и удаляется', () async {
+    final (:dio, :adapter) = cannedDio({
+      'POST /devices': (
+        statusCode: 201,
+        body: {
+          'id': 'device-1',
+          'platform': 'android',
+          'created_at': '2026-08-21T09:00:00',
+          'last_seen_at': '2026-08-21T09:00:00',
+        },
+      ),
+      'DELETE /devices/device-1': (statusCode: 204, body: ''),
+    });
+    final repository = RemoteNotificationsRepository(dio);
+
+    final device = await repository.registerDevice(
+      token: 'push-token',
+      platform: 'android',
+    );
+    await repository.unregisterDevice(device.id);
+
+    expect(device.id, 'device-1');
+    expect(adapter.requests.first.data, {
+      'token': 'push-token',
+      'platform': 'android',
+    });
+    expect(adapter.requests.last.method, 'DELETE');
+  });
 }
