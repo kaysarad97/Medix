@@ -54,6 +54,15 @@ abstract final class ApiEndpoints {
 
   static String device(String id) => '$devices/$id';
 
+  static const String labReferrals = '/lab/referrals';
+  static const String labReferralUploadUrl = '$labReferrals/upload-url';
+  static String labReferral(String id) => '$labReferrals/$id';
+  static const String labOffers = '/lab/offers';
+  static const String labOrders = '/lab/orders';
+  static const String labResults = '/lab/results';
+  static String labResultDownloadUrl(String id) =>
+      '$labResults/$id/download-url';
+
   /// Члены семьи: список и добавление.
   static const String family = '/users/me/family';
 

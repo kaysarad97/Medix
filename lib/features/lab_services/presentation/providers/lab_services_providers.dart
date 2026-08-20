@@ -1,8 +1,29 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/network/dio_client.dart';
+import '../../data/repositories/lab_api_repository.dart';
 import '../../data/repositories/lab_services_repository.dart';
 import '../../domain/entities/lab_offer.dart';
 import '../../domain/entities/lab_service.dart';
+import '../../domain/entities/lab_workflow.dart';
+
+final labApiRepositoryProvider = Provider<LabApiRepository>(
+  (ref) => LabApiRepository(ref.watch(dioClientProvider)),
+);
+
+final labReferralProvider = FutureProvider.autoDispose
+    .family<LabReferral, String>(
+      (ref, id) => ref.watch(labApiRepositoryProvider).referral(id),
+    );
+
+final referralLabOffersProvider = FutureProvider.autoDispose
+    .family<List<LabPriceOffer>, String>(
+      (ref, id) => ref.watch(labApiRepositoryProvider).offers(id),
+    );
+
+final labOrdersProvider = FutureProvider.autoDispose<List<LabOrder>>(
+  (ref) => ref.watch(labApiRepositoryProvider).orders(),
+);
 
 final labServicesRepositoryProvider = Provider<LabServicesRepository>(
   // Бэкенда пока нет; переключение появится вместе с реальными эндпоинтами,
