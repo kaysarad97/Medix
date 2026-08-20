@@ -161,13 +161,24 @@ class _Content extends ConsumerWidget {
                   title: l10n.createAppointmentTitle,
                   subtitle: l10n.videoCallSubtitle,
                   // Активна только после выбора нового дня и времени.
-                  // Бэкенда нет — переносом считаем показ подтверждения,
-                  // изменить дату самого приёма нечем: `appointment(id)`
-                  // в заглушке не принимает новое время.
                   onTap: selected?.slot == null
                       ? null
-                      : () {
+                      : () async {
                           final slot = selected!.slot!;
+                          try {
+                            await ref
+                                .read(doctorsRepositoryProvider)
+                                .reschedule(appointment.id, slot);
+                          } catch (error) {
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context)
+                              ..hideCurrentSnackBar()
+                              ..showSnackBar(
+                                SnackBar(content: Text(error.toString())),
+                              );
+                            return;
+                          }
+                          if (!context.mounted) return;
                           ScaffoldMessenger.of(context)
                             ..hideCurrentSnackBar()
                             ..showSnackBar(

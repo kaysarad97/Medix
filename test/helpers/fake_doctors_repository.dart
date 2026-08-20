@@ -34,6 +34,8 @@ class FakeDoctorsRepository implements DoctorsRepository {
         'специалистами с хорошим рейтингом.',
   );
 
+  static final List<({String id, ScheduleSlot slot})> rescheduled = [];
+
   @override
   Future<Doctor> doctor(String id) async => doctor1;
 
@@ -76,14 +78,16 @@ class FakeDoctorsRepository implements DoctorsRepository {
   ];
 
   @override
-  Future<Appointment> reschedule(String id, ScheduleSlot newSlot) async =>
-      Appointment(
-        id: id,
-        specialty: 'Гастроэнтеролог',
-        kind: AppointmentKind.audioCall,
-        startsAt: newSlot.startsAt,
-        doctorId: 'd1',
-      );
+  Future<Appointment> reschedule(String id, ScheduleSlot newSlot) async => () {
+    rescheduled.add((id: id, slot: newSlot));
+    return Appointment(
+      id: id,
+      specialty: 'Гастроэнтеролог',
+      kind: AppointmentKind.audioCall,
+      startsAt: newSlot.startsAt,
+      doctorId: 'd1',
+    );
+  }();
 
   @override
   Future<Appointment> cancel(String id) async => Appointment(

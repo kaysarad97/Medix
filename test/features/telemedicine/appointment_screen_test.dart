@@ -79,6 +79,7 @@ void main() {
   testWidgets('перенос записи показывает подтверждение с новым временем', (
     tester,
   ) async {
+    FakeDoctorsRepository.rescheduled.clear();
     await pumpAppointment(tester);
 
     await tester.tap(find.text('12:30'));
@@ -89,6 +90,11 @@ void main() {
     expect(
       find.textContaining('Приём перенесён на 20.07, 12:30'),
       findsOneWidget,
+    );
+    expect(FakeDoctorsRepository.rescheduled.single.id, 'a1');
+    expect(
+      FakeDoctorsRepository.rescheduled.single.slot.startsAt,
+      DateTime(2026, 7, 20, 12, 30),
     );
   });
 
