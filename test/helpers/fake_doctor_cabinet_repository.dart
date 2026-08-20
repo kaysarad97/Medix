@@ -1,4 +1,5 @@
 import 'package:medix/features/doctor_cabinet/data/repositories/doctor_cabinet_repository.dart';
+import 'package:medix/features/doctor_cabinet/domain/entities/admin_request.dart';
 import 'package:medix/features/doctor_cabinet/domain/entities/certificate.dart';
 import 'package:medix/features/doctor_cabinet/domain/entities/doctor_appointment.dart';
 import 'package:medix/features/doctor_cabinet/domain/entities/doctor_own_profile.dart';
@@ -266,5 +267,50 @@ class FakeDoctorCabinetRepository implements DoctorCabinetRepository {
     text: text,
     isMine: true,
     sentAt: DateTime(2026, 7, 21, 13, 45),
+  );
+
+  /// Две заявки: одна с ответом, одна без — оба состояния «Ответа от
+  /// админа» проверяются на одном фейке.
+  @override
+  Future<List<AdminRequest>> adminRequests() async => [
+    AdminRequest(
+      id: 'ar1',
+      topic: AdminRequestTopic.reschedule,
+      text: _requestText,
+      createdAt: DateTime(2026, 8, 10),
+      answer: 'Временный текст ответа.',
+      answeredAt: DateTime(2026, 8, 10),
+    ),
+    AdminRequest(
+      id: 'ar2',
+      topic: AdminRequestTopic.vacation,
+      text: _requestText,
+      createdAt: DateTime(2026, 8, 10),
+    ),
+  ];
+
+  /// Тот же текст, что в макете «Мои заявки»: врезка занимает две строки.
+  static const String _requestText =
+      'Временный текст запроса. Скоро здесь будет описание проблемы, '
+      'которое укажет врач.';
+
+  @override
+  Future<AdminRequest> adminRequest(String id) async {
+    final all = await adminRequests();
+    return all.firstWhere(
+      (request) => request.id == id,
+      orElse: () => all.first,
+    );
+  }
+
+  @override
+  Future<AdminRequest> sendAdminRequest({
+    required AdminRequestTopic topic,
+    required String text,
+  }) async => AdminRequest(
+    id: 'ar-sent',
+    topic: topic,
+    text: text,
+    createdAt: DateTime(2026, 8, 10),
   );
 }

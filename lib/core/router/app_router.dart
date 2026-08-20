@@ -17,6 +17,9 @@ import '../../features/doctor_cabinet/presentation/screens/doctor_calendar_scree
 import '../../features/doctor_cabinet/presentation/screens/doctor_certificates_screen.dart';
 import '../../features/doctor_cabinet/presentation/screens/doctor_home_screen.dart';
 import '../../features/doctor_cabinet/presentation/screens/doctor_profile_screen.dart';
+import '../../features/doctor_cabinet/presentation/screens/doctor_admin_answer_screen.dart';
+import '../../features/doctor_cabinet/presentation/screens/doctor_admin_request_screen.dart';
+import '../../features/doctor_cabinet/presentation/screens/doctor_admin_requests_screen.dart';
 import '../../features/doctor_cabinet/presentation/screens/doctor_analytics_screen.dart';
 import '../../features/doctor_cabinet/presentation/screens/doctor_history_screen.dart';
 import '../../features/doctor_cabinet/presentation/screens/doctor_past_appointment_screen.dart';
@@ -209,6 +212,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.doctorAnalytics,
         builder: (context, state) => const DoctorAnalyticsScreen(),
+      ),
+      GoRoute(
+        path: Routes.doctorAdminRequests,
+        builder: (context, state) => const DoctorAdminRequestsScreen(),
+      ),
+      GoRoute(
+        path: Routes.doctorAdminNewRequest,
+        builder: (context, state) => const DoctorAdminRequestScreen(),
+      ),
+      GoRoute(
+        path: Routes.doctorAdminRequest,
+        builder: (context, state) =>
+            DoctorAdminAnswerScreen(requestId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: Routes.doctorChats,

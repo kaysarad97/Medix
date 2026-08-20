@@ -1,6 +1,7 @@
 import '../../../../shared/models/analysis_result.dart';
 import '../../../../shared/models/appointment.dart';
 import '../../../../shared/models/medix_avatars.dart';
+import '../../domain/entities/admin_request.dart';
 import '../../domain/entities/certificate.dart';
 import '../../domain/entities/doctor_appointment.dart';
 import '../../domain/entities/doctor_own_profile.dart';
@@ -54,6 +55,19 @@ abstract interface class DoctorCabinetRepository {
   /// Отправка реплики. Возвращает то, что реально ушло, — с сервера у
   /// сообщения будет свой идентификатор и время.
   Future<PatientMessage> sendPatientMessage(String threadId, String text);
+
+  /// «Мои заявки» — обращения врача в администрацию клиники.
+  Future<List<AdminRequest>> adminRequests();
+
+  /// Одна заявка с ответом администрации.
+  Future<AdminRequest> adminRequest(String id);
+
+  /// Отправка новой заявки. Возвращает заведённую — с сервера у неё будет
+  /// свой идентификатор и время.
+  Future<AdminRequest> sendAdminRequest({
+    required AdminRequestTopic topic,
+    required String text,
+  });
 }
 
 /// Заглушка на время разработки бэкенда — кабинета врача на сервере пока
@@ -404,6 +418,65 @@ class MockDoctorCabinetRepository implements DoctorCabinetRepository {
       text: text,
       isMine: true,
       sentAt: now,
+    );
+  }
+
+  /// Текст-заглушка заявки. Дословно из макета «Мои заявки»: настоящие
+  /// заявки пишет врач, и придумывать за него незачем.
+  static const String _requestText =
+      'Временный текст запроса. Скоро здесь будет описание проблемы, '
+      'которое укажет врач. Мы стараемся обрабатывать все заявки быстро '
+      'и удобно.';
+
+  static const String _answerText =
+      'Временный текст ответа. Скоро здесь будет ответ администрации на '
+      'Ваш запрос. Мы стараемся отвечать на все обращения максимально '
+      'быстро.';
+
+  @override
+  Future<List<AdminRequest>> adminRequests() async {
+    await Future<void>.delayed(_latency);
+    final at = DateTime(2026, 8, 10);
+    return [
+      for (var i = 0; i < 4; i++)
+        AdminRequest(
+          id: 'ar${i + 1}',
+          topic: AdminRequestTopic.reschedule,
+          text: _requestText,
+          createdAt: at,
+          // Ответ есть не у всех: заявка без ответа — обычное состояние.
+          answer: i.isEven ? _answerText : null,
+          answeredAt: i.isEven ? at : null,
+        ),
+    ];
+  }
+
+  @override
+  Future<AdminRequest> adminRequest(String id) async {
+    await Future<void>.delayed(_latency);
+    final at = DateTime(2026, 8, 10);
+    return AdminRequest(
+      id: id,
+      topic: AdminRequestTopic.reschedule,
+      text: _requestText,
+      createdAt: at,
+      answer: _answerText,
+      answeredAt: at,
+    );
+  }
+
+  @override
+  Future<AdminRequest> sendAdminRequest({
+    required AdminRequestTopic topic,
+    required String text,
+  }) async {
+    await Future<void>.delayed(_latency);
+    final now = DateTime.now();
+    return AdminRequest(
+      id: 'ar-${now.microsecondsSinceEpoch}',
+      topic: topic,
+      text: text,
+      createdAt: now,
     );
   }
 }

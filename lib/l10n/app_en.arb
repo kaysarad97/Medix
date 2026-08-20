@@ -280,5 +280,21 @@
   "doctorOwnAppointmentSubtitle": "Your appointment",
   "doctorPatientChatSubtitle": "Chat with the patient",
   "doctorBotThreadPreview": "How can I help?",
-  "doctorPatientChatTitle": "Chat with the patient"
+  "doctorPatientChatTitle": "Chat with the patient",
+  "doctorAdminRequestTitle": "Request to administration",
+  "doctorAdminFaqTitle": "Frequently asked questions:",
+  "doctorAdminTopicTitle": "Request topic:",
+  "doctorAdminTopicReschedule": "Need to reschedule an appointment",
+  "doctorAdminTopicCancel": "Need to cancel an appointment",
+  "doctorAdminTopicVacation": "Going on holiday",
+  "doctorAdminTopicResignation": "Leaving the job",
+  "doctorAdminTopicOther": "Other",
+  "doctorAdminComposeHint": "Describe the problem...",
+  "doctorAdminAttachFile": "Attach a file",
+  "doctorAdminSend": "Send the request",
+  "doctorMyRequestsTitle": "My requests",
+  "doctorAdminCreateNew": "Create a new request",
+  "doctorAdminAnswerTitle": "Administration reply:",
+  "doctorAdminNoAnswerYet": "No reply from the administration yet",
+  "doctorAdminDate": "of {date}"
 }

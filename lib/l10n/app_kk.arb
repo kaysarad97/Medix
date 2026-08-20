@@ -280,5 +280,21 @@
   "doctorOwnAppointmentSubtitle": "Сіздің жазбаңыз",
   "doctorPatientChatSubtitle": "Емделушімен чат",
   "doctorBotThreadPreview": "Немен көмектесе аламын?",
-  "doctorPatientChatTitle": "Емделушімен чат"
+  "doctorPatientChatTitle": "Емделушімен чат",
+  "doctorAdminRequestTitle": "Әкімшілікке өтініш",
+  "doctorAdminFaqTitle": "Жиі қойылатын сұрақтар:",
+  "doctorAdminTopicTitle": "Өтініш тақырыбы:",
+  "doctorAdminTopicReschedule": "Жазбаны ауыстыру керек",
+  "doctorAdminTopicCancel": "Жазбаны болдырмау керек",
+  "doctorAdminTopicVacation": "Демалысқа шығамын",
+  "doctorAdminTopicResignation": "Жұмыстан кетемін",
+  "doctorAdminTopicOther": "Басқа",
+  "doctorAdminComposeHint": "Мәселені сипаттаңыз...",
+  "doctorAdminAttachFile": "Файл тіркеу",
+  "doctorAdminSend": "Өтініш жіберу",
+  "doctorMyRequestsTitle": "Менің өтініштерім",
+  "doctorAdminCreateNew": "Жаңа өтініш жасау",
+  "doctorAdminAnswerTitle": "Әкімшілік жауабы:",
+  "doctorAdminNoAnswerYet": "Әкімшілік әзірге жауап берген жоқ",
+  "doctorAdminDate": "{date} бастап"
 }

@@ -102,6 +102,18 @@ abstract final class Routes {
 
   static String doctorPatientChatOf(String id) => '/doctor-chats/$id';
 
+  /// «Мои заявки» — плитка «Администрация» на главной кабинета врача.
+  static const String doctorAdminRequests = '/doctor-admin-requests';
+
+  /// Новая заявка в администрацию. Отдельным путём, а не сегментом `new`
+  /// внутри списка: литерал и параметр в одном месте — источник путаницы.
+  static const String doctorAdminNewRequest = '/doctor-admin-request';
+
+  /// Заявка с ответом администрации.
+  static const String doctorAdminRequest = '/doctor-admin-requests/:id';
+
+  static String doctorAdminRequestOf(String id) => '/doctor-admin-requests/$id';
+
   /// «Аналитика Работы» — третья плитка на главной кабинета врача.
   static const String doctorAnalytics = '/doctor-analytics';
 

@@ -16,6 +16,8 @@ class ScreenTopBar extends StatelessWidget {
     this.onBack,
     this.trailing,
     this.titleColor,
+    this.height = defaultHeight,
+    this.titleMaxWidth,
   });
 
   final String title;
@@ -27,7 +29,17 @@ class ScreenTopBar extends StatelessWidget {
   /// Чип города в правом углу. На экране «Ваша запись» его нет.
   final Widget? trailing;
 
-  static const double height = 34;
+  /// Высота строки. Обычно [defaultHeight], но у «Заявки в
+  /// администрацию» заголовок в макете занимает две строки, и строку
+  /// приходится делать выше.
+  final double height;
+
+  /// Ограничение ширины заголовка. Нужно там, где в макете он переносится
+  /// на две строки («Заявка в администрацию»): без ограничения строка
+  /// умещается в одну и расходится с макетом.
+  final double? titleMaxWidth;
+
+  static const double defaultHeight = 34;
 
   /// Центр стрелки — 65 от левого края. В макете она заметно вдвинута
   /// внутрь относительно полей экрана.
@@ -44,16 +56,21 @@ class ScreenTopBar extends StatelessWidget {
       child: Stack(
         children: [
           Center(
-            child: Text(
-              title,
-              style: titleColor == null
-                  ? AppTypography.screenTitle
-                  : AppTypography.screenTitle.copyWith(color: titleColor),
-              textAlign: TextAlign.center,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: titleMaxWidth ?? double.infinity,
+              ),
+              child: Text(
+                title,
+                style: titleColor == null
+                    ? AppTypography.screenTitle
+                    : AppTypography.screenTitle.copyWith(color: titleColor),
+                textAlign: TextAlign.center,
+              ),
             ),
           ),
           Positioned(
-            left: backArrowCenterX - height / 2,
+            left: backArrowCenterX - defaultHeight / 2,
             top: 0,
             bottom: 0,
             child: _BackButton(onTap: onBack),
@@ -81,7 +98,7 @@ class _BackButton extends StatelessWidget {
     return SizedBox(
       // Квадрат по высоте строки: сам глиф в макете 12×10, попасть пальцем
       // в него невозможно.
-      width: ScreenTopBar.height,
+      width: ScreenTopBar.defaultHeight,
       child: Material(
         color: Colors.transparent,
         shape: const CircleBorder(),

@@ -105,6 +105,7 @@ class DoctorHomeScreen extends ConsumerWidget {
                     subtitle: l10n.doctorAdminTileSubtitle,
                     icon: MedixIcon.planFamily,
                     background: AppColors.surfaceInfo,
+                    onTap: () => context.push(Routes.doctorAdminRequests),
                   ),
                 ),
               ],

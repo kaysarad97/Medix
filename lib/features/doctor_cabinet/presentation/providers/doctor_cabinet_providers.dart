@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/repositories/doctor_cabinet_repository.dart';
+import '../../domain/entities/admin_request.dart';
 import '../../domain/entities/certificate.dart';
 import '../../domain/entities/doctor_appointment.dart';
 import '../../domain/entities/doctor_own_profile.dart';
@@ -272,4 +273,16 @@ class PatientChatController extends Notifier<PatientChatState> {
 final patientChatControllerProvider =
     NotifierProvider<PatientChatController, PatientChatState>(
       PatientChatController.new,
+    );
+
+/// «Мои заявки». Перечитывается при каждом открытии: отправленная заявка
+/// должна появиться в списке сразу, а не после перезапуска.
+final doctorAdminRequestsProvider =
+    FutureProvider.autoDispose<List<AdminRequest>>(
+      (ref) => ref.watch(doctorCabinetRepositoryProvider).adminRequests(),
+    );
+
+final doctorAdminRequestProvider = FutureProvider.autoDispose
+    .family<AdminRequest, String>(
+      (ref, id) => ref.watch(doctorCabinetRepositoryProvider).adminRequest(id),
     );

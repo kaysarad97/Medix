@@ -1225,5 +1225,70 @@
   "doctorPatientChatTitle": "Чат с пациентом",
   "@doctorPatientChatTitle": {
     "description": "Заголовок экрана переписки с пациентом в кабинете врача."
+  },
+  "doctorAdminRequestTitle": "Заявка в администрацию",
+  "@doctorAdminRequestTitle": {
+    "description": "Заголовок экрана заявки в администрацию. В макете переносится на две строки."
+  },
+  "doctorAdminFaqTitle": "Часто задаваемые вопросы:",
+  "@doctorAdminFaqTitle": {
+    "description": "Подпись над списком тем заявки."
+  },
+  "doctorAdminTopicTitle": "Тема заявки:",
+  "@doctorAdminTopicTitle": {
+    "description": "Подпись над выбранной темой заявки."
+  },
+  "doctorAdminTopicReschedule": "Нужно перенести запись",
+  "@doctorAdminTopicReschedule": {
+    "description": "Тема заявки: перенос записи."
+  },
+  "doctorAdminTopicCancel": "Нужно отменить запись",
+  "@doctorAdminTopicCancel": {
+    "description": "Тема заявки: отмена записи."
+  },
+  "doctorAdminTopicVacation": "Ухожу в отпуск",
+  "@doctorAdminTopicVacation": {
+    "description": "Тема заявки: отпуск."
+  },
+  "doctorAdminTopicResignation": "Ухожу с места работы",
+  "@doctorAdminTopicResignation": {
+    "description": "Тема заявки: увольнение."
+  },
+  "doctorAdminTopicOther": "Другое",
+  "@doctorAdminTopicOther": {
+    "description": "Тема заявки: всё остальное."
+  },
+  "doctorAdminComposeHint": "Опишите проблему...",
+  "@doctorAdminComposeHint": {
+    "description": "Плейсхолдер поля текста заявки."
+  },
+  "doctorAdminAttachFile": "Приложить файл",
+  "@doctorAdminAttachFile": {
+    "description": "Строка вложения под текстом заявки."
+  },
+  "doctorAdminSend": "Отправить заявку",
+  "@doctorAdminSend": {
+    "description": "Кнопка отправки заявки."
+  },
+  "doctorMyRequestsTitle": "Мои заявки",
+  "@doctorMyRequestsTitle": {
+    "description": "Заголовок списка заявок врача. Не путать с doctorAdminRequestsTitle — это строка-ссылка «Запросы в администрацию» на «Ваш Профиль»."
+  },
+  "doctorAdminCreateNew": "Создать новую заявку",
+  "@doctorAdminCreateNew": {
+    "description": "Кнопка под списком заявок."
+  },
+  "doctorAdminAnswerTitle": "Ответ администрации:",
+  "@doctorAdminAnswerTitle": {
+    "description": "Заголовок блока с ответом на заявку."
+  },
+  "doctorAdminNoAnswerYet": "Администрация пока не ответила",
+  "@doctorAdminNoAnswerYet": {
+    "description": "Плашка вместо ответа, пока его нет. В макете такого состояния нет — дописано по смыслу, потому что ответ приходит не сразу."
+  },
+  "doctorAdminDate": "от {date}",
+  "@doctorAdminDate": {
+    "description": "Дата заявки и ответа: «от 10.08.26».",
+    "placeholders": { "date": { "type": "String" } }
   }
 }
