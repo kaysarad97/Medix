@@ -25,16 +25,6 @@ class RemoteDoctorsRepository implements DoctorsRepository {
 
   final Dio _dio;
 
-  /// Записи, созданные в этом запуске.
-  ///
-  /// ЭНДПОИНТА НЕТ. Сервер отдаёт список своих записей (`GET /appointments`),
-  /// но в каждой только `slot_id` — ни времени, ни врача, — и получить слот
-  /// по идентификатору нечем. Показать запись можно лишь ту, которую сами
-  /// же и создали, пока помним её состав; после перезапуска экран «Ваша
-  /// Запись» останется пустым. Вопрос бэкенду: `GET /appointments/{id}` с
-  /// разложенным слотом и врачом.
-  final Map<String, Appointment> _booked = {};
-
   @override
   Future<Doctor> doctor(String id) async {
     try {
@@ -158,19 +148,7 @@ class RemoteDoctorsRepository implements DoctorsRepository {
         },
       );
 
-      final appointment = Appointment(
-        id: response.data!['id'] as String,
-        specialty: doctor.specialty,
-        kind: kind,
-        startsAt: slot.startsAt,
-        doctorId: doctor.id,
-        basePrice: doctor.priceBeforeDiscount ?? doctor.price,
-        subscriberPrice: doctor.priceBeforeDiscount == null
-            ? null
-            : doctor.price,
-      );
-      _booked[appointment.id] = appointment;
-      return appointment;
+      return _appointment(response.data!);
     } on DioException catch (e) {
       throw ApiException.fromDio(e);
     }
@@ -191,13 +169,56 @@ class RemoteDoctorsRepository implements DoctorsRepository {
 
   @override
   Future<Appointment> appointment(String id) async {
-    final booked = _booked[id];
-    if (booked != null) return booked;
+    try {
+      final response = await _dio.get<Map<String, dynamic>>(
+        ApiEndpoints.appointment(id),
+      );
+      return _appointment(response.data!);
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
 
-    throw const ApiException(
-      'Запись не найдена. Откройте её сразу после оформления.',
-      statusCode: 404,
-    );
+  @override
+  Future<List<Appointment>> appointments({bool upcoming = false}) async {
+    try {
+      final response = await _dio.get<List<dynamic>>(
+        ApiEndpoints.appointments,
+        queryParameters: {'upcoming': upcoming, 'limit': 100},
+      );
+      return [
+        for (final item in response.data ?? const [])
+          _appointment(item as Map<String, dynamic>),
+      ];
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
+
+  @override
+  Future<Appointment> reschedule(String id, ScheduleSlot newSlot) =>
+      _patchAppointment(id, {
+        'action': 'reschedule',
+        'new_slot_id': newSlot.id,
+      });
+
+  @override
+  Future<Appointment> cancel(String id) =>
+      _patchAppointment(id, {'action': 'cancel'});
+
+  Future<Appointment> _patchAppointment(
+    String id,
+    Map<String, dynamic> data,
+  ) async {
+    try {
+      final response = await _dio.patch<Map<String, dynamic>>(
+        ApiEndpoints.appointment(id),
+        data: data,
+      );
+      return _appointment(response.data!);
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
   }
 
   /// Отзывы о враче.
@@ -232,11 +253,24 @@ class RemoteDoctorsRepository implements DoctorsRepository {
     }
   }
 
-  /// ЭНДПОИНТА НЕТ. Специальности сервер списком не отдаёт; собрать их из
-  /// каталога можно, но количество врачей в каждой — уже нет, а на макете
-  /// оно подписано под каждой плиткой.
   @override
-  Future<List<DoctorSpecialty>> specialties() async => const [];
+  Future<List<DoctorSpecialty>> specialties() async {
+    try {
+      final response = await _dio.get<List<dynamic>>(
+        ApiEndpoints.doctorSpecialties,
+      );
+      return [
+        for (final item in response.data ?? const [])
+          DoctorSpecialty(
+            id: item['specialty'] as String,
+            title: item['specialty'] as String,
+            doctorCount: (item['doctors_count'] as num).toInt(),
+          ),
+      ];
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
 
   /// ЭНДПОИНТА НЕТ. «Мои Врачи» — те, у кого пользователь уже был; вывести
   /// их можно только из прошлых записей, а в них нет ни врача, ни времени.
@@ -264,4 +298,36 @@ class RemoteDoctorsRepository implements DoctorsRepository {
       priceBeforeDiscount: discount > 0 ? full : null,
     );
   }
+
+  static Appointment _appointment(Map<String, dynamic> json) {
+    final doctor = json['doctor'] as Map<String, dynamic>? ?? const {};
+    final price = (json['price'] as num?)?.round();
+    return Appointment(
+      id: json['id'] as String,
+      specialty: (doctor['specialty'] as String? ?? '').trim(),
+      kind: _kindFrom(json['type'] as String?),
+      startsAt: DateTime.parse(json['starts_at'] as String).toLocal(),
+      endsAt: DateTime.tryParse(json['ends_at'] as String? ?? '')?.toLocal(),
+      doctorId: doctor['id'] as String?,
+      doctorName: (doctor['full_name'] as String?)?.trim(),
+      familyMemberId: json['family_member_id'] as String?,
+      status: _statusFrom(json['status'] as String?),
+      basePrice: price,
+    );
+  }
+
+  static AppointmentKind _kindFrom(String? value) => switch (value) {
+    'video' => AppointmentKind.videoCall,
+    'audio' => AppointmentKind.audioCall,
+    'in_person' => AppointmentKind.inPerson,
+    _ => AppointmentKind.chat,
+  };
+
+  static AppointmentStatus _statusFrom(String? value) => switch (value) {
+    'pending' => AppointmentStatus.pending,
+    'confirmed' => AppointmentStatus.confirmed,
+    'completed' => AppointmentStatus.completed,
+    'cancelled' => AppointmentStatus.cancelled,
+    _ => AppointmentStatus.unknown,
+  };
 }

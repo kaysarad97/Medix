@@ -12,6 +12,23 @@ import '../../helpers/canned_dio.dart';
 /// `app/schemas/scheduling.py`), а не выдуманы.
 void main() {
   group('врач', () {
+    test('специальности приходят отдельным списком со счётчиками', () async {
+      final (:dio, :adapter) = cannedDio({
+        '/doctors/specialties': (
+          statusCode: 200,
+          body: [
+            {'specialty': 'Кардиолог', 'doctors_count': 7},
+          ],
+        ),
+      });
+
+      final specialties = await RemoteDoctorsRepository(dio).specialties();
+
+      expect(specialties.single.title, 'Кардиолог');
+      expect(specialties.single.doctorCount, 7);
+      expect(adapter.requests.single.path, '/doctors/specialties');
+    });
+
     test('без подписки цена одна, зачёркивать нечего', () async {
       final (:dio, :adapter) = cannedDio({
         '/doctors/d1': (
@@ -263,18 +280,32 @@ void main() {
       startsAt: DateTime(2026, 8, 13, 12, 30),
     );
 
+    Map<String, dynamic> appointmentJson({
+      String id = 'ap-1',
+      String type = 'video',
+      String status = 'pending',
+      String startsAt = '2026-08-13T12:30:00',
+    }) => {
+      'id': id,
+      'slot_id': 's-first',
+      'family_member_id': null,
+      'type': type,
+      'status': status,
+      'starts_at': startsAt,
+      'ends_at': '2026-08-13T13:00:00',
+      'price': 13500.0,
+      'doctor': {
+        'id': 'd1',
+        'full_name': 'Имя Фамилия',
+        'specialty': 'Гастроэнтеролог',
+        'photo_url': null,
+        'clinic': null,
+      },
+    };
+
     test('уходит слотом и форматом, возвращается с временем выбора', () async {
       final (:dio, :adapter) = cannedDio({
-        '/appointments': (
-          statusCode: 201,
-          body: {
-            'id': 'ap-1',
-            'slot_id': 's-first',
-            'family_member_id': null,
-            'type': 'video',
-            'status': 'pending',
-          },
-        ),
+        '/appointments': (statusCode: 201, body: appointmentJson()),
       });
       final repository = RemoteDoctorsRepository(dio);
 
@@ -290,26 +321,24 @@ void main() {
       expect(sent['slot_id'], 's-first');
       expect(sent['type'], 'video');
 
-      // Сервер отдаёт только идентификаторы и статус — время, специальность
-      // и цены собираются из того, что и так было на экране.
+      // Сервер возвращает развёрнутую запись, поэтому она восстановится и
+      // после перезапуска приложения.
       expect(appointment.id, 'ap-1');
       expect(appointment.startsAt, DateTime(2026, 8, 13, 12, 30));
       expect(appointment.specialty, 'Гастроэнтеролог');
-      expect(appointment.basePrice, 15000);
-      expect(appointment.subscriberPrice, 13500);
+      expect(appointment.basePrice, 13500);
+      expect(appointment.doctorName, 'Имя Фамилия');
     });
 
     test('созданную запись потом можно открыть по идентификатору', () async {
       final (:dio, adapter: _) = cannedDio({
-        '/appointments': (
+        'POST /appointments': (
           statusCode: 201,
-          body: {
-            'id': 'ap-1',
-            'slot_id': 's-first',
-            'family_member_id': null,
-            'type': 'audio',
-            'status': 'pending',
-          },
+          body: appointmentJson(type: 'audio'),
+        ),
+        'GET /appointments/ap-1': (
+          statusCode: 200,
+          body: appointmentJson(type: 'audio'),
         ),
       });
       final repository = RemoteDoctorsRepository(dio);
@@ -324,13 +353,45 @@ void main() {
       expect(opened.kind, AppointmentKind.audioCall);
     });
 
-    test('чужую запись открыть нечем — эндпоинта нет', () async {
+    test('неизвестная запись возвращает серверную ошибку', () async {
       final (:dio, adapter: _) = cannedDio({});
 
       expect(
         () => RemoteDoctorsRepository(dio).appointment('ap-2'),
         throwsA(isA<Exception>()),
       );
+    });
+
+    test('список записей приходит развёрнутым', () async {
+      final (:dio, :adapter) = cannedDio({
+        'GET /appointments': (statusCode: 200, body: [appointmentJson()]),
+      });
+
+      final result = await RemoteDoctorsRepository(
+        dio,
+      ).appointments(upcoming: true);
+
+      expect(result.single.doctorId, 'd1');
+      expect(adapter.requests.single.queryParameters['upcoming'], isTrue);
+    });
+
+    test('перенос и отмена отправляют action через PATCH', () async {
+      final (:dio, :adapter) = cannedDio({
+        'PATCH /appointments/ap-1': (
+          statusCode: 200,
+          body: appointmentJson(status: 'cancelled'),
+        ),
+      });
+      final repository = RemoteDoctorsRepository(dio);
+
+      await repository.reschedule('ap-1', slot);
+      await repository.cancel('ap-1');
+
+      expect(adapter.requests[0].data, {
+        'action': 'reschedule',
+        'new_slot_id': 's-first',
+      });
+      expect(adapter.requests[1].data, {'action': 'cancel'});
     });
   });
 }

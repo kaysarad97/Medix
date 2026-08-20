@@ -6,6 +6,8 @@ import '../../core/utils/ru_money.dart';
 /// Формат приёма.
 enum AppointmentKind { videoCall, audioCall, chat, inPerson }
 
+enum AppointmentStatus { pending, confirmed, completed, cancelled, unknown }
+
 /// Запись к врачу.
 ///
 /// Лежит в `shared/`, а не в фиче: её показывают и главная («Предстоящие
@@ -17,6 +19,10 @@ class Appointment {
     required this.kind,
     required this.startsAt,
     this.doctorId,
+    this.doctorName,
+    this.endsAt,
+    this.status = AppointmentStatus.unknown,
+    this.familyMemberId,
     this.basePrice,
     this.subscriberPrice,
   });
@@ -28,6 +34,10 @@ class Appointment {
 
   /// Врач, к которому запись. У моков главной пусто.
   final String? doctorId;
+  final String? doctorName;
+  final DateTime? endsAt;
+  final AppointmentStatus status;
+  final String? familyMemberId;
 
   /// Цена предоплаты без подписки. `null` — блок предоплаты не рисуется
   /// (у моков главной, где карточка записи компактная, цены нет вообще).

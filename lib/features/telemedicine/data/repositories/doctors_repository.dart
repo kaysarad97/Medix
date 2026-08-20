@@ -17,6 +17,12 @@ abstract interface class DoctorsRepository {
   /// Запись, открытая с главной. Экран «Ваша запись» показывает её же.
   Future<Appointment> appointment(String id);
 
+  Future<List<Appointment>> appointments({bool upcoming = false});
+
+  Future<Appointment> reschedule(String id, ScheduleSlot newSlot);
+
+  Future<Appointment> cancel(String id);
+
   /// Специальности для грида «Все Врачи» на экране поиска.
   Future<List<DoctorSpecialty>> specialties();
 
@@ -114,6 +120,40 @@ class MockDoctorsRepository implements DoctorsRepository {
       // 10 000 с подпиской — как на `design/Предоплата - GOLD.png`.
       basePrice: 15000,
       subscriberPrice: 10000,
+    );
+  }
+
+  @override
+  Future<List<Appointment>> appointments({bool upcoming = false}) async => [
+    await appointment('a1'),
+  ];
+
+  @override
+  Future<Appointment> reschedule(String id, ScheduleSlot newSlot) async {
+    final current = await appointment(id);
+    return Appointment(
+      id: current.id,
+      specialty: current.specialty,
+      kind: current.kind,
+      startsAt: newSlot.startsAt,
+      doctorId: current.doctorId,
+      basePrice: current.basePrice,
+      subscriberPrice: current.subscriberPrice,
+    );
+  }
+
+  @override
+  Future<Appointment> cancel(String id) async {
+    final current = await appointment(id);
+    return Appointment(
+      id: current.id,
+      specialty: current.specialty,
+      kind: current.kind,
+      startsAt: current.startsAt,
+      doctorId: current.doctorId,
+      basePrice: current.basePrice,
+      subscriberPrice: current.subscriberPrice,
+      status: AppointmentStatus.cancelled,
     );
   }
 

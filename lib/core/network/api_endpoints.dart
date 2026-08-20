@@ -64,6 +64,8 @@ abstract final class ApiEndpoints {
   /// учётом подписки — см. `price_for_user` в ответе.
   static const String doctors = '/doctors';
 
+  static const String doctorSpecialties = '$doctors/specialties';
+
   static String doctor(String id) => '$doctors/$id';
 
   /// Свободные слоты врача. Обязательные `from` и `to` — в ISO.

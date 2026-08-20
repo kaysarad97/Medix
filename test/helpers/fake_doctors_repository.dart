@@ -70,6 +70,31 @@ class FakeDoctorsRepository implements DoctorsRepository {
     subscriberPrice: appointmentSubscriberPrice,
   );
 
+  @override
+  Future<List<Appointment>> appointments({bool upcoming = false}) async => [
+    await appointment('a1'),
+  ];
+
+  @override
+  Future<Appointment> reschedule(String id, ScheduleSlot newSlot) async =>
+      Appointment(
+        id: id,
+        specialty: 'Гастроэнтеролог',
+        kind: AppointmentKind.audioCall,
+        startsAt: newSlot.startsAt,
+        doctorId: 'd1',
+      );
+
+  @override
+  Future<Appointment> cancel(String id) async => Appointment(
+    id: id,
+    specialty: 'Гастроэнтеролог',
+    kind: AppointmentKind.audioCall,
+    startsAt: DateTime(2026, 7, 10, 13, 30),
+    doctorId: 'd1',
+    status: AppointmentStatus.cancelled,
+  );
+
   /// Что ушло в [book] — форме записи проверять больше нечего.
   static final List<({ScheduleSlot slot, AppointmentKind kind})> booked = [];
 
