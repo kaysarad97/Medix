@@ -336,5 +336,8 @@
   "subscriptionCancelledMessage": "Жазылым тоқтатылды. Қолжетімділік {date} дейін сақталады",
   "cancelSubscriptionError": "Жазылымнан бас тарту мүмкін болмады",
   "joinWaitlistAction": "Бос уақыт пайда болғанда хабарлау",
-  "joinWaitlistSuccess": "Сіз күту тізіміне қосылдыңыз"
+  "joinWaitlistSuccess": "Сіз күту тізіміне қосылдыңыз",
+  "uploadOwnPhotoAction": "Өз фотосуретіңізді жүктеу",
+  "avatarUploadSuccess": "Профиль фотосуреті жаңартылды",
+  "avatarUploadError": "Фотосуретті жүктеу мүмкін болмады"
 }

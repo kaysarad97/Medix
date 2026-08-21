@@ -7,6 +7,8 @@ import '../../../../shared/models/my_doctor.dart';
 import '../../../../shared/services/preferences_service.dart';
 import '../../data/repositories/profile_repository.dart';
 import '../../data/repositories/remote_profile_repository.dart';
+import '../../data/services/avatar_file_picker.dart';
+import '../../data/services/avatar_upload_service.dart';
 import '../../domain/entities/medical_card.dart';
 import '../../domain/entities/medical_procedure.dart';
 import '../../domain/entities/user_profile.dart';
@@ -35,6 +37,11 @@ class AvatarSelection extends Notifier<String?> {
     state = asset;
     await ref.read(preferencesServiceProvider).saveAvatar(asset);
   }
+
+  Future<void> clear() async {
+    state = null;
+    await ref.read(preferencesServiceProvider).clearAvatar();
+  }
 }
 
 final avatarSelectionProvider = NotifierProvider<AvatarSelection, String?>(
@@ -46,6 +53,17 @@ final avatarSelectionProvider = NotifierProvider<AvatarSelection, String?>(
 final userAvatarProvider = Provider<String?>((ref) {
   return ref.watch(avatarSelectionProvider) ??
       ref.watch(profileProvider).value?.avatarAsset;
+});
+
+final avatarFilePickerProvider = Provider<AvatarFilePicker>(
+  (ref) => const PlatformAvatarFilePicker(),
+);
+
+final avatarUploadServiceProvider = Provider<AvatarUploadService>((ref) {
+  final repository = ref.watch(profileRepositoryProvider);
+  return useMocks
+      ? MockAvatarUploadService(repository)
+      : RemoteAvatarUploadService(repository);
 });
 
 final medicalCardProvider = FutureProvider<MedicalCard>(

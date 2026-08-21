@@ -336,5 +336,8 @@
   "subscriptionCancelledMessage": "Subscription cancelled. Access remains available until {date}",
   "cancelSubscriptionError": "Couldn't cancel the subscription",
   "joinWaitlistAction": "Notify me when an appointment is available",
-  "joinWaitlistSuccess": "You have been added to the waiting list"
+  "joinWaitlistSuccess": "You have been added to the waiting list",
+  "uploadOwnPhotoAction": "Upload your photo",
+  "avatarUploadSuccess": "Profile photo updated",
+  "avatarUploadError": "Couldn't upload the photo"
 }

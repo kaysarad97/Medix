@@ -1387,5 +1387,8 @@
   },
   "cancelSubscriptionError": "Не удалось отменить подписку",
   "joinWaitlistAction": "Сообщить, когда появится время",
-  "joinWaitlistSuccess": "Вы добавлены в лист ожидания"
+  "joinWaitlistSuccess": "Вы добавлены в лист ожидания",
+  "uploadOwnPhotoAction": "Загрузить своё фото",
+  "avatarUploadSuccess": "Фотография профиля обновлена",
+  "avatarUploadError": "Не удалось загрузить фотографию"
 }

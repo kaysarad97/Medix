@@ -14,37 +14,53 @@ import '../providers/profile_providers.dart';
 /// Свёрстан по `design/АВАТАРКИ.png` (440×956). Открывается по подписи
 /// «изменить аватара» с экрана настроек профиля.
 ///
-/// Своё фото не загружается и здесь: снимок лица — биометрия, её обработка
-/// требует отдельного согласия и защищённого хранения (см. [MedixAvatars]).
-class AvatarPickerScreen extends ConsumerWidget {
+/// Пользователь может оставить иллюстрацию или осознанно выбрать собственное
+/// фото в системном picker. Файл отправляется напрямую в хранилище через
+/// короткоживущую presigned-форму и не сохраняется приложением локально.
+class AvatarPickerScreen extends ConsumerStatefulWidget {
   const AvatarPickerScreen({super.key});
 
-  /// Верх экрана → верхняя строка, как на остальных внутренних экранах.
   static const double topBarTop = 36;
-
-  /// Низ верхней строки 132 → верх первого ряда 174.
-  static const double topBarToGrid = 42;
-
-  /// Плитка 117×135 с радиусом 16 — замеры по макету. Пропорция совпадает
-  /// с подложкой `assets/images/avatar_bg.png` (131×151), это один и тот же
-  /// прямоугольник.
+  static const double topBarToGrid = 18;
   static const double tileWidth = 117;
   static const double tileHeight = 135;
   static const double tileRadius = 16;
-
-  /// Поля экрана: плитки идут x 21…419.
   static const double screenH = 21;
-
-  /// Между плитками: 23.5 по горизонтали и 38.5 по вертикали.
   static const double columnGap = 23.5;
   static const double rowGap = 38.5;
-
-  /// Белое кольцо у выбранной. Рисуется снаружи плитки, поэтому ячейка
-  /// сетки на две его толщины больше самой плитки.
   static const double ringWidth = 3;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AvatarPickerScreen> createState() => _AvatarPickerScreenState();
+}
+
+class _AvatarPickerScreenState extends ConsumerState<AvatarPickerScreen> {
+  bool uploading = false;
+
+  Future<void> _upload() async {
+    if (uploading) return;
+    final file = await ref.read(avatarFilePickerProvider).pick();
+    if (file == null || !mounted) return;
+
+    setState(() => uploading = true);
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      await ref.read(avatarUploadServiceProvider).upload(file);
+      await ref.read(avatarSelectionProvider.notifier).clear();
+      ref.invalidate(profileProvider);
+      if (!mounted) return;
+      messenger.showSnackBar(SnackBar(content: Text(l10n.avatarUploadSuccess)));
+    } catch (_) {
+      if (!mounted) return;
+      messenger.showSnackBar(SnackBar(content: Text(l10n.avatarUploadError)));
+    } finally {
+      if (mounted) setState(() => uploading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final selected = ref.watch(userAvatarProvider) ?? MedixAvatars.fallback;
 
@@ -55,15 +71,33 @@ class AvatarPickerScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const SizedBox(height: topBarTop),
+            const SizedBox(height: AvatarPickerScreen.topBarTop),
             ScreenTopBar(
               title: l10n.avatarPickerTitle,
               onBack: () => Navigator.of(context).maybePop(),
             ),
-            const SizedBox(height: topBarToGrid),
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AvatarPickerScreen.screenH,
+              ),
+              child: OutlinedButton.icon(
+                onPressed: uploading ? null : _upload,
+                icon: uploading
+                    ? const SizedBox.square(
+                        dimension: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.add_a_photo_outlined),
+                label: Text(l10n.uploadOwnPhotoAction),
+              ),
+            ),
+            const SizedBox(height: AvatarPickerScreen.topBarToGrid),
             Expanded(
               child: GridView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: screenH),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AvatarPickerScreen.screenH,
+                ),
                 itemCount: MedixAvatars.all.length,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
@@ -71,10 +105,16 @@ class AvatarPickerScreen extends ConsumerWidget {
                   // зазоры на столько же меньше — расстояние между
                   // плитками остаётся замеренным.
                   childAspectRatio:
-                      (tileWidth + ringWidth * 2) /
-                      (tileHeight + ringWidth * 2),
-                  crossAxisSpacing: columnGap - ringWidth * 2,
-                  mainAxisSpacing: rowGap - ringWidth * 2,
+                      (AvatarPickerScreen.tileWidth +
+                          AvatarPickerScreen.ringWidth * 2) /
+                      (AvatarPickerScreen.tileHeight +
+                          AvatarPickerScreen.ringWidth * 2),
+                  crossAxisSpacing:
+                      AvatarPickerScreen.columnGap -
+                      AvatarPickerScreen.ringWidth * 2,
+                  mainAxisSpacing:
+                      AvatarPickerScreen.rowGap -
+                      AvatarPickerScreen.ringWidth * 2,
                 ),
                 itemBuilder: (context, index) {
                   final asset = MedixAvatars.all[index];

@@ -21,6 +21,8 @@ abstract interface class PreferencesService {
   String? readAvatar();
 
   Future<void> saveAvatar(String asset);
+
+  Future<void> clearAvatar();
 }
 
 class SharedPreferencesService implements PreferencesService {
@@ -43,6 +45,9 @@ class SharedPreferencesService implements PreferencesService {
 
   @override
   Future<void> saveAvatar(String asset) => _prefs.setString(_avatarKey, asset);
+
+  @override
+  Future<void> clearAvatar() => _prefs.remove(_avatarKey);
 }
 
 /// Память вместо диска.
@@ -69,6 +74,9 @@ class InMemoryPreferences implements PreferencesService {
 
   @override
   Future<void> saveAvatar(String asset) async => _avatar = asset;
+
+  @override
+  Future<void> clearAvatar() async => _avatar = null;
 }
 
 /// Подменяется в `main` на [SharedPreferencesService] — там уже есть
