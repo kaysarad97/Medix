@@ -129,6 +129,12 @@ abstract final class Routes {
 
   static String doctorAdminRequestOf(String id) => '/doctor-admin-requests/$id';
 
+  /// Звонок со стороны врача — кнопка «Начать звонок» на «Записи с
+  /// пациентом».
+  static const String doctorCall = '/doctor-appointment/:id/call';
+
+  static String doctorCallOf(String id) => '/doctor-appointment/$id/call';
+
   /// «Аналитика Работы» — третья плитка на главной кабинета врача.
   static const String doctorAnalytics = '/doctor-analytics';
 

@@ -74,9 +74,8 @@ class DoctorPatientAppointmentScreen extends ConsumerWidget {
                             appointment.kind,
                             l10n,
                           ),
-                          // Звонок со стороны врача пока некуда вести:
-                          // экран звонка живёт в пациентской фиче и завязан
-                          // на её запись.
+                          onTap: () =>
+                              context.push(Routes.doctorCallOf(patientId)),
                         ),
                         secondary: ActionButtonData(
                           icon: MedixIcon.mail,

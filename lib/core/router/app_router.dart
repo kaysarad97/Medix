@@ -17,6 +17,7 @@ import '../../features/calls/presentation/screens/call_screen.dart';
 import '../../features/chats/presentation/screens/chats_list_screen.dart';
 import '../../features/chats/presentation/screens/doctor_chat_screen.dart';
 import '../../features/doctor_cabinet/presentation/screens/doctor_chats_screen.dart';
+import '../../features/doctor_cabinet/presentation/screens/doctor_call_screen.dart';
 import '../../features/doctor_cabinet/presentation/screens/doctor_calendar_screen.dart';
 import '../../features/doctor_cabinet/presentation/screens/doctor_certificates_screen.dart';
 import '../../features/doctor_cabinet/presentation/screens/doctor_home_screen.dart';
@@ -369,6 +370,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: Routes.doctorPatient,
         builder: (context, state) =>
             DoctorPatientScreen(patientId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: Routes.doctorCall,
+        builder: (context, state) =>
+            DoctorCallScreen(patientId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: Routes.doctorPatientAppointment,

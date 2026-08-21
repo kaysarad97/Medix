@@ -10,7 +10,6 @@ import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/doctor_photo.dart';
-import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../core/widgets/user_avatar.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -18,7 +17,8 @@ import '../../../../shared/models/appointment.dart';
 import '../../../profile/presentation/providers/profile_providers.dart';
 import '../../../telemedicine/domain/entities/doctor.dart';
 import '../../../telemedicine/presentation/providers/telemedicine_providers.dart';
-import '../widgets/call_metrics.dart';
+import '../../../../core/widgets/call_controls.dart';
+import '../../../../core/widgets/call_metrics.dart';
 
 /// Экран звонка: видео или аудио, по `Appointment.kind`.
 ///
@@ -188,7 +188,11 @@ class _VideoBody extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _CallControls(isVideo: true, onHangUp: onHangUp),
+              CallControls(
+                isVideo: true,
+                onHangUp: onHangUp,
+                onChat: () => context.push(Routes.chatOf('t1')),
+              ),
               _SelfView(asset: selfAvatar),
             ],
           ),
@@ -217,7 +221,11 @@ class _AudioBody extends StatelessWidget {
         const SizedBox(height: CallMetrics.audioPhotoToName),
         Text(doctor.fullName, style: AppTypography.titleMd),
         const SizedBox(height: CallMetrics.audioNameToControls),
-        _CallControls(isVideo: false, onHangUp: onHangUp),
+        CallControls(
+          isVideo: false,
+          onHangUp: onHangUp,
+          onChat: () => context.push(Routes.chatOf('t1')),
+        ),
       ],
     );
   }
@@ -260,95 +268,6 @@ class _SelfView extends StatelessWidget {
       asset: asset,
       size: CallMetrics.selfViewSize,
       borderRadius: AppRadius.allLg,
-    );
-  }
-}
-
-/// Ромб из четырёх круглых кнопок: видеокамера сверху, пауза слева, чат
-/// справа, сброс звонка снизу — `design/Видео-звонок.png`.
-///
-/// На аудио-звонке та же кнопка видеокамеры перечёркнута — камера не
-/// включена — и своей позиции у ромба нет, он просто центрирован на
-/// экране, без самопросмотра рядом.
-class _CallControls extends StatelessWidget {
-  const _CallControls({required this.isVideo, required this.onHangUp});
-
-  final bool isVideo;
-  final VoidCallback onHangUp;
-
-  static const double _radius = CallMetrics.controlSize / 2;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox.fromSize(
-      size: CallMetrics.controlsClusterSize,
-      child: Stack(
-        children: [
-          Positioned(
-            left: CallMetrics.controlsClusterSize.width / 2 - _radius,
-            top: 0,
-            child: _ControlButton(
-              icon: isVideo ? MedixIcon.videoCall : MedixIcon.videoOff,
-            ),
-          ),
-          const Positioned(
-            left: 0,
-            top: CallMetrics.controlsSideTop,
-            child: _ControlButton(icon: null, isPause: true),
-          ),
-          Positioned(
-            right: 0,
-            top: CallMetrics.controlsSideTop,
-            child: _ControlButton(
-              icon: MedixIcon.chat,
-              onTap: () => context.push(Routes.chatOf('t1')),
-            ),
-          ),
-          Positioned(
-            left: CallMetrics.controlsClusterSize.width / 2 - _radius,
-            bottom: 0,
-            child: _ControlButton(
-              icon: MedixIcon.callDecline,
-              color: AppColors.callDecline,
-              onTap: onHangUp,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ControlButton extends StatelessWidget {
-  const _ControlButton({
-    required this.icon,
-    this.color = AppColors.primary,
-    this.isPause = false,
-    this.onTap,
-  });
-
-  final MedixIcon? icon;
-  final Color color;
-  final bool isPause;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox.square(
-      dimension: CallMetrics.controlSize,
-      child: Material(
-        color: AppColors.surfaceWhite,
-        shape: const CircleBorder(),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onTap,
-          child: Center(
-            child: isPause
-                ? Icon(Icons.pause, size: 24, color: color)
-                : AppIcon(icon: icon!, size: 24, color: color),
-          ),
-        ),
-      ),
     );
   }
 }
