@@ -11,6 +11,7 @@ import '../../../../core/widgets/form_error_snack_bar.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../providers/login_controller.dart';
+import '../../domain/entities/app_user.dart';
 import '../widgets/otp_code_input.dart';
 import '../widgets/otp_resend_timer.dart';
 
@@ -43,7 +44,9 @@ class _LoginVerifyScreenState extends ConsumerState<LoginVerifyScreen> {
 
     ref.listen(loginControllerProvider, (previous, next) {
       if (next.isAuthenticated && previous?.isAuthenticated != true) {
-        context.go(Routes.home);
+        context.go(
+          next.userRole == AppUserRole.doctor ? Routes.doctorHome : Routes.home,
+        );
         return;
       }
 

@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/router/routes.dart';
 import '../../../../core/widgets/medix_wait_view.dart';
 import '../providers/session_providers.dart';
+import '../../domain/entities/app_user.dart';
 
 /// Заставка запуска по `design/Загрузка.png`.
 ///
@@ -50,16 +51,22 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   Future<void> _decide() async {
     // Оба запущены сразу — ждём того, кто закончит позже.
     final sessionFuture = ref.read(hasStoredSessionProvider.future);
+    final roleFuture = ref.read(storedSessionRoleProvider.future);
     final inkGoneFuture = _inkGoneCompleter.future.timeout(
       SplashScreen.maxWait,
       onTimeout: () {},
     );
 
     final hasSession = await sessionFuture;
+    final role = await roleFuture;
     await inkGoneFuture;
 
     if (!mounted) return;
-    context.go(hasSession ? Routes.home : Routes.login);
+    if (!hasSession) {
+      context.go(Routes.login);
+    } else {
+      context.go(role == AppUserRole.doctor ? Routes.doctorHome : Routes.home);
+    }
   }
 
   @override

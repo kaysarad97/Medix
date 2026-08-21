@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/features/auth/data/repositories/auth_repository.dart';
 import 'package:medix/features/auth/presentation/providers/login_controller.dart';
+import 'package:medix/features/auth/domain/entities/app_user.dart';
 
 import '../../helpers/auth_overrides.dart';
 
@@ -84,6 +85,7 @@ void main() {
       await controller().submitCode();
 
       expect(state().isAuthenticated, isTrue);
+      expect(state().userRole, AppUserRole.patient);
       expect(state().isSubmitting, isFalse);
       expect(state().formError, isNull);
     });

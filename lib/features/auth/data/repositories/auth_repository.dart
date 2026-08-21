@@ -124,6 +124,7 @@ class RemoteAuthRepository implements AuthRepository {
         accessToken: session.accessToken,
         refreshToken: session.refreshToken,
       );
+      await _storage.saveUserRole(session.user.role.name);
       return session;
     } on DioException catch (e) {
       throw ApiException.fromDio(e);

@@ -6,6 +6,7 @@ import 'package:medix/core/router/routes.dart';
 import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/features/auth/presentation/providers/session_providers.dart';
 import 'package:medix/features/auth/presentation/screens/splash_screen.dart';
+import 'package:medix/features/auth/domain/entities/app_user.dart';
 
 import '../../helpers/test_fonts.dart';
 
@@ -20,14 +21,23 @@ void main() {
       GoRoute(path: Routes.splash, builder: (_, _) => const SplashScreen()),
       GoRoute(path: Routes.login, builder: (_, _) => const Text('ЛОГИН')),
       GoRoute(path: Routes.home, builder: (_, _) => const Text('ГЛАВНАЯ')),
+      GoRoute(
+        path: Routes.doctorHome,
+        builder: (_, _) => const Text('КАБИНЕТ ВРАЧА'),
+      ),
     ],
   );
 
-  Future<void> pumpSplash(WidgetTester tester, {required bool hasSession}) {
+  Future<void> pumpSplash(
+    WidgetTester tester, {
+    required bool hasSession,
+    AppUserRole role = AppUserRole.patient,
+  }) {
     return tester.pumpWidget(
       ProviderScope(
         overrides: [
           hasStoredSessionProvider.overrideWith((ref) async => hasSession),
+          storedSessionRoleProvider.overrideWith((ref) async => role),
         ],
         child: MaterialApp.router(
           theme: AppTheme.light,
@@ -73,5 +83,15 @@ void main() {
 
     await tester.pump(SplashScreen.maxWait);
     await tester.pumpAndSettle();
+  });
+
+  testWidgets('сохранённая сессия врача ведёт в кабинет', (tester) async {
+    await pumpSplash(tester, hasSession: true, role: AppUserRole.doctor);
+
+    await tester.pump(SplashScreen.maxWait);
+    await tester.pumpAndSettle();
+
+    expect(find.text('КАБИНЕТ ВРАЧА'), findsOneWidget);
+    expect(find.text('ГЛАВНАЯ'), findsNothing);
   });
 }

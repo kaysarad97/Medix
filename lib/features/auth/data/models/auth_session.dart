@@ -27,6 +27,7 @@ class AuthSession {
       user: AppUser(
         id: user['id'] as String,
         email: user['email'] as String,
+        role: AppUserRole.fromCode(user['role']),
         fullName: user['full_name'] as String?,
         subscription: SubscriptionTier.values.firstWhere(
           (t) => t.name == user['subscription'],

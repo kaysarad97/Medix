@@ -13,10 +13,13 @@ class SecureStorageService {
 
   static const _accessTokenKey = 'medix.access_token';
   static const _refreshTokenKey = 'medix.refresh_token';
+  static const _userRoleKey = 'medix.user_role';
 
   Future<String?> readAccessToken() => _storage.read(key: _accessTokenKey);
 
   Future<String?> readRefreshToken() => _storage.read(key: _refreshTokenKey);
+
+  Future<String?> readUserRole() => _storage.read(key: _userRoleKey);
 
   Future<void> saveTokens({
     required String accessToken,
@@ -26,9 +29,13 @@ class SecureStorageService {
     await _storage.write(key: _refreshTokenKey, value: refreshToken);
   }
 
+  Future<void> saveUserRole(String role) =>
+      _storage.write(key: _userRoleKey, value: role);
+
   Future<void> clear() async {
     await _storage.delete(key: _accessTokenKey);
     await _storage.delete(key: _refreshTokenKey);
+    await _storage.delete(key: _userRoleKey);
   }
 }
 

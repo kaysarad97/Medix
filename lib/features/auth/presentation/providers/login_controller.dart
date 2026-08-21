@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/network/api_exception.dart';
 import '../../../../core/utils/validators.dart';
+import '../../domain/entities/app_user.dart';
 import 'auth_providers.dart';
 
 @immutable
@@ -16,6 +17,7 @@ class LoginState {
     this.isSubmitting = false,
     this.isCodeSent = false,
     this.isAuthenticated = false,
+    this.userRole,
   });
 
   final String email;
@@ -33,6 +35,7 @@ class LoginState {
   final bool isCodeSent;
 
   final bool isAuthenticated;
+  final AppUserRole? userRole;
 
   bool get canSubmitEmail => email.trim().isNotEmpty && !isSubmitting;
   bool get canSubmitCode => code.trim().isNotEmpty && !isSubmitting;
@@ -49,6 +52,7 @@ class LoginState {
     bool? isSubmitting,
     bool? isCodeSent,
     bool? isAuthenticated,
+    AppUserRole? userRole,
   }) {
     return LoginState(
       email: email ?? this.email,
@@ -59,6 +63,7 @@ class LoginState {
       isSubmitting: isSubmitting ?? this.isSubmitting,
       isCodeSent: isCodeSent ?? this.isCodeSent,
       isAuthenticated: isAuthenticated ?? this.isAuthenticated,
+      userRole: userRole ?? this.userRole,
     );
   }
 }
@@ -135,10 +140,14 @@ class LoginController extends Notifier<LoginState> {
 
     state = state.copyWith(isSubmitting: true);
     try {
-      await ref
+      final session = await ref
           .read(authRepositoryProvider)
           .loginVerify(email: state.email.trim(), code: state.code);
-      state = state.copyWith(isSubmitting: false, isAuthenticated: true);
+      state = state.copyWith(
+        isSubmitting: false,
+        isAuthenticated: true,
+        userRole: session.user.role,
+      );
     } on ApiException catch (e) {
       state = state.copyWith(isSubmitting: false, formError: e.message);
     }
