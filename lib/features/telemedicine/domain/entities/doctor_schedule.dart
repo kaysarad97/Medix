@@ -15,6 +15,24 @@ class ScheduleSlot {
   String get timeLabel => RuDates.time(startsAt);
 }
 
+enum WaitlistEntryStatus { active, fulfilled, cancelled, unknown }
+
+class WaitlistEntry {
+  const WaitlistEntry({
+    required this.id,
+    required this.doctorId,
+    required this.status,
+    this.offeredSlotId,
+  });
+
+  final String id;
+  final String doctorId;
+  final WaitlistEntryStatus status;
+  final String? offeredSlotId;
+
+  bool get hasOffer => offeredSlotId != null;
+}
+
 /// День в недельной ленте расписания.
 class ScheduleDay {
   const ScheduleDay({required this.date, required this.slots});

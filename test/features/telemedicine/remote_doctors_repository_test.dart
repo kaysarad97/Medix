@@ -394,4 +394,68 @@ void main() {
       expect(adapter.requests[1].data, {'action': 'cancel'});
     });
   });
+
+  group('лист ожидания', () {
+    test('создание, список и отмена используют отдельный ресурс', () async {
+      final entry = {
+        'id': 'w1',
+        'doctor_id': 'd1',
+        'status': 'active',
+        'offered_slot_id': 's1',
+      };
+      final (:dio, :adapter) = cannedDio({
+        'POST /waitlist': (statusCode: 201, body: entry),
+        'GET /waitlist': (statusCode: 200, body: [entry]),
+        'DELETE /waitlist/w1': (statusCode: 204, body: const {}),
+      });
+      final repository = RemoteDoctorsRepository(dio);
+
+      final created = await repository.joinWaitlist('d1');
+      final listed = await repository.waitlistEntries();
+      await repository.leaveWaitlist('w1');
+
+      expect(created.offeredSlotId, 's1');
+      expect(created.hasOffer, isTrue);
+      expect(listed.single.status, WaitlistEntryStatus.active);
+      expect(adapter.requests.first.data, {'doctor_id': 'd1'});
+      expect(adapter.requests.last.path, '/waitlist/w1');
+    });
+
+    test('предложенный слот бронируется с форматом и членом семьи', () async {
+      final (:dio, :adapter) = cannedDio({
+        '/slots/s1/claim': (
+          statusCode: 201,
+          body: {
+            'id': 'ap-1',
+            'slot_id': 's1',
+            'family_member_id': 'f1',
+            'type': 'audio',
+            'status': 'confirmed',
+            'starts_at': '2026-08-22T10:00:00Z',
+            'ends_at': '2026-08-22T10:30:00Z',
+            'price': 10000,
+            'doctor': {
+              'id': 'd1',
+              'full_name': 'Имя Фамилия',
+              'specialty': 'Терапевт',
+              'photo_url': null,
+              'clinic': null,
+            },
+          },
+        ),
+      });
+
+      final result = await RemoteDoctorsRepository(dio).claimWaitlistOffer(
+        slotId: 's1',
+        kind: AppointmentKind.audioCall,
+        familyMemberId: 'f1',
+      );
+
+      expect(result.id, 'ap-1');
+      expect(adapter.requests.single.data, {
+        'type': 'audio',
+        'family_member_id': 'f1',
+      });
+    });
+  });
 }

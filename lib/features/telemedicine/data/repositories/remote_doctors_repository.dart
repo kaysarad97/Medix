@@ -206,6 +206,61 @@ class RemoteDoctorsRepository implements DoctorsRepository {
   Future<Appointment> cancel(String id) =>
       _patchAppointment(id, {'action': 'cancel'});
 
+  @override
+  Future<WaitlistEntry> joinWaitlist(String doctorId) async {
+    try {
+      final response = await _dio.post<Map<String, dynamic>>(
+        ApiEndpoints.waitlist,
+        data: {'doctor_id': doctorId},
+      );
+      return _waitlistEntry(response.data!);
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
+
+  @override
+  Future<List<WaitlistEntry>> waitlistEntries() async {
+    try {
+      final response = await _dio.get<List<dynamic>>(ApiEndpoints.waitlist);
+      return [
+        for (final item in response.data ?? const [])
+          _waitlistEntry(item as Map<String, dynamic>),
+      ];
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
+
+  @override
+  Future<void> leaveWaitlist(String entryId) async {
+    try {
+      await _dio.delete<void>(ApiEndpoints.waitlistEntry(entryId));
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
+
+  @override
+  Future<Appointment> claimWaitlistOffer({
+    required String slotId,
+    required AppointmentKind kind,
+    String? familyMemberId,
+  }) async {
+    try {
+      final response = await _dio.post<Map<String, dynamic>>(
+        ApiEndpoints.claimSlot(slotId),
+        data: {
+          'type': _typeOf(kind),
+          'family_member_id': familyMemberId,
+        },
+      );
+      return _appointment(response.data!);
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
+
   Future<Appointment> _patchAppointment(
     String id,
     Map<String, dynamic> data,
@@ -315,6 +370,19 @@ class RemoteDoctorsRepository implements DoctorsRepository {
       basePrice: price,
     );
   }
+
+  static WaitlistEntry _waitlistEntry(Map<String, dynamic> json) =>
+      WaitlistEntry(
+        id: json['id'] as String,
+        doctorId: json['doctor_id'] as String,
+        status: switch (json['status']) {
+          'active' => WaitlistEntryStatus.active,
+          'fulfilled' => WaitlistEntryStatus.fulfilled,
+          'cancelled' => WaitlistEntryStatus.cancelled,
+          _ => WaitlistEntryStatus.unknown,
+        },
+        offeredSlotId: json['offered_slot_id'] as String?,
+      );
 
   static AppointmentKind _kindFrom(String? value) => switch (value) {
     'video' => AppointmentKind.videoCall,

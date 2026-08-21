@@ -23,6 +23,18 @@ abstract interface class DoctorsRepository {
 
   Future<Appointment> cancel(String id);
 
+  Future<WaitlistEntry> joinWaitlist(String doctorId);
+
+  Future<List<WaitlistEntry>> waitlistEntries();
+
+  Future<void> leaveWaitlist(String entryId);
+
+  Future<Appointment> claimWaitlistOffer({
+    required String slotId,
+    required AppointmentKind kind,
+    String? familyMemberId,
+  });
+
   /// Специальности для грида «Все Врачи» на экране поиска.
   Future<List<DoctorSpecialty>> specialties();
 
@@ -156,6 +168,31 @@ class MockDoctorsRepository implements DoctorsRepository {
       status: AppointmentStatus.cancelled,
     );
   }
+
+  @override
+  Future<WaitlistEntry> joinWaitlist(String doctorId) async {
+    await Future<void>.delayed(_latency);
+    return WaitlistEntry(
+      id: 'wait-$doctorId',
+      doctorId: doctorId,
+      status: WaitlistEntryStatus.active,
+    );
+  }
+
+  @override
+  Future<List<WaitlistEntry>> waitlistEntries() async => const [];
+
+  @override
+  Future<void> leaveWaitlist(String entryId) async {
+    await Future<void>.delayed(_latency);
+  }
+
+  @override
+  Future<Appointment> claimWaitlistOffer({
+    required String slotId,
+    required AppointmentKind kind,
+    String? familyMemberId,
+  }) async => appointment('a1');
 
   @override
   Future<Appointment> book({

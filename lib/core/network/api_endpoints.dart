@@ -98,6 +98,12 @@ abstract final class ApiEndpoints {
 
   static String appointment(String id) => '$appointments/$id';
 
+  static const String waitlist = '/waitlist';
+
+  static String waitlistEntry(String id) => '$waitlist/$id';
+
+  static String claimSlot(String id) => '/slots/$id/claim';
+
   /// Запросы к этой ветке уходят без токена доступа и не перезапрашиваются
   /// после 401: часть из них анонимна, а `/auth/refresh` и `/auth/logout`
   /// носят refresh-токен в теле. Единое правило избавляет от рекурсии в
