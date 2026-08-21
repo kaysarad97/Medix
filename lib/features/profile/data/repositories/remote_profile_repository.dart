@@ -336,8 +336,36 @@ class RemoteProfileRepository implements ProfileRepository {
   @override
   Future<List<AnalysisResult>> analyses() async => const [];
 
-  /// ЭНДПОИНТА НЕТ. Прошедшие приёмы можно было бы взять из своих записей,
-  /// но в них нет ни врача, ни специальности, ни времени.
   @override
-  Future<List<MedicalProcedure>> procedures() async => const [];
+  Future<List<MedicalProcedure>> procedures() async {
+    try {
+      final response = await _dio.get<List<dynamic>>(
+        ApiEndpoints.appointments,
+        queryParameters: {'upcoming': false, 'limit': 100},
+      );
+      return [
+        for (final item in response.data ?? const [])
+          if (_isOwnCompletedAppointment(item as Map<String, dynamic>))
+            _procedure(item),
+      ];
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
+
+  /// Семейные записи пока не попадают в этот список: ответ содержит только
+  /// `family_member_id`, но не возраст или категорию профиля, а экран делит
+  /// их на «ребёнка» и «старших». Присваивать категорию наугад нельзя.
+  static bool _isOwnCompletedAppointment(Map<String, dynamic> json) =>
+      json['status'] == 'completed' && json['family_member_id'] == null;
+
+  static MedicalProcedure _procedure(Map<String, dynamic> json) {
+    final doctor = json['doctor'] as Map<String, dynamic>? ?? const {};
+    return MedicalProcedure(
+      id: json['id'] as String,
+      doctorName: (doctor['full_name'] as String? ?? '').trim(),
+      specialty: (doctor['specialty'] as String? ?? '').trim(),
+      date: DateTime.parse(json['starts_at'] as String).toLocal(),
+    );
+  }
 }

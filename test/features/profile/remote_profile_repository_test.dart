@@ -232,6 +232,58 @@ void main() {
     });
   });
 
+  test(
+    'предыдущие процедуры собираются из завершённых личных записей',
+    () async {
+      Map<String, dynamic> appointment({
+        required String id,
+        required String status,
+        String? familyMemberId,
+      }) => {
+        'id': id,
+        'slot_id': 'slot-$id',
+        'family_member_id': familyMemberId,
+        'type': 'in_person',
+        'status': status,
+        'starts_at': '2026-08-10T10:30:00Z',
+        'ends_at': '2026-08-10T11:00:00Z',
+        'price': 15000.0,
+        'doctor': {
+          'id': 'd1',
+          'full_name': 'Айжан Садыкова',
+          'specialty': 'Терапевт',
+          'photo_url': null,
+          'clinic': null,
+        },
+      };
+      final (:dio, :adapter) = cannedDio({
+        'GET /appointments': (
+          statusCode: 200,
+          body: [
+            appointment(id: 'done', status: 'completed'),
+            appointment(id: 'future', status: 'confirmed'),
+            appointment(
+              id: 'family',
+              status: 'completed',
+              familyMemberId: 'f1',
+            ),
+          ],
+        ),
+      });
+
+      final result = await RemoteProfileRepository(dio).procedures();
+
+      expect(result, hasLength(1));
+      expect(result.single.id, 'done');
+      expect(result.single.doctorName, 'Айжан Садыкова');
+      expect(result.single.specialty, 'Терапевт');
+      expect(adapter.requests.single.queryParameters, {
+        'upcoming': false,
+        'limit': 100,
+      });
+    },
+  );
+
   group('мед-карта раскладывается обратно', () {
     test('новое заводится POST, известное правится PATCH', () async {
       final (:dio, :adapter) = cannedDio({
