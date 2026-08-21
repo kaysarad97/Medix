@@ -5,8 +5,11 @@ import '../../../../core/network/dio_client.dart';
 import '../../../../shared/models/appointment.dart';
 import '../../../../shared/models/doctor_specialty.dart';
 import '../../../../shared/models/my_doctor.dart';
+import '../../data/repositories/consultation_socket.dart';
+import '../../data/repositories/consultations_repository.dart';
 import '../../data/repositories/doctors_repository.dart';
 import '../../data/repositories/remote_doctors_repository.dart';
+import '../../domain/entities/consultation.dart';
 import '../../domain/entities/doctor.dart';
 import '../../domain/entities/doctor_review.dart';
 import '../../domain/entities/doctor_schedule.dart';
@@ -16,6 +19,24 @@ final doctorsRepositoryProvider = Provider<DoctorsRepository>((ref) {
 
   return RemoteDoctorsRepository(ref.watch(dioClientProvider));
 });
+
+final consultationsRepositoryProvider = Provider<ConsultationsRepository>(
+  (ref) => ConsultationsRepository(ref.watch(dioClientProvider)),
+);
+
+final consultationMessagesProvider = FutureProvider.autoDispose
+    .family<List<ConsultationMessage>, String>(
+      (ref, consultationId) => ref
+          .watch(consultationsRepositoryProvider)
+          .messages(consultationId),
+    );
+
+final consultationSocketProvider = Provider.autoDispose
+    .family<ConsultationSocket, String>((ref, _) {
+      final socket = ConsultationSocket();
+      ref.onDispose(socket.close);
+      return socket;
+    });
 
 final doctorProvider = FutureProvider.autoDispose.family<Doctor, String>(
   (ref, id) => ref.watch(doctorsRepositoryProvider).doctor(id),
