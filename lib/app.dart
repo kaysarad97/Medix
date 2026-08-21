@@ -4,9 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/constants/app_constants.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
-import 'features/profile/presentation/providers/profile_providers.dart';
 import 'l10n/app_localizations.dart';
 import 'shared/models/app_language.dart';
+import 'shared/providers/app_settings_provider.dart';
 
 class MedixApp extends ConsumerWidget {
   const MedixApp({super.key});

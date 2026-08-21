@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/features/profile/presentation/providers/profile_providers.dart';
 import 'package:medix/shared/models/app_language.dart';
+import 'package:medix/shared/providers/app_settings_provider.dart';
 import 'package:medix/shared/services/preferences_service.dart';
 
 void main() {

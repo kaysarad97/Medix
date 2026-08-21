@@ -1,4 +1,4 @@
-import '../../domain/entities/chat_message.dart';
+import '../../../../shared/models/chat_message.dart';
 
 abstract interface class ChatbotRepository {
   /// Быстрые вопросы для пустой переписки.

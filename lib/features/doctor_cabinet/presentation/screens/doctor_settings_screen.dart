@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -8,31 +10,29 @@ import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
-import '../../../../core/widgets/user_avatar.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/app_language.dart';
 import '../../../../shared/providers/app_settings_provider.dart';
-import '../providers/profile_providers.dart';
-import '../widgets/profile_metrics.dart';
+import '../widgets/doctor_profile_metrics.dart';
 
-/// «Настройки» — свёрстан по `design/Настройки Клиента.png`.
-class SettingsScreen extends ConsumerWidget {
-  const SettingsScreen({
-    super.key,
-    this.onOpenProfileSettings,
-    this.onOpenPaymentDetails,
-    this.onOpenContacts,
-  });
-
-  final VoidCallback? onOpenProfileSettings;
-  final VoidCallback? onOpenPaymentDetails;
-  final VoidCallback? onOpenContacts;
+/// «Настройки» — кабинет врача.
+///
+/// Свёрстан по `design/для врача от клиники/Настройки Врач.png`. Тот же
+/// набор строк, что и у пациентских настроек (`SettingsScreen` в
+/// `features/profile`), но без строк «Настройки профиля» и «Банковские
+/// данные» — их нет в макете; форма карточек не импортируется оттуда,
+/// та лежит в чужой фиче (см. `DoctorProfileLinkRow`).
+///
+/// Провайдер настроек общий с пациентским экраном
+/// ([appSettingsProvider] из `shared/providers`) — язык и уведомления
+/// одни на всё приложение, а не по одному набору на роль.
+class DoctorSettingsScreen extends ConsumerWidget {
+  const DoctorSettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(appSettingsProvider);
     final notifier = ref.read(appSettingsProvider.notifier);
-    final profile = ref.watch(profileProvider).value;
     final l10n = AppLocalizations.of(context)!;
 
     return AppScaffold(
@@ -46,27 +46,15 @@ class SettingsScreen extends ConsumerWidget {
               const SizedBox(height: 36),
               ScreenTopBar(
                 title: l10n.settingsTitle,
-                titleColor: AppColors.primaryBright,
                 onBack: () => Navigator.of(context).maybePop(),
               ),
               const SizedBox(height: 40),
               _Section(
-                child: _RowCard(
-                  onTap: onOpenProfileSettings,
-                  leading: UserAvatar(
-                    asset: ref.watch(userAvatarProvider),
-                    url: profile?.avatarUrl,
-                    size: const Size.square(ProfileMetrics.settingsAvatarSize),
-                    borderRadius: AppRadius.allSm,
-                  ),
-                  title: l10n.profileSettingsTitle,
-                ),
-              ),
-              const SizedBox(height: ProfileMetrics.settingsGap),
-              _Section(
                 child: AppCard(
-                  borderRadius: ProfileMetrics.allRadius,
-                  padding: const EdgeInsets.all(ProfileMetrics.cardPadding),
+                  borderRadius: _radius,
+                  padding: const EdgeInsets.all(
+                    DoctorProfileMetrics.cardPadding,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
@@ -89,21 +77,18 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: ProfileMetrics.settingsGap),
+              const SizedBox(height: DoctorProfileMetrics.linkRowGap),
               _Section(
                 child: _RowCard(
-                  onTap: onOpenPaymentDetails,
-                  title: l10n.bankDetailsTitle,
-                ),
-              ),
-              const SizedBox(height: ProfileMetrics.settingsGap),
-              _Section(
-                child: _RowCard(
-                  onTap: onOpenContacts,
                   title: l10n.contactUsTitle,
+                  onTap: () => context.push(Routes.contacts),
                 ),
               ),
-              const SizedBox(height: ProfileMetrics.settingsGap),
+              SizedBox(
+                height:
+                    DoctorProfileMetrics.linkRowGap +
+                    MediaQuery.paddingOf(context).bottom,
+              ),
             ],
           ),
         ),
@@ -112,51 +97,10 @@ class SettingsScreen extends ConsumerWidget {
   }
 }
 
-/// Карточка-строка с шевроном; необязательная картинка слева.
-class _RowCard extends StatelessWidget {
-  const _RowCard({required this.title, this.leading, this.onTap});
+const BorderRadius _radius = BorderRadius.all(Radius.circular(14));
 
-  final String title;
-  final Widget? leading;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: AppColors.surfaceWhite,
-      borderRadius: ProfileMetrics.allRadius,
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: SizedBox(
-          height: ProfileMetrics.settingsRowHeight,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              children: [
-                if (leading != null) ...[leading!, const SizedBox(width: 14)],
-                Expanded(
-                  child: Text(
-                    title,
-                    style: AppTypography.tileTitle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                const AppIcon(
-                  icon: MedixIcon.chevronRight,
-                  size: ProfileMetrics.chevronSize,
-                  color: AppColors.primary,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
+/// Строка-переключатель уведомлений — та же форма, что у пациентских
+/// настроек.
 class _NotificationsRow extends StatelessWidget {
   const _NotificationsRow({required this.enabled, required this.onChanged});
 
@@ -201,8 +145,7 @@ class _LanguageRow extends StatelessWidget {
     return Row(
       children: [
         for (final language in AppLanguage.values) ...[
-          if (language != AppLanguage.values.first)
-            const SizedBox(width: ProfileMetrics.languagePillGap),
+          if (language != AppLanguage.values.first) const SizedBox(width: 12),
           Expanded(
             child: _LanguagePill(
               language: language,
@@ -236,7 +179,7 @@ class _LanguagePill extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: SizedBox(
-          height: ProfileMetrics.languagePillHeight,
+          height: 48,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -285,6 +228,49 @@ class _Mark extends StatelessWidget {
   }
 }
 
+/// Карточка-строка с шевроном, без иконки слева — «Свяжитесь с нами».
+class _RowCard extends StatelessWidget {
+  const _RowCard({required this.title, this.onTap});
+
+  final String title;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.surfaceWhite,
+      borderRadius: _radius,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: SizedBox(
+          height: DoctorProfileMetrics.linkRowHeight,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    title,
+                    style: AppTypography.tileTitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const AppIcon(
+                  icon: MedixIcon.chevronRight,
+                  size: 14,
+                  color: AppColors.primary,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _Section extends StatelessWidget {
   const _Section({required this.child});
 
@@ -293,7 +279,9 @@ class _Section extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: ProfileMetrics.screenH),
+      padding: const EdgeInsets.symmetric(
+        horizontal: DoctorProfileMetrics.screenH,
+      ),
       child: child,
     );
   }

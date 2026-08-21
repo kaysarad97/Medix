@@ -2,6 +2,10 @@
 enum ChatAuthor { bot, user }
 
 /// Реплика в переписке с ботом.
+///
+/// Общая для лабораторного чат-бота (`features/lab_chatbot`) и Medi-bot
+/// кабинета врача (`features/doctor_cabinet`) — форма диалога одна на
+/// обоих, различаются только вопросы и ответы репозитория.
 class ChatMessage {
   const ChatMessage({
     required this.id,

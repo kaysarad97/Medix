@@ -117,6 +117,12 @@ abstract final class Routes {
   /// «Аналитика Работы» — третья плитка на главной кабинета врача.
   static const String doctorAnalytics = '/doctor-analytics';
 
+  /// «Настройки» — шестерёнка в шапке «Ваш Профиль» кабинета врача.
+  static const String doctorSettings = '/doctor-settings';
+
+  /// Medi-bot кабинета врача — поле «Напишите Medi-bot...» на главной.
+  static const String doctorChatbot = '/doctor-chatbot';
+
   /// Оформленная запись к врачу.
   static const String appointment = '/appointment/:id';
 

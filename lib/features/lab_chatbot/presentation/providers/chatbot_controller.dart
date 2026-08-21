@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../shared/models/chat_message.dart';
 import '../../data/repositories/chatbot_repository.dart';
-import '../../domain/entities/chat_message.dart';
 
 final chatbotRepositoryProvider = Provider<ChatbotRepository>(
   (ref) => const MockChatbotRepository(),

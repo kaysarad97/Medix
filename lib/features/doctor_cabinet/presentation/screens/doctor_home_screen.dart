@@ -88,7 +88,7 @@ class DoctorHomeScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: DoctorHomeMetrics.cardGap),
-              const _MediBotField(),
+              _MediBotField(onTap: () => context.push(Routes.doctorChatbot)),
               const SizedBox(height: DoctorHomeMetrics.cardGap),
               _Section(
                 child: RegularPatientsCard(
@@ -140,10 +140,11 @@ class _Section extends StatelessWidget {
   }
 }
 
-/// Поле «Напишите Medi-bot...». Вести пока некуда — своего чат-экрана у
-/// кабинета врача ещё нет, поле пока декоративное.
+/// Поле «Напишите Medi-bot...» — ведёт в `DoctorChatbotScreen`.
 class _MediBotField extends StatelessWidget {
-  const _MediBotField();
+  const _MediBotField({required this.onTap});
+
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -151,24 +152,26 @@ class _MediBotField extends StatelessWidget {
     return _Section(
       child: SizedBox(
         height: DoctorHomeMetrics.mediBotFieldHeight,
-        child: DecoratedBox(
-          decoration: const BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: AppRadius.allPill,
-          ),
-          child: Row(
-            children: [
-              const SizedBox(width: 26),
-              const AppIcon(icon: MedixIcon.chat, size: 20),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  l10n.doctorMediBotHint,
-                  style: AppTypography.placeholder,
+        child: Material(
+          color: AppColors.surface,
+          borderRadius: AppRadius.allPill,
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: onTap,
+            child: Row(
+              children: [
+                const SizedBox(width: 26),
+                const AppIcon(icon: MedixIcon.chat, size: 20),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    l10n.doctorMediBotHint,
+                    style: AppTypography.placeholder,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 14),
-            ],
+                const SizedBox(width: 14),
+              ],
+            ),
           ),
         ),
       ),

@@ -51,9 +51,12 @@ class DoctorOwnProfileScreen extends ConsumerWidget {
                 child: ScreenTopBar(
                   title: l10n.doctorOwnProfileTitle,
                   onBack: () => Navigator.of(context).maybePop(),
-                  trailing: const AppIcon(
-                    icon: MedixIcon.settings,
-                    color: AppColors.textOnPrimary,
+                  trailing: GestureDetector(
+                    onTap: () => context.push(Routes.doctorSettings),
+                    child: const AppIcon(
+                      icon: MedixIcon.settings,
+                      color: AppColors.textOnPrimary,
+                    ),
                   ),
                 ),
               ),

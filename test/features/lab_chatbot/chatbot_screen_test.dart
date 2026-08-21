@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/theme/app_theme.dart';
-import 'package:medix/features/lab_chatbot/domain/entities/chat_message.dart';
 import 'package:medix/features/lab_chatbot/presentation/providers/chatbot_controller.dart';
 import 'package:medix/features/lab_chatbot/presentation/screens/chatbot_screen.dart';
 import 'package:medix/core/widgets/chat_bubble.dart';
 import 'package:medix/core/widgets/chat_input_bar.dart';
 import 'package:medix/l10n/app_localizations.dart';
+import 'package:medix/shared/models/chat_message.dart';
 
 import '../../helpers/fake_chatbot_repository.dart';
 import '../../helpers/test_fonts.dart';

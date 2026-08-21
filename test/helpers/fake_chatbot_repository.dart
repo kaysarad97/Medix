@@ -1,5 +1,5 @@
 import 'package:medix/features/lab_chatbot/data/repositories/chatbot_repository.dart';
-import 'package:medix/features/lab_chatbot/domain/entities/chat_message.dart';
+import 'package:medix/shared/models/chat_message.dart';
 
 /// Заглушка бота с предсказуемой задержкой: у боевой она 1200 мс, ждать
 /// столько в каждом тесте незачем.

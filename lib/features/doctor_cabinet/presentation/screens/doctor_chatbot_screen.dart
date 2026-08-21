@@ -11,32 +11,30 @@ import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/chat_message.dart';
-import '../providers/chatbot_controller.dart';
+import '../providers/doctor_chatbot_controller.dart';
 
-/// Лабораторный чат-бот.
+/// Medi-bot кабинета врача.
 ///
-/// Свёрстан по `design/Чат-бот Старт.png` и `design/Чат-бот.png`. Это не два
-/// экрана, а два состояния одного: «Старт» — пустая переписка, вместо истории
-/// показываются частые вопросы.
-class ChatbotScreen extends ConsumerWidget {
-  const ChatbotScreen({super.key});
+/// Свёрстан по `design/для врача от клиники/Чат-бот Старт - в.ф.png` и
+/// `Чат-бот - в.ф.png` — то же деление на состояния «Старт»/переписка, что
+/// у пациентского `ChatbotScreen`, но своя форма вопросов (дозировки,
+/// совместимость препаратов) и без прикрепления файла: в макете кнопка
+/// скрепки есть (она в общем `ChatInputBar`), а сценария вложений — нет.
+///
+/// Вход — поле «Напишите Medi-bot...» на главной кабинета врача
+/// (`DoctorHomeScreen._MediBotField`).
+class DoctorChatbotScreen extends ConsumerWidget {
+  const DoctorChatbotScreen({super.key});
 
-  /// Поля экрана — та же сетка, что везде: x 21…419.
   static const double _screenH = 21;
-
-  /// Безопасная зона 62 → верхняя строка 99.
   static const double _topBarTop = 37;
-
-  /// Верхняя строка 99…133 → карточка 150.
   static const double _topBarToCard = 17;
-
-  /// Карточка → строка ввода 565.
   static const double _cardToInput = 20;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final controller = ref.read(chatbotControllerProvider.notifier);
-    final state = ref.watch(chatbotControllerProvider);
+    final controller = ref.read(doctorChatbotControllerProvider.notifier);
+    final state = ref.watch(doctorChatbotControllerProvider);
 
     return AppScaffold(
       background: AppBackgroundStyle.main,
@@ -60,7 +58,6 @@ class ChatbotScreen extends ConsumerWidget {
               ChatInputBar(
                 onSend: controller.send,
                 enabled: !state.botIsTyping,
-                onAttach: controller.attachFile,
               ),
               const SizedBox(height: 20),
             ],
@@ -71,7 +68,8 @@ class ChatbotScreen extends ConsumerWidget {
   }
 }
 
-/// Полупрозрачная карточка поверх фона: история или частые вопросы.
+/// Полупрозрачная карточка поверх фона: история или частые вопросы — та же
+/// форма, что у пациентского бота.
 class _ConversationCard extends StatelessWidget {
   const _ConversationCard({
     required this.state,
@@ -79,11 +77,10 @@ class _ConversationCard extends StatelessWidget {
     required this.onQuickReply,
   });
 
-  final ChatbotState state;
+  final DoctorChatbotState state;
   final List<QuickReply> quickReplies;
   final ValueChanged<QuickReply> onQuickReply;
 
-  /// Замер: белый примерно на 18 % поверх фонового градиента.
   static const Color _fill = Color(0x2EFFFFFF);
   static const BorderRadius _radius = BorderRadius.all(Radius.circular(24));
 
@@ -112,28 +109,20 @@ class _QuickReplies extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const AppIconChip(icon: MedixIcon.botAvatar, size: 44),
         const SizedBox(height: 20),
-        Text(l10n.chatbotFaqTitle, style: AppTypography.bodyMd),
+        Text(
+          AppLocalizations.of(context)!.chatbotFaqTitle,
+          style: AppTypography.bodyMd,
+        ),
         const SizedBox(height: 12),
         for (final reply in replies) ...[
           if (reply != replies.first) const SizedBox(height: _pillGap),
           _Pill(text: reply.text, onTap: () => onTap(reply)),
         ],
-        const Spacer(),
-        // ВНЕ МАКЕТА. Требование ТЗ: бот не ставит диагнозы, окончательное
-        // решение за врачом. В макетах дисклеймера нет, но для медицинского
-        // приложения он обязателен — как и кнопка вызова 103 на главной,
-        // которой там тоже нет.
-        Text(
-          l10n.chatbotDisclaimer,
-          style: AppTypography.captionMuted,
-          textAlign: TextAlign.center,
-        ),
       ],
     );
   }
@@ -147,10 +136,13 @@ class _Pill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Без Align и Center: оба растягиваются на всю доступную ширину, а в
-    // макете пилюля обхватывает текст — 167, 194 и 197 у трёх вопросов.
-    return SizedBox(
-      height: _QuickReplies._pillHeight,
+    // Без Row(mainAxisSize: min): такой Row отдаёт Text неограниченную
+    // ширину и текст никогда не переносится — у коротких пациентских
+    // вопросов это не всплывало, а «Оформить направление и список анализов
+    // для пациента» вылезает за карточку на 23px. Text сам обхватывает
+    // короткий текст и переносит длинный по ширине карточки.
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: _QuickReplies._pillHeight),
       child: Material(
         color: AppColors.surfaceWhite,
         borderRadius: BorderRadius.circular(_QuickReplies._pillHeight / 2),
@@ -158,11 +150,8 @@ class _Pill extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [Text(text, style: AppTypography.chatQuickReply)],
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Text(text, style: AppTypography.chatQuickReply),
           ),
         ),
       ),
@@ -173,14 +162,13 @@ class _Pill extends StatelessWidget {
 class _History extends StatelessWidget {
   const _History({required this.state});
 
-  final ChatbotState state;
+  final DoctorChatbotState state;
 
   static const double _messageGap = 18;
 
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
-      // Свежие реплики внизу — начинаем показ оттуда же.
       reverse: true,
       itemCount: state.messages.length + (state.botIsTyping ? 1 : 0),
       separatorBuilder: (_, _) => const SizedBox(height: _messageGap),

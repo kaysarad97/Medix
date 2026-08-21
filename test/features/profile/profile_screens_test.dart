@@ -19,6 +19,7 @@ import 'package:medix/features/profile/domain/entities/medical_card.dart';
 import 'package:medix/l10n/app_localizations.dart';
 import 'package:medix/shared/models/app_language.dart';
 import 'package:medix/shared/models/medix_avatars.dart';
+import 'package:medix/shared/providers/app_settings_provider.dart';
 
 import '../../helpers/fake_family_repository.dart';
 import '../../helpers/fake_profile_repository.dart';
