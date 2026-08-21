@@ -137,6 +137,15 @@ class _Content extends ConsumerWidget {
                 ),
               ),
             ),
+          if (schedule != null && schedule!.firstAvailable == null) ...[
+            const SizedBox(height: 10),
+            _Section(
+              child: TextButton(
+                onPressed: () => _joinWaitlist(context, ref, doctor.id),
+                child: Text(l10n.joinWaitlistAction),
+              ),
+            ),
+          ],
           const SizedBox(height: DoctorMetrics.cardGap),
           if (reviews.isNotEmpty)
             _Section(child: ReviewsCard(reviews: reviews)),
@@ -150,6 +159,20 @@ class _Content extends ConsumerWidget {
         ],
       ),
     );
+  }
+}
+
+Future<void> _joinWaitlist(
+  BuildContext context,
+  WidgetRef ref,
+  String doctorId,
+) async {
+  try {
+    await ref.read(doctorsRepositoryProvider).joinWaitlist(doctorId);
+    ref.invalidate(waitlistEntriesProvider);
+    if (context.mounted) context.push(Routes.waitlist);
+  } on ApiException catch (e) {
+    if (context.mounted) showFormErrorSnackBar(context, e.message);
   }
 }
 

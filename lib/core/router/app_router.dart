@@ -48,6 +48,8 @@ import '../../features/profile/presentation/screens/avatar_picker_screen.dart';
 import '../../features/profile/presentation/screens/contact_screen.dart';
 import '../../features/profile/presentation/screens/medical_card_form_screen.dart';
 import '../../features/profile/presentation/screens/medical_card_screen.dart';
+import '../../features/profile/presentation/screens/measurement_history_screen.dart';
+import '../../features/profile/domain/entities/medical_card.dart';
 import '../../features/profile/presentation/screens/procedures_screen.dart';
 import '../../features/profile/presentation/screens/profile_settings_screen.dart';
 import '../../features/profile/presentation/screens/settings_screen.dart';
@@ -56,11 +58,13 @@ import '../../features/subscriptions/presentation/screens/card_form_screen.dart'
 import '../../features/subscriptions/presentation/screens/payment_method_screen.dart';
 import '../../features/subscriptions/presentation/screens/payment_result_screen.dart';
 import '../../features/subscriptions/presentation/screens/subscription_screen.dart';
+import '../../features/subscriptions/presentation/screens/cancel_subscription_screen.dart';
 import '../../features/telemedicine/presentation/screens/appointment_screen.dart';
 import '../../features/telemedicine/presentation/screens/doctor_profile_screen.dart';
 import '../../features/telemedicine/presentation/screens/doctor_search_results_screen.dart';
 import '../../features/telemedicine/presentation/screens/doctor_search_screen.dart';
 import '../../features/telemedicine/presentation/screens/leave_review_screen.dart';
+import '../../features/telemedicine/presentation/screens/waitlist_screen.dart';
 import 'app_shell.dart';
 import 'routes.dart';
 
@@ -400,6 +404,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         ),
       ),
       GoRoute(
+        path: Routes.cancelSubscription,
+        builder: (context, state) => const CancelSubscriptionScreen(),
+      ),
+      GoRoute(
+        path: Routes.waitlist,
+        builder: (context, state) => WaitlistScreen(
+          onAppointmentClaimed: (appointment) =>
+              context.push(Routes.appointmentOf(appointment.id)),
+        ),
+      ),
+      GoRoute(
         path: Routes.payment,
         builder: (context, state) => PaymentMethodScreen(
           // Kaspi, Halyk и Apple Pay проводят оплату своим интерфейсом —
@@ -461,7 +476,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           onOpenProfileSettings: () => context.push(Routes.profileSettings),
           onOpenPaymentDetails: () => context.push(Routes.payment),
           onOpenContacts: () => context.push(Routes.contacts),
+          onCancelSubscription: () => context.push(Routes.cancelSubscription),
         ),
+      ),
+      GoRoute(
+        path: Routes.heightHistory,
+        builder: (context, state) =>
+            const MeasurementHistoryScreen(kind: MeasurementKind.height),
+      ),
+      GoRoute(
+        path: Routes.weightHistory,
+        builder: (context, state) =>
+            const MeasurementHistoryScreen(kind: MeasurementKind.weight),
       ),
       GoRoute(
         path: Routes.profileSettings,

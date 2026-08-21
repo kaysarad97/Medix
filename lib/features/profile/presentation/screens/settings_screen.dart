@@ -11,6 +11,7 @@ import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../core/widgets/user_avatar.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/app_language.dart';
+import '../../../../shared/models/subscription_tier.dart';
 import '../../../../shared/providers/app_settings_provider.dart';
 import '../providers/profile_providers.dart';
 import '../widgets/profile_metrics.dart';
@@ -22,11 +23,13 @@ class SettingsScreen extends ConsumerWidget {
     this.onOpenProfileSettings,
     this.onOpenPaymentDetails,
     this.onOpenContacts,
+    this.onCancelSubscription,
   });
 
   final VoidCallback? onOpenProfileSettings;
   final VoidCallback? onOpenPaymentDetails;
   final VoidCallback? onOpenContacts;
+  final VoidCallback? onCancelSubscription;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -62,6 +65,16 @@ class SettingsScreen extends ConsumerWidget {
                   title: l10n.profileSettingsTitle,
                 ),
               ),
+              if (profile?.subscription != null &&
+                  profile!.subscription != SubscriptionTier.free) ...[
+                const SizedBox(height: ProfileMetrics.settingsGap),
+                _Section(
+                  child: _RowCard(
+                    onTap: onCancelSubscription,
+                    title: l10n.cancelSubscriptionTitle,
+                  ),
+                ),
+              ],
               const SizedBox(height: ProfileMetrics.settingsGap),
               _Section(
                 child: AppCard(

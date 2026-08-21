@@ -172,6 +172,9 @@ abstract final class Routes {
   /// Форма мед-карты: группа крови, аллергии, операции.
   static const String medicalCardForm = '/profile/medical-card';
 
+  static const String heightHistory = '/profile/medical-card/height-history';
+  static const String weightHistory = '/profile/medical-card/weight-history';
+
   /// История консультаций: «Предыдущие процедуры».
   static const String procedures = '/profile/procedures';
 
@@ -208,6 +211,11 @@ abstract final class Routes {
 
   /// Варианты подписки.
   static const String subscription = '/subscription';
+
+  static const String cancelSubscription = '/subscription/cancel';
+
+  /// Свободное время ожидаемых врачей и предложенные сервером слоты.
+  static const String waitlist = '/waitlist';
 
   /// Выбор способа оплаты.
   static const String payment = '/subscription/payment';

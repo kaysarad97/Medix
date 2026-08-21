@@ -102,6 +102,10 @@ class MedicalCardScreen extends ConsumerWidget {
                         ageLabel: profile.ageLabel(now ?? DateTime.now()),
                         registrationAddress: profile.registrationAddress,
                         onOpen: () => context.push(Routes.medicalCardForm),
+                        onOpenHeightHistory: () =>
+                            context.push(Routes.heightHistory),
+                        onOpenWeightHistory: () =>
+                            context.push(Routes.weightHistory),
                       ),
                     ),
                     const SizedBox(height: ProfileMetrics.cardGap),

@@ -321,5 +321,20 @@
   "doctorSlotCreateSuccess": "Slot added",
   "doctorSlotCreateError": "Couldn't add the slot",
   "doctorSlotDeleteError": "Couldn't delete the slot",
-  "doctorSlotEndBeforeStartError": "End must be after start"
+  "doctorSlotEndBeforeStartError": "End must be after start",
+  "waitlistTitle": "Waiting list",
+  "waitlistEmpty": "You are not waiting for an available appointment yet",
+  "waitlistActiveStatus": "Waiting for an available appointment",
+  "waitlistOfferStatus": "An appointment is now available",
+  "waitlistAcceptAction": "Book",
+  "waitlistLeaveAction": "Leave waiting list",
+  "waitlistActionError": "Couldn't update the waiting list",
+  "cancelSubscriptionTitle": "Cancel subscription",
+  "cancelSubscriptionPrompt": "Cancel automatic subscription renewal? Access remains available until the end of the paid period.",
+  "cancelSubscriptionAction": "Cancel subscription",
+  "keepSubscriptionAction": "Keep subscription",
+  "subscriptionCancelledMessage": "Subscription cancelled. Access remains available until {date}",
+  "cancelSubscriptionError": "Couldn't cancel the subscription",
+  "joinWaitlistAction": "Notify me when an appointment is available",
+  "joinWaitlistSuccess": "You have been added to the waiting list"
 }

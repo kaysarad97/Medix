@@ -321,5 +321,20 @@
   "doctorSlotCreateSuccess": "Слот қосылды",
   "doctorSlotCreateError": "Слотты қосу мүмкін болмады",
   "doctorSlotDeleteError": "Слотты жою мүмкін болмады",
-  "doctorSlotEndBeforeStartError": "Аяқталуы басталуынан кеш болуы керек"
+  "doctorSlotEndBeforeStartError": "Аяқталуы басталуынан кеш болуы керек",
+  "waitlistTitle": "Күту тізімі",
+  "waitlistEmpty": "Сіз әзірше бос уақытты күтпейсіз",
+  "waitlistActiveStatus": "Бос уақытты күтеміз",
+  "waitlistOfferStatus": "Бос уақыт пайда болды",
+  "waitlistAcceptAction": "Жазылу",
+  "waitlistLeaveAction": "Күту тізімінен шығу",
+  "waitlistActionError": "Күту тізімін жаңарту мүмкін болмады",
+  "cancelSubscriptionTitle": "Жазылымнан бас тарту",
+  "cancelSubscriptionPrompt": "Жазылымның автоматты ұзартылуынан бас тартасыз ба? Қолжетімділік төленген кезеңнің соңына дейін сақталады.",
+  "cancelSubscriptionAction": "Жазылымнан бас тарту",
+  "keepSubscriptionAction": "Жазылымды сақтау",
+  "subscriptionCancelledMessage": "Жазылым тоқтатылды. Қолжетімділік {date} дейін сақталады",
+  "cancelSubscriptionError": "Жазылымнан бас тарту мүмкін болмады",
+  "joinWaitlistAction": "Бос уақыт пайда болғанда хабарлау",
+  "joinWaitlistSuccess": "Сіз күту тізіміне қосылдыңыз"
 }

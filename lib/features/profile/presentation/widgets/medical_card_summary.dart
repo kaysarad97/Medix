@@ -29,6 +29,8 @@ class MedicalCardSummary extends StatelessWidget {
     required this.ageLabel,
     required this.registrationAddress,
     this.onOpen,
+    this.onOpenHeightHistory,
+    this.onOpenWeightHistory,
   });
 
   final String? topFieldValue;
@@ -38,6 +40,8 @@ class MedicalCardSummary extends StatelessWidget {
   final String ageLabel;
   final String? registrationAddress;
   final VoidCallback? onOpen;
+  final VoidCallback? onOpenHeightHistory;
+  final VoidCallback? onOpenWeightHistory;
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +68,7 @@ class MedicalCardSummary extends StatelessWidget {
                   icon: MedixIcon.height,
                   label: l10n.heightFieldLabel,
                   value: heightLabel,
+                  onTap: onOpenHeightHistory,
                 ),
               ),
               const SizedBox(width: ProfileMetrics.tileGap),
@@ -72,6 +77,7 @@ class MedicalCardSummary extends StatelessWidget {
                   icon: MedixIcon.weight,
                   label: l10n.weightFieldLabel,
                   value: weightLabel,
+                  onTap: onOpenWeightHistory,
                 ),
               ),
               const SizedBox(width: ProfileMetrics.tileGap),
@@ -135,56 +141,66 @@ class _Field extends StatelessWidget {
 /// Плитка «Рост / 176 см»: иконка с подписью сверху, синяя пилюля значения
 /// снизу и шеврон в правом нижнем углу.
 class _Tile extends StatelessWidget {
-  const _Tile({required this.icon, required this.label, required this.value});
+  const _Tile({
+    required this.icon,
+    required this.label,
+    required this.value,
+    this.onTap,
+  });
 
   final MedixIcon icon;
   final String label;
   final String value;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: ProfileMetrics.tileHeight,
-      child: DecoratedBox(
-        decoration: const BoxDecoration(
-          color: AppColors.surfaceWhite,
-          borderRadius: ProfileMetrics.allRadius,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(10, 12, 8, 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  AppIcon(icon: icon, size: 18, color: AppColors.textPrimary),
-                  const SizedBox(width: 6),
-                  Flexible(
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        label,
-                        style: AppTypography.chipLabel,
-                        maxLines: 1,
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: SizedBox(
+        height: ProfileMetrics.tileHeight,
+        child: DecoratedBox(
+          decoration: const BoxDecoration(
+            color: AppColors.surfaceWhite,
+            borderRadius: ProfileMetrics.allRadius,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(10, 12, 8, 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    AppIcon(icon: icon, size: 18, color: AppColors.textPrimary),
+                    const SizedBox(width: 6),
+                    Flexible(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          label,
+                          style: AppTypography.chipLabel,
+                          maxLines: 1,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const Spacer(),
-              Row(
-                children: [
-                  Flexible(child: _ValuePill(value: value)),
-                  const SizedBox(width: 6),
-                  const AppIcon(
-                    icon: MedixIcon.chevronRight,
-                    size: 12,
-                    color: AppColors.primary,
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+                const Spacer(),
+                Row(
+                  children: [
+                    Flexible(child: _ValuePill(value: value)),
+                    const SizedBox(width: 6),
+                    const AppIcon(
+                      icon: MedixIcon.chevronRight,
+                      size: 12,
+                      color: AppColors.primary,
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

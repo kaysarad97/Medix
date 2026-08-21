@@ -1369,5 +1369,23 @@
   "doctorSlotEndBeforeStartError": "Окончание должно быть позже начала",
   "@doctorSlotEndBeforeStartError": {
     "description": "Ошибка формы нового слота, когда конец раньше или равен началу."
-  }
+  },
+  "waitlistTitle": "Лист ожидания",
+  "waitlistEmpty": "Вы пока не ожидаете свободного времени",
+  "waitlistActiveStatus": "Ожидаем свободное время",
+  "waitlistOfferStatus": "Появилось свободное время",
+  "waitlistAcceptAction": "Записаться",
+  "waitlistLeaveAction": "Выйти из листа ожидания",
+  "waitlistActionError": "Не удалось обновить лист ожидания",
+  "cancelSubscriptionTitle": "Отмена подписки",
+  "cancelSubscriptionPrompt": "Отменить автоматическое продление подписки? Доступ сохранится до конца оплаченного периода.",
+  "cancelSubscriptionAction": "Отменить подписку",
+  "keepSubscriptionAction": "Оставить подписку",
+  "subscriptionCancelledMessage": "Подписка отменена. Доступ сохранён до {date}",
+  "@subscriptionCancelledMessage": {
+    "placeholders": { "date": { "type": "String" } }
+  },
+  "cancelSubscriptionError": "Не удалось отменить подписку",
+  "joinWaitlistAction": "Сообщить, когда появится время",
+  "joinWaitlistSuccess": "Вы добавлены в лист ожидания"
 }

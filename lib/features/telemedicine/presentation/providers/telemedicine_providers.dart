@@ -108,6 +108,14 @@ final appointmentProvider = FutureProvider.family<Appointment, String>(
   (ref, id) => ref.watch(doctorsRepositoryProvider).appointment(id),
 );
 
+/// Активные записи пользователя в листе ожидания.
+///
+/// После выхода или принятия предложения provider инвалидируется экраном,
+/// чтобы состояние всегда повторно читалось с сервера.
+final waitlistEntriesProvider = FutureProvider.autoDispose<List<WaitlistEntry>>(
+  (ref) => ref.watch(doctorsRepositoryProvider).waitlistEntries(),
+);
+
 /// Отзывы, написанные пользователем на экране врача.
 ///
 /// ОТПРАВЛЯТЬ ПО-ПРЕЖНЕМУ НЕКУДА, но причина сменилась. Читать отзывы уже
