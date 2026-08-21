@@ -6,7 +6,16 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 /// Медицинские данные и токены доступа не должны попадать в
 /// SharedPreferences — на Android используется EncryptedSharedPreferences,
 /// на iOS Keychain.
-class SecureStorageService {
+abstract interface class AuthSessionStorage {
+  Future<void> saveTokens({
+    required String accessToken,
+    required String refreshToken,
+  });
+
+  Future<void> saveUserRole(String role);
+}
+
+class SecureStorageService implements AuthSessionStorage {
   const SecureStorageService(this._storage);
 
   final FlutterSecureStorage _storage;
@@ -21,6 +30,7 @@ class SecureStorageService {
 
   Future<String?> readUserRole() => _storage.read(key: _userRoleKey);
 
+  @override
   Future<void> saveTokens({
     required String accessToken,
     required String refreshToken,
@@ -29,6 +39,7 @@ class SecureStorageService {
     await _storage.write(key: _refreshTokenKey, value: refreshToken);
   }
 
+  @override
   Future<void> saveUserRole(String role) =>
       _storage.write(key: _userRoleKey, value: role);
 

@@ -16,6 +16,8 @@ abstract final class ApiEndpoints {
   /// Регистрация в два шага: заявка с данными профиля, затем код из письма.
   static const String registerStart = '/auth/register/start';
   static const String registerVerify = '/auth/register/verify';
+  static const String doctorRegisterStart = '/auth/doctor/register/start';
+  static const String doctorRegisterVerify = '/auth/doctor/register/verify';
 
   /// Вход тоже в два шага — пароля нет, сервер присылает одноразовый код.
   static const String loginStart = '/auth/login/start';
