@@ -17,13 +17,53 @@ import '../widgets/doctor_profile_metrics.dart';
 /// фрилансера сверху ещё строка «Загрузить Сертификат» — своих файлов
 /// врач от клиники не грузит, это делает клиника-администратор
 /// (см. [showUploadRow], решение подтверждено в HANDOFF.md).
-class DoctorCertificatesScreen extends ConsumerWidget {
+class DoctorCertificatesScreen extends ConsumerStatefulWidget {
   const DoctorCertificatesScreen({super.key, this.showUploadRow = false});
 
   final bool showUploadRow;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DoctorCertificatesScreen> createState() =>
+      _DoctorCertificatesScreenState();
+}
+
+class _DoctorCertificatesScreenState
+    extends ConsumerState<DoctorCertificatesScreen> {
+  bool _isUploading = false;
+
+  Future<void> _uploadCertificate() async {
+    if (_isUploading) return;
+
+    final file = await ref.read(doctorFilePickerProvider).pickCertificate();
+    if (file == null || !mounted) return;
+
+    setState(() => _isUploading = true);
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      await ref
+          .read(doctorMediaRepositoryProvider)
+          .uploadCredentials(
+            filename: file.name,
+            contentType: file.contentType,
+            bytes: file.bytes,
+          );
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.doctorCertificateUploadSuccess)),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.doctorCertificateUploadError)),
+      );
+    } finally {
+      if (mounted) setState(() => _isUploading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final certificates =
         ref.watch(doctorCertificatesProvider).value ?? const [];
@@ -51,11 +91,20 @@ class DoctorCertificatesScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: DoctorProfileMetrics.topBarToPhoto),
-              if (showUploadRow) ...[
+              if (widget.showUploadRow) ...[
                 _Section(
-                  child: DoctorProfileLinkRow(
-                    icon: MedixIcon.medicalCard,
-                    title: l10n.doctorUploadCertificateTitle,
+                  child: Column(
+                    children: [
+                      DoctorProfileLinkRow(
+                        icon: MedixIcon.medicalCard,
+                        title: l10n.doctorUploadCertificateTitle,
+                        onTap: _isUploading ? null : _uploadCertificate,
+                      ),
+                      if (_isUploading)
+                        const LinearProgressIndicator(
+                          key: ValueKey('doctor-certificate-upload-progress'),
+                        ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: DoctorProfileMetrics.cardGap),

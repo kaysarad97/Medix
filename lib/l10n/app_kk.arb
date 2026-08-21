@@ -243,6 +243,8 @@
   "doctorReviewsAboutYouTitle": "Сіз туралы пікірлер",
   "doctorAdminRequestsTitle": "Әкімшілікке өтінімдер",
   "doctorUploadCertificateTitle": "Сертификат жүктеу",
+  "doctorCertificateUploadSuccess": "Сертификат жүктелді",
+  "doctorCertificateUploadError": "Сертификатты жүктеу мүмкін болмады",
   "doctorReviewsScreenTitle": "Пікірлер",
   "doctorOtherReviewsTitle": "Басқа пікірлер",
   "doctorHistoryTitle": "Жазбалар тарихы",

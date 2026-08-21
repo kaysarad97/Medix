@@ -243,6 +243,8 @@
   "doctorReviewsAboutYouTitle": "Reviews about you",
   "doctorAdminRequestsTitle": "Requests to administration",
   "doctorUploadCertificateTitle": "Upload Certificate",
+  "doctorCertificateUploadSuccess": "Certificate uploaded",
+  "doctorCertificateUploadError": "Could not upload certificate",
   "doctorReviewsScreenTitle": "Reviews",
   "doctorOtherReviewsTitle": "Other reviews",
   "doctorHistoryTitle": "Appointment history",

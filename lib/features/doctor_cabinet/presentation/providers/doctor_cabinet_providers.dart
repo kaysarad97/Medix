@@ -6,6 +6,7 @@ import '../../../../core/network/dio_client.dart';
 import '../../data/repositories/doctor_cabinet_repository.dart';
 import '../../data/repositories/doctor_media_repository.dart';
 import '../../data/repositories/doctor_schedule_repository.dart';
+import '../../data/services/doctor_file_picker.dart';
 import '../../domain/entities/admin_request.dart';
 import '../../domain/entities/certificate.dart';
 import '../../domain/entities/doctor_appointment.dart';
@@ -32,6 +33,10 @@ final doctorMediaRepositoryProvider = Provider<DoctorMediaRepository>((ref) {
   if (useMocks) return const MockDoctorMediaRepository();
   return RemoteDoctorMediaRepository(ref.watch(dioClientProvider));
 });
+
+final doctorFilePickerProvider = Provider<DoctorFilePicker>(
+  (ref) => const PlatformDoctorFilePicker(),
+);
 
 final doctorWorkScheduleProvider = FutureProvider.autoDispose
     .family<List<DoctorWorkSlot>, ({DateTime from, DateTime to})>(

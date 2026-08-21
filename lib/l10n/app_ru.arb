@@ -1065,6 +1065,8 @@
   "@doctorUploadCertificateTitle": {
     "description": "Строка загрузки файла на экране «Ваши сертификаты» — только у врача-фрилансера."
   },
+  "doctorCertificateUploadSuccess": "Сертификат загружен",
+  "doctorCertificateUploadError": "Не удалось загрузить сертификат",
   "doctorReviewsScreenTitle": "Отзывы",
   "@doctorReviewsScreenTitle": {
     "description": "Заголовок экрана «Отзывы о Вас» в кабинете врача."
