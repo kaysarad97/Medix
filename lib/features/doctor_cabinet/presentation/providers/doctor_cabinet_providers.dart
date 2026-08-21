@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/network/api_mode.dart';
 import '../../../../core/network/dio_client.dart';
 import '../../data/repositories/doctor_cabinet_repository.dart';
+import '../../data/repositories/doctor_media_repository.dart';
 import '../../data/repositories/doctor_schedule_repository.dart';
 import '../../domain/entities/admin_request.dart';
 import '../../domain/entities/certificate.dart';
@@ -25,6 +26,11 @@ final doctorScheduleRepositoryProvider = Provider<DoctorScheduleRepository>((
 ) {
   if (useMocks) return const MockDoctorScheduleRepository();
   return RemoteDoctorScheduleRepository(ref.watch(dioClientProvider));
+});
+
+final doctorMediaRepositoryProvider = Provider<DoctorMediaRepository>((ref) {
+  if (useMocks) return const MockDoctorMediaRepository();
+  return RemoteDoctorMediaRepository(ref.watch(dioClientProvider));
 });
 
 final doctorWorkScheduleProvider = FutureProvider.autoDispose

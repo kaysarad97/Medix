@@ -113,6 +113,11 @@ abstract final class ApiEndpoints {
   static const String myDoctorSchedule = '$doctors/me/schedule';
   static const String myDoctorSlots = '$doctors/me/slots';
   static String myDoctorSlot(String id) => '$myDoctorSlots/$id';
+  static const String myDoctorCredentials = '$doctors/me/credentials';
+  static const String myDoctorCredentialsUploadUrl =
+      '$myDoctorCredentials/upload-url';
+  static const String myDoctorPhoto = '$doctors/me/photo';
+  static const String myDoctorPhotoUploadUrl = '$myDoctorPhoto/upload-url';
 
   /// Записи на приём: создание, свои записи, перенос и отмена.
   static const String appointments = '/appointments';
