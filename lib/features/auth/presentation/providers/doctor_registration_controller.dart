@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/network/api_exception.dart';
 import '../../../../core/utils/validators.dart';
+import '../../../../shared/models/app_language.dart';
 import 'auth_providers.dart';
 
 enum DoctorRegField {
@@ -23,6 +24,9 @@ class DoctorRegistrationState {
     this.isSubmitting = false,
     this.formError,
     this.codeTtlSeconds = 0,
+    this.language,
+    this.pushConsent = false,
+    this.policyAccepted = false,
   });
 
   final Map<DoctorRegField, String> values;
@@ -30,6 +34,16 @@ class DoctorRegistrationState {
   final bool isSubmitting;
   final String? formError;
   final int codeTtlSeconds;
+
+  /// Язык и согласие на рассылки — шаг «Язык и пуш увед», общий с
+  /// пациентским мастером. Хранит их не `AppSettingsScreen` сам, а этот
+  /// контроллер: тот же приём, что у `RegistrationController`, макета
+  /// врача под этот шаг тоже нет (см. HANDOFF).
+  final AppLanguage? language;
+  final bool pushConsent;
+
+  /// Согласие с политикой — последний шаг перед `Routes.doctorHome`.
+  final bool policyAccepted;
 
   String value(DoctorRegField field) => values[field] ?? '';
   String? errorOf(DoctorRegField field) => errors[field];
@@ -40,12 +54,18 @@ class DoctorRegistrationState {
     bool? isSubmitting,
     String? formError,
     int? codeTtlSeconds,
+    AppLanguage? language,
+    bool? pushConsent,
+    bool? policyAccepted,
   }) => DoctorRegistrationState(
     values: values ?? this.values,
     errors: errors ?? const {},
     isSubmitting: isSubmitting ?? this.isSubmitting,
     formError: formError,
     codeTtlSeconds: codeTtlSeconds ?? this.codeTtlSeconds,
+    language: language ?? this.language,
+    pushConsent: pushConsent ?? this.pushConsent,
+    policyAccepted: policyAccepted ?? this.policyAccepted,
   );
 }
 
@@ -138,6 +158,19 @@ class DoctorRegistrationController extends Notifier<DoctorRegistrationState> {
   }
 
   void formErrorShown() => state = state.copyWith(values: state.values);
+
+  void setLanguage(AppLanguage language) =>
+      state = state.copyWith(values: state.values, language: language);
+
+  void setPushConsent(bool value) =>
+      state = state.copyWith(values: state.values, pushConsent: value);
+
+  bool submitAppSettings() => state.language != null;
+
+  void setPolicyAccepted(bool value) =>
+      state = state.copyWith(values: state.values, policyAccepted: value);
+
+  bool submitPolicy() => state.policyAccepted;
 }
 
 final doctorRegistrationControllerProvider =

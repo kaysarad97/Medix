@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/theme/app_theme.dart';
+import 'package:medix/core/widgets/primary_button.dart';
 import 'package:medix/features/doctor_cabinet/data/repositories/doctor_media_repository.dart';
 import 'package:medix/features/doctor_cabinet/data/services/doctor_file_picker.dart';
 import 'package:medix/features/doctor_cabinet/presentation/providers/doctor_cabinet_providers.dart';
@@ -53,6 +54,7 @@ void main() {
     expect(find.text('Документ 1.pdf'), findsOneWidget);
     expect(find.text('Документ 2.pdf'), findsOneWidget);
     expect(find.text('Загрузить Сертификат'), findsNothing);
+    expect(find.byType(PrimaryButton), findsNothing);
   });
 
   testWidgets('showUploadRow добавляет строку загрузки', (tester) async {
@@ -61,6 +63,7 @@ void main() {
     await tester.pump();
 
     expect(find.text('Загрузить Сертификат'), findsOneWidget);
+    expect(find.widgetWithText(PrimaryButton, 'Далее'), findsOneWidget);
   });
 
   testWidgets('выбранный сертификат загружается и показывает результат', (

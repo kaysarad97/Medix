@@ -23,9 +23,24 @@ import '../providers/subscriptions_providers.dart';
 /// логов, ни нашего бэкенда — хранение данных держателя карты требует
 /// сертификации PCI DSS.
 class CardFormScreen extends ConsumerStatefulWidget {
-  const CardFormScreen({super.key, this.onResult, this.animatedWait = true});
+  const CardFormScreen({
+    super.key,
+    this.onResult,
+    this.onSubmit,
+    this.animatedWait = true,
+  });
 
   final ValueChanged<PaymentOutcome>? onResult;
+
+  /// Что происходит по кнопке «Далее» вместо оформления подписки.
+  ///
+  /// `null` — прежнее поведение: `subscriptionsRepositoryProvider.pay()`.
+  /// Нужен регистрации врача-фрилансера: там тот же экран собирает
+  /// банковские данные (`design/Ввод данных карты.png`), но это задел на
+  /// будущую монетизацию, а не оплата — своего эндпоинта под сохранение
+  /// карты врача нет, и дёргать `pay()` с чужим тарифом было бы неверно
+  /// по смыслу.
+  final Future<PaymentOutcome> Function(CardDetails card)? onSubmit;
 
   /// Крутить анимацию на экране ожидания.
   ///
@@ -75,10 +90,9 @@ class _CardFormScreenState extends ConsumerState<CardFormScreen> {
     cvv: _cvv.text,
   );
 
-  Future<void> _submit() async {
-    setState(() => _paying = true);
-    final started = DateTime.now();
-
+  /// Прежнее поведение: оформление подписки. Используется, когда
+  /// [CardFormScreen.onSubmit] не передан.
+  Future<PaymentOutcome> _pay() async {
     final outcome = await ref
         .read(subscriptionsRepositoryProvider)
         .pay(_card, tier: ref.read(selectedPlanProvider));
@@ -88,6 +102,14 @@ class _CardFormScreenState extends ConsumerState<CardFormScreen> {
     // перечитать, иначе до перезапуска приложение считает, что подписки
     // нет. Ровно так уже терялись данные на живом сервере.
     if (outcome == PaymentOutcome.success) ref.invalidate(profileProvider);
+    return outcome;
+  }
+
+  Future<void> _submit() async {
+    setState(() => _paying = true);
+    final started = DateTime.now();
+
+    final outcome = await (widget.onSubmit?.call(_card) ?? _pay());
 
     final left = _minimumWait - DateTime.now().difference(started);
     if (left > Duration.zero) await Future<void>.delayed(left);

@@ -13,6 +13,42 @@ import 'package:medix/l10n/app_localizations.dart';
 import '../../helpers/auth_overrides.dart';
 import '../../helpers/test_fonts.dart';
 
+/// Экраны сами больше не читают `registrationControllerProvider` — тем же
+/// приёмом их подключает `app_router.dart`, здесь он повторён без роутера.
+class _AppSettingsHost extends ConsumerWidget {
+  const _AppSettingsHost();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(registrationControllerProvider);
+    final controller = ref.read(registrationControllerProvider.notifier);
+    return AppSettingsScreen(
+      language: state.language,
+      pushConsent: state.pushConsent,
+      onLanguageSelected: controller.setLanguage,
+      onPushConsentChanged: controller.setPushConsent,
+      onNext: state.language == null
+          ? null
+          : () => controller.submitAppSettings(),
+    );
+  }
+}
+
+class _PolicyHost extends ConsumerWidget {
+  const _PolicyHost();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(registrationControllerProvider);
+    final controller = ref.read(registrationControllerProvider.notifier);
+    return PolicyScreen(
+      policyAccepted: state.policyAccepted,
+      onPolicyAcceptedChanged: controller.setPolicyAccepted,
+      onNext: state.policyAccepted ? () => controller.submitPolicy() : null,
+    );
+  }
+}
+
 void main() {
   setUpAll(loadAppFonts);
 
@@ -44,7 +80,7 @@ void main() {
     testWidgets('показывает три языка, казахский подписан на казахском', (
       tester,
     ) async {
-      await pumpScreen(tester, const AppSettingsScreen());
+      await pumpScreen(tester, const _AppSettingsHost());
 
       expect(find.text('Настройки приложения'), findsOneWidget);
       // Голая проверка наличия строки заодно ловит подмену шрифта на такой,
@@ -56,7 +92,7 @@ void main() {
     });
 
     testWidgets('кнопка заблокирована, пока язык не выбран', (tester) async {
-      await pumpScreen(tester, const AppSettingsScreen());
+      await pumpScreen(tester, const _AppSettingsHost());
       expect(button(tester).onPressed, isNull);
 
       await tester.tap(find.text('Русский'));
@@ -68,7 +104,7 @@ void main() {
     testWidgets('согласие на рассылки не обязательно для перехода', (
       tester,
     ) async {
-      await pumpScreen(tester, const AppSettingsScreen());
+      await pumpScreen(tester, const _AppSettingsHost());
 
       await tester.tap(find.text('Қазақша'));
       await tester.pump();
@@ -83,7 +119,7 @@ void main() {
     testWidgets('кнопка заблокирована, пока согласие не отмечено', (
       tester,
     ) async {
-      await pumpScreen(tester, const PolicyScreen());
+      await pumpScreen(tester, const _PolicyHost());
       expect(button(tester).onPressed, isNull);
 
       await tester.tap(find.byType(AppCheckbox));
@@ -93,7 +129,7 @@ void main() {
     });
 
     testWidgets('видна пометка о несогласованном тексте', (tester) async {
-      await pumpScreen(tester, const PolicyScreen());
+      await pumpScreen(tester, const _PolicyHost());
 
       expect(find.textContaining('не согласован с юристом'), findsOneWidget);
     });

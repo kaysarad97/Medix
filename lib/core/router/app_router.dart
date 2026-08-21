@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/auth/presentation/providers/doctor_registration_controller.dart';
+import '../../features/auth/presentation/providers/registration_controller.dart';
 import '../../features/auth/presentation/screens/app_settings_screen.dart';
 import '../../features/auth/presentation/screens/doctor_register_screen.dart';
 import '../../features/auth/presentation/screens/doctor_register_verify_screen.dart';
@@ -96,11 +98,50 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: Routes.appSettings,
-        builder: (context, state) => const AppSettingsScreen(),
+        builder: (context, state) => Consumer(
+          builder: (context, ref, _) {
+            final regState = ref.watch(registrationControllerProvider);
+            final controller = ref.read(
+              registrationControllerProvider.notifier,
+            );
+            return AppSettingsScreen(
+              language: regState.language,
+              pushConsent: regState.pushConsent,
+              onLanguageSelected: controller.setLanguage,
+              onPushConsentChanged: controller.setPushConsent,
+              onNext: regState.language == null
+                  ? null
+                  : () {
+                      if (controller.submitAppSettings()) {
+                        context.push(Routes.policy);
+                      }
+                    },
+            );
+          },
+        ),
       ),
       GoRoute(
         path: Routes.policy,
-        builder: (context, state) => const PolicyScreen(),
+        builder: (context, state) => Consumer(
+          builder: (context, ref, _) {
+            final regState = ref.watch(registrationControllerProvider);
+            final controller = ref.read(
+              registrationControllerProvider.notifier,
+            );
+            return PolicyScreen(
+              policyAccepted: regState.policyAccepted,
+              onPolicyAcceptedChanged: controller.setPolicyAccepted,
+              onNext: regState.policyAccepted
+                  ? () {
+                      if (controller.submitPolicy()) {
+                        // Регистрация завершена — стек мастера сбрасываем.
+                        context.go(Routes.home);
+                      }
+                    }
+                  : null,
+            );
+          },
+        ),
       ),
       GoRoute(
         path: Routes.doctorRegister,
@@ -109,6 +150,68 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.doctorRegisterVerify,
         builder: (context, state) => const DoctorRegisterVerifyScreen(),
+      ),
+      GoRoute(
+        path: Routes.doctorRegisterCard,
+        builder: (context, state) => Consumer(
+          builder: (context, ref, _) {
+            return CardFormScreen(
+              // Задел на будущую монетизацию, не оплата — своего
+              // эндпоинта под сохранение карты врача ещё нет (см.
+              // HANDOFF). Подтверждённые данные никуда не уходят,
+              // мастер просто идёт дальше.
+              onSubmit: (_) async => PaymentOutcome.success,
+              onResult: (_) => context.push(Routes.doctorRegisterLanguage),
+            );
+          },
+        ),
+      ),
+      GoRoute(
+        path: Routes.doctorRegisterLanguage,
+        builder: (context, state) => Consumer(
+          builder: (context, ref, _) {
+            final regState = ref.watch(doctorRegistrationControllerProvider);
+            final controller = ref.read(
+              doctorRegistrationControllerProvider.notifier,
+            );
+            return AppSettingsScreen(
+              language: regState.language,
+              pushConsent: regState.pushConsent,
+              onLanguageSelected: controller.setLanguage,
+              onPushConsentChanged: controller.setPushConsent,
+              onNext: regState.language == null
+                  ? null
+                  : () {
+                      if (controller.submitAppSettings()) {
+                        context.push(Routes.doctorRegisterPolicy);
+                      }
+                    },
+            );
+          },
+        ),
+      ),
+      GoRoute(
+        path: Routes.doctorRegisterPolicy,
+        builder: (context, state) => Consumer(
+          builder: (context, ref, _) {
+            final regState = ref.watch(doctorRegistrationControllerProvider);
+            final controller = ref.read(
+              doctorRegistrationControllerProvider.notifier,
+            );
+            return PolicyScreen(
+              policyAccepted: regState.policyAccepted,
+              onPolicyAcceptedChanged: controller.setPolicyAccepted,
+              onNext: regState.policyAccepted
+                  ? () {
+                      if (controller.submitPolicy()) {
+                        // Регистрация завершена — стек мастера сбрасываем.
+                        context.go(Routes.doctorHome);
+                      }
+                    }
+                  : null,
+            );
+          },
+        ),
       ),
       // Нижняя навигация: Домой/Карта/Чаты/Профиль — общий плавающий
       // таб-бар в AppShell, у каждой ветки свой стек и своя история.

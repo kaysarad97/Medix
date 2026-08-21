@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/theme/app_theme.dart';
+import 'package:medix/features/auth/presentation/providers/registration_controller.dart';
 import 'package:medix/features/auth/presentation/screens/app_settings_screen.dart';
 import 'package:medix/features/auth/presentation/screens/personal_data_screen.dart';
 import 'package:medix/features/auth/presentation/screens/policy_screen.dart';
@@ -14,6 +15,40 @@ import 'package:medix/l10n/app_localizations.dart';
 
 import '../../helpers/auth_overrides.dart';
 import '../../helpers/test_fonts.dart';
+
+class _AppSettingsHost extends ConsumerWidget {
+  const _AppSettingsHost();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(registrationControllerProvider);
+    final controller = ref.read(registrationControllerProvider.notifier);
+    return AppSettingsScreen(
+      language: state.language,
+      pushConsent: state.pushConsent,
+      onLanguageSelected: controller.setLanguage,
+      onPushConsentChanged: controller.setPushConsent,
+      onNext: state.language == null
+          ? null
+          : () => controller.submitAppSettings(),
+    );
+  }
+}
+
+class _PolicyHost extends ConsumerWidget {
+  const _PolicyHost();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(registrationControllerProvider);
+    final controller = ref.read(registrationControllerProvider.notifier);
+    return PolicyScreen(
+      policyAccepted: state.policyAccepted,
+      onPolicyAcceptedChanged: controller.setPolicyAccepted,
+      onNext: state.policyAccepted ? () => controller.submitPolicy() : null,
+    );
+  }
+}
 
 /// Эталонные рендеры шагов регистрации для сверки с макетами в `design/`.
 ///
@@ -84,7 +119,7 @@ void main() {
   });
 
   testWidgets('Настройки приложения соответствует эталону', (tester) async {
-    await pumpScreen(tester, const AppSettingsScreen());
+    await pumpScreen(tester, const _AppSettingsHost());
 
     await expectLater(
       find.byType(AppSettingsScreen),
@@ -93,7 +128,7 @@ void main() {
   });
 
   testWidgets('Политика соответствует эталону', (tester) async {
-    await pumpScreen(tester, const PolicyScreen());
+    await pumpScreen(tester, const _PolicyHost());
 
     await expectLater(
       find.byType(PolicyScreen),

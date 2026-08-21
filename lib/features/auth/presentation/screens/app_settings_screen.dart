@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -12,15 +9,32 @@ import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/step_progress_bar.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/app_language.dart';
-import '../providers/registration_controller.dart';
 import '../widgets/consent_row.dart';
 import '../widgets/registration_step_layout.dart';
 
 /// Шаг 4 регистрации — язык интерфейса и согласие на рассылки.
 ///
-/// Свёрстан по `design/Язык и пуш увед.png`.
-class AppSettingsScreen extends ConsumerWidget {
-  const AppSettingsScreen({super.key});
+/// Свёрстан по `design/Язык и пуш увед.png`. Данные и переход дальше —
+/// снаружи: экран общий для пациентского и врачебного мастера
+/// регистрации (см. `Routes.appSettings`/`Routes.doctorRegisterLanguage`
+/// в `app_router.dart`), у каждого свой контроллер состояния.
+class AppSettingsScreen extends StatelessWidget {
+  const AppSettingsScreen({
+    super.key,
+    required this.language,
+    required this.pushConsent,
+    required this.onLanguageSelected,
+    required this.onPushConsentChanged,
+    required this.onNext,
+  });
+
+  final AppLanguage? language;
+  final bool pushConsent;
+  final ValueChanged<AppLanguage> onLanguageSelected;
+  final ValueChanged<bool> onPushConsentChanged;
+
+  /// `null` — кнопка недоступна (язык ещё не выбран).
+  final VoidCallback? onNext;
 
   /// Заголовок здесь стоит выше, чем на других шагах: прописные с 263
   /// против 269–270.
@@ -41,9 +55,7 @@ class AppSettingsScreen extends ConsumerWidget {
   static const double _rowTextInset = 55;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final controller = ref.read(registrationControllerProvider.notifier);
-    final state = ref.watch(registrationControllerProvider);
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
     return RegistrationStepLayout(
@@ -63,13 +75,13 @@ class AppSettingsScreen extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                for (final language in AppLanguage.values) ...[
-                  if (language != AppLanguage.values.first)
+                for (final option in AppLanguage.values) ...[
+                  if (option != AppLanguage.values.first)
                     const SizedBox(height: _rowGap),
                   _LanguageRow(
-                    language: language,
-                    selected: state.language == language,
-                    onTap: () => controller.setLanguage(language),
+                    language: option,
+                    selected: language == option,
+                    onTap: () => onLanguageSelected(option),
                   ),
                 ],
               ],
@@ -78,8 +90,8 @@ class AppSettingsScreen extends ConsumerWidget {
         ),
         const SizedBox(height: _cardToConsent),
         ConsentRow(
-          value: state.pushConsent,
-          onChanged: controller.setPushConsent,
+          value: pushConsent,
+          onChanged: onPushConsentChanged,
           text: l10n.pushConsentText,
         ),
         const SizedBox(height: _consentToButton),
@@ -89,13 +101,7 @@ class AppSettingsScreen extends ConsumerWidget {
             trailingIcon: Icons.arrow_forward,
             // Согласие на рассылки не блокирует переход — блокирует только
             // невыбранный язык.
-            onPressed: state.language == null
-                ? null
-                : () {
-                    if (controller.submitAppSettings()) {
-                      context.push(Routes.policy);
-                    }
-                  },
+            onPressed: onNext,
           ),
         ),
       ],

@@ -27,6 +27,18 @@ abstract final class Routes {
   static const String doctorRegister = '/register/doctor';
   static const String doctorRegisterVerify = '/register/doctor/verify';
 
+  /// Банковские данные фрилансера — задел на монетизацию, не оплата
+  /// (см. HANDOFF). Тот же `CardFormScreen`, что и у подписки, с чужим
+  /// `onSubmit`.
+  static const String doctorRegisterCard = '/register/doctor/card';
+
+  /// Язык интерфейса и согласие на рассылки — тот же `AppSettingsScreen`,
+  /// что и у пациентского мастера, со своим контроллером состояния.
+  static const String doctorRegisterLanguage = '/register/doctor/language';
+
+  /// Согласие с политикой — последний шаг, ведёт в [doctorHome].
+  static const String doctorRegisterPolicy = '/register/doctor/policy';
+
   static const String home = '/';
 
   /// Уведомления — колокольчик в шапке главной.

@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -12,7 +9,6 @@ import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/step_progress_bar.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/legal/privacy_policy_draft.dart';
-import '../providers/registration_controller.dart';
 import '../widgets/consent_row.dart';
 import '../widgets/registration_step_layout.dart';
 
@@ -26,8 +22,22 @@ import '../widgets/registration_step_layout.dart';
 /// дизайнер просто вытянул страницу. Поэтому карточка с текстом тянется
 /// по доступной высоте и прокручивается внутри себя, а страница целиком не
 /// скроллится: вложенная прокрутка внутри прокрутки неудобна на телефоне.
-class PolicyScreen extends ConsumerWidget {
-  const PolicyScreen({super.key});
+///
+/// Общий для пациентского и врачебного мастера — тот же приём, что у
+/// `AppSettingsScreen`: данные и переход дальше передаются снаружи.
+class PolicyScreen extends StatelessWidget {
+  const PolicyScreen({
+    super.key,
+    required this.policyAccepted,
+    required this.onPolicyAcceptedChanged,
+    required this.onNext,
+  });
+
+  final bool policyAccepted;
+  final ValueChanged<bool> onPolicyAcceptedChanged;
+
+  /// `null` — кнопка недоступна (согласие ещё не отмечено).
+  final VoidCallback? onNext;
 
   /// Заголовок 111…154 при безопасной зоне 62.
   static const double _titleTop = 49;
@@ -45,9 +55,7 @@ class PolicyScreen extends ConsumerWidget {
   static const double _consentToButton = 28;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final controller = ref.read(registrationControllerProvider.notifier);
-    final state = ref.watch(registrationControllerProvider);
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
     return AppScaffold(
@@ -76,8 +84,8 @@ class PolicyScreen extends ConsumerWidget {
             ),
             const SizedBox(height: _cardToConsent),
             ConsentRow(
-              value: state.policyAccepted,
-              onChanged: controller.setPolicyAccepted,
+              value: policyAccepted,
+              onChanged: onPolicyAcceptedChanged,
               text: l10n.policyConsentText,
             ),
             const SizedBox(height: _consentToButton),
@@ -87,14 +95,7 @@ class PolicyScreen extends ConsumerWidget {
                 trailingIcon: Icons.arrow_forward,
                 // Без согласия дальше нельзя: обрабатывать медицинские
                 // данные без него противозаконно.
-                onPressed: state.policyAccepted
-                    ? () {
-                        if (controller.submitPolicy()) {
-                          // Регистрация завершена — стек мастера сбрасываем.
-                          context.go(Routes.home);
-                        }
-                      }
-                    : null,
+                onPressed: onNext,
               ),
             ),
             const SizedBox(height: AppSpacing.xl),

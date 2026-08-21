@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/icon_chip.dart';
+import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../providers/doctor_cabinet_providers.dart';
@@ -110,6 +113,18 @@ class _DoctorCertificatesScreenState
                 const SizedBox(height: DoctorProfileMetrics.cardGap),
               ],
               _Section(child: CertificateGrid(certificates: certificates)),
+              if (widget.showUploadRow) ...[
+                const SizedBox(height: DoctorProfileMetrics.cardGap),
+                _Section(
+                  child: PrimaryButton(
+                    label: l10n.nextButtonLabel,
+                    trailingIcon: Icons.arrow_forward,
+                    onPressed: _isUploading
+                        ? null
+                        : () => context.push(Routes.doctorRegisterCard),
+                  ),
+                ),
+              ],
               SizedBox(
                 height:
                     DoctorProfileMetrics.cardGap +
