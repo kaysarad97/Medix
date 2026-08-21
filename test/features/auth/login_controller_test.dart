@@ -90,6 +90,17 @@ void main() {
       expect(state().formError, isNull);
     });
 
+    test('тестовая почта врача открывает врачебную сессию', () async {
+      controller().emailChanged(MockAuthRepository.doctorEmail);
+      await controller().submitEmail();
+      controller().codeChanged(MockAuthRepository.validCode);
+
+      await controller().submitCode();
+
+      expect(state().isAuthenticated, isTrue);
+      expect(state().userRole, AppUserRole.doctor);
+    });
+
     test('повторная отправка не сбрасывает введённую почту', () async {
       await reachCodeStep();
 

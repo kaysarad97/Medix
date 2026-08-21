@@ -153,11 +153,15 @@ class RemoteAuthRepository implements AuthRepository {
 ///
 /// Негативные сценарии, чтобы их можно было прогонять руками:
 /// почта `taken@medix.kz` при регистрации, код `000000` при подтверждении.
+/// Вход с [doctorEmail] открывает кабинет врача; регистрация с тем же адресом
+/// всё равно создаёт пациента, как и настоящий публичный endpoint.
 class MockAuthRepository implements AuthRepository {
   const MockAuthRepository();
 
   /// Код, который заглушка считает верным. Длина — как у настоящего.
   static const String validCode = '123456';
+
+  static const String doctorEmail = 'doctor@medix.kz';
 
   /// Столько же, сколько отдаёт бэкенд.
   static const int codeTtlSeconds = 300;
@@ -183,7 +187,7 @@ class MockAuthRepository implements AuthRepository {
   Future<AuthSession> registerVerify({
     required String email,
     required String code,
-  }) => _verify(email: email, code: code);
+  }) => _verify(email: email, code: code, role: AppUserRole.patient);
 
   @override
   Future<void> loginStart({required String email}) async {
@@ -194,11 +198,18 @@ class MockAuthRepository implements AuthRepository {
   Future<AuthSession> loginVerify({
     required String email,
     required String code,
-  }) => _verify(email: email, code: code);
+  }) => _verify(
+    email: email,
+    code: code,
+    role: email.trim().toLowerCase() == doctorEmail
+        ? AppUserRole.doctor
+        : AppUserRole.patient,
+  );
 
   Future<AuthSession> _verify({
     required String email,
     required String code,
+    required AppUserRole role,
   }) async {
     await Future<void>.delayed(const Duration(milliseconds: 700));
 
@@ -214,6 +225,7 @@ class MockAuthRepository implements AuthRepository {
         id: 'mock-user-1',
         email: email,
         fullName: 'Тестовый Пользователь',
+        role: role,
       ),
       accessToken: 'mock-access-token',
       refreshToken: 'mock-refresh-token',
