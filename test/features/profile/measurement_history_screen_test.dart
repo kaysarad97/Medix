@@ -37,6 +37,18 @@ void main() {
     expect(repository.calls, 2);
     expect(repository.from, DateTime.utc(2026, 5, 3));
   });
+
+  testWidgets('один замер объясняет, почему графика ещё нет', (tester) async {
+    final repository = _HistoryRepository(singlePoint: true);
+    await _pump(tester, repository);
+
+    expect(
+      find.text('Замеров пока мало, чтобы построить график'),
+      findsOneWidget,
+    );
+    expect(find.byKey(const Key('measurement-history-chart')), findsNothing);
+    expect(find.text('78 kg'), findsNWidgets(2));
+  });
 }
 
 Future<void> _pump(WidgetTester tester, _HistoryRepository repository) async {
@@ -64,6 +76,9 @@ Future<void> _pump(WidgetTester tester, _HistoryRepository repository) async {
 }
 
 class _HistoryRepository extends MockProfileRepository {
+  _HistoryRepository({this.singlePoint = false});
+
+  final bool singlePoint;
   int calls = 0;
   DateTime? from;
   DateTime? to;
@@ -79,13 +94,14 @@ class _HistoryRepository extends MockProfileRepository {
     this.from = from;
     this.to = to;
     return [
-      MeasurementPoint(
-        id: 'older',
-        kind: kind,
-        value: 76,
-        unit: 'kg',
-        measuredAt: DateTime.utc(2026, 7, 1),
-      ),
+      if (!singlePoint)
+        MeasurementPoint(
+          id: 'older',
+          kind: kind,
+          value: 76,
+          unit: 'kg',
+          measuredAt: DateTime.utc(2026, 7, 1),
+        ),
       MeasurementPoint(
         id: 'latest',
         kind: kind,

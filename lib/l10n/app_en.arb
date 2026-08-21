@@ -339,5 +339,6 @@
   "joinWaitlistSuccess": "You have been added to the waiting list",
   "uploadOwnPhotoAction": "Upload your photo",
   "avatarUploadSuccess": "Profile photo updated",
-  "avatarUploadError": "Couldn't upload the photo"
+  "avatarUploadError": "Couldn't upload the photo",
+  "measurementHistoryTooShort": "There aren't enough measurements to build a chart yet"
 }

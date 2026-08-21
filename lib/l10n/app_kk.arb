@@ -339,5 +339,6 @@
   "joinWaitlistSuccess": "Сіз күту тізіміне қосылдыңыз",
   "uploadOwnPhotoAction": "Өз фотосуретіңізді жүктеу",
   "avatarUploadSuccess": "Профиль фотосуреті жаңартылды",
-  "avatarUploadError": "Фотосуретті жүктеу мүмкін болмады"
+  "avatarUploadError": "Фотосуретті жүктеу мүмкін болмады",
+  "measurementHistoryTooShort": "График құру үшін өлшемдер әзірше жеткіліксіз"
 }

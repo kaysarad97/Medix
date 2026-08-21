@@ -1390,5 +1390,6 @@
   "joinWaitlistSuccess": "Вы добавлены в лист ожидания",
   "uploadOwnPhotoAction": "Загрузить своё фото",
   "avatarUploadSuccess": "Фотография профиля обновлена",
-  "avatarUploadError": "Не удалось загрузить фотографию"
+  "avatarUploadError": "Не удалось загрузить фотографию",
+  "measurementHistoryTooShort": "Замеров пока мало, чтобы построить график"
 }

@@ -206,14 +206,34 @@ class _HistoryContent extends StatelessWidget {
                   style: AppTypography.h2.copyWith(color: AppColors.primary),
                 ),
                 const SizedBox(height: 18),
-                SizedBox(
-                  height: 210,
-                  child: CustomPaint(
-                    key: const Key('measurement-history-chart'),
-                    painter: _HistoryChartPainter(sorted),
-                    child: const SizedBox.expand(),
+                if (sorted.length < 2)
+                  SizedBox(
+                    height: 210,
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 28),
+                        child: Text(
+                          AppLocalizations.of(
+                            context,
+                          )!.measurementHistoryTooShort,
+                          key: const Key('measurement-history-too-short'),
+                          textAlign: TextAlign.center,
+                          style: AppTypography.bodyMd.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                else
+                  SizedBox(
+                    height: 210,
+                    child: CustomPaint(
+                      key: const Key('measurement-history-chart'),
+                      painter: _HistoryChartPainter(sorted),
+                      child: const SizedBox.expand(),
+                    ),
                   ),
-                ),
               ],
             ),
           ),
