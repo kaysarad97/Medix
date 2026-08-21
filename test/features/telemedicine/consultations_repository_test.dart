@@ -83,10 +83,7 @@ void main() {
           'expires_at': '2026-08-21T12:00:00Z',
         },
       ),
-      'POST /consultations/c1/files': (
-        statusCode: 200,
-        body: _fileJson,
-      ),
+      'POST /consultations/c1/files': (statusCode: 200, body: _fileJson),
       'GET /consultations/c1/files/f1/download-url': (
         statusCode: 200,
         body: {
@@ -112,10 +109,7 @@ void main() {
 
   test('список вложений и спор разбираются', () async {
     final (:dio, :adapter) = cannedDio({
-      'GET /consultations/c1/files': (
-        statusCode: 200,
-        body: [_fileJson],
-      ),
+      'GET /consultations/c1/files': (statusCode: 200, body: [_fileJson]),
       'POST /consultations/c1/dispute': (
         statusCode: 200,
         body: {

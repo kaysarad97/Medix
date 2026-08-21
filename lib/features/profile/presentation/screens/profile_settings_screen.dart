@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/network/api_exception.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_scaffold.dart';
+import '../../../../core/widgets/form_error_snack_bar.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../core/widgets/user_avatar.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../domain/entities/user_profile.dart';
 import '../providers/profile_providers.dart';
 import '../widgets/profile_metrics.dart';
 
@@ -32,6 +35,7 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
   final _last = TextEditingController();
   final _email = TextEditingController();
   var _prefilled = false;
+  var _saving = false;
 
   @override
   void dispose() {
@@ -39,6 +43,60 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
     _last.dispose();
     _email.dispose();
     super.dispose();
+  }
+
+  /// Сохраняет и закрывает экран по стрелке назад — другого способа
+  /// подтвердить правку в макете нет: ни кнопки «Сохранить», ни галочки в
+  /// шапке (см. `design/Настройки Профиля.png`). Почта не отправляется —
+  /// `PATCH /users/me` её не принимает, это логин, а не редактируемое поле;
+  /// поле в форме остаётся для чтения текущего значения, как и было.
+  Future<void> _close() async {
+    if (_saving) return;
+
+    final profile = ref.read(profileProvider).value;
+    final firstName = _first.text.trim();
+    final lastName = _last.text.trim();
+    final changed =
+        profile != null &&
+        (firstName != profile.firstName || lastName != profile.lastName);
+    if (!changed) {
+      Navigator.of(context).maybePop();
+      return;
+    }
+
+    setState(() => _saving = true);
+    try {
+      await ref
+          .read(profileRepositoryProvider)
+          .saveProfile(
+            UserProfile(
+              id: profile.id,
+              firstName: firstName,
+              lastName: lastName,
+              subscription: profile.subscription,
+              gender: profile.gender,
+              birthDate: profile.birthDate,
+              email: profile.email,
+              iin: profile.iin,
+              registrationAddress: profile.registrationAddress,
+              heightCm: profile.heightCm,
+              weightKg: profile.weightKg,
+              avatarUrl: profile.avatarUrl,
+              avatarAsset: profile.avatarAsset,
+            ),
+          );
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      setState(() => _saving = false);
+      showFormErrorSnackBar(context, e.message);
+      return;
+    }
+
+    ref.invalidate(profileProvider);
+    if (!mounted) return;
+    if (!await Navigator.of(context).maybePop() && mounted) {
+      setState(() => _saving = false);
+    }
   }
 
   @override
@@ -63,7 +121,7 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
               const SizedBox(height: 36),
               ScreenTopBar(
                 title: l10n.profileSettingsTitle,
-                onBack: () => Navigator.of(context).maybePop(),
+                onBack: () => _close(),
               ),
               const SizedBox(height: 30),
               Center(
@@ -97,13 +155,29 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      _Field(controller: _first, hint: l10n.firstNameHint),
+                      _Field(
+                        controller: _first,
+                        hint: l10n.firstNameHint,
+                        enabled: !_saving,
+                      ),
                       const SizedBox(height: ProfileMetrics.formFieldGap),
-                      _Field(controller: _last, hint: l10n.lastNameHint),
+                      _Field(
+                        controller: _last,
+                        hint: l10n.lastNameHint,
+                        enabled: !_saving,
+                      ),
                       const SizedBox(height: ProfileMetrics.formFieldGap),
                       // Поля пароля здесь нет: паролей в MedIx нет вообще,
                       // вход идёт по одноразовому коду на эту самую почту.
-                      _Field(controller: _email, hint: 'E-mail'),
+                      // Почта в `_close` не отправляется — `PATCH /users/me`
+                      // её не принимает; поле остаётся редактируемым, чтобы
+                      // не менять вид формы без дизайнера, но правка тут
+                      // молча не сохранится, как и раньше у всех полей.
+                      _Field(
+                        controller: _email,
+                        hint: 'E-mail',
+                        enabled: !_saving,
+                      ),
                     ],
                   ),
                 ),
@@ -118,10 +192,15 @@ class _ProfileSettingsScreenState extends ConsumerState<ProfileSettingsScreen> {
 }
 
 class _Field extends StatelessWidget {
-  const _Field({required this.controller, required this.hint});
+  const _Field({
+    required this.controller,
+    required this.hint,
+    this.enabled = true,
+  });
 
   final TextEditingController controller;
   final String hint;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
@@ -137,6 +216,7 @@ class _Field extends StatelessWidget {
           child: Center(
             child: TextField(
               controller: controller,
+              enabled: enabled,
               style: AppTypography.bodyMd,
               cursorColor: AppColors.accent,
               decoration: InputDecoration(

@@ -1,12 +1,6 @@
 enum ConsultationMode { video, audio }
 
-enum ConsultationStatus {
-  scheduled,
-  inProgress,
-  completed,
-  cancelled,
-  unknown,
-}
+enum ConsultationStatus { scheduled, inProgress, completed, cancelled, unknown }
 
 class ConsultationJoin {
   const ConsultationJoin({

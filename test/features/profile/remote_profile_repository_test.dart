@@ -104,9 +104,7 @@ void main() {
     });
 
     test('разрешённые поля профиля отправляются одним PATCH', () async {
-      final (:dio, :adapter) = cannedDio({
-        'PATCH /users/me': me(),
-      });
+      final (:dio, :adapter) = cannedDio({'PATCH /users/me': me()});
       final source = UserProfile(
         id: 'u1',
         firstName: 'Имя',

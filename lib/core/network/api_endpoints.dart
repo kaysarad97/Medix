@@ -78,8 +78,7 @@ abstract final class ApiEndpoints {
       '${consultationFiles(id)}/upload-url';
   static String consultationFileDownloadUrl(String id, String fileId) =>
       '${consultationFiles(id)}/$fileId/download-url';
-  static String consultationDispute(String id) =>
-      '$consultations/$id/dispute';
+  static String consultationDispute(String id) => '$consultations/$id/dispute';
   static String consultationReview(String id) => '$consultations/$id/review';
 
   /// Члены семьи: список и добавление.

@@ -26,9 +26,8 @@ final consultationsRepositoryProvider = Provider<ConsultationsRepository>(
 
 final consultationMessagesProvider = FutureProvider.autoDispose
     .family<List<ConsultationMessage>, String>(
-      (ref, consultationId) => ref
-          .watch(consultationsRepositoryProvider)
-          .messages(consultationId),
+      (ref, consultationId) =>
+          ref.watch(consultationsRepositoryProvider).messages(consultationId),
     );
 
 final consultationSocketProvider = Provider.autoDispose

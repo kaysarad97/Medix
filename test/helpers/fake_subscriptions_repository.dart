@@ -17,6 +17,12 @@ class FakeSubscriptionsRepository implements SubscriptionsRepository {
       MockSubscriptionsRepository.mockPlans;
 
   @override
+  Future<SubscriptionCancellation> cancel() async => SubscriptionCancellation(
+    periodEnd: DateTime(2026, 8, 31),
+    cancelAtPeriodEnd: true,
+  );
+
+  @override
   Future<PaymentOutcome> pay(
     CardDetails card, {
     required SubscriptionTier tier,

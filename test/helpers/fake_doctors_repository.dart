@@ -99,6 +99,26 @@ class FakeDoctorsRepository implements DoctorsRepository {
     status: AppointmentStatus.cancelled,
   );
 
+  @override
+  Future<WaitlistEntry> joinWaitlist(String doctorId) async => WaitlistEntry(
+    id: 'wait-$doctorId',
+    doctorId: doctorId,
+    status: WaitlistEntryStatus.active,
+  );
+
+  @override
+  Future<List<WaitlistEntry>> waitlistEntries() async => const [];
+
+  @override
+  Future<void> leaveWaitlist(String entryId) async {}
+
+  @override
+  Future<Appointment> claimWaitlistOffer({
+    required String slotId,
+    required AppointmentKind kind,
+    String? familyMemberId,
+  }) async => appointment('a1');
+
   /// Что ушло в [book] — форме записи проверять больше нечего.
   static final List<({ScheduleSlot slot, AppointmentKind kind})> booked = [];
 

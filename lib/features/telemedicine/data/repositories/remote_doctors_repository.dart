@@ -250,10 +250,7 @@ class RemoteDoctorsRepository implements DoctorsRepository {
     try {
       final response = await _dio.post<Map<String, dynamic>>(
         ApiEndpoints.claimSlot(slotId),
-        data: {
-          'type': _typeOf(kind),
-          'family_member_id': familyMemberId,
-        },
+        data: {'type': _typeOf(kind), 'family_member_id': familyMemberId},
       );
       return _appointment(response.data!);
     } on DioException catch (e) {
