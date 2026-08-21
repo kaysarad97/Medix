@@ -52,6 +52,29 @@ final medicalCardProvider = FutureProvider<MedicalCard>(
   (ref) => ref.watch(profileRepositoryProvider).medicalCard(),
 );
 
+/// Parameters for a height/weight history request.
+///
+/// [familyMemberId] is absent for the current user. Optional bounds are sent
+/// to the API in UTC by [RemoteProfileRepository].
+typedef MeasurementHistoryQuery = ({
+  MeasurementKind kind,
+  String? familyMemberId,
+  DateTime? from,
+  DateTime? to,
+});
+
+final measurementHistoryProvider = FutureProvider.autoDispose
+    .family<List<MeasurementPoint>, MeasurementHistoryQuery>((ref, query) {
+      return ref
+          .watch(profileRepositoryProvider)
+          .measurementHistory(
+            query.kind,
+            familyMemberId: query.familyMemberId,
+            from: query.from,
+            to: query.to,
+          );
+    });
+
 final myDoctorsProvider = FutureProvider<List<MyDoctor>>(
   (ref) => ref.watch(profileRepositoryProvider).myDoctors(),
 );
