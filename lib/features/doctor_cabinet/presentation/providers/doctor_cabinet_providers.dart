@@ -1,13 +1,17 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/network/api_mode.dart';
+import '../../../../core/network/dio_client.dart';
 import '../../data/repositories/doctor_cabinet_repository.dart';
+import '../../data/repositories/doctor_schedule_repository.dart';
 import '../../domain/entities/admin_request.dart';
 import '../../domain/entities/certificate.dart';
 import '../../domain/entities/doctor_appointment.dart';
 import '../../domain/entities/doctor_own_profile.dart';
 import '../../domain/entities/doctor_own_review.dart';
 import '../../domain/entities/doctor_patient.dart';
+import '../../domain/entities/doctor_work_slot.dart';
 import '../../domain/entities/patient_chat.dart';
 import '../../domain/entities/regular_patient.dart';
 import '../../domain/entities/work_analytics.dart';
@@ -15,6 +19,20 @@ import '../../domain/entities/work_analytics.dart';
 final doctorCabinetRepositoryProvider = Provider<DoctorCabinetRepository>(
   (ref) => const MockDoctorCabinetRepository(),
 );
+
+final doctorScheduleRepositoryProvider = Provider<DoctorScheduleRepository>((
+  ref,
+) {
+  if (useMocks) return const MockDoctorScheduleRepository();
+  return RemoteDoctorScheduleRepository(ref.watch(dioClientProvider));
+});
+
+final doctorWorkScheduleProvider = FutureProvider.autoDispose
+    .family<List<DoctorWorkSlot>, ({DateTime from, DateTime to})>(
+      (ref, range) => ref
+          .watch(doctorScheduleRepositoryProvider)
+          .schedule(from: range.from, to: range.to),
+    );
 
 final doctorUpcomingAppointmentsProvider =
     FutureProvider<List<DoctorAppointment>>(

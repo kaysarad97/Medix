@@ -109,6 +109,11 @@ abstract final class ApiEndpoints {
   /// Отзывы о враче. Единственный эндпоинт каталога без токена.
   static String doctorReviews(String id) => '${doctor(id)}/reviews';
 
+  /// Рабочие слоты текущего врача.
+  static const String myDoctorSchedule = '$doctors/me/schedule';
+  static const String myDoctorSlots = '$doctors/me/slots';
+  static String myDoctorSlot(String id) => '$myDoctorSlots/$id';
+
   /// Записи на приём: создание, свои записи, перенос и отмена.
   static const String appointments = '/appointments';
 
