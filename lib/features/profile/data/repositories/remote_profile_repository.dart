@@ -26,35 +26,90 @@ class RemoteProfileRepository implements ProfileRepository {
   Future<UserProfile> profile() async {
     try {
       final response = await _dio.get<Map<String, dynamic>>(ApiEndpoints.me);
-      final json = response.data!;
-      final fullName = (json['full_name'] as String? ?? '').trim();
-      final space = fullName.indexOf(' ');
+      return _profile(response.data!, await _subscription());
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
 
-      return UserProfile(
-        id: json['id'] as String,
-        // ФИО одной строкой, как и у члена семьи, но порядок обратный:
-        // на регистрации поле подписано «ФИО», то есть фамилия впереди.
-        firstName: space == -1
-            ? fullName
-            : fullName.substring(space + 1).trim(),
-        lastName: space == -1 ? '' : fullName.substring(0, space),
-        email: json['email'] as String?,
-        iin: json['iin'] as String?,
-        birthDate: DateTime.tryParse(json['birth_date'] as String? ?? ''),
-        gender: switch (json['sex']) {
-          'male' => Gender.male,
-          'female' => Gender.female,
-          _ => null,
+  @override
+  Future<UserProfile> saveProfile(UserProfile profile) async {
+    try {
+      final response = await _dio.patch<Map<String, dynamic>>(
+        ApiEndpoints.me,
+        data: {
+          'full_name': '${profile.lastName} ${profile.firstName}'.trim(),
+          'birth_date': profile.birthDate?.toIso8601String().split('T').first,
+          'sex': profile.gender?.name,
+          'iin': profile.iin,
         },
-        subscription: await _subscription(),
-        // Рост и вес — не здесь: они лежат в мед-карте отдельными записями
-        // (`record_type: measurement`). Аватар сервер хранит ключом в S3
-        // (`avatar_s3_key`), но отдельной ссылкой на скачивание его пока не
-        // отдаёт — до неё аватарка берётся из набора в сборке.
+      );
+      return _profile(response.data!, profile.subscription);
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
+
+  @override
+  Future<AvatarUploadTicket> requestAvatarUpload({
+    required String filename,
+    required String contentType,
+  }) async {
+    try {
+      final response = await _dio.post<Map<String, dynamic>>(
+        ApiEndpoints.myAvatarUploadUrl,
+        data: {'filename': filename, 'content_type': contentType},
+      );
+      final json = response.data!;
+      return AvatarUploadTicket(
+        uploadUrl: json['upload_url'] as String,
+        fields: (json['fields'] as Map<String, dynamic>).map(
+          (key, value) => MapEntry(key, value as String),
+        ),
+        key: json['key'] as String,
+        expiresAt: DateTime.parse(json['expires_at'] as String).toLocal(),
       );
     } on DioException catch (e) {
       throw ApiException.fromDio(e);
     }
+  }
+
+  @override
+  Future<UserProfile> confirmAvatar(String s3Key) async {
+    try {
+      final response = await _dio.post<Map<String, dynamic>>(
+        ApiEndpoints.myAvatar,
+        data: {'avatar_s3_key': s3Key},
+      );
+      return _profile(response.data!, await _subscription());
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
+
+  static UserProfile _profile(
+    Map<String, dynamic> json,
+    SubscriptionTier subscription,
+  ) {
+    final fullName = (json['full_name'] as String? ?? '').trim();
+    final space = fullName.indexOf(' ');
+    return UserProfile(
+      id: json['id'] as String,
+      // На регистрации поле подписано «ФИО»: фамилия идёт первой.
+      firstName: space == -1 ? fullName : fullName.substring(space + 1).trim(),
+      lastName: space == -1 ? '' : fullName.substring(0, space),
+      email: json['email'] as String?,
+      iin: json['iin'] as String?,
+      birthDate: DateTime.tryParse(json['birth_date'] as String? ?? ''),
+      gender: switch (json['sex']) {
+        'male' => Gender.male,
+        'female' => Gender.female,
+        _ => null,
+      },
+      subscription: subscription,
+      avatarUrl: json['avatar_url'] as String?,
+      // Рост и вес лежат в мед-карте отдельными записями measurement.
+    );
   }
 
   /// Тариф из действующей подписки. Её нет — сервер отвечает 404, и это

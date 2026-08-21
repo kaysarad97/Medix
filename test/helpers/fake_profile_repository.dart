@@ -36,6 +36,23 @@ class FakeProfileRepository implements ProfileRepository {
     );
   }
 
+  @override
+  Future<UserProfile> saveProfile(UserProfile profile) async => profile;
+
+  @override
+  Future<AvatarUploadTicket> requestAvatarUpload({
+    required String filename,
+    required String contentType,
+  }) async => AvatarUploadTicket(
+    uploadUrl: 'https://storage.example/avatar',
+    fields: const {},
+    key: 'avatars/u1/$filename',
+    expiresAt: DateTime(2026, 8, 21, 12),
+  );
+
+  @override
+  Future<UserProfile> confirmAvatar(String s3Key) => profile();
+
   /// Сохранённая карта. Заглушка не выбрасывает записанное, как раньше:
   /// иначе не поймать, что экран не перечитал карту после сохранения.
   MedicalCard? _saved;
@@ -52,6 +69,14 @@ class FakeProfileRepository implements ProfileRepository {
         heightCm: 176,
         weightKg: 77,
       );
+
+  @override
+  Future<List<MeasurementPoint>> measurementHistory(
+    MeasurementKind kind, {
+    String? familyMemberId,
+    DateTime? from,
+    DateTime? to,
+  }) async => const [];
 
   @override
   Future<List<MyDoctor>> myDoctors() async => MockProfileRepository.mockDoctors;

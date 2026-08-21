@@ -26,6 +26,8 @@ abstract final class ApiEndpoints {
 
   /// Профиль текущего пользователя.
   static const String me = '/users/me';
+  static const String myAvatar = '$me/avatar';
+  static const String myAvatarUploadUrl = '$myAvatar/upload-url';
 
   /// Мед-карта: записи о здоровье. Хранятся дописыванием — правка заводит
   /// новую версию и помечает старую `superseded_by`.

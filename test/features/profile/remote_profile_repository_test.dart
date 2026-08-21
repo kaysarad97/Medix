@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:medix/features/profile/data/repositories/remote_profile_repository.dart';
+import 'package:medix/features/profile/data/repositories/'
+    'remote_profile_repository.dart';
 import 'package:medix/features/profile/domain/entities/medical_card.dart';
+import 'package:medix/features/profile/domain/entities/user_profile.dart';
 import 'package:medix/shared/models/gender.dart';
 import 'package:medix/shared/models/subscription_tier.dart';
 
@@ -25,6 +27,8 @@ void main() {
       'phone': null,
       'phone_verified_at': null,
       'email_verified_at': '2026-08-09T10:00:00',
+      'avatar_s3_key': null,
+      'avatar_url': 'https://storage.example/avatar.jpg',
     },
   );
 
@@ -96,6 +100,62 @@ void main() {
       expect(profile.birthDate, DateTime(1996, 12, 6));
       expect(profile.iin, '961206300123');
       expect(profile.ageLabel(DateTime(2026, 8, 13)), '29 лет');
+      expect(profile.avatarUrl, endsWith('avatar.jpg'));
+    });
+
+    test('разрешённые поля профиля отправляются одним PATCH', () async {
+      final (:dio, :adapter) = cannedDio({
+        'PATCH /users/me': me(),
+      });
+      final source = UserProfile(
+        id: 'u1',
+        firstName: 'Имя',
+        lastName: 'Фамилия',
+        subscription: SubscriptionTier.silver,
+        gender: Gender.female,
+        birthDate: DateTime(1996, 12, 6),
+        iin: '961206300123',
+      );
+
+      final saved = await RemoteProfileRepository(dio).saveProfile(source);
+
+      expect(saved.avatarUrl, endsWith('avatar.jpg'));
+      expect(adapter.requests.single.data, {
+        'full_name': 'Фамилия Имя',
+        'birth_date': '1996-12-06',
+        'sex': 'female',
+        'iin': '961206300123',
+      });
+    });
+
+    test('аватар загружается через билет и подтверждение S3-ключа', () async {
+      final (:dio, :adapter) = cannedDio({
+        'POST /users/me/avatar/upload-url': (
+          statusCode: 200,
+          body: {
+            'upload_url': 'https://storage.example/upload',
+            'fields': {'policy': 'signed'},
+            'key': 'avatars/u1/avatar.png',
+            'expires_at': '2026-08-21T12:00:00Z',
+          },
+        ),
+        'POST /users/me/avatar': me(),
+        '/subscriptions/me': (
+          statusCode: 404,
+          body: {'detail': 'Подписка не найдена'},
+        ),
+      });
+      final repository = RemoteProfileRepository(dio);
+
+      final ticket = await repository.requestAvatarUpload(
+        filename: 'avatar.png',
+        contentType: 'image/png',
+      );
+      final profile = await repository.confirmAvatar(ticket.key);
+
+      expect(ticket.fields['policy'], 'signed');
+      expect(profile.avatarUrl, endsWith('avatar.jpg'));
+      expect(adapter.requests[1].data, {'avatar_s3_key': ticket.key});
     });
   });
 

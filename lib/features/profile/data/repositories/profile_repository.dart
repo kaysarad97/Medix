@@ -10,6 +10,15 @@ import '../../domain/entities/user_profile.dart';
 abstract interface class ProfileRepository {
   Future<UserProfile> profile();
 
+  Future<UserProfile> saveProfile(UserProfile profile);
+
+  Future<AvatarUploadTicket> requestAvatarUpload({
+    required String filename,
+    required String contentType,
+  });
+
+  Future<UserProfile> confirmAvatar(String s3Key);
+
   Future<MedicalCard> medicalCard();
 
   Future<List<MeasurementPoint>> measurementHistory(
@@ -37,6 +46,32 @@ class MockProfileRepository implements ProfileRepository {
 
   @override
   Future<UserProfile> profile() async {
+    await Future<void>.delayed(_latency);
+    return mockProfile;
+  }
+
+  @override
+  Future<UserProfile> saveProfile(UserProfile profile) async {
+    await Future<void>.delayed(_latency);
+    return profile;
+  }
+
+  @override
+  Future<AvatarUploadTicket> requestAvatarUpload({
+    required String filename,
+    required String contentType,
+  }) async {
+    await Future<void>.delayed(_latency);
+    return AvatarUploadTicket(
+      uploadUrl: 'https://storage.example/avatar',
+      fields: const {},
+      key: 'avatars/u1/$filename',
+      expiresAt: DateTime(2026, 8, 21, 12),
+    );
+  }
+
+  @override
+  Future<UserProfile> confirmAvatar(String s3Key) async {
     await Future<void>.delayed(_latency);
     return mockProfile;
   }

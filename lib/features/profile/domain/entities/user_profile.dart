@@ -2,6 +2,20 @@ import '../../../../core/utils/ru_plurals.dart';
 import '../../../../shared/models/gender.dart';
 import '../../../../shared/models/subscription_tier.dart';
 
+class AvatarUploadTicket {
+  const AvatarUploadTicket({
+    required this.uploadUrl,
+    required this.fields,
+    required this.key,
+    required this.expiresAt,
+  });
+
+  final String uploadUrl;
+  final Map<String, String> fields;
+  final String key;
+  final DateTime expiresAt;
+}
+
 /// Владелец аккаунта — то, что видно в шапке экрана «Ваша Мед-Карта»
 /// и правится в «Настройках профиля».
 class UserProfile {
