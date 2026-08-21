@@ -71,6 +71,14 @@ abstract final class ApiEndpoints {
       '$consultations/$id/complete';
   static String consultationMessages(String id) =>
       '$consultations/$id/messages';
+  static String consultationFiles(String id) => '$consultations/$id/files';
+  static String consultationFileUploadUrl(String id) =>
+      '${consultationFiles(id)}/upload-url';
+  static String consultationFileDownloadUrl(String id, String fileId) =>
+      '${consultationFiles(id)}/$fileId/download-url';
+  static String consultationDispute(String id) =>
+      '$consultations/$id/dispute';
+  static String consultationReview(String id) => '$consultations/$id/review';
 
   /// Члены семьи: список и добавление.
   static const String family = '/users/me/family';

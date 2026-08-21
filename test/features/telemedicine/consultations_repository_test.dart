@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:medix/features/telemedicine/data/repositories/consultations_repository.dart';
+import 'package:medix/features/telemedicine/data/repositories/'
+    'consultations_repository.dart';
 import 'package:medix/features/telemedicine/domain/entities/consultation.dart';
 
 import '../../helpers/canned_dio.dart';
@@ -70,4 +71,106 @@ void main() {
     expect(result.single.body, 'Здравствуйте');
     expect(adapter.requests.single.path, '/consultations/c1/messages');
   });
+
+  test('вложение проходит выдачу URL, подтверждение и скачивание', () async {
+    final (:dio, :adapter) = cannedDio({
+      'POST /consultations/c1/files/upload-url': (
+        statusCode: 200,
+        body: {
+          'upload_url': 'https://storage.example/upload',
+          'fields': {'policy': 'signed'},
+          'key': 'consultations/c1/file.pdf',
+          'expires_at': '2026-08-21T12:00:00Z',
+        },
+      ),
+      'POST /consultations/c1/files': (
+        statusCode: 200,
+        body: _fileJson,
+      ),
+      'GET /consultations/c1/files/f1/download-url': (
+        statusCode: 200,
+        body: {
+          'download_url': 'https://storage.example/file.pdf',
+          'expires_at': '2026-08-21T13:00:00Z',
+        },
+      ),
+    });
+    final repository = ConsultationsRepository(dio);
+
+    final ticket = await repository.requestFileUpload(
+      'c1',
+      filename: 'file.pdf',
+      contentType: 'application/pdf',
+    );
+    final file = await repository.confirmFileUpload('c1', s3Key: ticket.key);
+    final download = await repository.fileDownload('c1', file.id);
+
+    expect(ticket.fields['policy'], 'signed');
+    expect(download.url, endsWith('file.pdf'));
+    expect(adapter.requests[1].data, {'s3_key': ticket.key});
+  });
+
+  test('список вложений и спор разбираются', () async {
+    final (:dio, :adapter) = cannedDio({
+      'GET /consultations/c1/files': (
+        statusCode: 200,
+        body: [_fileJson],
+      ),
+      'POST /consultations/c1/dispute': (
+        statusCode: 200,
+        body: {
+          'id': 'd1',
+          'consultation_id': 'c1',
+          'raised_by': 'u1',
+          'reason': 'Связь прервалась',
+          'status': 'open',
+          'resolution': null,
+          'resolved_by': null,
+          'resolved_at': null,
+          'created_at': '2026-08-21T11:00:00Z',
+        },
+      ),
+    });
+    final repository = ConsultationsRepository(dio);
+
+    final files = await repository.files('c1');
+    final dispute = await repository.dispute('c1', 'Связь прервалась');
+
+    expect(files.single.uploadedBy, 'u1');
+    expect(dispute.status, ConsultationDisputeStatus.open);
+    expect(adapter.requests.last.data, {'reason': 'Связь прервалась'});
+  });
+
+  test('отзыв отправляется через завершённую консультацию', () async {
+    final (:dio, :adapter) = cannedDio({
+      'POST /consultations/c1/review': (
+        statusCode: 201,
+        body: {
+          'id': 'r1',
+          'doctor_id': 'd1',
+          'author_id': 'u1',
+          'author_name': 'Алия',
+          'consultation_id': 'c1',
+          'rating': 5,
+          'body': 'Спасибо',
+          'created_at': '2026-08-21T11:00:00Z',
+        },
+      ),
+    });
+
+    final review = await ConsultationsRepository(
+      dio,
+    ).review('c1', rating: 5, body: 'Спасибо');
+
+    expect(review.authorName, 'Алия');
+    expect(review.rating, 5);
+    expect(adapter.requests.single.data, {'rating': 5, 'body': 'Спасибо'});
+  });
 }
+
+const _fileJson = {
+  'id': 'f1',
+  'consultation_id': 'c1',
+  'uploaded_by': 'u1',
+  'created_at': '2026-08-21T10:30:00Z',
+};

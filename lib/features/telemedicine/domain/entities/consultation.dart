@@ -79,3 +79,64 @@ class ConsultationSocketErrorEvent extends ConsultationSocketEvent {
 
   final String detail;
 }
+
+class ConsultationFileUpload {
+  const ConsultationFileUpload({
+    required this.uploadUrl,
+    required this.fields,
+    required this.key,
+    required this.expiresAt,
+  });
+
+  final String uploadUrl;
+  final Map<String, String> fields;
+  final String key;
+  final DateTime expiresAt;
+}
+
+class ConsultationFile {
+  const ConsultationFile({
+    required this.id,
+    required this.consultationId,
+    required this.uploadedBy,
+    required this.createdAt,
+  });
+
+  final String id;
+  final String consultationId;
+  final String uploadedBy;
+  final DateTime createdAt;
+}
+
+class ConsultationFileDownload {
+  const ConsultationFileDownload({required this.url, required this.expiresAt});
+
+  final String url;
+  final DateTime expiresAt;
+}
+
+enum ConsultationDisputeStatus { open, resolved, unknown }
+
+class ConsultationDispute {
+  const ConsultationDispute({
+    required this.id,
+    required this.consultationId,
+    required this.raisedBy,
+    required this.reason,
+    required this.status,
+    required this.createdAt,
+    this.resolution,
+    this.resolvedBy,
+    this.resolvedAt,
+  });
+
+  final String id;
+  final String consultationId;
+  final String raisedBy;
+  final String reason;
+  final ConsultationDisputeStatus status;
+  final String? resolution;
+  final String? resolvedBy;
+  final DateTime? resolvedAt;
+  final DateTime createdAt;
+}
