@@ -24,14 +24,60 @@ import '../widgets/doctor_profile_metrics.dart';
 ///
 /// Маршрут зарегистрирован отдельно от реального входа — см.
 /// `DoctorHomeScreen` и HANDOFF.md, «Кабинет врача».
-class DoctorOwnProfileScreen extends ConsumerWidget {
+///
+/// Фото под фото-плашкой — «изменить фото» — тоже вне макета: там фото
+/// нарисовано, но без подписи-ссылки. Добавлена по тому же приёму, что и
+/// пациентская «изменить аватара» на «Настройках профиля»: без неё
+/// presigned-загрузку [doctorMediaRepositoryProvider] было бы не
+/// дотянуть до экрана.
+class DoctorOwnProfileScreen extends ConsumerStatefulWidget {
   const DoctorOwnProfileScreen({super.key, this.showAdminRequests = true});
 
   /// `false` у врача-фрилансера: своей администрации нет.
   final bool showAdminRequests;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DoctorOwnProfileScreen> createState() =>
+      _DoctorOwnProfileScreenState();
+}
+
+class _DoctorOwnProfileScreenState
+    extends ConsumerState<DoctorOwnProfileScreen> {
+  bool _isUploadingPhoto = false;
+
+  Future<void> _changePhoto() async {
+    if (_isUploadingPhoto) return;
+
+    final file = await ref.read(doctorFilePickerProvider).pickPhoto();
+    if (file == null || !mounted) return;
+
+    setState(() => _isUploadingPhoto = true);
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      await ref
+          .read(doctorMediaRepositoryProvider)
+          .uploadPhoto(
+            filename: file.name,
+            contentType: file.contentType,
+            bytes: file.bytes,
+          );
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.doctorPhotoUploadSuccess)),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.doctorPhotoUploadError)),
+      );
+    } finally {
+      if (mounted) setState(() => _isUploadingPhoto = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final profile = ref.watch(doctorOwnProfileProvider).value;
 
@@ -62,7 +108,11 @@ class DoctorOwnProfileScreen extends ConsumerWidget {
               ),
               const SizedBox(height: DoctorProfileMetrics.topBarToPhoto),
               if (profile != null) ...[
-                DoctorProfileHeader(profile: profile),
+                DoctorProfileHeader(
+                  profile: profile,
+                  onChangePhoto: _changePhoto,
+                  isUploadingPhoto: _isUploadingPhoto,
+                ),
                 const SizedBox(height: DoctorProfileMetrics.photoToCard),
                 _Section(child: DoctorInfoCard(profile: profile)),
                 const SizedBox(height: DoctorProfileMetrics.cardGap),
@@ -88,7 +138,7 @@ class DoctorOwnProfileScreen extends ConsumerWidget {
                     onTap: () => context.push(Routes.doctorOwnReviews),
                   ),
                 ),
-                if (showAdminRequests) ...[
+                if (widget.showAdminRequests) ...[
                   const SizedBox(height: DoctorProfileMetrics.linkRowGap),
                   _Section(
                     child: DoctorProfileLinkRow(

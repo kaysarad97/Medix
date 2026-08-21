@@ -7,18 +7,20 @@ import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/features/doctor_cabinet/data/repositories/doctor_media_repository.dart';
 import 'package:medix/features/doctor_cabinet/data/services/doctor_file_picker.dart';
 import 'package:medix/features/doctor_cabinet/presentation/providers/doctor_cabinet_providers.dart';
-import 'package:medix/features/doctor_cabinet/presentation/screens/doctor_certificates_screen.dart';
+import 'package:medix/features/doctor_cabinet/presentation/screens/doctor_profile_screen.dart';
 import 'package:medix/l10n/app_localizations.dart';
 
 import '../../helpers/fake_doctor_cabinet_repository.dart';
 import '../../helpers/test_fonts.dart';
 
+/// Загрузка фото врача с «Ваш Профиль» — тот же путь, что и у сертификата
+/// в `doctor_certificates_screen_test.dart`, но на другом экране и через
+/// `pickPhoto()`, а не `pickCertificate()`.
 void main() {
   setUpAll(loadAppFonts);
 
   Future<void> pumpScreen(
     WidgetTester tester, {
-    bool showUploadRow = false,
     DoctorFilePicker? picker,
     DoctorMediaRepository? mediaRepository,
   }) {
@@ -38,42 +40,30 @@ void main() {
           locale: const Locale('ru'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: DoctorCertificatesScreen(showUploadRow: showUploadRow),
+          home: const DoctorOwnProfileScreen(),
         ),
       ),
     );
   }
 
-  testWidgets('рисует заголовок и сетку сертификатов', (tester) async {
+  testWidgets('подпись «изменить фото» видна под фото', (tester) async {
     await pumpScreen(tester);
     await tester.pump();
     await tester.pump();
 
-    expect(find.text('Ваши сертификаты'), findsOneWidget);
-    expect(find.text('Документ 1.pdf'), findsOneWidget);
-    expect(find.text('Документ 2.pdf'), findsOneWidget);
-    expect(find.text('Загрузить Сертификат'), findsNothing);
+    expect(find.text('изменить фото'), findsOneWidget);
   });
 
-  testWidgets('showUploadRow добавляет строку загрузки', (tester) async {
-    await pumpScreen(tester, showUploadRow: true);
-    await tester.pump();
-    await tester.pump();
-
-    expect(find.text('Загрузить Сертификат'), findsOneWidget);
-  });
-
-  testWidgets('выбранный сертификат загружается и показывает результат', (
+  testWidgets('выбранное фото загружается и показывает результат', (
     tester,
   ) async {
     final repository = _RecordingMediaRepository();
     await pumpScreen(
       tester,
-      showUploadRow: true,
       picker: _FakeFilePicker(
         PickedDoctorFile(
-          name: 'diploma.pdf',
-          contentType: 'application/pdf',
+          name: 'photo.jpg',
+          contentType: 'image/jpeg',
           bytes: Uint8List.fromList([1, 2, 3]),
         ),
       ),
@@ -81,29 +71,28 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Загрузить Сертификат'));
+    await tester.tap(find.text('изменить фото'));
     await tester.pumpAndSettle();
 
-    expect(repository.uploadedFilename, 'diploma.pdf');
-    expect(repository.uploadedContentType, 'application/pdf');
-    expect(find.text('Сертификат загружен'), findsOneWidget);
+    expect(repository.uploadedFilename, 'photo.jpg');
+    expect(repository.uploadedContentType, 'image/jpeg');
+    expect(find.text('Фото обновлено'), findsOneWidget);
   });
 
   testWidgets('отмена выбора файла не запускает загрузку', (tester) async {
     final repository = _RecordingMediaRepository();
     await pumpScreen(
       tester,
-      showUploadRow: true,
       picker: const _FakeFilePicker(null),
       mediaRepository: repository,
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Загрузить Сертификат'));
+    await tester.tap(find.text('изменить фото'));
     await tester.pumpAndSettle();
 
     expect(repository.uploadedFilename, isNull);
-    expect(find.text('Сертификат загружен'), findsNothing);
+    expect(find.text('Фото обновлено'), findsNothing);
   });
 
   testWidgets('ошибка загрузки показывается без падения экрана', (
@@ -112,11 +101,10 @@ void main() {
     final repository = _RecordingMediaRepository(shouldFail: true);
     await pumpScreen(
       tester,
-      showUploadRow: true,
       picker: _FakeFilePicker(
         PickedDoctorFile(
-          name: 'diploma.pdf',
-          contentType: 'application/pdf',
+          name: 'photo.jpg',
+          contentType: 'image/jpeg',
           bytes: Uint8List(1),
         ),
       ),
@@ -124,11 +112,11 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Загрузить Сертификат'));
+    await tester.tap(find.text('изменить фото'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Не удалось загрузить сертификат'), findsOneWidget);
-    expect(find.text('Загрузить Сертификат'), findsOneWidget);
+    expect(find.text('Не удалось загрузить фото'), findsOneWidget);
+    expect(find.text('изменить фото'), findsOneWidget);
   });
 }
 
@@ -156,16 +144,16 @@ class _RecordingMediaRepository implements DoctorMediaRepository {
     required String filename,
     required String contentType,
     required Uint8List bytes,
-  }) async {
-    if (shouldFail) throw Exception('upload failed');
-    uploadedFilename = filename;
-    uploadedContentType = contentType;
-  }
+  }) async {}
 
   @override
   Future<void> uploadPhoto({
     required String filename,
     required String contentType,
     required Uint8List bytes,
-  }) async {}
+  }) async {
+    if (shouldFail) throw Exception('upload failed');
+    uploadedFilename = filename;
+    uploadedContentType = contentType;
+  }
 }

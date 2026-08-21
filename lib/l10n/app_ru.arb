@@ -1067,6 +1067,18 @@
   },
   "doctorCertificateUploadSuccess": "Сертификат загружен",
   "doctorCertificateUploadError": "Не удалось загрузить сертификат",
+  "doctorChangePhotoAction": "изменить фото",
+  "@doctorChangePhotoAction": {
+    "description": "Подпись под фото врача на «Ваш Профиль» — тем же жестом, что у пациентской «изменить аватара»."
+  },
+  "doctorPhotoUploadSuccess": "Фото обновлено",
+  "@doctorPhotoUploadSuccess": {
+    "description": "Снек-бар после успешной загрузки фото врача."
+  },
+  "doctorPhotoUploadError": "Не удалось загрузить фото",
+  "@doctorPhotoUploadError": {
+    "description": "Снек-бар при ошибке загрузки фото врача."
+  },
   "registerAsDoctorAction": "Я — врач",
   "doctorRegistrationTitle": "Регистрация врача",
   "doctorSpecialtyHint": "Специализация",

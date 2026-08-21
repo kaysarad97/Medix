@@ -14,9 +14,20 @@ import 'doctor_profile_metrics.dart';
 /// значение-подпись + бейдж справа), но не импортируется: та лежит в
 /// `features/profile`, чужой фиче.
 class DoctorProfileHeader extends StatelessWidget {
-  const DoctorProfileHeader({super.key, required this.profile});
+  const DoctorProfileHeader({
+    super.key,
+    required this.profile,
+    this.onChangePhoto,
+    this.isUploadingPhoto = false,
+  });
 
   final DoctorOwnProfile profile;
+
+  /// `null` — фото не тапается: пока такое есть только у экрана профиля
+  /// врача, а не у карточек, где он показывается пациенту или другому
+  /// врачу в списке.
+  final VoidCallback? onChangePhoto;
+  final bool isUploadingPhoto;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +39,14 @@ class DoctorProfileHeader extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _Photo(),
+          if (onChangePhoto != null)
+            _TappablePhoto(
+              onTap: isUploadingPhoto ? null : onChangePhoto!,
+              isUploading: isUploadingPhoto,
+              caption: l10n.doctorChangePhotoAction,
+            )
+          else
+            const _Photo(),
           const SizedBox(width: DoctorProfileMetrics.photoToInfo),
           Expanded(
             child: Column(
@@ -77,6 +95,61 @@ class _Photo extends StatelessWidget {
         width: DoctorProfileMetrics.photoWidth,
         height: DoctorProfileMetrics.photoHeight,
       ),
+    );
+  }
+}
+
+/// Та же плашка, что [_Photo], плюс подпись-ссылка под ней — тот же жест,
+/// что у пациентской «изменить аватара» на «Настройках профиля», только
+/// там аватар большой и по центру экрана, а тут маленький и в шапке.
+class _TappablePhoto extends StatelessWidget {
+  const _TappablePhoto({
+    required this.onTap,
+    required this.isUploading,
+    required this.caption,
+  });
+
+  final VoidCallback? onTap;
+  final bool isUploading;
+  final String caption;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        GestureDetector(
+          onTap: onTap,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: AppColors.accentSoft.withValues(alpha: 0.5),
+              borderRadius: AppRadius.allLg,
+            ),
+            child: SizedBox(
+              width: DoctorProfileMetrics.photoWidth,
+              height: DoctorProfileMetrics.photoHeight,
+              child: isUploading
+                  ? const Center(
+                      child: SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    )
+                  : null,
+            ),
+          ),
+        ),
+        const SizedBox(height: 6),
+        GestureDetector(
+          onTap: onTap,
+          child: Text(
+            caption,
+            textAlign: TextAlign.center,
+            style: AppTypography.captionMuted,
+          ),
+        ),
+      ],
     );
   }
 }
