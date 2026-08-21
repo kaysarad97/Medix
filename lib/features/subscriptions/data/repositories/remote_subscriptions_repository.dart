@@ -45,6 +45,22 @@ class RemoteSubscriptionsRepository implements SubscriptionsRepository {
     }
   }
 
+  @override
+  Future<SubscriptionCancellation> cancel() async {
+    try {
+      final response = await _dio.delete<Map<String, dynamic>>(
+        ApiEndpoints.mySubscription,
+      );
+      final json = response.data!;
+      return SubscriptionCancellation(
+        periodEnd: DateTime.parse(json['period_end'] as String).toLocal(),
+        cancelAtPeriodEnd: json['cancel_at_period_end'] as bool,
+      );
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
+
   /// Карта не отправляется никуда: принимать её серверу нечем, и подписку
   /// оформляет сам запрос.
   @override

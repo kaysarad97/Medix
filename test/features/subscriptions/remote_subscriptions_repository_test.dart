@@ -123,4 +123,26 @@ void main() {
       expect(outcome, PaymentOutcome.failure);
     });
   });
+
+  test('отмена сохраняет доступ до конца оплаченного периода', () async {
+    final (:dio, :adapter) = cannedDio({
+      '/subscriptions/me': (
+        statusCode: 200,
+        body: {
+          'id': 's1',
+          'plan_code': 'silver',
+          'status': 'active',
+          'period_end': '2026-09-19T10:00:00Z',
+          'cancel_at_period_end': true,
+        },
+      ),
+    });
+
+    final result = await RemoteSubscriptionsRepository(dio).cancel();
+
+    expect(result.cancelAtPeriodEnd, isTrue);
+    expect(result.periodEnd.toUtc(), DateTime.utc(2026, 9, 19, 10));
+    expect(adapter.requests.single.method, 'DELETE');
+    expect(adapter.requests.single.path, '/subscriptions/me');
+  });
 }

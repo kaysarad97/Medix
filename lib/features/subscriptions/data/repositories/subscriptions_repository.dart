@@ -12,6 +12,8 @@ abstract interface class SubscriptionsRepository {
 
   Future<List<SubscriptionPlan>> plans();
 
+  Future<SubscriptionCancellation> cancel();
+
   /// Оплачивает подписку выбранного тарифа. Данные держателя карты нигде не
   /// сохраняются — см. пояснение в [CardDetails].
   ///
@@ -40,6 +42,15 @@ class MockSubscriptionsRepository implements SubscriptionsRepository {
   Future<List<SubscriptionPlan>> plans() async {
     await Future<void>.delayed(_latency);
     return mockPlans;
+  }
+
+  @override
+  Future<SubscriptionCancellation> cancel() async {
+    await Future<void>.delayed(_latency);
+    return SubscriptionCancellation(
+      periodEnd: DateTime(2026, 8, 31),
+      cancelAtPeriodEnd: true,
+    );
   }
 
   @override

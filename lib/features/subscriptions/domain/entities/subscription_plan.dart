@@ -40,3 +40,13 @@ class SubscriptionPlan {
   /// «9999» — разряды не разделяем, так в макете.
   String get priceLabel => pricePerMonth.toString();
 }
+
+class SubscriptionCancellation {
+  const SubscriptionCancellation({
+    required this.periodEnd,
+    required this.cancelAtPeriodEnd,
+  });
+
+  final DateTime periodEnd;
+  final bool cancelAtPeriodEnd;
+}
