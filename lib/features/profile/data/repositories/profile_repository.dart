@@ -12,6 +12,13 @@ abstract interface class ProfileRepository {
 
   Future<MedicalCard> medicalCard();
 
+  Future<List<MeasurementPoint>> measurementHistory(
+    MeasurementKind kind, {
+    String? familyMemberId,
+    DateTime? from,
+    DateTime? to,
+  });
+
   Future<List<MyDoctor>> myDoctors();
 
   Future<List<AnalysisResult>> analyses();
@@ -45,6 +52,27 @@ class MockProfileRepository implements ProfileRepository {
       weightKg: 77,
       hasBadHabits: true,
     );
+  }
+
+  @override
+  Future<List<MeasurementPoint>> measurementHistory(
+    MeasurementKind kind, {
+    String? familyMemberId,
+    DateTime? from,
+    DateTime? to,
+  }) async {
+    await Future<void>.delayed(_latency);
+    final unit = kind == MeasurementKind.height ? 'cm' : 'kg';
+    final value = kind == MeasurementKind.height ? 176.0 : 77.0;
+    return [
+      MeasurementPoint(
+        id: 'measurement-${kind.apiValue}',
+        kind: kind,
+        value: value,
+        unit: unit,
+        measuredAt: DateTime(2026, 7, 20),
+      ),
+    ];
   }
 
   @override

@@ -173,6 +173,65 @@ void main() {
     });
   });
 
+  group('история замеров', () {
+    CannedResponse history() => (
+      statusCode: 200,
+      body: [
+        {
+          'id': 'm1',
+          'family_member_id': null,
+          'record_type': 'measurement',
+          'payload': {
+            'kind': 'weight',
+            'value': 76.5,
+            'unit': 'kg',
+            'measured_at': '2026-08-20T10:00:00Z',
+          },
+          'created_by': 'u1',
+          'superseded_by': 'm2',
+          'created_at': '2026-08-20T10:00:00Z',
+        },
+      ],
+    );
+
+    test('личная история передаёт вид замера и период', () async {
+      final (:dio, :adapter) = cannedDio({
+        '/users/me/medical-records/history': history(),
+      });
+
+      final result = await RemoteProfileRepository(dio).measurementHistory(
+        MeasurementKind.weight,
+        from: DateTime.utc(2026, 8, 1),
+        to: DateTime.utc(2026, 8, 31),
+      );
+
+      expect(result.single.value, 76.5);
+      expect(result.single.unit, 'kg');
+      expect(result.single.kind, MeasurementKind.weight);
+      expect(adapter.requests.single.queryParameters, {
+        'kind': 'weight',
+        'from': '2026-08-01T00:00:00.000Z',
+        'to': '2026-08-31T00:00:00.000Z',
+      });
+    });
+
+    test('история члена семьи использует защищённый семейный путь', () async {
+      final (:dio, :adapter) = cannedDio({
+        '/users/me/family/f1/medical-records/history': history(),
+      });
+
+      await RemoteProfileRepository(
+        dio,
+      ).measurementHistory(MeasurementKind.height, familyMemberId: 'f1');
+
+      expect(
+        adapter.requests.single.path,
+        '/users/me/family/f1/medical-records/history',
+      );
+      expect(adapter.requests.single.queryParameters, {'kind': 'height'});
+    });
+  });
+
   group('мед-карта раскладывается обратно', () {
     test('новое заводится POST, известное правится PATCH', () async {
       final (:dio, :adapter) = cannedDio({

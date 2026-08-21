@@ -109,6 +109,53 @@ class RemoteProfileRepository implements ProfileRepository {
     return card;
   }
 
+  @override
+  Future<List<MeasurementPoint>> measurementHistory(
+    MeasurementKind kind, {
+    String? familyMemberId,
+    DateTime? from,
+    DateTime? to,
+  }) async {
+    final path = familyMemberId == null
+        ? ApiEndpoints.medicalRecordHistory
+        : ApiEndpoints.familyMedicalRecordHistory(familyMemberId);
+    try {
+      final response = await _dio.get<List<dynamic>>(
+        path,
+        queryParameters: {
+          'kind': kind.apiValue,
+          'from': ?from?.toUtc().toIso8601String(),
+          'to': ?to?.toUtc().toIso8601String(),
+        },
+      );
+      return [
+        for (final item in response.data ?? const [])
+          _measurementPoint(item as Map<String, dynamic>, kind),
+      ];
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
+
+  static MeasurementPoint _measurementPoint(
+    Map<String, dynamic> json,
+    MeasurementKind requestedKind,
+  ) {
+    final payload = json['payload'] as Map<String, dynamic>? ?? const {};
+    final kind = switch (payload['kind']) {
+      'height' => MeasurementKind.height,
+      'weight' => MeasurementKind.weight,
+      _ => requestedKind,
+    };
+    return MeasurementPoint(
+      id: json['id'] as String,
+      kind: kind,
+      value: (payload['value'] as num).toDouble(),
+      unit: payload['unit'] as String,
+      measuredAt: DateTime.parse(payload['measured_at'] as String).toLocal(),
+    );
+  }
+
   /// Полям, которым на сервере нет своего типа, остаются заметки с
   /// известным заголовком.
   ///

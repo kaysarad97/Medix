@@ -19,6 +19,32 @@ enum RhesusFactor {
   final String label;
 }
 
+enum MeasurementKind {
+  height('height'),
+  weight('weight');
+
+  const MeasurementKind(this.apiValue);
+
+  final String apiValue;
+}
+
+/// Одна точка истории роста или веса.
+class MeasurementPoint {
+  const MeasurementPoint({
+    required this.id,
+    required this.kind,
+    required this.value,
+    required this.unit,
+    required this.measuredAt,
+  });
+
+  final String id;
+  final MeasurementKind kind;
+  final double value;
+  final String unit;
+  final DateTime measuredAt;
+}
+
 /// Мед-карта: то, что пользователь заполняет о себе один раз.
 ///
 /// Все поля необязательные: карта заводится пустой и дозаполняется. Пустое

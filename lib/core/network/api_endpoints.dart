@@ -31,6 +31,8 @@ abstract final class ApiEndpoints {
   /// новую версию и помечает старую `superseded_by`.
   static const String medicalRecords = '$me/medical-records';
 
+  static const String medicalRecordHistory = '$medicalRecords/history';
+
   static String medicalRecord(String id) => '$medicalRecords/$id';
 
   /// Тарифы с ценами. Единственный эндпоинт подписок без токена.
@@ -73,6 +75,9 @@ abstract final class ApiEndpoints {
   /// журнал доступа на сервере.
   static String familyMedicalRecords(String id) =>
       '${familyMember(id)}/medical-records';
+
+  static String familyMedicalRecordHistory(String id) =>
+      '${familyMedicalRecords(id)}/history';
 
   /// Каталог врачей. Токен не обязателен, но с ним сервер считает цену с
   /// учётом подписки — см. `price_for_user` в ответе.
