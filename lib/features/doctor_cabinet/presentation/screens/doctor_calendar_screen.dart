@@ -3,10 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/routes.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/ru_dates.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_scaffold.dart';
+import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/doctor_appointment.dart';
@@ -53,6 +55,17 @@ class DoctorCalendarScreen extends ConsumerWidget {
               ScreenTopBar(
                 title: l10n.upcomingAppointmentsTitle,
                 onBack: () => Navigator.of(context).maybePop(),
+                // Ведёт в «Рабочие часы» — свои свободные слоты, не эти
+                // записи пациентов. Экран новый, макета для входа нет,
+                // решение — держать рядом с календарём, а не подменять
+                // его (см. doc-комментарий DoctorWorkScheduleScreen).
+                trailing: GestureDetector(
+                  onTap: () => context.push(Routes.doctorWorkSchedule),
+                  child: const AppIcon(
+                    icon: MedixIcon.settings,
+                    color: AppColors.textOnPrimary,
+                  ),
+                ),
               ),
               const SizedBox(height: 30),
               Text(

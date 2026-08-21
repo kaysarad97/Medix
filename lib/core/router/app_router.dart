@@ -21,6 +21,7 @@ import '../../features/doctor_cabinet/presentation/screens/doctor_home_screen.da
 import '../../features/doctor_cabinet/presentation/screens/doctor_chatbot_screen.dart';
 import '../../features/doctor_cabinet/presentation/screens/doctor_profile_screen.dart';
 import '../../features/doctor_cabinet/presentation/screens/doctor_settings_screen.dart';
+import '../../features/doctor_cabinet/presentation/screens/doctor_work_schedule_screen.dart';
 import '../../features/doctor_cabinet/presentation/screens/doctor_admin_answer_screen.dart';
 import '../../features/doctor_cabinet/presentation/screens/doctor_admin_request_screen.dart';
 import '../../features/doctor_cabinet/presentation/screens/doctor_admin_requests_screen.dart';
@@ -234,6 +235,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.doctorChatbot,
         builder: (context, state) => const DoctorChatbotScreen(),
+      ),
+      GoRoute(
+        path: Routes.doctorWorkSchedule,
+        builder: (context, state) => const DoctorWorkScheduleScreen(),
       ),
       GoRoute(
         path: Routes.doctorAdminRequests,

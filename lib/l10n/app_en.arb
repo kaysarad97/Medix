@@ -303,5 +303,20 @@
   "doctorAdminCreateNew": "Create a new request",
   "doctorAdminAnswerTitle": "Administration reply:",
   "doctorAdminNoAnswerYet": "No reply from the administration yet",
-  "doctorAdminDate": "of {date}"
+  "doctorAdminDate": "of {date}",
+  "doctorWorkScheduleTitle": "Working hours",
+  "doctorWorkScheduleEmpty": "No slots for this day",
+  "doctorWorkSlotStatusOpen": "Open",
+  "doctorWorkSlotStatusHeld": "Held",
+  "doctorWorkSlotStatusBooked": "Booked",
+  "doctorWorkSlotStatusCancelled": "Cancelled",
+  "doctorAddSlotAction": "Add a slot",
+  "doctorAddSlotTitle": "New slot",
+  "doctorSlotStartLabel": "Start",
+  "doctorSlotEndLabel": "End",
+  "doctorSlotSaveAction": "Save",
+  "doctorSlotCreateSuccess": "Slot added",
+  "doctorSlotCreateError": "Couldn't add the slot",
+  "doctorSlotDeleteError": "Couldn't delete the slot",
+  "doctorSlotEndBeforeStartError": "End must be after start"
 }

@@ -1297,5 +1297,65 @@
   "@doctorAdminDate": {
     "description": "Дата заявки и ответа: «от 10.08.26».",
     "placeholders": { "date": { "type": "String" } }
+  },
+  "doctorWorkScheduleTitle": "Рабочие часы",
+  "@doctorWorkScheduleTitle": {
+    "description": "Заголовок экрана управления свободными слотами — не путать с календарём записей пациентов."
+  },
+  "doctorWorkScheduleEmpty": "На этот день слотов нет",
+  "@doctorWorkScheduleEmpty": {
+    "description": "Пустое состояние, когда на выбранный день не заведено ни одного рабочего слота."
+  },
+  "doctorWorkSlotStatusOpen": "Свободно",
+  "@doctorWorkSlotStatusOpen": {
+    "description": "Статус слота: пациент ещё не записался."
+  },
+  "doctorWorkSlotStatusHeld": "Придержано",
+  "@doctorWorkSlotStatusHeld": {
+    "description": "Статус слота: временно занят на время оформления записи."
+  },
+  "doctorWorkSlotStatusBooked": "Занято",
+  "@doctorWorkSlotStatusBooked": {
+    "description": "Статус слота: пациент уже записан."
+  },
+  "doctorWorkSlotStatusCancelled": "Отменено",
+  "@doctorWorkSlotStatusCancelled": {
+    "description": "Статус слота: запись на него отменена."
+  },
+  "doctorAddSlotAction": "Добавить слот",
+  "@doctorAddSlotAction": {
+    "description": "Кнопка/шеврон открытия формы нового слота."
+  },
+  "doctorAddSlotTitle": "Новый слот",
+  "@doctorAddSlotTitle": {
+    "description": "Заголовок формы добавления слота."
+  },
+  "doctorSlotStartLabel": "Начало",
+  "@doctorSlotStartLabel": {
+    "description": "Подпись поля времени начала слота."
+  },
+  "doctorSlotEndLabel": "Окончание",
+  "@doctorSlotEndLabel": {
+    "description": "Подпись поля времени окончания слота."
+  },
+  "doctorSlotSaveAction": "Сохранить",
+  "@doctorSlotSaveAction": {
+    "description": "Кнопка сохранения нового слота."
+  },
+  "doctorSlotCreateSuccess": "Слот добавлен",
+  "@doctorSlotCreateSuccess": {
+    "description": "Снек-бар после успешного создания слота."
+  },
+  "doctorSlotCreateError": "Не удалось добавить слот",
+  "@doctorSlotCreateError": {
+    "description": "Снек-бар при ошибке создания слота."
+  },
+  "doctorSlotDeleteError": "Не удалось удалить слот",
+  "@doctorSlotDeleteError": {
+    "description": "Снек-бар при ошибке удаления слота."
+  },
+  "doctorSlotEndBeforeStartError": "Окончание должно быть позже начала",
+  "@doctorSlotEndBeforeStartError": {
+    "description": "Ошибка формы нового слота, когда конец раньше или равен началу."
   }
 }

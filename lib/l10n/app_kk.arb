@@ -303,5 +303,20 @@
   "doctorAdminCreateNew": "Жаңа өтініш жасау",
   "doctorAdminAnswerTitle": "Әкімшілік жауабы:",
   "doctorAdminNoAnswerYet": "Әкімшілік әзірге жауап берген жоқ",
-  "doctorAdminDate": "{date} бастап"
+  "doctorAdminDate": "{date} бастап",
+  "doctorWorkScheduleTitle": "Жұмыс уақыты",
+  "doctorWorkScheduleEmpty": "Бұл күнге слоттар жоқ",
+  "doctorWorkSlotStatusOpen": "Бос",
+  "doctorWorkSlotStatusHeld": "Уақытша ұсталды",
+  "doctorWorkSlotStatusBooked": "Бос емес",
+  "doctorWorkSlotStatusCancelled": "Болдырылмады",
+  "doctorAddSlotAction": "Слот қосу",
+  "doctorAddSlotTitle": "Жаңа слот",
+  "doctorSlotStartLabel": "Басталуы",
+  "doctorSlotEndLabel": "Аяқталуы",
+  "doctorSlotSaveAction": "Сақтау",
+  "doctorSlotCreateSuccess": "Слот қосылды",
+  "doctorSlotCreateError": "Слотты қосу мүмкін болмады",
+  "doctorSlotDeleteError": "Слотты жою мүмкін болмады",
+  "doctorSlotEndBeforeStartError": "Аяқталуы басталуынан кеш болуы керек"
 }

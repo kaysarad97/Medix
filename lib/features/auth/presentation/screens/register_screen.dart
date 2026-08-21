@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../../../core/widgets/primary_button.dart';
@@ -17,6 +18,11 @@ import '../widgets/registration_step_layout.dart';
 /// Свёрстан по `design/Создайте профиль.png`. Отличие от макета: полей
 /// пароля нет — бэкенд паролей не хранит, вместо них на шаге 3 приходит
 /// одноразовый код. Карточка из-за этого ниже, чем нарисовано.
+///
+/// Ссылка «Я — врач» под кнопкой — тоже вне макета: развилка на
+/// врача-фрилансера есть в решениях HANDOFF (20 августа 2026), но сам PNG
+/// с ней в рабочем дереве не сохранился. Форма ссылки взята с готового
+/// образца — «или создать профиль» на `LoginScreen`.
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
@@ -60,19 +66,27 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         ),
         const SizedBox(height: _cardToButton),
         RegistrationNextButton(
-          child: Column(
-            children: [
-              PrimaryButton(
-                label: l10n.nextButtonLabel,
-                trailingIcon: Icons.arrow_forward,
-                onPressed: state.filled(const [RegField.email]) ? _next : null,
+          child: PrimaryButton(
+            label: l10n.nextButtonLabel,
+            trailingIcon: Icons.arrow_forward,
+            onPressed: state.filled(const [RegField.email]) ? _next : null,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        Center(
+          child: GestureDetector(
+            onTap: () => context.push(Routes.doctorRegister),
+            behavior: HitTestBehavior.opaque,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: AppSpacing.xs,
+                horizontal: AppSpacing.md,
               ),
-              const SizedBox(height: AppSpacing.sm),
-              TextButton(
-                onPressed: () => context.push(Routes.doctorRegister),
-                child: Text(l10n.registerAsDoctorAction),
+              child: Text(
+                l10n.registerAsDoctorAction,
+                style: AppTypography.link,
               ),
-            ],
+            ),
           ),
         ),
       ],

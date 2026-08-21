@@ -45,6 +45,43 @@ final doctorWorkScheduleProvider = FutureProvider.autoDispose
           .schedule(from: range.from, to: range.to),
     );
 
+/// Выбранный день на экране «Рабочие часы».
+///
+/// Не переиспользует [SelectedCalendarDay]: тот день — для календаря
+/// записей пациентов, этот — для своих свободных слотов. Общее состояние
+/// незаметно бы протекало между экранами при переходе туда-обратно.
+class SelectedWorkScheduleDay extends Notifier<DateTime> {
+  @override
+  DateTime build() {
+    final now = DateTime.now();
+    return DateTime(now.year, now.month, now.day);
+  }
+
+  void select(DateTime day) => state = DateTime(day.year, day.month, day.day);
+
+  void previousWeek() => state = state.subtract(const Duration(days: 7));
+
+  void nextWeek() => state = state.add(const Duration(days: 7));
+}
+
+final selectedWorkScheduleDayProvider =
+    NotifierProvider<SelectedWorkScheduleDay, DateTime>(
+      SelectedWorkScheduleDay.new,
+    );
+
+/// Слоты выбранного дня — тот же приём переигрывания на смену дня, что и
+/// у [doctorAppointmentsForDayProvider].
+final doctorWorkSlotsForDayProvider =
+    FutureProvider.autoDispose<List<DoctorWorkSlot>>((ref) {
+      final day = ref.watch(selectedWorkScheduleDayProvider);
+      return ref
+          .watch(doctorScheduleRepositoryProvider)
+          .schedule(
+            from: day,
+            to: DateTime(day.year, day.month, day.day, 23, 59, 59),
+          );
+    });
+
 final doctorUpcomingAppointmentsProvider =
     FutureProvider<List<DoctorAppointment>>(
       (ref) =>

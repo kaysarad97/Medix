@@ -126,6 +126,10 @@ abstract final class Routes {
   /// Medi-bot кабинета врача — поле «Напишите Medi-bot...» на главной.
   static const String doctorChatbot = '/doctor-chatbot';
 
+  /// Рабочие часы врача: свободные слоты, отдельно от приёмов пациентов
+  /// в [doctorCalendar]. Вход — шестерёнка в шапке календаря.
+  static const String doctorWorkSchedule = '/doctor-work-schedule';
+
   /// Оформленная запись к врачу.
   static const String appointment = '/appointment/:id';
 
