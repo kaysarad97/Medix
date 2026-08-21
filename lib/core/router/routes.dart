@@ -24,6 +24,9 @@ abstract final class Routes {
   /// Шаг 5 — политика конфиденциальности.
   static const String policy = '/register/policy';
 
+  static const String doctorRegister = '/register/doctor';
+  static const String doctorRegisterVerify = '/register/doctor/verify';
+
   static const String home = '/';
 
   /// Уведомления — колокольчик в шапке главной.

@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/auth/presentation/screens/app_settings_screen.dart';
+import '../../features/auth/presentation/screens/doctor_register_screen.dart';
+import '../../features/auth/presentation/screens/doctor_register_verify_screen.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/login_verify_screen.dart';
 import '../../features/auth/presentation/screens/personal_data_screen.dart';
@@ -99,6 +101,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: Routes.policy,
         builder: (context, state) => const PolicyScreen(),
       ),
+      GoRoute(
+        path: Routes.doctorRegister,
+        builder: (context, state) => const DoctorRegisterScreen(),
+      ),
+      GoRoute(
+        path: Routes.doctorRegisterVerify,
+        builder: (context, state) => const DoctorRegisterVerifyScreen(),
+      ),
       // Нижняя навигация: Домой/Карта/Чаты/Профиль — общий плавающий
       // таб-бар в AppShell, у каждой ветки свой стек и своя история.
       // Порядок веток совпадает с порядком вкладок в BottomNavBar.
@@ -195,7 +205,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: Routes.doctorCertificates,
-        builder: (context, state) => const DoctorCertificatesScreen(),
+        builder: (context, state) => DoctorCertificatesScreen(
+          showUploadRow: state.uri.queryParameters['upload'] == 'true',
+        ),
       ),
       GoRoute(
         path: Routes.doctorOwnReviews,

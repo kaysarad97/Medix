@@ -1067,6 +1067,11 @@
   },
   "doctorCertificateUploadSuccess": "Сертификат загружен",
   "doctorCertificateUploadError": "Не удалось загрузить сертификат",
+  "registerAsDoctorAction": "Я — врач",
+  "doctorRegistrationTitle": "Регистрация врача",
+  "doctorSpecialtyHint": "Специализация",
+  "doctorLicenseNumberHint": "Номер лицензии",
+  "doctorCityHint": "Город (необязательно)",
   "doctorReviewsScreenTitle": "Отзывы",
   "@doctorReviewsScreenTitle": {
     "description": "Заголовок экрана «Отзывы о Вас» в кабинете врача."

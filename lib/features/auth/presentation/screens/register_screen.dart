@@ -60,10 +60,19 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         ),
         const SizedBox(height: _cardToButton),
         RegistrationNextButton(
-          child: PrimaryButton(
-            label: l10n.nextButtonLabel,
-            trailingIcon: Icons.arrow_forward,
-            onPressed: state.filled(const [RegField.email]) ? _next : null,
+          child: Column(
+            children: [
+              PrimaryButton(
+                label: l10n.nextButtonLabel,
+                trailingIcon: Icons.arrow_forward,
+                onPressed: state.filled(const [RegField.email]) ? _next : null,
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              TextButton(
+                onPressed: () => context.push(Routes.doctorRegister),
+                child: Text(l10n.registerAsDoctorAction),
+              ),
+            ],
           ),
         ),
       ],
