@@ -2,12 +2,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../shared/models/appointment.dart';
 import '../../../../shared/models/doctor_specialty.dart';
+import '../../../telemedicine/presentation/providers/telemedicine_providers.dart';
 import '../../data/repositories/home_repository.dart';
 
 final homeRepositoryProvider = Provider<HomeRepository>(
-  // Бэкенда пока нет; переключение появится вместе с реальными эндпоинтами,
-  // как в authRepositoryProvider.
-  (ref) => const MockHomeRepository(),
+  (ref) => DoctorsHomeRepository(ref.watch(doctorsRepositoryProvider)),
 );
 
 final specialtiesProvider = FutureProvider<List<DoctorSpecialty>>(
