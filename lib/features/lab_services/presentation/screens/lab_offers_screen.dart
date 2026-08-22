@@ -7,10 +7,13 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/icon_chip.dart';
+import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/lab_offer.dart';
 import '../../domain/entities/lab_service.dart';
+import '../../domain/entities/lab_workflow.dart';
+import '../providers/lab_ocr_providers.dart';
 import '../providers/lab_services_providers.dart';
 
 /// «Партнерские лаборатории» — сколько та же корзина стоит у других.
@@ -18,7 +21,9 @@ import '../providers/lab_services_providers.dart';
 /// Свёрстан по `design/Сравнение корзины.png`. Открывается кнопкой
 /// «Сравнить цены» из шторки корзины.
 class LabOffersScreen extends ConsumerWidget {
-  const LabOffersScreen({super.key});
+  const LabOffersScreen({super.key, this.referralId});
+
+  final String? referralId;
 
   static const double screenH = 21;
   static const double topBarTop = 36;
@@ -33,6 +38,11 @@ class LabOffersScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final referralId = this.referralId;
+    if (referralId != null) {
+      return _ReferralOffersScreen(referralId: referralId);
+    }
+
     final services = ref.watch(cartServicesProvider);
     final total = ref.watch(cartTotalProvider);
     final offers = ref.watch(labOffersProvider).value ?? const <LabOffer>[];
@@ -86,6 +96,152 @@ class LabOffersScreen extends ConsumerWidget {
   /// одинаковые наборы, а не названия комплексов.
   static List<String> _itemsOf(LabService service) =>
       service.includes.isEmpty ? [service.name] : service.includes;
+}
+
+class _ReferralOffersScreen extends ConsumerStatefulWidget {
+  const _ReferralOffersScreen({required this.referralId});
+
+  final String referralId;
+
+  @override
+  ConsumerState<_ReferralOffersScreen> createState() =>
+      _ReferralOffersScreenState();
+}
+
+class _ReferralOffersScreenState extends ConsumerState<_ReferralOffersScreen> {
+  String? _orderingLabId;
+
+  Future<void> _order(LabPriceOffer offer) async {
+    if (_orderingLabId != null) return;
+    setState(() => _orderingLabId = offer.labId);
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      final order = await ref
+          .read(labOcrServiceProvider)
+          .createOrder(referralId: widget.referralId, labId: offer.labId);
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.labOrderCreated(order.id))),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      messenger.showSnackBar(SnackBar(content: Text(l10n.labOrderCreateError)));
+    } finally {
+      if (mounted) setState(() => _orderingLabId = null);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final offers = ref.watch(labOcrOffersProvider(widget.referralId));
+    final l10n = AppLocalizations.of(context)!;
+    return AppScaffold(
+      background: AppBackgroundStyle.main,
+      child: SafeArea(
+        bottom: false,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(height: LabOffersScreen.topBarTop),
+            ScreenTopBar(
+              title: l10n.partnerLabsTitle,
+              onBack: () => Navigator.of(context).maybePop(),
+            ),
+            const SizedBox(height: LabOffersScreen.topBarToCard),
+            Expanded(
+              child: offers.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (_, _) => Center(
+                  child: Text(
+                    l10n.labOffersLoadError,
+                    style: AppTypography.bodyLg,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                data: (items) => items.isEmpty
+                    ? Center(
+                        child: Text(
+                          l10n.labOffersEmpty,
+                          style: AppTypography.bodyLg,
+                        ),
+                      )
+                    : ListView.separated(
+                        padding: const EdgeInsets.fromLTRB(
+                          LabOffersScreen.screenH,
+                          0,
+                          LabOffersScreen.screenH,
+                          32,
+                        ),
+                        itemCount: items.length,
+                        separatorBuilder: (_, _) =>
+                            const SizedBox(height: LabOffersScreen.offerGap),
+                        itemBuilder: (context, index) {
+                          final offer = items[index];
+                          return _ReferralOfferCard(
+                            offer: offer,
+                            isOrdering: _orderingLabId == offer.labId,
+                            onOrder: () => _order(offer),
+                          );
+                        },
+                      ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ReferralOfferCard extends StatelessWidget {
+  const _ReferralOfferCard({
+    required this.offer,
+    required this.isOrdering,
+    required this.onOrder,
+  });
+
+  final LabPriceOffer offer;
+  final bool isOrdering;
+  final VoidCallback onOrder;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return AppCard(
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(offer.labName, style: AppTypography.analysisValue),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Text(l10n.cartTotalLabel, style: AppTypography.cartTotal),
+              const Spacer(),
+              Text(
+                '${offer.priceForUser} ₸',
+                style: AppTypography.cardTitleAccent,
+              ),
+            ],
+          ),
+          if (offer.discountPercent > 0) ...[
+            const SizedBox(height: 6),
+            Text(
+              l10n.labOfferDiscount(offer.discountPercent),
+              style: AppTypography.captionMuted,
+            ),
+          ],
+          const SizedBox(height: 18),
+          PrimaryButton(
+            label: l10n.orderAtLab(offer.labName),
+            isLoading: isOrdering,
+            onPressed: isOrdering ? null : onOrder,
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _OwnCartCard extends StatelessWidget {

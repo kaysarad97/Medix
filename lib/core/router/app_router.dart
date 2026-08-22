@@ -41,6 +41,7 @@ import '../../features/family_access/presentation/screens/family_member_screen.d
 import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/lab_chatbot/presentation/screens/chatbot_screen.dart';
 import '../../features/lab_services/presentation/screens/lab_offers_screen.dart';
+import '../../features/lab_services/presentation/screens/lab_referral_screen.dart';
 import '../../features/lab_services/presentation/screens/lab_services_screen.dart';
 import '../../features/map_search/presentation/screens/map_search_screen.dart';
 import '../../features/notifications/presentation/screens/notifications_screen.dart';
@@ -272,8 +273,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const LabServicesScreen(),
       ),
       GoRoute(
+        path: Routes.labReferral,
+        builder: (context, state) => const LabReferralScreen(),
+      ),
+      GoRoute(
         path: Routes.labOffers,
-        builder: (context, state) => const LabOffersScreen(),
+        builder: (context, state) =>
+            LabOffersScreen(referralId: state.uri.queryParameters['referral']),
       ),
       GoRoute(
         path: Routes.chat,

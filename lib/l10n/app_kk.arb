@@ -340,5 +340,21 @@
   "uploadOwnPhotoAction": "Өз фотосуретіңізді жүктеу",
   "avatarUploadSuccess": "Профиль фотосуреті жаңартылды",
   "avatarUploadError": "Фотосуретті жүктеу мүмкін болмады",
-  "measurementHistoryTooShort": "График құру үшін өлшемдер әзірше жеткіліксіз"
+  "measurementHistoryTooShort": "График құру үшін өлшемдер әзірше жеткіліксіз",
+  "labReferralTitle": "Жолдаманы жүктеу",
+  "labReferralDescription": "PDF, JPG немесе PNG форматындағы дәрігер жолдамасын таңдаңыз. Талдауларды танып, зертхана бағаларын салыстырамыз.",
+  "labReferralChooseAction": "Жолдаманы таңдау",
+  "labReferralRecognizing": "Жолдаманы танып жатырмыз…",
+  "labReferralUploadError": "Жолдаманы жүктеу немесе тану мүмкін болмады",
+  "labReferralRetryAction": "Қайталап көру",
+  "labReferralRecognitionError": "Жолдамадағы талдауларды тану мүмкін болмады",
+  "labReferralRecognizedTitle": "Танылған талдаулар",
+  "labReferralCompareAction": "Бағаларды салыстыру",
+  "labOffersLoadError": "Зертхана ұсыныстарын жүктеу мүмкін болмады",
+  "labOffersEmpty": "Бұл жолдама бойынша әзірге ұсыныстар жоқ",
+  "labOrderCreated": "{id} тапсырысы жасалды",
+  "@labOrderCreated": { "placeholders": { "id": { "type": "String" } } },
+  "labOrderCreateError": "Тапсырыс жасау мүмкін болмады",
+  "labOfferDiscount": "{percent}% жеңілдік",
+  "@labOfferDiscount": { "placeholders": { "percent": { "type": "int" } } }
 }

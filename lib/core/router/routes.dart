@@ -163,8 +163,14 @@ abstract final class Routes {
   /// Перечень услуг: каталог анализов и комплексов.
   static const String labServices = '/lab-services';
 
+  /// Загрузка направления, ожидание OCR и переход к рассчитанным ценам.
+  static const String labReferral = '/lab-referral';
+
   /// «Партнерские лаборатории» — сколько та же корзина стоит у других.
   static const String labOffers = '/lab-services/offers';
+
+  static String labOffersForReferral(String referralId) =>
+      '$labOffers?referral=${Uri.encodeQueryComponent(referralId)}';
 
   /// Профиль пользователя — «Ваша Мед-Карта».
   static const String profile = '/profile';

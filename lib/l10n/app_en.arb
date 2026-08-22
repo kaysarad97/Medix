@@ -340,5 +340,21 @@
   "uploadOwnPhotoAction": "Upload your photo",
   "avatarUploadSuccess": "Profile photo updated",
   "avatarUploadError": "Couldn't upload the photo",
-  "measurementHistoryTooShort": "There aren't enough measurements to build a chart yet"
+  "measurementHistoryTooShort": "There aren't enough measurements to build a chart yet",
+  "labReferralTitle": "Upload referral",
+  "labReferralDescription": "Choose a PDF, JPG or PNG referral. We will recognize the tests and compare laboratory prices.",
+  "labReferralChooseAction": "Choose referral",
+  "labReferralRecognizing": "Recognizing referral…",
+  "labReferralUploadError": "The referral could not be uploaded or recognized",
+  "labReferralRetryAction": "Try again",
+  "labReferralRecognitionError": "The tests in the referral could not be recognized",
+  "labReferralRecognizedTitle": "Recognized tests",
+  "labReferralCompareAction": "Compare prices",
+  "labOffersLoadError": "Laboratory offers could not be loaded",
+  "labOffersEmpty": "There are no offers for this referral yet",
+  "labOrderCreated": "Order {id} created",
+  "@labOrderCreated": { "placeholders": { "id": { "type": "String" } } },
+  "labOrderCreateError": "The order could not be created",
+  "labOfferDiscount": "{percent}% discount",
+  "@labOfferDiscount": { "placeholders": { "percent": { "type": "int" } } }
 }

@@ -99,7 +99,7 @@ class HomeScreen extends ConsumerWidget {
               const SizedBox(height: HomeMetrics.cardGap),
               _Section(
                 child: UploadAnalysesCard(
-                  onTap: () => context.push(Routes.chatbot),
+                  onTap: () => context.push(Routes.labReferral),
                 ),
               ),
               if (family.isNotEmpty) ...[

@@ -1391,5 +1391,21 @@
   "uploadOwnPhotoAction": "Загрузить своё фото",
   "avatarUploadSuccess": "Фотография профиля обновлена",
   "avatarUploadError": "Не удалось загрузить фотографию",
-  "measurementHistoryTooShort": "Замеров пока мало, чтобы построить график"
+  "measurementHistoryTooShort": "Замеров пока мало, чтобы построить график",
+  "labReferralTitle": "Загрузить направление",
+  "labReferralDescription": "Выберите PDF, JPG или PNG с направлением врача. Мы распознаем анализы и сравним цены лабораторий.",
+  "labReferralChooseAction": "Выбрать направление",
+  "labReferralRecognizing": "Распознаём направление…",
+  "labReferralUploadError": "Не удалось загрузить или распознать направление",
+  "labReferralRetryAction": "Попробовать снова",
+  "labReferralRecognitionError": "Не удалось распознать анализы в направлении",
+  "labReferralRecognizedTitle": "Распознанные анализы",
+  "labReferralCompareAction": "Сравнить цены",
+  "labOffersLoadError": "Не удалось загрузить предложения лабораторий",
+  "labOffersEmpty": "Для этого направления пока нет предложений",
+  "labOrderCreated": "Заказ {id} создан",
+  "@labOrderCreated": { "placeholders": { "id": { "type": "String" } } },
+  "labOrderCreateError": "Не удалось создать заказ",
+  "labOfferDiscount": "Скидка {percent}%",
+  "@labOfferDiscount": { "placeholders": { "percent": { "type": "int" } } }
 }
