@@ -163,6 +163,7 @@
   "familyScopeSenior": "Senior's procedures",
   "proceduresSearchHint": "Procedure name",
   "proceduresResultsCount": "{count} procedures found in your medical card",
+  "procedureResultsNotReadySnackbar": "The procedure results screen isn't ready yet",
   "consultationWithLabel": "Consultation with",
   "viewResultsLinkLabel": "view results",
   "bloodGroupLabel": "Blood type:",
@@ -365,5 +366,6 @@
   "labResultsEmpty": "No completed results yet",
   "labResultsLoadError": "Test results could not be loaded",
   "labResultsRetryAction": "Try again",
-  "labResultOpenError": "The result file could not be opened"
+  "labResultOpenError": "The result file could not be opened",
+  "labResultsOpenFilesHint": "Open completed result files"
 }

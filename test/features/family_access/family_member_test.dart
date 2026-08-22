@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:medix/core/router/routes.dart';
 import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/features/family_access/presentation/providers/family_providers.dart';
 import 'package:medix/features/family_access/presentation/screens/family_member_screen.dart';
@@ -70,6 +72,61 @@ void main() {
       expect(find.text('Врачи моего ребёнка'), findsOneWidget);
       expect(find.text('Педиатр'), findsOneWidget);
       expect(find.text('Анализы ребёнка'), findsOneWidget);
+    });
+
+    testWidgets('открывает лабораторные файлы именно ребёнка', (tester) async {
+      tester.view.physicalSize = const Size(440, 1200);
+      tester.view.devicePixelRatio = 1;
+      tester.view.padding = const FakeViewPadding(top: 62);
+      addTearDown(tester.view.reset);
+
+      final router = GoRouter(
+        initialLocation: Routes.familyMemberOf('f1'),
+        routes: [
+          GoRoute(
+            path: Routes.familyMember,
+            builder: (_, state) => FamilyMemberScreen(
+              memberId: state.pathParameters['id']!,
+              now: DateTime(2026, 8, 6),
+            ),
+          ),
+          GoRoute(
+            path: Routes.labResults,
+            builder: (_, state) => Scaffold(
+              body: Text(
+                'family-result-${state.uri.queryParameters['family_member_id']}',
+              ),
+            ),
+          ),
+        ],
+      );
+      addTearDown(router.dispose);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            familyRepositoryProvider.overrideWithValue(FakeFamilyRepository()),
+          ],
+          child: MaterialApp.router(
+            theme: AppTheme.light,
+            locale: const Locale('ru'),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            routerConfig: router,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(
+        find.text('Анализы ребёнка'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+
+      await tester.tap(find.text('Анализы ребёнка'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('family-result-f1'), findsOneWidget);
     });
   });
 

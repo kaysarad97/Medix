@@ -25,9 +25,12 @@ final labOrdersProvider = FutureProvider.autoDispose<List<LabOrder>>(
   (ref) => ref.watch(labApiRepositoryProvider).orders(),
 );
 
-final labResultsProvider = FutureProvider.autoDispose<List<LabResultFile>>(
-  (ref) => ref.watch(labApiRepositoryProvider).results(),
-);
+final labResultsProvider = FutureProvider.autoDispose
+    .family<List<LabResultFile>, String?>(
+      (ref, familyMemberId) => ref
+          .watch(labApiRepositoryProvider)
+          .results(familyMemberId: familyMemberId),
+    );
 
 final labResultDownloadProvider = FutureProvider.autoDispose
     .family<LabResultDownload, String>(

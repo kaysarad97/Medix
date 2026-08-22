@@ -163,6 +163,7 @@
   "familyScopeSenior": "Ересектердің процедуралары",
   "proceduresSearchHint": "Процедура атауы",
   "proceduresResultsCount": "Сіздің медициналық картаңыздан {count} процедура табылды",
+  "procedureResultsNotReadySnackbar": "Процедура нәтижелері экраны әлі дайын емес",
   "consultationWithLabel": "Дәрігермен кеңес",
   "viewResultsLinkLabel": "нәтижелерін көру",
   "bloodGroupLabel": "Қан тобы:",
@@ -365,5 +366,6 @@
   "labResultsEmpty": "Дайын нәтижелер әзірге жоқ",
   "labResultsLoadError": "Талдау нәтижелерін жүктеу мүмкін болмады",
   "labResultsRetryAction": "Қайталап көру",
-  "labResultOpenError": "Нәтиже файлын ашу мүмкін болмады"
+  "labResultOpenError": "Нәтиже файлын ашу мүмкін болмады",
+  "labResultsOpenFilesHint": "Дайын нәтиже файлдарын ашыңыз"
 }

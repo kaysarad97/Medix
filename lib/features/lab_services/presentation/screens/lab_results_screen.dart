@@ -22,7 +22,9 @@ import '../providers/lab_services_providers.dart';
 /// name or laboratory name. The screen therefore does not invent metadata and
 /// presents each server result as a downloadable document.
 class LabResultsScreen extends ConsumerStatefulWidget {
-  const LabResultsScreen({super.key});
+  const LabResultsScreen({super.key, this.familyMemberId});
+
+  final String? familyMemberId;
 
   @override
   ConsumerState<LabResultsScreen> createState() => _LabResultsScreenState();
@@ -34,7 +36,7 @@ class _LabResultsScreenState extends ConsumerState<LabResultsScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final results = ref.watch(labResultsProvider);
+    final results = ref.watch(labResultsProvider(widget.familyMemberId));
 
     return AppScaffold(
       background: AppBackgroundStyle.main,
@@ -59,13 +61,16 @@ class _LabResultsScreenState extends ConsumerState<LabResultsScreen> {
                 error: (_, _) => _MessageState(
                   message: l10n.labResultsLoadError,
                   actionLabel: l10n.labResultsRetryAction,
-                  onPressed: () => ref.invalidate(labResultsProvider),
+                  onPressed: () =>
+                      ref.invalidate(labResultsProvider(widget.familyMemberId)),
                 ),
                 data: (items) => items.isEmpty
                     ? _MessageState(message: l10n.labResultsEmpty)
                     : RefreshIndicator(
                         onRefresh: () => ref
-                            .refresh(labResultsProvider.future)
+                            .refresh(
+                              labResultsProvider(widget.familyMemberId).future,
+                            )
                             .then<void>((_) {}),
                         child: ListView.separated(
                           physics: const AlwaysScrollableScrollPhysics(),

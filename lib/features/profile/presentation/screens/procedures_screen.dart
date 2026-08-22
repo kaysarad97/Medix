@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -53,7 +52,8 @@ IconData _iconFor(String specialty) =>
 /// «сегодня»), поэтому здесь все карточки одинаковые, без выборочной
 /// подсветки.
 ///
-/// Строка «посмотреть результаты» ведёт к лабораторным файлам пользователя.
+/// У строки «посмотреть результаты» нет consultation id, по которому можно
+/// запросить заключение конкретного приёма, поэтому она показывает заглушку.
 class ProceduresScreen extends ConsumerWidget {
   const ProceduresScreen({super.key});
 
@@ -105,7 +105,7 @@ class ProceduresScreen extends ConsumerWidget {
                         separatorBuilder: (_, _) => const SizedBox(height: 12),
                         itemBuilder: (context, index) => _ProcedureRow(
                           procedure: procedures[index],
-                          onTap: () => context.push(Routes.labResults),
+                          onTap: () => _showNoResultsYet(context),
                         ),
                       ),
               ),
@@ -115,6 +115,23 @@ class ProceduresScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  static void _showNoResultsYet(BuildContext context) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context)!.procedureResultsNotReadySnackbar,
+            style: AppTypography.bodyMd.copyWith(
+              color: AppColors.textOnPrimary,
+            ),
+          ),
+          backgroundColor: AppColors.primary,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
   }
 }
 

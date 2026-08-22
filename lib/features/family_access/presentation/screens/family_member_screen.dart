@@ -104,25 +104,26 @@ class FamilyMemberScreen extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: ProfileMetrics.cardGap),
-                    if (analyses.isNotEmpty) ...[
-                      _Section(
-                        child: AnalysesCard(
-                          analyses: analyses,
-                          filter: filter,
-                          // У всех, кроме ребёнка, заголовок с именем: он
-                          // одинаково годится и родителю, и супругу, и брату.
-                          title: member.relation.isChild
-                              ? l10n.familyAnalysesCardTitleChild
-                              : l10n.familyAnalysesCardTitleSenior(
-                                  member.fullName,
-                                ),
-                          onFilterChanged: ref
-                              .read(familyAnalysesFilterProvider.notifier)
-                              .select,
-                        ),
+                    _Section(
+                      child: AnalysesCard(
+                        analyses: analyses,
+                        filter: filter,
+                        // У всех, кроме ребёнка, заголовок с именем: он
+                        // одинаково годится и родителю, и супругу, и брату.
+                        title: member.relation.isChild
+                            ? l10n.familyAnalysesCardTitleChild
+                            : l10n.familyAnalysesCardTitleSenior(
+                                member.fullName,
+                              ),
+                        emptyMessage: l10n.labResultsOpenFilesHint,
+                        onOpenAll: () =>
+                            context.push(Routes.labResultsForFamily(memberId)),
+                        onFilterChanged: ref
+                            .read(familyAnalysesFilterProvider.notifier)
+                            .select,
                       ),
-                      const SizedBox(height: ProfileMetrics.cardGap),
-                    ],
+                    ),
+                    const SizedBox(height: ProfileMetrics.cardGap),
                     _Section(child: _DeleteProfileButton(memberId: memberId)),
                     const SizedBox(height: AppSpacing.xxl),
                   ],

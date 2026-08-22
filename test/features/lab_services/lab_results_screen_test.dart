@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/platform/external_url_opener.dart';
+import 'package:medix/core/router/routes.dart';
 import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/features/lab_services/data/repositories/lab_api_repository.dart';
 import 'package:medix/features/lab_services/domain/entities/lab_workflow.dart';
@@ -14,6 +15,13 @@ import '../../helpers/test_fonts.dart';
 
 void main() {
   setUpAll(loadAppFonts);
+
+  test('семейный маршрут безопасно кодирует идентификатор', () {
+    expect(
+      Routes.labResultsForFamily('family member/1'),
+      '/lab-results?family_member_id=family+member%2F1',
+    );
+  });
 
   testWidgets('показывает результаты и открывает серверную download-ссылку', (
     tester,
@@ -58,6 +66,14 @@ void main() {
     expect(find.text('Открыть'), findsNothing);
   });
 
+  testWidgets('запрашивает результаты выбранного члена семьи', (tester) async {
+    final repository = _LabResultsRepository(resultItems: const []);
+
+    await _pump(tester, repository, familyMemberId: 'family-1');
+
+    expect(repository.requestedFamilyMemberId, 'family-1');
+  });
+
   testWidgets('сообщает об ошибке, если файл невозможно открыть', (
     tester,
   ) async {
@@ -86,6 +102,7 @@ Future<void> _pump(
   WidgetTester tester,
   _LabResultsRepository repository, {
   ExternalUrlOpener? opener,
+  String? familyMemberId,
 }) async {
   tester.view.physicalSize = const Size(440, 956);
   tester.view.devicePixelRatio = 1;
@@ -105,7 +122,7 @@ Future<void> _pump(
         locale: const Locale('ru'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: const LabResultsScreen(),
+        home: LabResultsScreen(familyMemberId: familyMemberId),
       ),
     ),
   );
@@ -117,10 +134,13 @@ class _LabResultsRepository extends LabApiRepository {
 
   final List<LabResultFile> resultItems;
   String? downloadedResultId;
+  String? requestedFamilyMemberId;
 
   @override
-  Future<List<LabResultFile>> results({String? familyMemberId}) async =>
-      resultItems;
+  Future<List<LabResultFile>> results({String? familyMemberId}) async {
+    requestedFamilyMemberId = familyMemberId;
+    return resultItems;
+  }
 
   @override
   Future<LabResultDownload> resultDownload(String resultId) async {

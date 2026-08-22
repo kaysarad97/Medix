@@ -19,6 +19,7 @@ class AnalysesCard extends StatelessWidget {
     required this.title,
     this.onFilterChanged,
     this.onOpenAll,
+    this.emptyMessage,
   });
 
   final List<AnalysisResult> analyses;
@@ -33,6 +34,7 @@ class AnalysesCard extends StatelessWidget {
 
   final ValueChanged<AnalysesFilter>? onFilterChanged;
   final VoidCallback? onOpenAll;
+  final String? emptyMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -49,13 +51,18 @@ class AnalysesCard extends StatelessWidget {
             title: title,
             onTap: onOpenAll,
           ),
-          const SizedBox(height: ProfileMetrics.titleToToggle),
-          _FilterToggle(value: filter, onChanged: onFilterChanged),
-          const SizedBox(height: ProfileMetrics.toggleToList),
-          for (final analysis in analyses) ...[
-            if (analysis != analyses.first)
-              const SizedBox(height: ProfileMetrics.analysisRowGap),
-            _AnalysisRow(analysis: analysis),
+          if (analyses.isEmpty && emptyMessage != null) ...[
+            const SizedBox(height: ProfileMetrics.titleToToggle),
+            Text(emptyMessage!, style: AppTypography.cardItemMeta),
+          ] else if (analyses.isNotEmpty) ...[
+            const SizedBox(height: ProfileMetrics.titleToToggle),
+            _FilterToggle(value: filter, onChanged: onFilterChanged),
+            const SizedBox(height: ProfileMetrics.toggleToList),
+            for (final analysis in analyses) ...[
+              if (analysis != analyses.first)
+                const SizedBox(height: ProfileMetrics.analysisRowGap),
+              _AnalysisRow(analysis: analysis),
+            ],
           ],
         ],
       ),

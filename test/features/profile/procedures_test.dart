@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:go_router/go_router.dart';
-import 'package:medix/core/router/routes.dart';
 import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/features/profile/presentation/providers/profile_providers.dart';
 import 'package:medix/features/profile/presentation/screens/procedures_screen.dart';
@@ -27,31 +25,15 @@ void main() {
     );
     addTearDown(container.dispose);
 
-    final router = GoRouter(
-      initialLocation: Routes.procedures,
-      routes: [
-        GoRoute(
-          path: Routes.procedures,
-          builder: (_, _) => const ProceduresScreen(),
-        ),
-        GoRoute(
-          path: Routes.labResults,
-          builder: (_, _) =>
-              const Scaffold(body: Center(child: Text('lab-results-route'))),
-        ),
-      ],
-    );
-    addTearDown(router.dispose);
-
     await tester.pumpWidget(
       UncontrolledProviderScope(
         container: container,
-        child: MaterialApp.router(
+        child: MaterialApp(
           theme: AppTheme.light,
           locale: const Locale('ru'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          routerConfig: router,
+          home: const ProceduresScreen(),
         ),
       ),
     );
@@ -98,15 +80,16 @@ void main() {
       expect(find.text('Пульмонолог'), findsNothing);
     });
 
-    testWidgets('нажатие на строку открывает результаты анализов', (
-      tester,
-    ) async {
+    testWidgets('нажатие на строку показывает снек-бар', (tester) async {
       await pumpScreen(tester);
 
       await tester.tap(find.text('Пульмонолог'));
-      await tester.pumpAndSettle();
+      await tester.pump();
 
-      expect(find.text('lab-results-route'), findsOneWidget);
+      expect(
+        find.text('Экран с результатами процедуры ещё не готов'),
+        findsOneWidget,
+      );
     });
   });
 }

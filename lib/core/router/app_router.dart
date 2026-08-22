@@ -279,7 +279,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: Routes.labResults,
-        builder: (context, state) => const LabResultsScreen(),
+        builder: (context, state) => LabResultsScreen(
+          familyMemberId: state.uri.queryParameters['family_member_id'],
+        ),
       ),
       GoRoute(
         path: Routes.labOffers,

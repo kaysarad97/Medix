@@ -151,17 +151,18 @@ class MedicalCardScreen extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: ProfileMetrics.cardGap),
-                    if (analyses.isNotEmpty)
-                      _Section(
-                        child: AnalysesCard(
-                          analyses: analyses,
-                          filter: filter,
-                          title: l10n.yourAnalysesTitle,
-                          onFilterChanged: ref
-                              .read(analysesFilterProvider.notifier)
-                              .select,
-                        ),
+                    _Section(
+                      child: AnalysesCard(
+                        analyses: analyses,
+                        filter: filter,
+                        title: l10n.yourAnalysesTitle,
+                        emptyMessage: l10n.labResultsOpenFilesHint,
+                        onOpenAll: () => context.push(Routes.labResults),
+                        onFilterChanged: ref
+                            .read(analysesFilterProvider.notifier)
+                            .select,
                       ),
+                    ),
                     // Высоту плавающего таб-бара AppShell кладёт в нижний
                     // отступ MediaQuery — без него карточка анализов уедет
                     // под таблетку.

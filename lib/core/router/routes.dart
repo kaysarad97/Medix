@@ -169,6 +169,9 @@ abstract final class Routes {
   /// Готовые лабораторные результаты пользователя.
   static const String labResults = '/lab-results';
 
+  static String labResultsForFamily(String familyMemberId) =>
+      '$labResults?family_member_id=${Uri.encodeQueryComponent(familyMemberId)}';
+
   /// «Партнерские лаборатории» — сколько та же корзина стоит у других.
   static const String labOffers = '/lab-services/offers';
 
