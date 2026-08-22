@@ -166,6 +166,9 @@ abstract final class Routes {
   /// Загрузка направления, ожидание OCR и переход к рассчитанным ценам.
   static const String labReferral = '/lab-referral';
 
+  /// Готовые лабораторные результаты пользователя.
+  static const String labResults = '/lab-results';
+
   /// «Партнерские лаборатории» — сколько та же корзина стоит у других.
   static const String labOffers = '/lab-services/offers';
 

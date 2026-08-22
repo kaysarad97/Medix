@@ -163,7 +163,6 @@
   "familyScopeSenior": "Ересектердің процедуралары",
   "proceduresSearchHint": "Процедура атауы",
   "proceduresResultsCount": "Сіздің медициналық картаңыздан {count} процедура табылды",
-  "procedureResultsNotReadySnackbar": "Процедура нәтижелері экраны әлі дайын емес",
   "consultationWithLabel": "Дәрігермен кеңес",
   "viewResultsLinkLabel": "нәтижелерін көру",
   "bloodGroupLabel": "Қан тобы:",
@@ -357,5 +356,14 @@
   "labOrderCreateError": "Тапсырыс жасау мүмкін болмады",
   "labOrderAction": "Тапсырыс беру",
   "labOfferDiscount": "{percent}% жеңілдік",
-  "@labOfferDiscount": { "placeholders": { "percent": { "type": "int" } } }
+  "@labOfferDiscount": { "placeholders": { "percent": { "type": "int" } } },
+  "labResultsTitle": "Талдау нәтижелері",
+  "labResultFileTitle": "Талдау нәтижесі",
+  "labResultOrderPrefix": "Тапсырыс",
+  "labResultDatePrefix": "Алынды",
+  "labResultOpenAction": "Ашу",
+  "labResultsEmpty": "Дайын нәтижелер әзірге жоқ",
+  "labResultsLoadError": "Талдау нәтижелерін жүктеу мүмкін болмады",
+  "labResultsRetryAction": "Қайталап көру",
+  "labResultOpenError": "Нәтиже файлын ашу мүмкін болмады"
 }

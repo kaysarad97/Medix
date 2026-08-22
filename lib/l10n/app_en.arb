@@ -163,7 +163,6 @@
   "familyScopeSenior": "Senior's procedures",
   "proceduresSearchHint": "Procedure name",
   "proceduresResultsCount": "{count} procedures found in your medical card",
-  "procedureResultsNotReadySnackbar": "The procedure results screen isn't ready yet",
   "consultationWithLabel": "Consultation with",
   "viewResultsLinkLabel": "view results",
   "bloodGroupLabel": "Blood type:",
@@ -357,5 +356,14 @@
   "labOrderCreateError": "The order could not be created",
   "labOrderAction": "Place order",
   "labOfferDiscount": "{percent}% discount",
-  "@labOfferDiscount": { "placeholders": { "percent": { "type": "int" } } }
+  "@labOfferDiscount": { "placeholders": { "percent": { "type": "int" } } },
+  "labResultsTitle": "Test results",
+  "labResultFileTitle": "Test result",
+  "labResultOrderPrefix": "Order",
+  "labResultDatePrefix": "Received",
+  "labResultOpenAction": "Open",
+  "labResultsEmpty": "No completed results yet",
+  "labResultsLoadError": "Test results could not be loaded",
+  "labResultsRetryAction": "Try again",
+  "labResultOpenError": "The result file could not be opened"
 }

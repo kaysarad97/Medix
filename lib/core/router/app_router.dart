@@ -42,6 +42,7 @@ import '../../features/home/presentation/screens/home_screen.dart';
 import '../../features/lab_chatbot/presentation/screens/chatbot_screen.dart';
 import '../../features/lab_services/presentation/screens/lab_offers_screen.dart';
 import '../../features/lab_services/presentation/screens/lab_referral_screen.dart';
+import '../../features/lab_services/presentation/screens/lab_results_screen.dart';
 import '../../features/lab_services/presentation/screens/lab_services_screen.dart';
 import '../../features/map_search/presentation/screens/map_search_screen.dart';
 import '../../features/notifications/presentation/screens/notifications_screen.dart';
@@ -275,6 +276,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.labReferral,
         builder: (context, state) => const LabReferralScreen(),
+      ),
+      GoRoute(
+        path: Routes.labResults,
+        builder: (context, state) => const LabResultsScreen(),
       ),
       GoRoute(
         path: Routes.labOffers,

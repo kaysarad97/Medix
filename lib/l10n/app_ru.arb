@@ -756,10 +756,6 @@
       }
     }
   },
-  "procedureResultsNotReadySnackbar": "Экран с результатами процедуры ещё не готов",
-  "@procedureResultsNotReadySnackbar": {
-    "description": "Снек-бар при нажатии на процедуру — экрана результатов ещё нет."
-  },
   "consultationWithLabel": "Консультация с",
   "@consultationWithLabel": {
     "description": "Подпись над именем врача в карточке процедуры."
@@ -1408,5 +1404,14 @@
   "labOrderCreateError": "Не удалось создать заказ",
   "labOrderAction": "Оформить заказ",
   "labOfferDiscount": "Скидка {percent}%",
-  "@labOfferDiscount": { "placeholders": { "percent": { "type": "int" } } }
+  "@labOfferDiscount": { "placeholders": { "percent": { "type": "int" } } },
+  "labResultsTitle": "Результаты анализов",
+  "labResultFileTitle": "Результат анализа",
+  "labResultOrderPrefix": "Заказ",
+  "labResultDatePrefix": "Получен",
+  "labResultOpenAction": "Открыть",
+  "labResultsEmpty": "Готовых результатов пока нет",
+  "labResultsLoadError": "Не удалось загрузить результаты анализов",
+  "labResultsRetryAction": "Попробовать снова",
+  "labResultOpenError": "Не удалось открыть файл результата"
 }

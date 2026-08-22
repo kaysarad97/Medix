@@ -25,6 +25,16 @@ final labOrdersProvider = FutureProvider.autoDispose<List<LabOrder>>(
   (ref) => ref.watch(labApiRepositoryProvider).orders(),
 );
 
+final labResultsProvider = FutureProvider.autoDispose<List<LabResultFile>>(
+  (ref) => ref.watch(labApiRepositoryProvider).results(),
+);
+
+final labResultDownloadProvider = FutureProvider.autoDispose
+    .family<LabResultDownload, String>(
+      (ref, resultId) =>
+          ref.watch(labApiRepositoryProvider).resultDownload(resultId),
+    );
+
 final labServicesRepositoryProvider = Provider<LabServicesRepository>(
   // Бэкенда пока нет; переключение появится вместе с реальными эндпоинтами,
   // как в authRepositoryProvider.
