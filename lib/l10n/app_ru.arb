@@ -1406,6 +1406,7 @@
   "labOrderCreated": "Заказ {id} создан",
   "@labOrderCreated": { "placeholders": { "id": { "type": "String" } } },
   "labOrderCreateError": "Не удалось создать заказ",
+  "labOrderAction": "Оформить заказ",
   "labOfferDiscount": "Скидка {percent}%",
   "@labOfferDiscount": { "placeholders": { "percent": { "type": "int" } } }
 }

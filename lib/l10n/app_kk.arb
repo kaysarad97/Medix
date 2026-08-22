@@ -355,6 +355,7 @@
   "labOrderCreated": "{id} тапсырысы жасалды",
   "@labOrderCreated": { "placeholders": { "id": { "type": "String" } } },
   "labOrderCreateError": "Тапсырыс жасау мүмкін болмады",
+  "labOrderAction": "Тапсырыс беру",
   "labOfferDiscount": "{percent}% жеңілдік",
   "@labOfferDiscount": { "placeholders": { "percent": { "type": "int" } } }
 }

@@ -234,7 +234,7 @@ class _ReferralOfferCard extends StatelessWidget {
           ],
           const SizedBox(height: 18),
           PrimaryButton(
-            label: l10n.orderAtLab(offer.labName),
+            label: l10n.labOrderAction,
             isLoading: isOrdering,
             onPressed: isOrdering ? null : onOrder,
           ),

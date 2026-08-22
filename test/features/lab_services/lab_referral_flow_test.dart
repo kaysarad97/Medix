@@ -45,6 +45,9 @@ void main() {
   testWidgets('OCR-предложение создаёт заказ через API service', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(360, 740);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
     final service = _Service();
     await tester.pumpWidget(
       app(const LabOffersScreen(referralId: 'ref-1'), service: service),
@@ -52,7 +55,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Лаборатория 1'), findsOneWidget);
-    await tester.tap(find.textContaining('Сдать анализы в'));
+    await tester.tap(find.text('Оформить заказ'));
     await tester.pumpAndSettle();
 
     expect(service.orderedReferralId, 'ref-1');

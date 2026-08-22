@@ -355,6 +355,7 @@
   "labOrderCreated": "Order {id} created",
   "@labOrderCreated": { "placeholders": { "id": { "type": "String" } } },
   "labOrderCreateError": "The order could not be created",
+  "labOrderAction": "Place order",
   "labOfferDiscount": "{percent}% discount",
   "@labOfferDiscount": { "placeholders": { "percent": { "type": "int" } } }
 }
