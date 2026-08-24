@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/features/family_access/presentation/providers/family_providers.dart';
 import 'package:medix/features/home/presentation/providers/home_providers.dart';
+import 'package:medix/features/notifications/presentation/providers/notifications_providers.dart';
 import 'package:medix/features/profile/presentation/providers/profile_providers.dart';
 import 'package:medix/features/home/presentation/screens/home_screen.dart';
 import 'package:medix/l10n/app_localizations.dart';
@@ -28,6 +29,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          unreadNotificationsCountProvider.overrideWith((ref) => 0),
           specialtiesProvider.overrideWith((ref) => const []),
           upcomingAppointmentsProvider.overrideWith((ref) => const []),
           // По той же причине: заглушка семьи отдаёт данные через

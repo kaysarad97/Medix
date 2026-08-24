@@ -11,6 +11,7 @@ import 'package:medix/shared/models/appointment.dart';
 import 'package:medix/shared/models/doctor_specialty.dart';
 import 'package:medix/features/family_access/presentation/providers/family_providers.dart';
 import 'package:medix/features/home/presentation/providers/home_providers.dart';
+import 'package:medix/features/notifications/presentation/providers/notifications_providers.dart';
 import 'package:medix/features/profile/presentation/providers/profile_providers.dart';
 import 'package:medix/features/home/presentation/screens/home_screen.dart';
 
@@ -35,6 +36,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          unreadNotificationsCountProvider.overrideWith((ref) => 2),
           // Синхронно, а не через MockHomeRepository: та отдаёт данные через
           // Future.delayed, таймер создаётся вне runAsync и тест падает
           // на «timersPending».

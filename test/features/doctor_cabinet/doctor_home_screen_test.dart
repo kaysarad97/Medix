@@ -7,6 +7,7 @@ import 'package:medix/features/doctor_cabinet/domain/entities/doctor_own_profile
 import 'package:medix/features/doctor_cabinet/domain/entities/regular_patient.dart';
 import 'package:medix/features/doctor_cabinet/presentation/providers/doctor_cabinet_providers.dart';
 import 'package:medix/features/doctor_cabinet/presentation/screens/doctor_home_screen.dart';
+import 'package:medix/features/notifications/presentation/providers/notifications_providers.dart';
 import 'package:medix/l10n/app_localizations.dart';
 import 'package:medix/shared/models/appointment.dart';
 
@@ -23,6 +24,7 @@ void main() {
     return tester.pumpWidget(
       ProviderScope(
         overrides: [
+          unreadNotificationsCountProvider.overrideWith((ref) => 0),
           // Синхронно, не через мок-репозиторий: `Future.delayed` создаёт
           // таймер вне `runAsync`, тест падает на «timersPending».
           doctorUpcomingAppointmentsProvider.overrideWith(
@@ -74,6 +76,7 @@ void main() {
     await tester.pump();
 
     expect(find.textContaining('Здравствуйте'), findsOneWidget);
+    expect(find.text('Здравствуйте, Имя Фамилия!'), findsOneWidget);
     expect(find.text('График\nработы'), findsOneWidget);
     expect(find.text('История\nзаписей'), findsOneWidget);
     expect(find.text('Аналитика активности'), findsOneWidget);

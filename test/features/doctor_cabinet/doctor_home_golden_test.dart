@@ -9,6 +9,7 @@ import 'package:medix/features/doctor_cabinet/domain/entities/doctor_appointment
 import 'package:medix/features/doctor_cabinet/domain/entities/regular_patient.dart';
 import 'package:medix/features/doctor_cabinet/presentation/providers/doctor_cabinet_providers.dart';
 import 'package:medix/features/doctor_cabinet/presentation/screens/doctor_home_screen.dart';
+import 'package:medix/features/notifications/presentation/providers/notifications_providers.dart';
 import 'package:medix/l10n/app_localizations.dart';
 import 'package:medix/shared/models/appointment.dart';
 
@@ -29,6 +30,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          unreadNotificationsCountProvider.overrideWith((ref) => 2),
           doctorUpcomingAppointmentsProvider.overrideWith(
             (ref) => [
               DoctorAppointment(

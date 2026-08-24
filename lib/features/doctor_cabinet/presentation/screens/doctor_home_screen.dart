@@ -9,6 +9,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../notifications/presentation/providers/notifications_providers.dart';
 import '../providers/doctor_cabinet_providers.dart';
 import '../widgets/doctor_action_tiles_card.dart';
 import '../widgets/doctor_home_header.dart';
@@ -38,11 +39,11 @@ class DoctorHomeScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final appointments = ref.watch(doctorUpcomingAppointmentsProvider);
     final patients = ref.watch(doctorRegularPatientsProvider);
-    final profile = showAdminTile == null
-        ? ref.watch(doctorOwnProfileProvider).value
-        : null;
+    final profile = ref.watch(doctorOwnProfileProvider).value;
+    final unreadNotifications = ref.watch(unreadNotificationsCountProvider);
     final shouldShowAdminTile =
         showAdminTile ?? (profile != null && !profile.isFreelancer);
+    final greetingName = profile?.fullName.trim();
 
     return AppScaffold(
       background: AppBackgroundStyle.main,
@@ -54,13 +55,19 @@ class DoctorHomeScreen extends ConsumerWidget {
             children: [
               const SizedBox(height: DoctorHomeMetrics.headerTop),
               DoctorHomeHeader(
-                unreadCount: 2,
+                unreadCount: unreadNotifications,
+                avatarUrl: profile?.photoUrl,
                 onAvatarTap: () => context.push(Routes.doctorProfile),
+                onNotificationsTap: () => context.push(Routes.notifications),
               ),
               const SizedBox(height: DoctorHomeMetrics.headerToGreeting),
               _Section(
                 child: Text(
-                  l10n.doctorHomeGreeting('Имя Отчество'),
+                  l10n.doctorHomeGreeting(
+                    greetingName == null || greetingName.isEmpty
+                        ? 'Имя Отчество'
+                        : greetingName,
+                  ),
                   style: AppTypography.homeGreeting,
                 ),
               ),

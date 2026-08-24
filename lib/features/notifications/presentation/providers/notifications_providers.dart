@@ -23,6 +23,15 @@ final notificationsProvider = FutureProvider.autoDispose<List<AppNotification>>(
   (ref) => ref.watch(notificationsRepositoryProvider).notifications(),
 );
 
+/// Число непрочитанных уведомлений для чипа в шапке главных экранов.
+///
+/// Пока лента загружается или недоступна, показываем ноль, а не макетное
+/// значение: выдуманный счётчик особенно заметен на пустом тестовом аккаунте.
+final unreadNotificationsCountProvider = Provider.autoDispose<int>((ref) {
+  final notifications = ref.watch(notificationsProvider).value ?? const [];
+  return notifications.where((notification) => !notification.isRead).length;
+});
+
 /// Вкладки над списком.
 enum NotificationsFilter {
   /// «Расписание» — всё про записи к врачу.

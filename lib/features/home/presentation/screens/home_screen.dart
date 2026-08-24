@@ -12,6 +12,7 @@ import '../../../../core/widgets/icon_chip.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/subscription_tier.dart';
 import '../../../family_access/presentation/providers/family_providers.dart';
+import '../../../notifications/presentation/providers/notifications_providers.dart';
 import '../../../profile/presentation/providers/profile_providers.dart';
 import '../providers/home_providers.dart';
 import '../widgets/doctors_card.dart';
@@ -38,6 +39,7 @@ class HomeScreen extends ConsumerWidget {
     final specialties = ref.watch(specialtiesProvider);
     final appointments = ref.watch(upcomingAppointmentsProvider);
     final family = ref.watch(familyMembersProvider).value ?? const [];
+    final unreadNotifications = ref.watch(unreadNotificationsCountProvider);
     // Тот же платный гейт, что и на «Ваша Мед-Карта»: проверяем наличие
     // подписки, а не её уровень — тариф остался один.
     final subscription = ref.watch(profileProvider).value?.subscription;
@@ -55,7 +57,7 @@ class HomeScreen extends ConsumerWidget {
             children: [
               const SizedBox(height: HomeMetrics.headerTop),
               HomeHeader(
-                unreadCount: 2,
+                unreadCount: unreadNotifications,
                 // Вкладки нижней навигации переключаются через `go`: `push`
                 // поднимает вторую копию оболочки, и навигатор падает на
                 // повторных глобальных ключах.

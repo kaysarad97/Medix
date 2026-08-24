@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/features/notifications/data/repositories/notifications_repository.dart';
+import 'package:medix/features/notifications/domain/entities/app_notification.dart';
 import 'package:medix/features/notifications/presentation/providers/notifications_providers.dart';
 import 'package:medix/features/notifications/presentation/screens/notifications_screen.dart';
 import 'package:medix/l10n/app_localizations.dart';
@@ -11,6 +12,35 @@ import '../../helpers/test_fonts.dart';
 
 void main() {
   setUpAll(loadAppFonts);
+
+  test('счётчик шапки учитывает только непрочитанные', () {
+    final container = ProviderContainer(
+      overrides: [
+        notificationsProvider.overrideWith(
+          (ref) => [
+            AppNotification(
+              id: 'unread',
+              kind: NotificationKind.schedule,
+              title: '',
+              body: '',
+              createdAt: DateTime(2026),
+            ),
+            AppNotification(
+              id: 'read',
+              kind: NotificationKind.message,
+              title: '',
+              body: '',
+              createdAt: DateTime(2026),
+              isRead: true,
+            ),
+          ],
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    expect(container.read(unreadNotificationsCountProvider), 1);
+  });
 
   Future<void> pumpScreen(WidgetTester tester) async {
     tester.view.physicalSize = const Size(440, 956);
