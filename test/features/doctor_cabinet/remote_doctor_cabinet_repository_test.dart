@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/features/doctor_cabinet/data/repositories/remote_doctor_cabinet_repository.dart';
 import 'package:medix/features/doctor_cabinet/domain/entities/doctor_own_profile.dart';
@@ -255,6 +256,39 @@ void main() {
 
     expect(patients, hasLength(2));
     expect(patients.map((item) => item.id), [patientId, 'patient-2']);
+  });
+
+  test('загружает записи врача до последней страницы', () async {
+    final requests = <RequestOptions>[];
+    final dio = Dio(BaseOptions(baseUrl: 'http://localhost:8000'))
+      ..interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options, handler) {
+            requests.add(options);
+            final offset = options.queryParameters['offset'] as int? ?? 0;
+            final body = offset == 0
+                ? [
+                    for (var i = 0; i < 100; i++)
+                      appointment(id: 'a$i', patient: 'p$i'),
+                  ]
+                : [
+                    appointment(
+                      id: 'last',
+                      patient: 'last-patient',
+                      fullName: 'Последний пациент',
+                    ),
+                  ];
+            handler.resolve(Response(requestOptions: options, data: body));
+          },
+        ),
+      );
+
+    final patients = await RemoteDoctorCabinetRepository(dio).regularPatients();
+
+    expect(patients, hasLength(101));
+    expect(requests, hasLength(2));
+    expect(requests.first.queryParameters.containsKey('offset'), isFalse);
+    expect(requests.last.queryParameters['offset'], 100);
   });
 
   test('читает собственный сертификат и отзывы через id врача', () async {

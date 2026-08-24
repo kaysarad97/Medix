@@ -372,19 +372,25 @@ class RemoteDoctorCabinetRepository implements DoctorCabinetRepository {
     String? status,
   }) async {
     try {
-      final response = await _dio.get<List<dynamic>>(
-        ApiEndpoints.myDoctorAppointments,
-        queryParameters: {
-          'from': ?from?.toUtc().toIso8601String(),
-          'to': ?to?.toUtc().toIso8601String(),
-          'status': ?status,
-          'limit': _pageLimit,
-        },
-      );
-      return [
-        for (final item in response.data ?? const [])
-          item as Map<String, dynamic>,
-      ];
+      final result = <Map<String, dynamic>>[];
+      var offset = 0;
+      while (true) {
+        final response = await _dio.get<List<dynamic>>(
+          ApiEndpoints.myDoctorAppointments,
+          queryParameters: {
+            'from': ?from?.toUtc().toIso8601String(),
+            'to': ?to?.toUtc().toIso8601String(),
+            'status': ?status,
+            'limit': _pageLimit,
+            if (offset > 0) 'offset': offset,
+          },
+        );
+        final page = response.data ?? const <dynamic>[];
+        result.addAll(page.cast<Map<String, dynamic>>());
+        if (page.length < _pageLimit) break;
+        offset += page.length;
+      }
+      return result;
     } on DioException catch (e) {
       throw ApiException.fromDio(e);
     }
