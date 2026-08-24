@@ -130,6 +130,7 @@ class _ProfileCard extends StatelessWidget {
       onTap: onTap,
       image: (borderRadius) => UserAvatar(
         asset: member.avatarAsset,
+        url: member.avatarUrl,
         size: Size.infinite,
         borderRadius: borderRadius,
       ),

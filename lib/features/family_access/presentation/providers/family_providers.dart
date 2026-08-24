@@ -17,18 +17,11 @@ final familyMembersProvider = FutureProvider<List<FamilyMember>>(
   (ref) => ref.watch(familyRepositoryProvider).members(),
 );
 
-/// Один член семьи по id — переключатель на экране профиля ведёт сюда по
-/// ссылке, поэтому подгружать нужно только выбранного, а не весь список.
-final familyMemberProvider = FutureProvider.family<FamilyMember?, String>((
-  ref,
-  id,
-) async {
-  final members = await ref.watch(familyMembersProvider.future);
-  for (final member in members) {
-    if (member.id == id) return member;
-  }
-  return null;
-});
+/// Один член семьи по id. Сервер имеет отдельный endpoint детали, поэтому
+/// глубокая ссылка не зависит от того, успел ли загрузиться общий список.
+final familyMemberProvider = FutureProvider.family<FamilyMember?, String>(
+  (ref, id) => ref.watch(familyRepositoryProvider).member(id),
+);
 
 final familyDoctorsProvider = FutureProvider.family<List<MyDoctor>, String>(
   (ref, id) => ref.watch(familyRepositoryProvider).doctorsOf(id),

@@ -89,6 +89,11 @@ abstract final class ApiEndpoints {
   /// Один член семьи: чтение, правка, удаление.
   static String familyMember(String id) => '$family/$id';
 
+  static String familyMemberAvatar(String id) => '${familyMember(id)}/avatar';
+
+  static String familyMemberAvatarUploadUrl(String id) =>
+      '${familyMemberAvatar(id)}/upload-url';
+
   /// Мед-карта члена семьи. Чужой идентификатор отдаёт 404 и попадает в
   /// журнал доступа на сервере.
   static String familyMedicalRecords(String id) =>

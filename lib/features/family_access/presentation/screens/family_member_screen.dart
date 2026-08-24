@@ -151,6 +151,7 @@ class _MemberHeader extends StatelessWidget {
         children: [
           UserAvatar(
             asset: member.avatarAsset,
+            url: member.avatarUrl,
             size: ProfileMetrics.avatarSize,
             borderRadius: BorderRadius.circular(ProfileMetrics.avatarRadius),
           ),

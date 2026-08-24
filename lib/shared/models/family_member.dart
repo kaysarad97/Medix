@@ -49,6 +49,7 @@ class FamilyMember {
     this.heightCm,
     this.weightKg,
     this.avatarAsset,
+    this.avatarUrl,
   });
 
   final String id;
@@ -70,6 +71,10 @@ class FamilyMember {
   /// иллюстраций для детей/старших дизайнер не присылал, поэтому мок берёт
   /// подходящую по стилю из общего набора.
   final String? avatarAsset;
+
+  /// Короткоживущая ссылка на серверный аватар. Используется боевым
+  /// репозиторием; локальный asset остаётся только у моков.
+  final String? avatarUrl;
 
   /// «Имя Фамилия».
   ///

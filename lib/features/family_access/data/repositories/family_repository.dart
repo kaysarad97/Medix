@@ -8,14 +8,25 @@ import '../../../../shared/models/family_member.dart';
 import '../../../../shared/models/gender.dart';
 import '../../../../shared/models/medix_avatars.dart';
 import '../../../../shared/models/my_doctor.dart';
+import '../../domain/entities/family_avatar_upload_ticket.dart';
 import '../../domain/entities/family_member_draft.dart';
 
 abstract interface class FamilyRepository {
   Future<List<FamilyMember>> members();
 
+  Future<FamilyMember> member(String id);
+
   Future<List<MyDoctor>> doctorsOf(String memberId);
 
   Future<List<AnalysisResult>> analysesOf(String memberId);
+
+  Future<FamilyAvatarUploadTicket> requestAvatarUpload(
+    String memberId, {
+    required String filename,
+    required String contentType,
+  });
+
+  Future<FamilyMember> confirmAvatar(String memberId, String s3Key);
 
   /// Заводит нового члена семьи и возвращает его уже с идентификатором.
   Future<FamilyMember> add(FamilyMemberDraft draft);
@@ -28,7 +39,7 @@ abstract interface class FamilyRepository {
 /// Боевая реализация поверх FastAPI-бэкенда.
 ///
 /// Сервер хранит о члене семьи `full_name`, `birth_date`, `relation`
-/// (перечисление из пяти значений), `sex` и `iin`. Рост, вес и аватар из
+/// (перечисление из пяти значений), `sex`, `iin` и аватар. Рост и вес из
 /// макетов карточки он не хранит — они приходят пустыми, и карточка
 /// показывает на их месте прочерк.
 class RemoteFamilyRepository implements FamilyRepository {
@@ -44,6 +55,18 @@ class RemoteFamilyRepository implements FamilyRepository {
         for (final item in response.data ?? const [])
           _member(item as Map<String, dynamic>),
       ];
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
+
+  @override
+  Future<FamilyMember> member(String id) async {
+    try {
+      final response = await _dio.get<Map<String, dynamic>>(
+        ApiEndpoints.familyMember(id),
+      );
+      return _member(response.data!);
     } on DioException catch (e) {
       throw ApiException.fromDio(e);
     }
@@ -96,12 +119,50 @@ class RemoteFamilyRepository implements FamilyRepository {
     }
   }
 
-  /// ПОКА НЕ ПОДКЛЮЧЕНО. С 17 августа 2026 у сервера есть лабораторная
-  /// ветка: `GET /lab/results?family_member_id=` отдаёт результаты анализов
-  /// члена семьи. Это отдельная работа со своими экранами — до неё карточка
-  /// анализов при пустом списке просто не рисуется.
+  /// Серверный `/lab/results?family_member_id=` отдаёт файлы результатов,
+  /// но не числовые показатели с единицами и границами нормы, которые нужны
+  /// [AnalysisResult]. Файлы уже открываются отдельным экраном; эта карточка
+  /// остаётся пустой до расширения контракта.
   @override
   Future<List<AnalysisResult>> analysesOf(String memberId) async => const [];
+
+  @override
+  Future<FamilyAvatarUploadTicket> requestAvatarUpload(
+    String memberId, {
+    required String filename,
+    required String contentType,
+  }) async {
+    try {
+      final response = await _dio.post<Map<String, dynamic>>(
+        ApiEndpoints.familyMemberAvatarUploadUrl(memberId),
+        data: {'filename': filename, 'content_type': contentType},
+      );
+      final json = response.data!;
+      return FamilyAvatarUploadTicket(
+        uploadUrl: json['upload_url'] as String,
+        fields: (json['fields'] as Map<String, dynamic>).map(
+          (key, value) => MapEntry(key, value as String),
+        ),
+        key: json['key'] as String,
+        expiresAt: DateTime.parse(json['expires_at'] as String).toLocal(),
+      );
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
+
+  @override
+  Future<FamilyMember> confirmAvatar(String memberId, String s3Key) async {
+    try {
+      final response = await _dio.post<Map<String, dynamic>>(
+        ApiEndpoints.familyMemberAvatar(memberId),
+        data: {'avatar_s3_key': s3Key},
+      );
+      return _member(response.data!);
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
 
   static Map<String, dynamic> _body(FamilyMemberDraft draft) => {
     'full_name': draft.fullName,
@@ -132,6 +193,7 @@ class RemoteFamilyRepository implements FamilyRepository {
         'female' => Gender.female,
         _ => null,
       },
+      avatarUrl: json['avatar_url'] as String?,
     );
   }
 
@@ -183,6 +245,12 @@ class MockFamilyRepository implements FamilyRepository {
   }
 
   @override
+  Future<FamilyMember> member(String id) async {
+    await Future<void>.delayed(_latency);
+    return _members.firstWhere((member) => member.id == id);
+  }
+
+  @override
   Future<List<MyDoctor>> doctorsOf(String memberId) async {
     await Future<void>.delayed(_latency);
     return mockDoctors[memberId] ?? const [];
@@ -192,6 +260,27 @@ class MockFamilyRepository implements FamilyRepository {
   Future<List<AnalysisResult>> analysesOf(String memberId) async {
     await Future<void>.delayed(_latency);
     return mockAnalyses[memberId] ?? const [];
+  }
+
+  @override
+  Future<FamilyAvatarUploadTicket> requestAvatarUpload(
+    String memberId, {
+    required String filename,
+    required String contentType,
+  }) async {
+    await Future<void>.delayed(_latency);
+    return FamilyAvatarUploadTicket(
+      uploadUrl: 'https://storage.example/family-avatar',
+      fields: const {},
+      key: 'family/$memberId/$filename',
+      expiresAt: DateTime(2026, 8, 24, 12),
+    );
+  }
+
+  @override
+  Future<FamilyMember> confirmAvatar(String memberId, String s3Key) async {
+    await Future<void>.delayed(_latency);
+    return member(memberId);
   }
 
   @override
@@ -224,6 +313,7 @@ class MockFamilyRepository implements FamilyRepository {
       heightCm: old.heightCm,
       weightKg: old.weightKg,
       avatarAsset: old.avatarAsset,
+      avatarUrl: old.avatarUrl,
     );
     return _members[index];
   }

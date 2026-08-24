@@ -338,9 +338,12 @@ class _FamilyMemberFormScreenState
       return;
     }
 
-    // Список перечитывается после любой правки: карточка члена семьи и обе
-    // карточки «Моя Семья» читают его же.
+    // Список и отдельная деталь — разные endpoint'ы. После правки обновляем
+    // оба кэша, иначе экран под формой сохранил бы старые данные.
     ref.invalidate(familyMembersProvider);
+    if (_isEditing) {
+      ref.invalidate(familyMemberProvider(widget.memberId!));
+    }
     if (!mounted) return;
 
     // Закрывать нечего — снимаем ожидание с кнопки, чтобы она не осталась
