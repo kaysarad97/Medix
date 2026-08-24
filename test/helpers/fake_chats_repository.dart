@@ -21,6 +21,9 @@ class FakeChatsRepository implements ChatsRepository {
   }
 
   @override
+  Stream<DoctorMessage> watchMessages(String threadId) => const Stream.empty();
+
+  @override
   Future<DoctorMessage> send(String threadId, String text) async {
     await Future<void>.delayed(delay);
     return DoctorMessage(
@@ -30,4 +33,7 @@ class FakeChatsRepository implements ChatsRepository {
       sentAt: DateTime(2026, 8, 3),
     );
   }
+
+  @override
+  Future<void> closeChat(String threadId) async {}
 }

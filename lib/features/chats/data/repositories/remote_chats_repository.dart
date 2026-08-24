@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 
 import '../../../../core/network/api_endpoints.dart';
 import '../../../../core/network/api_exception.dart';
+import '../../../telemedicine/data/repositories/consultation_live_chat.dart';
 import '../../../telemedicine/data/repositories/consultations_repository.dart';
 import '../../../telemedicine/domain/entities/consultation.dart';
 import '../../domain/entities/chat_thread.dart';
@@ -17,10 +18,13 @@ class RemoteChatsRepository implements ChatsRepository {
     this._dio, {
     ConsultationsRepository? consultationsRepository,
   }) : _consultations =
-           consultationsRepository ?? ConsultationsRepository(_dio);
+           consultationsRepository ?? ConsultationsRepository(_dio) {
+    _liveChat = ConsultationLiveChat(_consultations);
+  }
 
   final Dio _dio;
   final ConsultationsRepository _consultations;
+  late final ConsultationLiveChat _liveChat;
 
   @override
   Future<List<ChatThread>> threads() async {
@@ -77,13 +81,22 @@ class RemoteChatsRepository implements ChatsRepository {
   }
 
   @override
+  Stream<DoctorMessage> watchMessages(String threadId) async* {
+    final userId = await _currentUserId();
+    await for (final message in _liveChat.watch(threadId, userId: userId)) {
+      yield DoctorMessage(
+        id: message.id,
+        text: message.body,
+        isMine: message.senderId == userId,
+        sentAt: message.createdAt,
+      );
+    }
+  }
+
+  @override
   Future<DoctorMessage> send(String threadId, String text) async {
     final userId = await _currentUserId();
-    final message = await _consultations.sendMessage(
-      threadId,
-      senderId: userId,
-      body: text,
-    );
+    final message = await _liveChat.send(threadId, userId: userId, body: text);
     return DoctorMessage(
       id: message.id,
       text: message.body,
@@ -91,6 +104,9 @@ class RemoteChatsRepository implements ChatsRepository {
       sentAt: message.createdAt,
     );
   }
+
+  @override
+  Future<void> closeChat(String threadId) => _liveChat.close(threadId);
 
   Future<String> _currentUserId() async {
     try {

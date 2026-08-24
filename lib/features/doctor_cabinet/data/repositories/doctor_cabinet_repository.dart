@@ -55,9 +55,13 @@ abstract interface class DoctorCabinetRepository {
   /// История одной переписки — «Чат с пациентом».
   Future<List<PatientMessage>> patientMessages(String threadId);
 
+  Stream<PatientMessage> watchPatientMessages(String threadId);
+
   /// Отправка реплики. Возвращает то, что реально ушло, — с сервера у
   /// сообщения будет свой идентификатор и время.
   Future<PatientMessage> sendPatientMessage(String threadId, String text);
+
+  Future<void> closePatientChat(String threadId);
 
   /// «Мои заявки» — обращения врача в администрацию клиники.
   Future<List<AdminRequest>> adminRequests();
@@ -416,6 +420,10 @@ class MockDoctorCabinetRepository implements DoctorCabinetRepository {
   }
 
   @override
+  Stream<PatientMessage> watchPatientMessages(String threadId) =>
+      const Stream.empty();
+
+  @override
   Future<PatientMessage> sendPatientMessage(
     String threadId,
     String text,
@@ -429,6 +437,9 @@ class MockDoctorCabinetRepository implements DoctorCabinetRepository {
       sentAt: now,
     );
   }
+
+  @override
+  Future<void> closePatientChat(String threadId) async {}
 
   /// Текст-заглушка заявки. Дословно из макета «Мои заявки»: настоящие
   /// заявки пишет врач, и придумывать за него незачем.

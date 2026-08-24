@@ -5,7 +5,11 @@ abstract interface class ChatsRepository {
 
   Future<List<DoctorMessage>> messages(String threadId);
 
+  Stream<DoctorMessage> watchMessages(String threadId);
+
   Future<DoctorMessage> send(String threadId, String text);
+
+  Future<void> closeChat(String threadId);
 }
 
 /// Заглушка на время разработки бэкенда. Содержимое — с макетов
@@ -80,6 +84,9 @@ class MockChatsRepository implements ChatsRepository {
   }
 
   @override
+  Stream<DoctorMessage> watchMessages(String threadId) => const Stream.empty();
+
+  @override
   Future<DoctorMessage> send(String threadId, String text) async {
     await Future<void>.delayed(const Duration(milliseconds: 200));
     return DoctorMessage(
@@ -89,4 +96,7 @@ class MockChatsRepository implements ChatsRepository {
       sentAt: DateTime.now(),
     );
   }
+
+  @override
+  Future<void> closeChat(String threadId) async {}
 }

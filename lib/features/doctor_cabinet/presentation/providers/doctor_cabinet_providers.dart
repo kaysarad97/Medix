@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -307,21 +309,36 @@ class PatientChatState {
 /// один чат, а экран сам сообщает, какой именно, через [open].
 class PatientChatController extends Notifier<PatientChatState> {
   String? _threadId;
+  StreamSubscription<PatientMessage>? _subscription;
 
   @override
-  PatientChatState build() => const PatientChatState();
+  PatientChatState build() {
+    final repository = ref.read(doctorCabinetRepositoryProvider);
+    ref.onDispose(() {
+      unawaited(_subscription?.cancel());
+      final threadId = _threadId;
+      if (threadId != null) unawaited(repository.closePatientChat(threadId));
+    });
+    return const PatientChatState();
+  }
 
   Future<void> open(String threadId) async {
     if (_threadId == threadId) return;
+    final repository = ref.read(doctorCabinetRepositoryProvider);
+    final previous = _threadId;
+    await _subscription?.cancel();
+    if (previous != null) await repository.closePatientChat(previous);
+
     _threadId = threadId;
     state = const PatientChatState();
+    _subscription = repository.watchPatientMessages(threadId).listen((message) {
+      if (_threadId == threadId) _merge([message]);
+    }, onError: (_) {});
 
-    final loaded = await ref
-        .read(doctorCabinetRepositoryProvider)
-        .patientMessages(threadId);
+    final loaded = await repository.patientMessages(threadId);
     // Пока грузили, могли открыть другой чат — тогда ответ уже не нужен.
     if (_threadId != threadId) return;
-    state = state.copyWith(messages: loaded);
+    _merge(loaded);
   }
 
   Future<void> send(String text) async {
@@ -330,13 +347,24 @@ class PatientChatController extends Notifier<PatientChatState> {
     if (trimmed.isEmpty || threadId == null || state.isSending) return;
 
     state = state.copyWith(isSending: true);
-    final sent = await ref
-        .read(doctorCabinetRepositoryProvider)
-        .sendPatientMessage(threadId, trimmed);
-    state = state.copyWith(
-      messages: [...state.messages, sent],
-      isSending: false,
-    );
+    try {
+      final sent = await ref
+          .read(doctorCabinetRepositoryProvider)
+          .sendPatientMessage(threadId, trimmed);
+      if (_threadId == threadId) _merge([sent]);
+    } finally {
+      if (_threadId == threadId) state = state.copyWith(isSending: false);
+    }
+  }
+
+  void _merge(Iterable<PatientMessage> incoming) {
+    final byId = {for (final message in state.messages) message.id: message};
+    for (final message in incoming) {
+      byId[message.id] = message;
+    }
+    final messages = byId.values.toList()
+      ..sort((a, b) => a.sentAt.compareTo(b.sentAt));
+    state = state.copyWith(messages: messages);
   }
 }
 

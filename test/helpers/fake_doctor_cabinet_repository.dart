@@ -263,6 +263,10 @@ class FakeDoctorCabinetRepository implements DoctorCabinetRepository {
   ];
 
   @override
+  Stream<PatientMessage> watchPatientMessages(String threadId) =>
+      const Stream.empty();
+
+  @override
   Future<PatientMessage> sendPatientMessage(
     String threadId,
     String text,
@@ -272,6 +276,9 @@ class FakeDoctorCabinetRepository implements DoctorCabinetRepository {
     isMine: true,
     sentAt: DateTime(2026, 7, 21, 13, 45),
   );
+
+  @override
+  Future<void> closePatientChat(String threadId) async {}
 
   /// Две заявки: одна с ответом, одна без — оба состояния «Ответа от
   /// админа» проверяются на одном фейке.

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -66,18 +68,35 @@ class DoctorChatState {
 /// какой именно, через [open].
 class DoctorChatController extends Notifier<DoctorChatState> {
   String? _threadId;
+  StreamSubscription<DoctorMessage>? _subscription;
 
   @override
-  DoctorChatState build() => const DoctorChatState();
+  DoctorChatState build() {
+    final repository = ref.read(chatsRepositoryProvider);
+    ref.onDispose(() {
+      unawaited(_subscription?.cancel());
+      final threadId = _threadId;
+      if (threadId != null) unawaited(repository.closeChat(threadId));
+    });
+    return const DoctorChatState();
+  }
 
   Future<void> open(String threadId) async {
     if (_threadId == threadId) return;
+    final repository = ref.read(chatsRepositoryProvider);
+    final previous = _threadId;
+    await _subscription?.cancel();
+    if (previous != null) await repository.closeChat(previous);
+
     _threadId = threadId;
     state = const DoctorChatState();
+    _subscription = repository.watchMessages(threadId).listen((message) {
+      if (_threadId == threadId) _merge([message]);
+    }, onError: (_) {});
 
-    final loaded = await ref.read(chatsRepositoryProvider).messages(threadId);
+    final loaded = await repository.messages(threadId);
     if (_threadId != threadId) return;
-    state = state.copyWith(messages: loaded);
+    _merge(loaded);
   }
 
   Future<void> send(String text) async {
@@ -86,13 +105,24 @@ class DoctorChatController extends Notifier<DoctorChatState> {
     if (trimmed.isEmpty || threadId == null || state.isSending) return;
 
     state = state.copyWith(isSending: true);
-    final sent = await ref
-        .read(chatsRepositoryProvider)
-        .send(threadId, trimmed);
-    state = state.copyWith(
-      messages: [...state.messages, sent],
-      isSending: false,
-    );
+    try {
+      final sent = await ref
+          .read(chatsRepositoryProvider)
+          .send(threadId, trimmed);
+      if (_threadId == threadId) _merge([sent]);
+    } finally {
+      if (_threadId == threadId) state = state.copyWith(isSending: false);
+    }
+  }
+
+  void _merge(Iterable<DoctorMessage> incoming) {
+    final byId = {for (final message in state.messages) message.id: message};
+    for (final message in incoming) {
+      byId[message.id] = message;
+    }
+    final messages = byId.values.toList()
+      ..sort((a, b) => a.sentAt.compareTo(b.sentAt));
+    state = state.copyWith(messages: messages);
   }
 }
 

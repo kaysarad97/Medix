@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import '../../../../core/network/api_endpoints.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../../../shared/models/appointment.dart';
+import '../../../telemedicine/data/repositories/consultation_live_chat.dart';
 import '../../../telemedicine/data/repositories/consultations_repository.dart';
 import '../../../telemedicine/domain/entities/consultation.dart';
 import '../../domain/entities/admin_request.dart';
@@ -23,9 +24,12 @@ import 'doctor_cabinet_repository.dart';
 /// отзывы, сертификат, аналитика и консультационные чаты читаются из
 /// реальных данных.
 class RemoteDoctorCabinetRepository implements DoctorCabinetRepository {
-  const RemoteDoctorCabinetRepository(this._dio);
+  RemoteDoctorCabinetRepository(this._dio) {
+    _liveChat = ConsultationLiveChat(ConsultationsRepository(_dio));
+  }
 
   final Dio _dio;
+  late final ConsultationLiveChat _liveChat;
 
   static const _fallback = MockDoctorCabinetRepository();
   static const _pageLimit = 100;
@@ -268,14 +272,25 @@ class RemoteDoctorCabinetRepository implements DoctorCabinetRepository {
   }
 
   @override
+  Stream<PatientMessage> watchPatientMessages(String threadId) async* {
+    final userId = await _currentUserId();
+    await for (final message in _liveChat.watch(threadId, userId: userId)) {
+      yield PatientMessage(
+        id: message.id,
+        text: message.body,
+        isMine: message.senderId == userId,
+        sentAt: message.createdAt,
+      );
+    }
+  }
+
+  @override
   Future<PatientMessage> sendPatientMessage(
     String threadId,
     String text,
   ) async {
     final userId = await _currentUserId();
-    final message = await ConsultationsRepository(
-      _dio,
-    ).sendMessage(threadId, senderId: userId, body: text);
+    final message = await _liveChat.send(threadId, userId: userId, body: text);
     return PatientMessage(
       id: message.id,
       text: message.body,
@@ -283,6 +298,9 @@ class RemoteDoctorCabinetRepository implements DoctorCabinetRepository {
       sentAt: message.createdAt,
     );
   }
+
+  @override
+  Future<void> closePatientChat(String threadId) => _liveChat.close(threadId);
 
   /// Doctor-to-admin API на сервере отсутствует.
   @override
