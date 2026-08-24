@@ -290,6 +290,34 @@ void main() {
     });
   });
 
+  test('мои врачи читаются из завершённых личных записей', () async {
+    final (:dio, :adapter) = cannedDio({
+      'GET /appointments': (
+        statusCode: 200,
+        body: [
+          {
+            'id': 'done',
+            'family_member_id': null,
+            'status': 'completed',
+            'starts_at': '2026-08-10T10:30:00Z',
+            'doctor': {
+              'id': 'd1',
+              'full_name': 'Айжан Садыкова',
+              'specialty': 'Терапевт',
+              'photo_url': null,
+            },
+          },
+        ],
+      ),
+    });
+
+    final result = await RemoteProfileRepository(dio).myDoctors();
+
+    expect(result.single.id, 'd1');
+    expect(result.single.fullName, 'Айжан Садыкова');
+    expect(adapter.requests.single.queryParameters['limit'], 100);
+  });
+
   test(
     'предыдущие процедуры собираются из завершённых личных записей',
     () async {

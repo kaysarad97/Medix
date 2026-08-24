@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 
 import '../../../../core/network/api_endpoints.dart';
 import '../../../../core/network/api_exception.dart';
+import '../../../../shared/data/my_doctors_from_appointments.dart';
 import '../../../../shared/models/appointment.dart';
 import '../../../../shared/models/doctor_specialty.dart';
 import '../../../../shared/models/my_doctor.dart';
@@ -324,10 +325,14 @@ class RemoteDoctorsRepository implements DoctorsRepository {
     }
   }
 
-  /// ЭНДПОИНТА НЕТ. «Мои Врачи» — те, у кого пользователь уже был; вывести
-  /// их можно только из прошлых записей, а в них нет ни врача, ни времени.
   @override
-  Future<List<MyDoctor>> myDoctors() async => const [];
+  Future<List<MyDoctor>> myDoctors() async {
+    try {
+      return await fetchMyDoctorsFromAppointments(_dio);
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
 
   static Doctor _doctor(Map<String, dynamic> json) {
     final discount = (json['discount_percent'] as num?)?.toInt() ?? 0;

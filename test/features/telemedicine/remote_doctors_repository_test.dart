@@ -171,6 +171,37 @@ void main() {
       expect(reviews.single.authorName, 'Пользователь 1');
       expect(adapter.requests.single.path, '/doctors/d1/reviews');
     });
+
+    test('мои врачи собираются из завершённых записей', () async {
+      final (:dio, :adapter) = cannedDio({
+        '/appointments': (
+          statusCode: 200,
+          body: [
+            {
+              'id': 'a1',
+              'status': 'completed',
+              'starts_at': '2026-08-20T10:00:00Z',
+              'family_member_id': null,
+              'doctor': {
+                'id': 'd1',
+                'full_name': 'Айжан Садыкова',
+                'specialty': 'Кардиолог',
+                'photo_url': 'https://cdn.example/d1.jpg',
+              },
+            },
+          ],
+        ),
+      });
+
+      final doctors = await RemoteDoctorsRepository(dio).myDoctors();
+
+      expect(doctors.single.id, 'd1');
+      expect(doctors.single.specialty, 'Кардиолог');
+      expect(adapter.requests.single.queryParameters, {
+        'upcoming': false,
+        'limit': 100,
+      });
+    });
   });
 
   group('расписание', () {

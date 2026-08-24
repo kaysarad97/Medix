@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 
 import '../../../../core/network/api_endpoints.dart';
 import '../../../../core/network/api_exception.dart';
+import '../../../../shared/data/my_doctors_from_appointments.dart';
 import '../../../../shared/models/analysis_result.dart';
 import '../../../../shared/models/gender.dart';
 import '../../../../shared/models/my_doctor.dart';
@@ -380,10 +381,14 @@ class RemoteProfileRepository implements ProfileRepository {
     }
   }
 
-  /// ЭНДПОИНТА НЕТ. «Мои Врачи» вывести неоткуда: в записях к врачу нет ни
-  /// врача, ни времени — см. `RemoteDoctorsRepository`.
   @override
-  Future<List<MyDoctor>> myDoctors() async => const [];
+  Future<List<MyDoctor>> myDoctors() async {
+    try {
+      return await fetchMyDoctorsFromAppointments(_dio);
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
 
   /// ЭНДПОИНТА НЕТ. Анализ — число с единицей измерения и границами нормы,
   /// а `record_type` таких записей не знает. Лабораторная ветка сервера

@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import '../../../../core/network/api_endpoints.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../../../shared/models/analysis_result.dart';
+import '../../../../shared/data/my_doctors_from_appointments.dart';
 import '../../../../shared/models/family_member.dart';
 import '../../../../shared/models/gender.dart';
 import '../../../../shared/models/medix_avatars.dart';
@@ -83,12 +84,17 @@ class RemoteFamilyRepository implements FamilyRepository {
     }
   }
 
-  /// ЭНДПОИНТА НЕТ. Врачей члена семьи бэкенд не отдаёт: есть только его
-  /// мед-карта (`/users/me/family/{id}/medical-records`), а записи в ней
-  /// бывают пяти типов, и врача среди них нет. Пустой список честнее
-  /// подставленных моков: карточка «Врачи…» покажет один заголовок.
   @override
-  Future<List<MyDoctor>> doctorsOf(String memberId) async => const [];
+  Future<List<MyDoctor>> doctorsOf(String memberId) async {
+    try {
+      return await fetchMyDoctorsFromAppointments(
+        _dio,
+        familyMemberId: memberId,
+      );
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
 
   /// ПОКА НЕ ПОДКЛЮЧЕНО. С 17 августа 2026 у сервера есть лабораторная
   /// ветка: `GET /lab/results?family_member_id=` отдаёт результаты анализов
