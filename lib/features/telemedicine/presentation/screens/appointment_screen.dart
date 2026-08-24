@@ -19,6 +19,7 @@ import '../../domain/entities/doctor_schedule.dart';
 import '../providers/telemedicine_providers.dart';
 import '../../../../core/widgets/action_button_row.dart';
 import '../widgets/appointment_summary_card.dart';
+import '../widgets/appointment_status_card.dart';
 import '../widgets/doctor_header.dart';
 import '../widgets/doctor_metrics.dart';
 import '../widgets/prepayment_card.dart';
@@ -92,6 +93,12 @@ class _Content extends ConsumerWidget {
     final hasSubscription =
         subscription != null && subscription != SubscriptionTier.free;
     final l10n = AppLocalizations.of(context)!;
+    final isClosed = switch (appointment.status) {
+      AppointmentStatus.completed ||
+      AppointmentStatus.cancelled ||
+      AppointmentStatus.noShow => true,
+      _ => false,
+    };
 
     return SingleChildScrollView(
       child: Column(
@@ -106,108 +113,113 @@ class _Content extends ConsumerWidget {
           DoctorHeader(doctor: doctor),
           const SizedBox(height: DoctorMetrics.photoToSummary),
           _Section(child: AppointmentSummaryCard(appointment: appointment)),
-          const SizedBox(height: DoctorMetrics.summaryToActions),
-          _Section(
-            child: ActionButtonRow(
-              height: DoctorMetrics.callActionHeight,
-              // На этом экране кнопки равной ширины, в отличие от карточки
-              // расписания.
-              primaryFlex: 1,
-              secondaryFlex: 1,
-              primary: ActionButtonData(
-                icon: MedixIcon.audioCall,
-                title: l10n.startCallTitle,
-                subtitle: _labelFor(appointment.kind, l10n),
-                onTap: () => context.push(Routes.callOf(appointment.id)),
-              ),
-              secondary: ActionButtonData(
-                icon: MedixIcon.chat,
-                title: l10n.messageActionTitle,
-                subtitle: l10n.doctorChatTitle,
-                onTap: () => _openChat(context, appointment.consultationId),
-              ),
-            ),
-          ),
-          if (appointment.basePriceLabel != null) ...[
+          if (isClosed) ...[
+            const SizedBox(height: DoctorMetrics.summaryToActions),
+            _Section(child: AppointmentStatusCard(appointment: appointment)),
+          ] else ...[
             const SizedBox(height: DoctorMetrics.summaryToActions),
             _Section(
-              child: PrepaymentCard(
-                appointment: appointment,
-                hasSubscription: hasSubscription,
-                // Kaspi и Apple Pay проводят оплату своим интерфейсом — SDK
-                // ещё нет, поэтому оба ведут в один и тот же мок-результат,
-                // как кнопки на PaymentMethodScreen.
-                onPay: (method) =>
-                    context.push(Routes.paymentResultOf('success')),
-                onSubscribe: () => context.push(Routes.subscription),
-              ),
-            ),
-          ],
-          const SizedBox(height: DoctorMetrics.actionsToReschedule),
-          if (schedule != null)
-            _Section(
-              child: ScheduleCard(
-                title: l10n.rescheduleTitle,
-                schedule: schedule!,
-                // Стрелок перелистывания месяца на этом макете нет.
-                showMonthArrows: false,
-                selectedDay: selected?.day,
-                selectedSlot: selected?.slot,
-                onDaySelected: notifier.selectDay,
-                onSlotSelected: notifier.selectSlot,
-                primaryAction: ActionButtonData(
-                  // В макете здесь трубка, а не камера, хотя подпись
-                  // «Видео-звонок» — так на обоих экранах.
+              child: ActionButtonRow(
+                height: DoctorMetrics.callActionHeight,
+                // На этом экране кнопки равной ширины, в отличие от карточки
+                // расписания.
+                primaryFlex: 1,
+                secondaryFlex: 1,
+                primary: ActionButtonData(
                   icon: MedixIcon.audioCall,
-                  title: l10n.createAppointmentTitle,
-                  subtitle: l10n.videoCallSubtitle,
-                  // Активна только после выбора нового дня и времени.
-                  onTap: selected?.slot == null
-                      ? null
-                      : () async {
-                          final slot = selected!.slot!;
-                          try {
-                            await ref
-                                .read(doctorsRepositoryProvider)
-                                .reschedule(appointment.id, slot);
-                          } catch (error) {
-                            if (!context.mounted) return;
-                            ScaffoldMessenger.of(context)
-                              ..hideCurrentSnackBar()
-                              ..showSnackBar(
-                                SnackBar(content: Text(error.toString())),
-                              );
-                            return;
-                          }
-                          if (!context.mounted) return;
-                          ScaffoldMessenger.of(context)
-                            ..hideCurrentSnackBar()
-                            ..showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  l10n.appointmentRescheduledSnackbar(
-                                    RuDates.dayMonth(slot.startsAt),
-                                    slot.timeLabel,
-                                  ),
-                                  style: AppTypography.bodyMd.copyWith(
-                                    color: AppColors.textOnPrimary,
-                                  ),
-                                ),
-                                backgroundColor: AppColors.primary,
-                                behavior: SnackBarBehavior.floating,
-                              ),
-                            );
-                          Navigator.of(context).maybePop();
-                        },
+                  title: l10n.startCallTitle,
+                  subtitle: _labelFor(appointment.kind, l10n),
+                  onTap: () => context.push(Routes.callOf(appointment.id)),
                 ),
-                secondaryAction: ActionButtonData(
-                  icon: MedixIcon.mail,
+                secondary: ActionButtonData(
+                  icon: MedixIcon.chat,
                   title: l10n.messageActionTitle,
                   subtitle: l10n.doctorChatTitle,
                   onTap: () => _openChat(context, appointment.consultationId),
                 ),
               ),
             ),
+            if (appointment.basePriceLabel != null) ...[
+              const SizedBox(height: DoctorMetrics.summaryToActions),
+              _Section(
+                child: PrepaymentCard(
+                  appointment: appointment,
+                  hasSubscription: hasSubscription,
+                  // Kaspi и Apple Pay проводят оплату своим интерфейсом — SDK
+                  // ещё нет, поэтому оба ведут в один и тот же мок-результат,
+                  // как кнопки на PaymentMethodScreen.
+                  onPay: (method) =>
+                      context.push(Routes.paymentResultOf('success')),
+                  onSubscribe: () => context.push(Routes.subscription),
+                ),
+              ),
+            ],
+            const SizedBox(height: DoctorMetrics.actionsToReschedule),
+            if (schedule != null)
+              _Section(
+                child: ScheduleCard(
+                  title: l10n.rescheduleTitle,
+                  schedule: schedule!,
+                  // Стрелок перелистывания месяца на этом макете нет.
+                  showMonthArrows: false,
+                  selectedDay: selected?.day,
+                  selectedSlot: selected?.slot,
+                  onDaySelected: notifier.selectDay,
+                  onSlotSelected: notifier.selectSlot,
+                  primaryAction: ActionButtonData(
+                    // В макете здесь трубка, а не камера, хотя подпись
+                    // «Видео-звонок» — так на обоих экранах.
+                    icon: MedixIcon.audioCall,
+                    title: l10n.createAppointmentTitle,
+                    subtitle: l10n.videoCallSubtitle,
+                    // Активна только после выбора нового дня и времени.
+                    onTap: selected?.slot == null
+                        ? null
+                        : () async {
+                            final slot = selected!.slot!;
+                            try {
+                              await ref
+                                  .read(doctorsRepositoryProvider)
+                                  .reschedule(appointment.id, slot);
+                            } catch (error) {
+                              if (!context.mounted) return;
+                              ScaffoldMessenger.of(context)
+                                ..hideCurrentSnackBar()
+                                ..showSnackBar(
+                                  SnackBar(content: Text(error.toString())),
+                                );
+                              return;
+                            }
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context)
+                              ..hideCurrentSnackBar()
+                              ..showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    l10n.appointmentRescheduledSnackbar(
+                                      RuDates.dayMonth(slot.startsAt),
+                                      slot.timeLabel,
+                                    ),
+                                    style: AppTypography.bodyMd.copyWith(
+                                      color: AppColors.textOnPrimary,
+                                    ),
+                                  ),
+                                  backgroundColor: AppColors.primary,
+                                  behavior: SnackBarBehavior.floating,
+                                ),
+                              );
+                            Navigator.of(context).maybePop();
+                          },
+                  ),
+                  secondaryAction: ActionButtonData(
+                    icon: MedixIcon.mail,
+                    title: l10n.messageActionTitle,
+                    subtitle: l10n.doctorChatTitle,
+                    onTap: () => _openChat(context, appointment.consultationId),
+                  ),
+                ),
+              ),
+          ],
           const SizedBox(height: DoctorMetrics.screenH),
         ],
       ),

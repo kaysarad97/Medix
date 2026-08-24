@@ -316,6 +316,7 @@ void main() {
       String type = 'video',
       String status = 'pending',
       String startsAt = '2026-08-13T12:30:00',
+      String? cancellationReason,
     }) => {
       'id': id,
       'slot_id': 's-first',
@@ -326,6 +327,7 @@ void main() {
       'starts_at': startsAt,
       'ends_at': '2026-08-13T13:00:00',
       'price': 13500.0,
+      'cancellation_reason': cancellationReason,
       'doctor': {
         'id': 'd1',
         'full_name': 'Имя Фамилия',
@@ -393,6 +395,25 @@ void main() {
         () => RemoteDoctorsRepository(dio).appointment('ap-2'),
         throwsA(isA<Exception>()),
       );
+    });
+
+    test('причина отмены врача читается из записи пациента', () async {
+      final (:dio, adapter: _) = cannedDio({
+        'GET /appointments/ap-1': (
+          statusCode: 200,
+          body: appointmentJson(
+            status: 'cancelled',
+            cancellationReason: 'Врач заболел',
+          ),
+        ),
+      });
+
+      final appointment = await RemoteDoctorsRepository(
+        dio,
+      ).appointment('ap-1');
+
+      expect(appointment.status, AppointmentStatus.cancelled);
+      expect(appointment.cancellationReason, 'Врач заболел');
     });
 
     test('список записей приходит развёрнутым', () async {

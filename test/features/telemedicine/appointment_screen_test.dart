@@ -7,6 +7,7 @@ import 'package:medix/features/profile/presentation/providers/profile_providers.
 import 'package:medix/features/telemedicine/presentation/providers/telemedicine_providers.dart';
 import 'package:medix/features/telemedicine/presentation/screens/appointment_screen.dart';
 import 'package:medix/l10n/app_localizations.dart';
+import 'package:medix/shared/models/appointment.dart';
 import 'package:medix/shared/models/subscription_tier.dart';
 
 import '../../helpers/fake_doctors_repository.dart';
@@ -20,6 +21,8 @@ void main() {
     WidgetTester tester, {
     UserProfile? profile,
     int? subscriberPrice = 10000,
+    AppointmentStatus status = AppointmentStatus.unknown,
+    String? cancellationReason,
   }) async {
     tester.view.physicalSize = const Size(440, 1300);
     tester.view.devicePixelRatio = 1.0;
@@ -30,7 +33,11 @@ void main() {
       ProviderScope(
         overrides: [
           doctorsRepositoryProvider.overrideWithValue(
-            FakeDoctorsRepository(appointmentSubscriberPrice: subscriberPrice),
+            FakeDoctorsRepository(
+              appointmentSubscriberPrice: subscriberPrice,
+              appointmentStatus: status,
+              appointmentCancellationReason: cancellationReason,
+            ),
           ),
           profileRepositoryProvider.overrideWithValue(FakeProfileRepository()),
           if (profile != null)
@@ -74,6 +81,22 @@ void main() {
 
     // «Аудио-звонок» стоит и в строке записи, и подписью на кнопке звонка.
     expect(find.text('Аудио-звонок'), findsNWidgets(2));
+  });
+
+  testWidgets('отменённая запись показывает причину и прячет действия', (
+    tester,
+  ) async {
+    await pumpAppointment(
+      tester,
+      status: AppointmentStatus.cancelled,
+      cancellationReason: 'Врач заболел',
+    );
+
+    expect(find.text('Запись отменена'), findsOneWidget);
+    expect(find.text('Причина: Врач заболел'), findsOneWidget);
+    expect(find.text('Начать звонок'), findsNothing);
+    expect(find.text('Перенести запись'), findsNothing);
+    expect(find.text('Предоплата записи'), findsNothing);
   });
 
   testWidgets('перенос записи показывает подтверждение с новым временем', (

@@ -370,6 +370,7 @@ class RemoteDoctorsRepository implements DoctorsRepository {
       consultationId: json['consultation_id'] as String?,
       familyMemberId: json['family_member_id'] as String?,
       status: _statusFrom(json['status'] as String?),
+      cancellationReason: (json['cancellation_reason'] as String?)?.trim(),
       basePrice: price,
     );
   }

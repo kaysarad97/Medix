@@ -11,7 +11,11 @@ import 'package:medix/shared/models/my_doctor.dart';
 /// Задержка в заглушке сделана через `Future.delayed`, а таймер вне
 /// `runAsync` роняет виджет-тест на «timersPending».
 class FakeDoctorsRepository implements DoctorsRepository {
-  const FakeDoctorsRepository({this.appointmentSubscriberPrice = 10000});
+  const FakeDoctorsRepository({
+    this.appointmentSubscriberPrice = 10000,
+    this.appointmentStatus = AppointmentStatus.unknown,
+    this.appointmentCancellationReason,
+  });
 
   static const doctor1 = Doctor(
     id: 'd1',
@@ -60,6 +64,8 @@ class FakeDoctorsRepository implements DoctorsRepository {
   /// поэтому «есть подписка» и «нет подписки» в тестах различаются данными
   /// записи, а не тарифом в профиле.
   final int? appointmentSubscriberPrice;
+  final AppointmentStatus appointmentStatus;
+  final String? appointmentCancellationReason;
 
   @override
   Future<Appointment> appointment(String id) async => Appointment(
@@ -68,6 +74,8 @@ class FakeDoctorsRepository implements DoctorsRepository {
     kind: AppointmentKind.audioCall,
     startsAt: DateTime(2026, 7, 10, 13, 30),
     doctorId: 'd1',
+    status: appointmentStatus,
+    cancellationReason: appointmentCancellationReason,
     basePrice: 15000,
     subscriberPrice: appointmentSubscriberPrice,
   );

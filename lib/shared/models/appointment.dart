@@ -30,6 +30,7 @@ class Appointment {
     this.consultationId,
     this.endsAt,
     this.status = AppointmentStatus.unknown,
+    this.cancellationReason,
     this.familyMemberId,
     this.basePrice,
     this.subscriberPrice,
@@ -46,6 +47,10 @@ class Appointment {
   final String? consultationId;
   final DateTime? endsAt;
   final AppointmentStatus status;
+
+  /// Причина отмены со стороны врача. При отмене пациентом сервер оставляет
+  /// поле пустым, поэтому `null` — допустимое состояние отменённой записи.
+  final String? cancellationReason;
   final String? familyMemberId;
 
   /// Цена предоплаты без подписки. `null` — блок предоплаты не рисуется

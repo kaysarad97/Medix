@@ -486,6 +486,17 @@
       }
     }
   },
+  "appointmentCancelledTitle": "Запись отменена",
+  "appointmentCancellationReason": "Причина: {reason}",
+  "@appointmentCancellationReason": {
+    "description": "Причина отмены записи со стороны врача.",
+    "placeholders": { "reason": { "type": "String" } }
+  },
+  "appointmentCancelledNoReason": "Причина отмены не указана.",
+  "appointmentNoShowTitle": "Приём не состоялся",
+  "appointmentNoShowMessage": "В записи отмечена неявка пациента.",
+  "appointmentCompletedTitle": "Приём завершён",
+  "appointmentCompletedMessage": "Эта консультация уже завершена.",
   "doctorSearchTitle": "Поиск врача",
   "@doctorSearchTitle": {
     "description": "Заголовок экранов поиска врача и результатов поиска."
