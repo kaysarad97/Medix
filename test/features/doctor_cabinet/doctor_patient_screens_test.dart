@@ -116,6 +116,38 @@ void main() {
       expect(opened.single.scheme, 'tel');
       expect(opened.single.path, '+77010000000');
     });
+
+    testWidgets('фрилансер отменяет запись только с указанной причиной', (
+      tester,
+    ) async {
+      final repository = _FreelancerCancellationRepository();
+      await pumpScreen(
+        tester,
+        const DoctorPatientAppointmentScreen(patientId: 'p1'),
+        repository: repository,
+      );
+
+      await tester.tap(find.byKey(const ValueKey('doctor-cancel-appointment')));
+      await tester.pumpAndSettle();
+
+      final confirm = find.byKey(const ValueKey('doctor-cancel-confirm'));
+      expect(tester.widget<FilledButton>(confirm).onPressed, isNull);
+
+      await tester.enterText(
+        find.byKey(const ValueKey('doctor-cancel-reason')),
+        'Врач заболел',
+      );
+      await tester.pump();
+      await tester.tap(confirm);
+      await tester.pumpAndSettle();
+
+      expect(repository.cancelledAppointmentId, 'p-p1');
+      expect(repository.cancellationReason, 'Врач заболел');
+      expect(
+        find.byKey(const ValueKey('doctor-cancel-appointment')),
+        findsNothing,
+      );
+    });
   });
 }
 
@@ -138,4 +170,40 @@ class _InPersonDoctorCabinetRepository extends FakeDoctorCabinetRepository {
       startsAt: DateTime(2026, 7, 21, 10, 30),
     ),
   );
+}
+
+class _FreelancerCancellationRepository extends FakeDoctorCabinetRepository {
+  _FreelancerCancellationRepository() : super(isFreelancer: true);
+
+  String? cancelledAppointmentId;
+  String? cancellationReason;
+
+  DoctorAppointment get appointment => DoctorAppointment(
+    id: 'p-p1',
+    patientName: 'Имя Фамилия',
+    patientId: 'p1',
+    kind: AppointmentKind.audioCall,
+    startsAt: DateTime(2026, 7, 21, 10, 30),
+    status: AppointmentStatus.confirmed,
+  );
+
+  @override
+  Future<DoctorPatient> patient(String id) async => DoctorPatient(
+    id: id,
+    fullName: 'Имя Фамилия',
+    heightCm: 170,
+    weightKg: 77,
+    age: 30,
+    appointment: appointment,
+  );
+
+  @override
+  Future<DoctorAppointment> cancelAppointment(
+    String appointmentId,
+    String reason,
+  ) async {
+    cancelledAppointmentId = appointmentId;
+    cancellationReason = reason;
+    return appointment.copyWithStatus(AppointmentStatus.cancelled);
+  }
 }

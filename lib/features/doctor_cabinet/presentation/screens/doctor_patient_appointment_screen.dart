@@ -17,6 +17,7 @@ import '../../../../shared/models/appointment.dart';
 import '../../domain/entities/doctor_appointment.dart';
 import '../providers/doctor_cabinet_providers.dart';
 import '../widgets/doctor_appointment_files_card.dart';
+import '../widgets/doctor_cancel_appointment_dialog.dart';
 import '../widgets/doctor_conclusion_card.dart';
 import '../widgets/doctor_history_row.dart';
 import '../widgets/doctor_patient_header.dart';
@@ -30,17 +31,32 @@ import '../widgets/doctor_patient_metrics.dart';
 /// Врач от клиники запись не отменяет и не подтверждает сам — для этого у
 /// него «Запросы к админу»; у фрилансера на этом же экране появятся кнопки
 /// подтверждения, но это следующий слайс.
-class DoctorPatientAppointmentScreen extends ConsumerWidget {
+class DoctorPatientAppointmentScreen extends ConsumerStatefulWidget {
   const DoctorPatientAppointmentScreen({super.key, required this.patientId});
 
   final String patientId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DoctorPatientAppointmentScreen> createState() =>
+      _DoctorPatientAppointmentScreenState();
+}
+
+class _DoctorPatientAppointmentScreenState
+    extends ConsumerState<DoctorPatientAppointmentScreen> {
+  DoctorAppointment? _updatedAppointment;
+  bool _cancelling = false;
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final patient = ref.watch(doctorPatientProvider(patientId)).value;
-    final appointment = patient?.appointment;
+    final patient = ref.watch(doctorPatientProvider(widget.patientId)).value;
+    final appointment = _updatedAppointment ?? patient?.appointment;
+    final profile = ref.watch(doctorOwnProfileProvider).value;
     final isInPerson = appointment?.kind == AppointmentKind.inPerson;
+    final canCancel =
+        profile?.isFreelancer == true &&
+        (appointment?.status == AppointmentStatus.pending ||
+            appointment?.status == AppointmentStatus.confirmed);
 
     return AppScaffold(
       background: AppBackgroundStyle.main,
@@ -88,7 +104,7 @@ class DoctorPatientAppointmentScreen extends ConsumerWidget {
                                   appointment.patientPhone,
                                 )
                               : () => context.push(
-                                  Routes.doctorCallOf(patientId),
+                                  Routes.doctorCallOf(widget.patientId),
                                 ),
                         ),
                         secondary: ActionButtonData(
@@ -105,6 +121,25 @@ class DoctorPatientAppointmentScreen extends ConsumerWidget {
                     const SizedBox(
                       height: DoctorPatientMetrics.actionsToConclusion,
                     ),
+                    if (canCancel) ...[
+                      Text(
+                        l10n.doctorCancelAppointmentAlternative,
+                        textAlign: TextAlign.center,
+                        style: AppTypography.cardItemMeta,
+                      ),
+                      const SizedBox(height: 10),
+                      _Section(
+                        child: _CancelAppointmentButton(
+                          loading: _cancelling,
+                          onTap: _cancelling
+                              ? null
+                              : () => _cancelAppointment(appointment),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: DoctorPatientMetrics.actionsToConclusion,
+                      ),
+                    ],
                     if (appointment.files.isNotEmpty) ...[
                       _Section(
                         child: DoctorAppointmentFilesCard(
@@ -128,6 +163,89 @@ class DoctorPatientAppointmentScreen extends ConsumerWidget {
                   ],
                 ),
               ),
+      ),
+    );
+  }
+
+  Future<void> _cancelAppointment(DoctorAppointment appointment) async {
+    final reason = await showDoctorCancelAppointmentDialog(context);
+    if (reason == null || !mounted) return;
+
+    setState(() => _cancelling = true);
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      final updated = await ref
+          .read(doctorCabinetRepositoryProvider)
+          .cancelAppointment(appointment.id, reason);
+      if (!mounted) return;
+      setState(() {
+        _updatedAppointment = updated;
+        _cancelling = false;
+      });
+      ref.invalidate(doctorUpcomingAppointmentsProvider);
+      ref.invalidate(doctorAppointmentsForDayProvider);
+      ref.invalidate(doctorRegularPatientsProvider);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.doctorCancelAppointmentSuccess)),
+      );
+    } on Object {
+      if (!mounted) return;
+      setState(() => _cancelling = false);
+      showFormErrorSnackBar(context, l10n.doctorCancelAppointmentError);
+    }
+  }
+}
+
+class _CancelAppointmentButton extends StatelessWidget {
+  const _CancelAppointmentButton({required this.loading, this.onTap});
+
+  final bool loading;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return SizedBox(
+      height: 49,
+      child: Material(
+        color: AppColors.accentSofter,
+        borderRadius: ActionButtonRow.radius,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          key: const ValueKey('doctor-cancel-appointment'),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            child: Row(
+              children: [
+                Container(
+                  width: 30,
+                  height: 30,
+                  decoration: const BoxDecoration(
+                    color: AppColors.surfaceWhite,
+                    shape: BoxShape.circle,
+                  ),
+                  alignment: Alignment.center,
+                  child: loading
+                      ? const SizedBox.square(
+                          dimension: 15,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(
+                          Icons.close_rounded,
+                          size: 19,
+                          color: AppColors.primaryBright,
+                        ),
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  l10n.doctorCancelAppointmentAction,
+                  style: AppTypography.actionTitle,
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

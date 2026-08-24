@@ -97,6 +97,22 @@ class DoctorAppointment {
     conclusion: value,
     files: files,
   );
+
+  DoctorAppointment copyWithStatus(AppointmentStatus value) =>
+      DoctorAppointment(
+        id: id,
+        patientName: patientName,
+        patientId: patientId,
+        consultationId: consultationId,
+        patientPhone: patientPhone,
+        kind: kind,
+        startsAt: startsAt,
+        endsAt: endsAt,
+        status: value,
+        patientAvatarAsset: patientAvatarAsset,
+        conclusion: conclusion,
+        files: files,
+      );
 }
 
 class DoctorAppointmentFile {

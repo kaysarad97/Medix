@@ -1254,6 +1254,13 @@
   "@doctorAppointmentTitle": {
     "description": "Заголовок экрана «Запись с пациентом» в кабинете врача."
   },
+  "doctorCancelAppointmentAlternative": "или",
+  "doctorCancelAppointmentAction": "Отменить запись",
+  "doctorCancelAppointmentDialogTitle": "Отмена записи",
+  "doctorCancelAppointmentReasonHint": "Укажите причину отмены",
+  "doctorCancelAppointmentConfirm": "Отменить запись",
+  "doctorCancelAppointmentSuccess": "Запись отменена",
+  "doctorCancelAppointmentError": "Не удалось отменить запись",
   "doctorOwnAppointmentSubtitle": "Ваша запись",
   "@doctorOwnAppointmentSubtitle": {
     "description": "Подпись под видом записи в строке на «Записи с пациентом» — в отличие от истории, где там имя пациента."
