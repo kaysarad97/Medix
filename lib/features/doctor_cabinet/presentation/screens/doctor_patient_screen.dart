@@ -17,6 +17,7 @@ import '../../../../shared/models/analysis_result.dart';
 import '../../../profile/presentation/widgets/analyses_card.dart';
 import '../../domain/entities/doctor_appointment.dart';
 import '../providers/doctor_cabinet_providers.dart';
+import '../widgets/doctor_appointment_files_card.dart';
 import '../widgets/doctor_conclusion_card.dart';
 import '../widgets/doctor_patient_header.dart';
 import '../widgets/doctor_patient_metrics.dart';
@@ -61,6 +62,14 @@ class DoctorPatientScreen extends ConsumerWidget {
                     if (patient.appointment case final appointment?) ...[
                       _Section(child: _ConfirmCard(appointment: appointment)),
                       const SizedBox(height: DoctorPatientMetrics.cardGap),
+                      if (appointment.files.isNotEmpty) ...[
+                        _Section(
+                          child: DoctorAppointmentFilesCard(
+                            files: appointment.files,
+                          ),
+                        ),
+                        const SizedBox(height: DoctorPatientMetrics.cardGap),
+                      ],
                     ],
                     _Section(
                       child: DoctorConclusionCard(

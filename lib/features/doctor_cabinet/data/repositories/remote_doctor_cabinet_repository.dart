@@ -549,8 +549,19 @@ class RemoteDoctorCabinetRepository implements DoctorCabinetRepository {
       endsAt: DateTime.tryParse(json['ends_at'] as String? ?? '')?.toLocal(),
       status: _appointmentStatus(json['status'] as String?),
       conclusion: payload?['text'] as String?,
+      files: [
+        for (final item in json['files'] as List<dynamic>? ?? const [])
+          _appointmentFile(item as Map<String, dynamic>),
+      ],
     );
   }
+
+  static DoctorAppointmentFile _appointmentFile(Map<String, dynamic> json) =>
+      DoctorAppointmentFile(
+        id: json['id'] as String,
+        downloadUrl: json['download_url'] as String,
+        createdAt: DateTime.parse(json['created_at'] as String).toLocal(),
+      );
 
   static AppointmentStatus _appointmentStatus(String? value) => switch (value) {
     'pending' => AppointmentStatus.pending,

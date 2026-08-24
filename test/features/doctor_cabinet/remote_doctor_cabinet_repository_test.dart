@@ -177,6 +177,38 @@ void main() {
     expect(adapter.requests.single.queryParameters['status'], 'completed');
   });
 
+  test('читает готовые download-ссылки файлов из детали записи', () async {
+    final (:dio, adapter: _) = cannedDio({
+      '/doctors/me/appointments/$appointmentId': (
+        statusCode: 200,
+        body: {
+          ...appointment(detailed: true),
+          'files': [
+            {
+              'id': 'file-1',
+              'download_url': 'https://storage.example/file-1?signature=test',
+              'created_at': '2026-08-24T08:10:00Z',
+            },
+          ],
+        },
+      ),
+    });
+
+    final result = await RemoteDoctorCabinetRepository(
+      dio,
+    ).pastAppointment(appointmentId);
+
+    expect(result.files.single.id, 'file-1');
+    expect(
+      result.files.single.downloadUrl,
+      'https://storage.example/file-1?signature=test',
+    );
+    expect(
+      result.files.single.createdAt.toUtc(),
+      DateTime.utc(2026, 8, 24, 8, 10),
+    );
+  });
+
   test('сохраняет заключение завершением записи врача', () async {
     final (:dio, :adapter) = cannedDio({
       'PATCH /doctors/me/appointments/$appointmentId': (

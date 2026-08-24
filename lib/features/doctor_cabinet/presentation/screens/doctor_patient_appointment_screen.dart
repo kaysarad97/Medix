@@ -14,6 +14,7 @@ import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/doctor_appointment.dart';
 import '../providers/doctor_cabinet_providers.dart';
+import '../widgets/doctor_appointment_files_card.dart';
 import '../widgets/doctor_conclusion_card.dart';
 import '../widgets/doctor_history_row.dart';
 import '../widgets/doctor_patient_header.dart';
@@ -92,6 +93,14 @@ class DoctorPatientAppointmentScreen extends ConsumerWidget {
                     const SizedBox(
                       height: DoctorPatientMetrics.actionsToConclusion,
                     ),
+                    if (appointment.files.isNotEmpty) ...[
+                      _Section(
+                        child: DoctorAppointmentFilesCard(
+                          files: appointment.files,
+                        ),
+                      ),
+                      const SizedBox(height: DoctorPatientMetrics.cardGap),
+                    ],
                     _Section(
                       child: DoctorConclusionCard(
                         patientName: patient.fullName,

@@ -37,6 +37,7 @@ class DoctorAppointment {
     this.status = AppointmentStatus.unknown,
     this.patientAvatarAsset,
     this.conclusion,
+    this.files = const [],
   });
 
   final String id;
@@ -58,6 +59,9 @@ class DoctorAppointment {
   /// Заключение врача о приёме — «О прошлой записи.png». `null` — врач его
   /// ещё не загрузил, и на месте текста стоит объяснение из макета.
   final String? conclusion;
+
+  /// Файлы консультации, доступные врачу из детальной записи.
+  final List<DoctorAppointmentFile> files;
 
   /// «13.08» — пилюля в карточке «Предстоящие записи» на главной.
   String get shortDate => RuDates.dayMonth(startsAt);
@@ -86,5 +90,18 @@ class DoctorAppointment {
     status: status,
     patientAvatarAsset: patientAvatarAsset,
     conclusion: value,
+    files: files,
   );
+}
+
+class DoctorAppointmentFile {
+  const DoctorAppointmentFile({
+    required this.id,
+    required this.downloadUrl,
+    required this.createdAt,
+  });
+
+  final String id;
+  final String downloadUrl;
+  final DateTime createdAt;
 }

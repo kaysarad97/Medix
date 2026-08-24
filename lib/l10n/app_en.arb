@@ -279,6 +279,8 @@
   "doctorConclusionTextHint": "Describe the patient's condition and consultation outcome",
   "doctorConclusionSaved": "Report saved",
   "doctorConclusionSaveError": "Could not save the report",
+  "doctorAppointmentFilesTitle": "Consultation files",
+  "doctorAppointmentFileOpenError": "Could not open the consultation file",
   "doctorAnalyticsTitle": "Work analytics",
   "doctorAnalyticsWeekTitle": "Appointments this week",
   "doctorAnalyticsWeekCardTitle": "Weekly analytics",

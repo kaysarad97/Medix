@@ -1160,6 +1160,8 @@
   "doctorConclusionTextHint": "Опишите состояние пациента и результаты консультации",
   "doctorConclusionSaved": "Заключение сохранено",
   "doctorConclusionSaveError": "Не удалось сохранить заключение",
+  "doctorAppointmentFilesTitle": "Файлы консультации",
+  "doctorAppointmentFileOpenError": "Не удалось открыть файл консультации",
   "doctorAnalyticsTitle": "Аналитика Работы",
   "@doctorAnalyticsTitle": {
     "description": "Заголовок экрана аналитики в кабинете врача."

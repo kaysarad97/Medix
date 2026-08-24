@@ -15,6 +15,7 @@ import '../../../../core/widgets/user_avatar.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/doctor_appointment.dart';
 import '../providers/doctor_cabinet_providers.dart';
+import '../widgets/doctor_appointment_files_card.dart';
 import '../widgets/doctor_conclusion_card.dart';
 import '../widgets/doctor_conclusion_dialog.dart';
 import '../widgets/doctor_history_metrics.dart';
@@ -67,6 +68,16 @@ class DoctorPastAppointmentScreen extends ConsumerWidget {
                         ),
                       ),
                     ),
+                    if (appointment.files.isNotEmpty) ...[
+                      const SizedBox(
+                        height: DoctorHistoryMetrics.patientRowToConclusion,
+                      ),
+                      _Section(
+                        child: DoctorAppointmentFilesCard(
+                          files: appointment.files,
+                        ),
+                      ),
+                    ],
                     const SizedBox(
                       height: DoctorHistoryMetrics.patientRowToConclusion,
                     ),

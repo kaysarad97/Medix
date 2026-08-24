@@ -279,6 +279,8 @@
   "doctorConclusionTextHint": "Емделушінің жағдайы мен консультация нәтижесін сипаттаңыз",
   "doctorConclusionSaved": "Қорытынды сақталды",
   "doctorConclusionSaveError": "Қорытындыны сақтау мүмкін болмады",
+  "doctorAppointmentFilesTitle": "Консультация файлдары",
+  "doctorAppointmentFileOpenError": "Консультация файлын ашу мүмкін болмады",
   "doctorAnalyticsTitle": "Жұмыс аналитикасы",
   "doctorAnalyticsWeekTitle": "Осы аптадағы жазбалар",
   "doctorAnalyticsWeekCardTitle": "Апта аналитикасы",
