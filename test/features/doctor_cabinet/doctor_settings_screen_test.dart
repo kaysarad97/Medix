@@ -11,7 +11,10 @@ import '../../helpers/test_fonts.dart';
 void main() {
   setUpAll(loadAppFonts);
 
-  Future<void> pumpScreen(WidgetTester tester) {
+  Future<void> pumpScreen(
+    WidgetTester tester, {
+    bool showFreelancerRows = false,
+  }) {
     tester.view.physicalSize = const Size(440, 956);
     tester.view.devicePixelRatio = 1.0;
     tester.view.padding = const FakeViewPadding(top: 62);
@@ -24,7 +27,7 @@ void main() {
           locale: const Locale('ru'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: const DoctorSettingsScreen(),
+          home: DoctorSettingsScreen(showFreelancerRows: showFreelancerRows),
         ),
       ),
     );
@@ -48,6 +51,16 @@ void main() {
     // данные» — в макете врача нет.
     expect(find.text('Настройки профиля'), findsNothing);
     expect(find.text('Банковские данные'), findsNothing);
+  });
+
+  testWidgets('showFreelancerRows добавляет настройки профиля и банк', (
+    tester,
+  ) async {
+    await pumpScreen(tester, showFreelancerRows: true);
+    await tester.pump();
+
+    expect(find.text('Настройки профиля'), findsOneWidget);
+    expect(find.text('Банковские данные'), findsOneWidget);
   });
 
   testWidgets('переключает язык через общий с пациентом провайдер', (

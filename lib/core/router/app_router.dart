@@ -10,6 +10,7 @@ import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/login_verify_screen.dart';
 import '../../features/auth/presentation/screens/personal_data_screen.dart';
 import '../../features/auth/presentation/screens/policy_screen.dart';
+import '../../features/auth/presentation/screens/register_role_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/auth/presentation/screens/verify_code_screen.dart';
@@ -23,6 +24,7 @@ import '../../features/doctor_cabinet/presentation/screens/doctor_certificates_s
 import '../../features/doctor_cabinet/presentation/screens/doctor_home_screen.dart';
 import '../../features/doctor_cabinet/presentation/screens/doctor_chatbot_screen.dart';
 import '../../features/doctor_cabinet/presentation/screens/doctor_profile_screen.dart';
+import '../../features/doctor_cabinet/presentation/screens/doctor_profile_settings_screen.dart';
 import '../../features/doctor_cabinet/presentation/screens/doctor_settings_screen.dart';
 import '../../features/doctor_cabinet/presentation/screens/doctor_work_schedule_screen.dart';
 import '../../features/doctor_cabinet/presentation/screens/doctor_admin_answer_screen.dart';
@@ -90,6 +92,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.loginVerify,
         builder: (context, state) => const LoginVerifyScreen(),
+      ),
+      GoRoute(
+        path: Routes.registerRoleChoice,
+        builder: (context, state) => const RegisterRoleScreen(),
       ),
       GoRoute(
         path: Routes.register,
@@ -352,6 +358,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.doctorSettings,
         builder: (context, state) => const DoctorSettingsScreen(),
+      ),
+      GoRoute(
+        path: Routes.doctorProfileSettings,
+        builder: (context, state) => const DoctorProfileSettingsScreen(),
+      ),
+      GoRoute(
+        path: Routes.doctorBankDetails,
+        builder: (context, state) => CardFormScreen(
+          // Тот же приём, что и в регистрации фрилансера
+          // (Routes.doctorRegisterCard): своего эндпоинта сохранения
+          // банковских данных врача нет, подтверждённые данные никуда не
+          // уходят.
+          onSubmit: (_) async => PaymentOutcome.success,
+          onResult: (_) => context.pop(),
+        ),
       ),
       GoRoute(
         path: Routes.doctorChatbot,

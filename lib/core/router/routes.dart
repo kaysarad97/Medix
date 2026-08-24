@@ -9,6 +9,10 @@ abstract final class Routes {
   /// Шаг 2 входа — код из письма.
   static const String loginVerify = '/login/verify';
 
+  /// Выбор роли перед регистрацией — пациент или врач-фрилансер. Вход с
+  /// «или создать профиль» на [login].
+  static const String registerRoleChoice = '/register/role';
+
   /// Шаг 1 мастера регистрации — почта.
   static const String register = '/register';
 
@@ -140,6 +144,15 @@ abstract final class Routes {
 
   /// «Настройки» — шестерёнка в шапке «Ваш Профиль» кабинета врача.
   static const String doctorSettings = '/doctor-settings';
+
+  /// «Настройки профиля» — только у врача-фрилансера, строка на
+  /// [doctorSettings].
+  static const String doctorProfileSettings = '/doctor-settings/profile';
+
+  /// «Банковские данные» — только у врача-фрилансера, строка на
+  /// [doctorSettings]. Тот же `CardFormScreen`, что и в регистрации
+  /// ([doctorRegisterCard]) — задел на монетизацию, не оплата.
+  static const String doctorBankDetails = '/doctor-settings/bank';
 
   /// Medi-bot кабинета врача — поле «Напишите Medi-bot...» на главной.
   static const String doctorChatbot = '/doctor-chatbot';

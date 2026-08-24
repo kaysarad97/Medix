@@ -24,6 +24,9 @@ abstract interface class DoctorCabinetRepository {
   /// «Ваш Профиль».
   Future<DoctorOwnProfile> ownProfile();
 
+  /// Правка имени/фамилии — «Настройки профиля» у врача-фрилансера.
+  Future<DoctorOwnProfile> updateOwnProfile(DoctorOwnProfile profile);
+
   /// «Ваши сертификаты».
   Future<List<Certificate>> certificates();
 
@@ -160,6 +163,12 @@ class MockDoctorCabinetRepository implements DoctorCabinetRepository {
       phone: '+7 700 000 0000',
       email: 'abcefg@mail.com',
     );
+  }
+
+  @override
+  Future<DoctorOwnProfile> updateOwnProfile(DoctorOwnProfile profile) async {
+    await Future<void>.delayed(_latency);
+    return profile;
   }
 
   @override

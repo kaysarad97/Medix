@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:medix/core/router/routes.dart';
 import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/core/widgets/primary_button.dart';
 import 'package:medix/features/auth/presentation/screens/login_screen.dart';
@@ -91,5 +93,37 @@ void main() {
           .first,
     );
     expect(fieldBox.height, 66);
+  });
+
+  testWidgets('«или создать профиль» ведёт на выбор роли', (tester) async {
+    final router = GoRouter(
+      initialLocation: Routes.login,
+      routes: [
+        GoRoute(path: Routes.login, builder: (_, _) => const LoginScreen()),
+        GoRoute(
+          path: Routes.registerRoleChoice,
+          builder: (_, _) => const Text('ВЫБОР РОЛИ'),
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: authOverrides,
+        child: MaterialApp.router(
+          theme: AppTheme.light,
+          routerConfig: router,
+          locale: const Locale('ru'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+        ),
+      ),
+    );
+    await tester.pump();
+
+    await tester.tap(find.text('или создать профиль'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('ВЫБОР РОЛИ'), findsOneWidget);
   });
 }

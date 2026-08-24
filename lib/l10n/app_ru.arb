@@ -856,6 +856,10 @@
   "@lastNameHint": {
     "description": "Подсказка поля фамилии на экране настроек профиля."
   },
+  "passwordHint": "Пароль",
+  "@passwordHint": {
+    "description": "Подсказка поля пароля на «Настройках профиля» врача-фрилансера. Поле — ради формы макета: паролей в MedIx нет, вход по одноразовому коду, значение не сохраняется."
+  },
   "audioCallLabel": "Аудио-звонок",
   "@audioCallLabel": {
     "description": "Формат приёма: аудио-звонок. Заголовок экрана звонка."
@@ -1080,6 +1084,7 @@
     "description": "Снек-бар при ошибке загрузки фото врача."
   },
   "registerAsDoctorAction": "Я — врач",
+  "registerAsPatientAction": "Я — клиент",
   "doctorRegistrationTitle": "Регистрация врача",
   "doctorSpecialtyHint": "Специализация",
   "doctorLicenseNumberHint": "Номер лицензии",

@@ -60,6 +60,10 @@ class StepProgressBar extends StatelessWidget {
 /// Значения замерены по макетам, а не вычислены: дизайнер расставил их
 /// вручную (30 / 50 / 70 / 100), поэтому равномерного шага тут нет.
 abstract final class RegistrationProgress {
+  /// `design/врач фрилансер/Логин Выбор.png` — шаг перед «Создайте
+  /// профиль», выбор роли пациент/врач-фрилансер.
+  static const double roleChoice = 0.205;
+
   /// `design/Создайте профиль.png`.
   static const double credentials = 0.313;
 

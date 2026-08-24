@@ -118,7 +118,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               const SizedBox(height: _buttonToLink),
               Center(
                 child: GestureDetector(
-                  onTap: () => context.push(Routes.register),
+                  onTap: () => context.push(Routes.registerRoleChoice),
                   behavior: HitTestBehavior.opaque,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(

@@ -9,6 +9,7 @@ import 'package:medix/features/auth/presentation/providers/registration_controll
 import 'package:medix/features/auth/presentation/screens/app_settings_screen.dart';
 import 'package:medix/features/auth/presentation/screens/personal_data_screen.dart';
 import 'package:medix/features/auth/presentation/screens/policy_screen.dart';
+import 'package:medix/features/auth/presentation/screens/register_role_screen.dart';
 import 'package:medix/features/auth/presentation/screens/register_screen.dart';
 import 'package:medix/features/auth/presentation/screens/verify_code_screen.dart';
 import 'package:medix/l10n/app_localizations.dart';
@@ -87,6 +88,15 @@ void main() {
     await tester.pump();
     await tester.pump();
   }
+
+  testWidgets('Логин Выбор соответствует эталону', (tester) async {
+    await pumpScreen(tester, const RegisterRoleScreen());
+
+    await expectLater(
+      find.byType(RegisterRoleScreen),
+      matchesGoldenFile('goldens/register_role.png'),
+    );
+  });
 
   testWidgets('Создайте профиль соответствует эталону', (tester) async {
     await pumpScreen(tester, const RegisterScreen());

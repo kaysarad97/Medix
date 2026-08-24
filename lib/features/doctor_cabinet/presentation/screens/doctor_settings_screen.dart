@@ -13,21 +13,31 @@ import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/app_language.dart';
 import '../../../../shared/providers/app_settings_provider.dart';
+import '../widgets/doctor_profile_link_row.dart';
 import '../widgets/doctor_profile_metrics.dart';
 
 /// «Настройки» — кабинет врача.
 ///
 /// Свёрстан по `design/для врача от клиники/Настройки Врач.png`. Тот же
 /// набор строк, что и у пациентских настроек (`SettingsScreen` в
-/// `features/profile`), но без строк «Настройки профиля» и «Банковские
-/// данные» — их нет в макете; форма карточек не импортируется оттуда,
-/// та лежит в чужой фиче (см. `DoctorProfileLinkRow`).
+/// `features/profile`); форма карточек не импортируется оттуда, та лежит
+/// в чужой фиче (см. `DoctorProfileLinkRow`).
+///
+/// У врача-фрилансера сверху добавляются «Настройки профиля» и
+/// «Банковские данные» — см. [showFreelancerRows] и
+/// `design/врач фрилансер/Настройки Врач.png`: своими данными фрилансер
+/// управляет сам, а у врача от клиники это делает администрация, поэтому
+/// строк нет вовсе, а не показаны пустыми.
 ///
 /// Провайдер настроек общий с пациентским экраном
 /// ([appSettingsProvider] из `shared/providers`) — язык и уведомления
 /// одни на всё приложение, а не по одному набору на роль.
 class DoctorSettingsScreen extends ConsumerWidget {
-  const DoctorSettingsScreen({super.key});
+  const DoctorSettingsScreen({super.key, this.showFreelancerRows = false});
+
+  /// `true` у врача-фрилансера — показывает «Настройки профиля» и
+  /// «Банковские данные».
+  final bool showFreelancerRows;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -49,6 +59,16 @@ class DoctorSettingsScreen extends ConsumerWidget {
                 onBack: () => Navigator.of(context).maybePop(),
               ),
               const SizedBox(height: 40),
+              if (showFreelancerRows) ...[
+                _Section(
+                  child: DoctorProfileLinkRow(
+                    icon: MedixIcon.userAvatar,
+                    title: l10n.profileSettingsTitle,
+                    onTap: () => context.push(Routes.doctorProfileSettings),
+                  ),
+                ),
+                const SizedBox(height: DoctorProfileMetrics.linkRowGap),
+              ],
               _Section(
                 child: AppCard(
                   borderRadius: _radius,
@@ -77,6 +97,15 @@ class DoctorSettingsScreen extends ConsumerWidget {
                   ),
                 ),
               ),
+              if (showFreelancerRows) ...[
+                const SizedBox(height: DoctorProfileMetrics.linkRowGap),
+                _Section(
+                  child: _RowCard(
+                    title: l10n.bankDetailsTitle,
+                    onTap: () => context.push(Routes.doctorBankDetails),
+                  ),
+                ),
+              ],
               const SizedBox(height: DoctorProfileMetrics.linkRowGap),
               _Section(
                 child: _RowCard(

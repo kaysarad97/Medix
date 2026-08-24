@@ -85,6 +85,10 @@ class FakeDoctorCabinetRepository implements DoctorCabinetRepository {
   );
 
   @override
+  Future<DoctorOwnProfile> updateOwnProfile(DoctorOwnProfile profile) async =>
+      profile;
+
+  @override
   Future<List<Certificate>> certificates() async => const [
     Certificate(id: 'c1', fileName: 'Документ 1.pdf'),
     Certificate(id: 'c2', fileName: 'Документ 2.pdf'),
