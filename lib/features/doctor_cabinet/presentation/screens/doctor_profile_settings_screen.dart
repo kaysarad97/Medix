@@ -114,6 +114,7 @@ class _DoctorProfileSettingsScreenState
               onlineConsultations: profile.onlineConsultations,
               phone: profile.phone,
               email: profile.email,
+              isFreelancer: profile.isFreelancer,
               photoUrl: profile.photoUrl,
             ),
           );

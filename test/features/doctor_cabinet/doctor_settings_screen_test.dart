@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/theme/app_theme.dart';
+import 'package:medix/features/doctor_cabinet/presentation/providers/doctor_cabinet_providers.dart';
 import 'package:medix/features/doctor_cabinet/presentation/screens/doctor_settings_screen.dart';
 import 'package:medix/l10n/app_localizations.dart';
 import 'package:medix/shared/providers/app_settings_provider.dart';
 
+import '../../helpers/fake_doctor_cabinet_repository.dart';
 import '../../helpers/test_fonts.dart';
 
 void main() {
@@ -13,7 +15,8 @@ void main() {
 
   Future<void> pumpScreen(
     WidgetTester tester, {
-    bool showFreelancerRows = false,
+    bool? showFreelancerRows = false,
+    bool isFreelancer = false,
   }) {
     tester.view.physicalSize = const Size(440, 956);
     tester.view.devicePixelRatio = 1.0;
@@ -22,6 +25,11 @@ void main() {
 
     return tester.pumpWidget(
       ProviderScope(
+        overrides: [
+          doctorCabinetRepositoryProvider.overrideWithValue(
+            FakeDoctorCabinetRepository(isFreelancer: isFreelancer),
+          ),
+        ],
         child: MaterialApp(
           theme: AppTheme.light,
           locale: const Locale('ru'),
@@ -63,10 +71,27 @@ void main() {
     expect(find.text('Банковские данные'), findsOneWidget);
   });
 
+  testWidgets('серверный профиль фрилансера добавляет его настройки', (
+    tester,
+  ) async {
+    await pumpScreen(tester, showFreelancerRows: null, isFreelancer: true);
+    await tester.pump();
+    await tester.pump();
+
+    expect(find.text('Настройки профиля'), findsOneWidget);
+    expect(find.text('Банковские данные'), findsOneWidget);
+  });
+
   testWidgets('переключает язык через общий с пациентом провайдер', (
     tester,
   ) async {
-    final container = ProviderContainer();
+    final container = ProviderContainer(
+      overrides: [
+        doctorCabinetRepositoryProvider.overrideWithValue(
+          const FakeDoctorCabinetRepository(),
+        ),
+      ],
+    );
     addTearDown(container.dispose);
 
     await tester.pumpWidget(

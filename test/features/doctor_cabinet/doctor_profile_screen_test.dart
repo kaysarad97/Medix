@@ -14,7 +14,7 @@ void main() {
 
   Future<void> pumpScreen(
     WidgetTester tester, {
-    bool showAdminRequests = true,
+    bool? showAdminRequests = true,
     FakeDoctorCabinetRepository repository =
         const FakeDoctorCabinetRepository(),
   }) {
@@ -55,6 +55,18 @@ void main() {
     tester,
   ) async {
     await pumpScreen(tester, showAdminRequests: false);
+    await tester.pump();
+    await tester.pump();
+
+    expect(find.text('Запросы в администрацию'), findsNothing);
+  });
+
+  testWidgets('серверный профиль фрилансера скрывает запросы', (tester) async {
+    await pumpScreen(
+      tester,
+      showAdminRequests: null,
+      repository: const FakeDoctorCabinetRepository(isFreelancer: true),
+    );
     await tester.pump();
     await tester.pump();
 

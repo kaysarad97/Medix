@@ -31,10 +31,11 @@ import '../widgets/doctor_profile_metrics.dart';
 /// presigned-загрузку [doctorMediaRepositoryProvider] было бы не
 /// дотянуть до экрана.
 class DoctorOwnProfileScreen extends ConsumerStatefulWidget {
-  const DoctorOwnProfileScreen({super.key, this.showAdminRequests = true});
+  const DoctorOwnProfileScreen({super.key, this.showAdminRequests});
 
   /// `false` у врача-фрилансера: своей администрации нет.
-  final bool showAdminRequests;
+  /// `null` определяет тип врача по серверному профилю.
+  final bool? showAdminRequests;
 
   @override
   ConsumerState<DoctorOwnProfileScreen> createState() =>
@@ -81,6 +82,8 @@ class _DoctorOwnProfileScreenState
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final profile = ref.watch(doctorOwnProfileProvider).value;
+    final shouldShowAdminRequests =
+        widget.showAdminRequests ?? (profile != null && !profile.isFreelancer);
 
     return AppScaffold(
       background: AppBackgroundStyle.main,
@@ -139,7 +142,7 @@ class _DoctorOwnProfileScreenState
                     onTap: () => context.push(Routes.doctorOwnReviews),
                   ),
                 ),
-                if (widget.showAdminRequests) ...[
+                if (shouldShowAdminRequests) ...[
                   const SizedBox(height: DoctorProfileMetrics.linkRowGap),
                   _Section(
                     child: DoctorProfileLinkRow(

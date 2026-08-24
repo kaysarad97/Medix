@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/features/doctor_cabinet/domain/entities/doctor_appointment.dart';
+import 'package:medix/features/doctor_cabinet/domain/entities/doctor_own_profile.dart';
 import 'package:medix/features/doctor_cabinet/domain/entities/regular_patient.dart';
 import 'package:medix/features/doctor_cabinet/presentation/providers/doctor_cabinet_providers.dart';
 import 'package:medix/features/doctor_cabinet/presentation/screens/doctor_home_screen.dart';
@@ -14,7 +15,11 @@ import '../../helpers/test_fonts.dart';
 void main() {
   setUpAll(loadAppFonts);
 
-  Future<void> pumpScreen(WidgetTester tester, {bool showAdminTile = true}) {
+  Future<void> pumpScreen(
+    WidgetTester tester, {
+    bool? showAdminTile = true,
+    bool isFreelancer = false,
+  }) {
     return tester.pumpWidget(
       ProviderScope(
         overrides: [
@@ -35,6 +40,22 @@ void main() {
               RegularPatient(id: 'p1', fullName: 'Ф. Имя Отчество'),
               RegularPatient(id: 'p2', fullName: 'Ф. Имя Отчество'),
             ],
+          ),
+          doctorOwnProfileProvider.overrideWith(
+            (ref) async => DoctorOwnProfile(
+              fullName: 'Имя Фамилия',
+              doctorId: 'd1',
+              status: 'активен',
+              rating: 4.5,
+              specialization: '',
+              experience: '',
+              category: '',
+              address: '',
+              onlineConsultations: true,
+              phone: '',
+              email: 'doctor@medix.kz',
+              isFreelancer: isFreelancer,
+            ),
           ),
         ],
         child: MaterialApp(
@@ -66,6 +87,15 @@ void main() {
     tester,
   ) async {
     await pumpScreen(tester, showAdminTile: false);
+    await tester.pump();
+
+    expect(find.text('Администрация'), findsNothing);
+  });
+
+  testWidgets('серверный профиль фрилансера скрывает администрацию', (
+    tester,
+  ) async {
+    await pumpScreen(tester, showAdminTile: null, isFreelancer: true);
     await tester.pump();
 
     expect(find.text('Администрация'), findsNothing);

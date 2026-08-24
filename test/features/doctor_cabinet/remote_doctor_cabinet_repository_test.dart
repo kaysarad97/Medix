@@ -14,7 +14,10 @@ void main() {
   const patientId = '00000000-0000-0000-0000-000000000030';
   const consultationId = '00000000-0000-0000-0000-000000000040';
 
-  Map<String, Object?> doctorMe({String fullName = 'Айжан Садыкова'}) => {
+  Map<String, Object?> doctorMe({
+    String fullName = 'Айжан Садыкова',
+    bool withClinic = true,
+  }) => {
     'id': doctorId,
     'full_name': fullName,
     'phone': '+77010000000',
@@ -31,7 +34,7 @@ void main() {
     'experience_years': 10,
     'rating': 4.8,
     'reviews_count': 12,
-    'clinic': {'id': 'clinic-1', 'name': 'MedIx Clinic'},
+    'clinic': withClinic ? {'id': 'clinic-1', 'name': 'MedIx Clinic'} : null,
     'created_at': '2026-08-01T10:00:00Z',
   };
 
@@ -90,7 +93,20 @@ void main() {
     expect(profile.experience, '10 лет');
     expect(profile.address, 'MedIx Clinic, Алматы');
     expect(profile.phone, '+77010000000');
+    expect(profile.isFreelancer, isFalse);
     expect(profile.photoUrl, 'https://cdn.example/doctor.jpg');
+    expect(adapter.requests.single.path, '/doctors/me');
+  });
+
+  test('определяет фрилансера по отсутствующей клинике', () async {
+    final (:dio, :adapter) = cannedDio({
+      '/doctors/me': (statusCode: 200, body: doctorMe(withClinic: false)),
+    });
+
+    final profile = await RemoteDoctorCabinetRepository(dio).ownProfile();
+
+    expect(profile.isFreelancer, isTrue);
+    expect(profile.address, 'Алматы');
     expect(adapter.requests.single.path, '/doctors/me');
   });
 
@@ -534,6 +550,7 @@ extension on DoctorOwnProfile {
     onlineConsultations: onlineConsultations,
     phone: phone,
     email: email,
+    isFreelancer: isFreelancer,
     photoUrl: photoUrl,
   );
 }

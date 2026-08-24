@@ -26,16 +26,23 @@ import '../widgets/regular_patients_card.dart';
 /// Маршрут зарегистрирован, но пока не связан с реальным входом — роли
 /// пользователя в приложении ещё нет, см. HANDOFF.md.
 class DoctorHomeScreen extends ConsumerWidget {
-  const DoctorHomeScreen({super.key, this.showAdminTile = true});
+  const DoctorHomeScreen({super.key, this.showAdminTile});
 
   /// `false` у врача-фрилансера: своей администрации нет.
-  final bool showAdminTile;
+  /// `null` читает вид кабинета из `GET /doctors/me`; явное значение
+  /// оставлено для изолированных макетных тестов.
+  final bool? showAdminTile;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final appointments = ref.watch(doctorUpcomingAppointmentsProvider);
     final patients = ref.watch(doctorRegularPatientsProvider);
+    final profile = showAdminTile == null
+        ? ref.watch(doctorOwnProfileProvider).value
+        : null;
+    final shouldShowAdminTile =
+        showAdminTile ?? (profile != null && !profile.isFreelancer);
 
     return AppScaffold(
       background: AppBackgroundStyle.main,
@@ -97,7 +104,7 @@ class DoctorHomeScreen extends ConsumerWidget {
                       context.push(Routes.doctorPatientOf(patient.id)),
                 ),
               ),
-              if (showAdminTile) ...[
+              if (shouldShowAdminTile) ...[
                 const SizedBox(height: DoctorHomeMetrics.cardGap),
                 _Section(
                   child: DoctorWideInfoTile(

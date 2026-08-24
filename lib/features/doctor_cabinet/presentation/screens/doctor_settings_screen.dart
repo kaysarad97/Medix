@@ -13,6 +13,7 @@ import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/app_language.dart';
 import '../../../../shared/providers/app_settings_provider.dart';
+import '../providers/doctor_cabinet_providers.dart';
 import '../widgets/doctor_profile_link_row.dart';
 import '../widgets/doctor_profile_metrics.dart';
 
@@ -33,17 +34,23 @@ import '../widgets/doctor_profile_metrics.dart';
 /// ([appSettingsProvider] из `shared/providers`) — язык и уведомления
 /// одни на всё приложение, а не по одному набору на роль.
 class DoctorSettingsScreen extends ConsumerWidget {
-  const DoctorSettingsScreen({super.key, this.showFreelancerRows = false});
+  const DoctorSettingsScreen({super.key, this.showFreelancerRows});
 
   /// `true` у врача-фрилансера — показывает «Настройки профиля» и
   /// «Банковские данные».
-  final bool showFreelancerRows;
+  /// `null` определяет вид настроек по серверному профилю врача.
+  final bool? showFreelancerRows;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(appSettingsProvider);
     final notifier = ref.read(appSettingsProvider.notifier);
     final l10n = AppLocalizations.of(context)!;
+    final profile = showFreelancerRows == null
+        ? ref.watch(doctorOwnProfileProvider).value
+        : null;
+    final shouldShowFreelancerRows =
+        showFreelancerRows ?? (profile?.isFreelancer ?? false);
 
     return AppScaffold(
       background: AppBackgroundStyle.main,
@@ -59,7 +66,7 @@ class DoctorSettingsScreen extends ConsumerWidget {
                 onBack: () => Navigator.of(context).maybePop(),
               ),
               const SizedBox(height: 40),
-              if (showFreelancerRows) ...[
+              if (shouldShowFreelancerRows) ...[
                 _Section(
                   child: DoctorProfileLinkRow(
                     icon: MedixIcon.userAvatar,
@@ -97,7 +104,7 @@ class DoctorSettingsScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-              if (showFreelancerRows) ...[
+              if (shouldShowFreelancerRows) ...[
                 const SizedBox(height: DoctorProfileMetrics.linkRowGap),
                 _Section(
                   child: _RowCard(

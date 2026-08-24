@@ -522,6 +522,7 @@ class RemoteDoctorCabinetRepository implements DoctorCabinetRepository {
       onlineConsultations: true,
       phone: json['phone'] as String? ?? '',
       email: json['email'] as String? ?? '',
+      isFreelancer: clinic == null,
       photoUrl: rawPhotoUrl == null || rawPhotoUrl.isEmpty ? null : rawPhotoUrl,
     );
   }

@@ -15,6 +15,7 @@ class DoctorOwnProfile {
     required this.onlineConsultations,
     required this.phone,
     required this.email,
+    this.isFreelancer = false,
     this.photoUrl,
   });
 
@@ -40,6 +41,9 @@ class DoctorOwnProfile {
 
   final String phone;
   final String email;
+
+  /// У самостоятельного врача `GET /doctors/me` возвращает `clinic: null`.
+  final bool isFreelancer;
   final String? photoUrl;
 
   String get ratingLabel => rating.toStringAsFixed(1);
