@@ -75,8 +75,8 @@ class DoctorMonthAnalytics {
   final DoctorWorkStats stats;
 }
 
-/// Обе карточки экрана разом: сервера под кабинет врача нет, а два
-/// отдельных запроса на один экран заводить незачем.
+/// Обе карточки экрана разом. Remote-репозиторий вычисляет их из завершённых
+/// записей, пока у сервера нет отдельного агрегирующего endpoint.
 class DoctorWorkAnalytics {
   const DoctorWorkAnalytics({required this.week, required this.month});
 

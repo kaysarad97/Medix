@@ -73,9 +73,9 @@ abstract interface class DoctorCabinetRepository {
   });
 }
 
-/// Заглушка на время разработки бэкенда — кабинета врача на сервере пока
-/// нет вовсе. Данные — с макетов `design/.../Главная - в.ф.png` и
-/// `design/.../Календарь.png`.
+/// Заглушка для визуальных тестов и запуска с `MEDIX_USE_MOCKS=true`.
+/// Данные — с макетов `design/.../Главная - в.ф.png` и
+/// `design/.../Календарь.png`; обычная сборка использует remote-реализацию.
 class MockDoctorCabinetRepository implements DoctorCabinetRepository {
   const MockDoctorCabinetRepository();
 

@@ -31,6 +31,8 @@ class DoctorAppointment {
     required this.patientName,
     required this.kind,
     required this.startsAt,
+    this.patientId,
+    this.consultationId,
     this.endsAt,
     this.patientAvatarAsset,
     this.conclusion,
@@ -38,6 +40,8 @@ class DoctorAppointment {
 
   final String id;
   final String patientName;
+  final String? patientId;
+  final String? consultationId;
   final AppointmentKind kind;
   final DateTime startsAt;
 

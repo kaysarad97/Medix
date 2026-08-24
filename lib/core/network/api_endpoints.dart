@@ -101,6 +101,18 @@ abstract final class ApiEndpoints {
   /// учётом подписки — см. `price_for_user` в ответе.
   static const String doctors = '/doctors';
 
+  static const String myDoctor = '$doctors/me';
+
+  static const String myDoctorAppointments = '$myDoctor/appointments';
+
+  static String myDoctorAppointment(String id) => '$myDoctorAppointments/$id';
+
+  static String myDoctorPatientMedicalRecords(String patientId) =>
+      '$myDoctor/patients/$patientId/medical-records';
+
+  static String myDoctorAppointmentNoShow(String id) =>
+      '${myDoctorAppointment(id)}/no-show';
+
   static const String doctorSpecialties = '$doctors/specialties';
 
   static String doctor(String id) => '$doctors/$id';

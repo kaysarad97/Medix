@@ -6,6 +6,7 @@ import '../../../../core/network/dio_client.dart';
 import '../../data/repositories/doctor_cabinet_repository.dart';
 import '../../data/repositories/doctor_media_repository.dart';
 import '../../data/repositories/doctor_schedule_repository.dart';
+import '../../data/repositories/remote_doctor_cabinet_repository.dart';
 import '../../data/services/doctor_file_picker.dart';
 import '../../domain/entities/admin_request.dart';
 import '../../domain/entities/certificate.dart';
@@ -18,9 +19,12 @@ import '../../domain/entities/patient_chat.dart';
 import '../../domain/entities/regular_patient.dart';
 import '../../domain/entities/work_analytics.dart';
 
-final doctorCabinetRepositoryProvider = Provider<DoctorCabinetRepository>(
-  (ref) => const MockDoctorCabinetRepository(),
-);
+final doctorCabinetRepositoryProvider = Provider<DoctorCabinetRepository>((
+  ref,
+) {
+  if (useMocks) return const MockDoctorCabinetRepository();
+  return RemoteDoctorCabinetRepository(ref.watch(dioClientProvider));
+});
 
 final doctorScheduleRepositoryProvider = Provider<DoctorScheduleRepository>((
   ref,
