@@ -53,7 +53,6 @@ class _DoctorChatScreenState extends ConsumerState<DoctorChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = ref.read(doctorChatControllerProvider.notifier);
     final state = ref.watch(doctorChatControllerProvider);
     final l10n = AppLocalizations.of(context)!;
 
@@ -118,7 +117,7 @@ class _DoctorChatScreenState extends ConsumerState<DoctorChatScreen> {
                 const SizedBox(height: 10),
               ],
               ChatInputBar(
-                onSend: controller.send,
+                onSend: _send,
                 enabled: !state.isSending && !state.isUploading,
                 onAttach: state.isUploading ? null : _attachFile,
               ),
@@ -128,6 +127,20 @@ class _DoctorChatScreenState extends ConsumerState<DoctorChatScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _send(String text) async {
+    try {
+      await ref.read(doctorChatControllerProvider.notifier).send(text);
+    } catch (_) {
+      if (mounted) {
+        showFormErrorSnackBar(
+          context,
+          AppLocalizations.of(context)!.consultationMessageSendError,
+        );
+      }
+      rethrow;
+    }
   }
 
   Future<void> _attachFile() async {

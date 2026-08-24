@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/core/widgets/chat_bubble.dart';
+import 'package:medix/features/chats/data/repositories/chats_repository.dart';
 import 'package:medix/features/chats/domain/entities/chat_thread.dart';
 import 'package:medix/features/chats/presentation/providers/chats_providers.dart';
 import 'package:medix/features/chats/presentation/screens/chats_list_screen.dart';
@@ -17,17 +18,16 @@ void main() {
 
   Future<ProviderContainer> pumpScreen(
     WidgetTester tester,
-    Widget screen,
-  ) async {
+    Widget screen, {
+    ChatsRepository repository = const FakeChatsRepository(),
+  }) async {
     tester.view.physicalSize = const Size(440, 956);
     tester.view.devicePixelRatio = 1.0;
     tester.view.padding = const FakeViewPadding(top: 62, bottom: 34);
     addTearDown(tester.view.reset);
 
     final container = ProviderContainer(
-      overrides: [
-        chatsRepositoryProvider.overrideWithValue(const FakeChatsRepository()),
-      ],
+      overrides: [chatsRepositoryProvider.overrideWithValue(repository)],
     );
     addTearDown(container.dispose);
 
@@ -78,6 +78,24 @@ void main() {
 
       expect(find.text('Чат с врачом'), findsOneWidget);
       expect(find.byType(ChatBubble), findsNWidgets(2));
+    });
+
+    testWidgets('ошибка отправки сохраняет текст и показывается пользователю', (
+      tester,
+    ) async {
+      await pumpScreen(
+        tester,
+        const DoctorChatScreen(threadId: 't1'),
+        repository: const _FailingChatsRepository(),
+      );
+
+      await tester.enterText(find.byType(TextField), 'Повторить сообщение');
+      await tester.testTextInput.receiveAction(TextInputAction.send);
+      await tester.pumpAndSettle();
+
+      final input = tester.widget<TextField>(find.byType(TextField));
+      expect(input.controller!.text, 'Повторить сообщение');
+      expect(find.text('Не удалось отправить сообщение'), findsOneWidget);
     });
   });
 
@@ -135,4 +153,13 @@ void main() {
       expect(messages.last.isMine, isTrue);
     });
   });
+}
+
+class _FailingChatsRepository extends FakeChatsRepository {
+  const _FailingChatsRepository();
+
+  @override
+  Future<DoctorMessage> send(String threadId, String text) async {
+    throw Exception('socket disconnected');
+  }
 }

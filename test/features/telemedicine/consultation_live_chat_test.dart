@@ -54,6 +54,53 @@ void main() {
     await subscription.cancel();
     expect(socket.closed, isTrue);
   });
+
+  test('после разрыва send открывает новый WebSocket-сеанс', () async {
+    final firstSocket = _ControllableSocket();
+    final secondSocket = _ControllableSocket();
+    final sockets = [firstSocket, secondSocket];
+    final (:dio, :adapter) = cannedDio({
+      'POST /consultations/c1/join': (
+        statusCode: 200,
+        body: {
+          'room_id': 'room-c1',
+          'ws_ticket': 'short-ticket',
+          'video_token': 'video-token',
+          'video_server_url': 'wss://video.medix.kz',
+          'mode': 'video',
+          'expires_at': '2026-08-24T12:00:00Z',
+        },
+      ),
+    });
+    final live = ConsultationLiveChat(
+      ConsultationsRepository(dio),
+      socketFactory: () => sockets.removeAt(0),
+    );
+    final errors = <Object>[];
+    final subscription = live
+        .watch('c1', userId: 'u1')
+        .listen((_) {}, onError: errors.add);
+    await pumpEventQueue();
+
+    await firstSocket.disconnect();
+    await pumpEventQueue();
+
+    final sending = live.send('c1', userId: 'u1', body: 'После разрыва');
+    await pumpEventQueue();
+    secondSocket.add(
+      ConsultationMessageEvent(
+        message('reconnected', sender: 'u1', body: 'После разрыва'),
+      ),
+    );
+
+    expect((await sending).id, 'reconnected');
+    expect(adapter.requests, hasLength(2));
+    expect(secondSocket.sent, ['После разрыва']);
+    expect(errors, hasLength(1));
+
+    await live.close('c1');
+    await subscription.cancel();
+  });
 }
 
 ConsultationMessage message(
@@ -84,6 +131,8 @@ class _ControllableSocket extends ConsultationSocket {
   }
 
   void add(ConsultationSocketEvent event) => _events.add(event);
+
+  Future<void> disconnect() => _events.close();
 
   @override
   void send(String body) => sent.add(body);

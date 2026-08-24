@@ -398,6 +398,7 @@
   "consultationAttachmentUploadSuccess": "Файл тіркелді",
   "consultationAttachmentUploadError": "Файлды тіркеу мүмкін болмады",
   "consultationAttachmentOpenError": "Тіркемені ашу мүмкін болмады",
+  "consultationMessageSendError": "Хабарламаны жіберу мүмкін болмады",
   "doctorChatUnavailable": "Чат консультация жасалғаннан кейін қолжетімді болады",
   "doctorPatientChatUnavailable": "Емделушімен чат консультация жасалғаннан кейін қолжетімді болады",
   "consultationDisputeAction": "Мәселе туралы хабарлау",

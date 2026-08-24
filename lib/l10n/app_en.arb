@@ -398,6 +398,7 @@
   "consultationAttachmentUploadSuccess": "File attached",
   "consultationAttachmentUploadError": "The file could not be attached",
   "consultationAttachmentOpenError": "The attachment could not be opened",
+  "consultationMessageSendError": "The message could not be sent",
   "doctorChatUnavailable": "The chat will be available after the consultation is created",
   "doctorPatientChatUnavailable": "The patient chat will be available after the consultation is created",
   "consultationDisputeAction": "Report a problem",

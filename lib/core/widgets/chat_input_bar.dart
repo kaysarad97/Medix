@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../l10n/app_localizations.dart';
@@ -18,7 +20,7 @@ class ChatInputBar extends StatefulWidget {
     this.enabled = true,
   });
 
-  final ValueChanged<String> onSend;
+  final Future<void> Function(String) onSend;
   final VoidCallback? onAttach;
   final bool enabled;
 
@@ -37,11 +39,16 @@ class _ChatInputBarState extends State<ChatInputBar> {
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     final text = _controller.text;
-    if (text.trim().isEmpty) return;
-    _controller.clear();
-    widget.onSend(text);
+    if (!widget.enabled || text.trim().isEmpty) return;
+    try {
+      await widget.onSend(text);
+      if (mounted && _controller.text == text) _controller.clear();
+    } catch (_) {
+      // Экран показывает подходящую локализованную ошибку. Текст намеренно
+      // остаётся в поле, чтобы пользователь мог повторить отправку.
+    }
   }
 
   @override
@@ -65,7 +72,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
                   controller: _controller,
                   enabled: widget.enabled,
                   textInputAction: TextInputAction.send,
-                  onSubmitted: (_) => _submit(),
+                  onSubmitted: (_) => unawaited(_submit()),
                   style: AppTypography.bodyLg.copyWith(
                     color: AppColors.textPrimary,
                   ),

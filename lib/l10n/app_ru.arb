@@ -1456,6 +1456,7 @@
   "consultationAttachmentUploadSuccess": "Файл прикреплён",
   "consultationAttachmentUploadError": "Не удалось прикрепить файл",
   "consultationAttachmentOpenError": "Не удалось открыть вложение",
+  "consultationMessageSendError": "Не удалось отправить сообщение",
   "doctorChatUnavailable": "Чат будет доступен после создания консультации",
   "doctorPatientChatUnavailable": "Чат с пациентом будет доступен после создания консультации",
   "consultationDisputeAction": "Сообщить о проблеме",

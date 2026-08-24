@@ -60,7 +60,6 @@ class _DoctorPatientChatScreenState
 
   @override
   Widget build(BuildContext context) {
-    final controller = ref.read(patientChatControllerProvider.notifier);
     final state = ref.watch(patientChatControllerProvider);
     final l10n = AppLocalizations.of(context)!;
 
@@ -127,7 +126,7 @@ class _DoctorPatientChatScreenState
                 const SizedBox(height: 10),
               ],
               ChatInputBar(
-                onSend: controller.send,
+                onSend: _send,
                 enabled: !state.isSending && !state.isUploading,
                 onAttach: state.isUploading ? null : _attachFile,
               ),
@@ -137,6 +136,20 @@ class _DoctorPatientChatScreenState
         ),
       ),
     );
+  }
+
+  Future<void> _send(String text) async {
+    try {
+      await ref.read(patientChatControllerProvider.notifier).send(text);
+    } catch (_) {
+      if (mounted) {
+        showFormErrorSnackBar(
+          context,
+          AppLocalizations.of(context)!.consultationMessageSendError,
+        );
+      }
+      rethrow;
+    }
   }
 
   Future<void> _attachFile() async {

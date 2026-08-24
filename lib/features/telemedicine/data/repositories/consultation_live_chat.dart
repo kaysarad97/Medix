@@ -49,7 +49,7 @@ class ConsultationLiveChat {
           consultationId: consultationId,
           userId: userId,
           repository: _repository,
-          socket: _socketFactory(),
+          socketFactory: _socketFactory,
         ),
       );
 }
@@ -59,7 +59,7 @@ class _LiveSession {
     required this.consultationId,
     required this.userId,
     required this.repository,
-    required this.socket,
+    required this.socketFactory,
   }) {
     _messages = StreamController<ConsultationMessage>.broadcast(
       onListen: () {
@@ -71,39 +71,72 @@ class _LiveSession {
   final String consultationId;
   final String userId;
   final ConsultationsRepository repository;
-  final ConsultationSocket socket;
+  final ConsultationSocket Function() socketFactory;
 
   late final StreamController<ConsultationMessage> _messages;
   final List<_PendingMessage> _pending = [];
+  ConsultationSocket? _socket;
   StreamSubscription<ConsultationSocketEvent>? _subscription;
   Future<void>? _opening;
+  var _connected = false;
   var _closed = false;
 
   Stream<ConsultationMessage> get stream => _messages.stream;
 
-  Future<void> _open() => _opening ??= _connect();
+  Future<void> _open() {
+    if (_closed) return Future.error(const ApiException('Чат уже закрыт'));
+    if (_connected) return Future.value();
+    final opening = _opening;
+    if (opening != null) return opening;
+
+    final future = _connect();
+    _opening = future;
+    return future.whenComplete(() {
+      if (identical(_opening, future)) _opening = null;
+    });
+  }
 
   Future<void> _connect() async {
     try {
+      await _subscription?.cancel();
+      await _socket?.close();
+      _subscription = null;
+
       final join = await repository.join(consultationId);
+      if (_closed) return;
+      final socket = socketFactory();
+      _socket = socket;
+      _connected = true;
       _subscription = socket
           .connect(consultationId: consultationId, ticket: join.webSocketTicket)
           .listen(
             _onEvent,
             onError: (Object error, StackTrace stackTrace) {
-              _failPending(error, stackTrace);
-              if (!_messages.isClosed) _messages.addError(error, stackTrace);
+              _onDisconnected(socket, error, stackTrace);
             },
             onDone: () {
-              const error = ApiException('Соединение с чатом закрыто');
-              _failPending(error);
-              if (!_messages.isClosed) _messages.addError(error);
+              _onDisconnected(
+                socket,
+                const ApiException('Соединение с чатом закрыто'),
+              );
             },
           );
     } catch (error, stackTrace) {
+      _connected = false;
       if (!_messages.isClosed) _messages.addError(error, stackTrace);
       rethrow;
     }
+  }
+
+  void _onDisconnected(
+    ConsultationSocket source,
+    Object error, [
+    StackTrace? stackTrace,
+  ]) {
+    if (!identical(_socket, source) || !_connected) return;
+    _connected = false;
+    _failPending(error, stackTrace);
+    if (!_messages.isClosed) _messages.addError(error, stackTrace);
   }
 
   void _onEvent(ConsultationSocketEvent event) {
@@ -131,6 +164,10 @@ class _LiveSession {
   Future<ConsultationMessage> send(String body) async {
     if (_closed) throw const ApiException('Чат уже закрыт');
     await _open();
+    final socket = _socket;
+    if (!_connected || socket == null) {
+      throw const ApiException('Соединение с чатом закрыто');
+    }
     final pending = _PendingMessage(body);
     _pending.add(pending);
     socket.send(body);
@@ -159,8 +196,9 @@ class _LiveSession {
     _closed = true;
     const error = ApiException('Чат закрыт');
     _failPending(error);
+    _connected = false;
     await _subscription?.cancel();
-    await socket.close();
+    await _socket?.close();
     await _messages.close();
   }
 }
