@@ -289,6 +289,7 @@ void main() {
       'id': id,
       'slot_id': 's-first',
       'family_member_id': null,
+      'consultation_id': 'c-ap-1',
       'type': type,
       'status': status,
       'starts_at': startsAt,
@@ -351,6 +352,7 @@ void main() {
 
       final opened = await repository.appointment('ap-1');
       expect(opened.kind, AppointmentKind.audioCall);
+      expect(opened.consultationId, 'c-ap-1');
     });
 
     test('неизвестная запись возвращает серверную ошибку', () async {

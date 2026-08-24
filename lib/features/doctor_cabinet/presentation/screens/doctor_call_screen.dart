@@ -16,6 +16,8 @@ import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../core/widgets/user_avatar.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/appointment.dart';
+import '../../../calls/data/call_media_session.dart';
+import '../../../calls/presentation/providers/call_session_controller.dart';
 import '../../domain/entities/doctor_patient.dart';
 import '../providers/doctor_cabinet_providers.dart';
 
@@ -30,8 +32,9 @@ import '../providers/doctor_cabinet_providers.dart';
 /// кнопка сброса розовая, а не красная. Ромб кнопок и размеры общие —
 /// `CallControls` и `CallMetrics` в `core/widgets`.
 ///
-/// Медиапотока по-прежнему нет: таймер идёт локально, сброс переводит
-/// экран в «Вызов завершен». Консультации с LiveKit подключает Codex.
+/// При наличии `consultation_id` экран входит в LiveKit-комнату, показывает
+/// удалённую камеру пациента и публикует дорожки врача. Сброс закрывает комнату
+/// и завершает консультацию на сервере.
 class DoctorCallScreen extends ConsumerStatefulWidget {
   const DoctorCallScreen({super.key, required this.patientId});
 
@@ -56,6 +59,8 @@ class DoctorCallScreen extends ConsumerStatefulWidget {
 
 class _DoctorCallScreenState extends ConsumerState<DoctorCallScreen> {
   Timer? _ticker;
+  CallSessionController? _call;
+  String? _callConsultationId;
   Duration _elapsed = Duration.zero;
   var _ended = false;
 
@@ -70,7 +75,36 @@ class _DoctorCallScreenState extends ConsumerState<DoctorCallScreen> {
   @override
   void dispose() {
     _ticker?.cancel();
+    _call?.removeListener(_onCallChanged);
+    _call?.dispose();
     super.dispose();
+  }
+
+  void _onCallChanged() {
+    if (mounted) setState(() {});
+  }
+
+  void _ensureCall(DoctorPatient patient) {
+    final appointment = patient.appointment;
+    final consultationId = appointment?.consultationId;
+    if (appointment == null ||
+        consultationId == null ||
+        _callConsultationId == consultationId) {
+      return;
+    }
+    _callConsultationId = consultationId;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _call != null) return;
+      final controller = ref.read(callSessionControllerFactoryProvider)();
+      _call = controller..addListener(_onCallChanged);
+      unawaited(
+        controller.connect(
+          consultationId,
+          enableVideo: appointment.kind == AppointmentKind.videoCall,
+        ),
+      );
+      setState(() {});
+    });
   }
 
   void _handleHangUp() {
@@ -79,12 +113,15 @@ class _DoctorCallScreenState extends ConsumerState<DoctorCallScreen> {
       return;
     }
     _ticker?.cancel();
+    unawaited(_call?.hangUp(completeConsultation: true));
     setState(() => _ended = true);
   }
 
   @override
   Widget build(BuildContext context) {
     final patient = ref.watch(doctorPatientProvider(widget.patientId)).value;
+    if (patient != null) _ensureCall(patient);
+    final call = _call?.state ?? const CallSessionState();
 
     return AppScaffold(
       background: AppBackgroundStyle.call,
@@ -95,9 +132,13 @@ class _DoctorCallScreenState extends ConsumerState<DoctorCallScreen> {
             : _Content(
                 patient: patient,
                 kind: patient.appointment?.kind ?? AppointmentKind.videoCall,
+                consultationId: patient.appointment?.consultationId,
+                call: call,
                 elapsed: _elapsed,
-                ended: _ended,
+                ended: _ended || call.status == CallSessionStatus.ended,
                 onHangUp: _handleHangUp,
+                onToggleCamera: _call?.toggleCamera,
+                onToggleMicrophone: _call?.toggleMicrophone,
               ),
       ),
     );
@@ -108,16 +149,24 @@ class _Content extends StatelessWidget {
   const _Content({
     required this.patient,
     required this.kind,
+    required this.consultationId,
+    required this.call,
     required this.elapsed,
     required this.ended,
     required this.onHangUp,
+    required this.onToggleCamera,
+    required this.onToggleMicrophone,
   });
 
   final DoctorPatient patient;
   final AppointmentKind kind;
+  final String? consultationId;
+  final CallSessionState call;
   final Duration elapsed;
   final bool ended;
   final VoidCallback onHangUp;
+  final VoidCallback? onToggleCamera;
+  final VoidCallback? onToggleMicrophone;
 
   bool get _isVideo => kind == AppointmentKind.videoCall;
 
@@ -142,6 +191,17 @@ class _Content extends StatelessWidget {
           ),
           const SizedBox(height: CallMetrics.topBarToStatus),
           Center(child: Text(_timerLabel(), style: AppTypography.callStatus)),
+          if (call.errorMessage case final message?)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+              child: Text(
+                message,
+                textAlign: TextAlign.center,
+                style: AppTypography.caption.copyWith(
+                  color: DoctorCallScreen.hangUpColor,
+                ),
+              ),
+            ),
           if (ended) ...[
             const SizedBox(height: CallMetrics.statusLines),
             Center(
@@ -152,8 +212,30 @@ class _Content extends StatelessWidget {
           Opacity(
             opacity: ended ? 0.43 : 1,
             child: _isVideo
-                ? _VideoBody(patient: patient, onHangUp: onHangUp)
-                : _AudioBody(patient: patient, onHangUp: onHangUp),
+                ? _VideoBody(
+                    patient: patient,
+                    consultationId: consultationId,
+                    remoteVideo: call.remoteVideo,
+                    localVideo: call.localVideo,
+                    cameraEnabled: call.status == CallSessionStatus.idle
+                        ? null
+                        : call.cameraEnabled,
+                    microphoneEnabled: call.status == CallSessionStatus.idle
+                        ? true
+                        : call.microphoneEnabled,
+                    onHangUp: onHangUp,
+                    onToggleCamera: onToggleCamera,
+                    onToggleMicrophone: onToggleMicrophone,
+                  )
+                : _AudioBody(
+                    patient: patient,
+                    consultationId: consultationId,
+                    microphoneEnabled: call.status == CallSessionStatus.idle
+                        ? true
+                        : call.microphoneEnabled,
+                    onHangUp: onHangUp,
+                    onToggleMicrophone: onToggleMicrophone,
+                  ),
           ),
         ],
       ),
@@ -162,10 +244,27 @@ class _Content extends StatelessWidget {
 }
 
 class _VideoBody extends StatelessWidget {
-  const _VideoBody({required this.patient, required this.onHangUp});
+  const _VideoBody({
+    required this.patient,
+    required this.consultationId,
+    required this.remoteVideo,
+    required this.localVideo,
+    required this.cameraEnabled,
+    required this.microphoneEnabled,
+    required this.onHangUp,
+    required this.onToggleCamera,
+    required this.onToggleMicrophone,
+  });
 
   final DoctorPatient patient;
+  final String? consultationId;
+  final CallVideoFeed? remoteVideo;
+  final CallVideoFeed? localVideo;
+  final bool? cameraEnabled;
+  final bool microphoneEnabled;
   final VoidCallback onHangUp;
+  final VoidCallback? onToggleCamera;
+  final VoidCallback? onToggleMicrophone;
 
   @override
   Widget build(BuildContext context) {
@@ -183,6 +282,7 @@ class _VideoBody extends StatelessWidget {
                   child: _PatientPhoto(
                     patient: patient,
                     avatarSize: DoctorCallScreen.videoAvatarSize,
+                    video: remoteVideo,
                   ),
                 ),
                 // Имя в макете подписано поверх фото, а не под ним, как у
@@ -212,12 +312,19 @@ class _VideoBody extends StatelessWidget {
             children: [
               CallControls(
                 isVideo: true,
+                cameraEnabled: cameraEnabled,
+                microphoneEnabled: microphoneEnabled,
+                onToggleCamera: onToggleCamera,
+                onToggleMicrophone: onToggleMicrophone,
                 onHangUp: onHangUp,
                 hangUpColor: DoctorCallScreen.hangUpColor,
-                onChat: () =>
-                    context.push(Routes.doctorPatientChatOf(patient.id)),
+                onChat: consultationId == null
+                    ? null
+                    : () => context.push(
+                        Routes.doctorPatientChatOf(consultationId!),
+                      ),
               ),
-              _SelfView(patient: patient),
+              _SelfView(patient: patient, video: localVideo),
             ],
           ),
         ],
@@ -227,10 +334,19 @@ class _VideoBody extends StatelessWidget {
 }
 
 class _AudioBody extends StatelessWidget {
-  const _AudioBody({required this.patient, required this.onHangUp});
+  const _AudioBody({
+    required this.patient,
+    required this.consultationId,
+    required this.microphoneEnabled,
+    required this.onHangUp,
+    required this.onToggleMicrophone,
+  });
 
   final DoctorPatient patient;
+  final String? consultationId;
+  final bool microphoneEnabled;
   final VoidCallback onHangUp;
+  final VoidCallback? onToggleMicrophone;
 
   @override
   Widget build(BuildContext context) {
@@ -247,32 +363,44 @@ class _AudioBody extends StatelessWidget {
         const SizedBox(height: CallMetrics.audioNameToControls),
         CallControls(
           isVideo: false,
+          microphoneEnabled: microphoneEnabled,
+          onToggleMicrophone: onToggleMicrophone,
           onHangUp: onHangUp,
           hangUpColor: DoctorCallScreen.hangUpColor,
-          onChat: () => context.push(Routes.doctorPatientChatOf(patient.id)),
+          onChat: consultationId == null
+              ? null
+              : () => context.push(Routes.doctorPatientChatOf(consultationId!)),
         ),
       ],
     );
   }
 }
 
-/// Пациент крупным планом. Настоящей камеры нет — на её месте аватар
-/// пациента, тот же, что в календаре и «Профиле пациента».
+/// Пациент крупным планом. Пока удалённой дорожки нет, на её месте остаётся
+/// аватар из календаря и «Профиля пациента».
 ///
 /// На видео-звонке аватар не растягивается на всю карточку: он рисованный,
 /// и в 538 точек высотой превращается в гигантскую голову. Вместо этого
 /// стоит по центру подложки — читается как «сигнала нет, вот с кем говорим».
 class _PatientPhoto extends StatelessWidget {
-  const _PatientPhoto({required this.patient, this.avatarSize});
+  const _PatientPhoto({required this.patient, this.avatarSize, this.video});
 
   final DoctorPatient patient;
 
   /// `null` — аватар занимает всю карточку (аудио-звонок, там она сама
   /// размером с аватар).
   final Size? avatarSize;
+  final CallVideoFeed? video;
 
   @override
   Widget build(BuildContext context) {
+    final feed = video;
+    if (feed != null) {
+      return ClipRRect(
+        borderRadius: AppRadius.allLg,
+        child: feed.view(mirror: false),
+      );
+    }
     final avatar = UserAvatar(
       asset: patient.avatarAsset,
       size: avatarSize ?? Size.infinite,
@@ -292,15 +420,26 @@ class _PatientPhoto extends StatelessWidget {
 /// Самопросмотр врача — портрет из набора дизайнера, как и везде, где
 /// фотографии с сервера ещё нет.
 class _SelfView extends StatelessWidget {
-  const _SelfView({required this.patient});
+  const _SelfView({required this.patient, this.video});
 
   final DoctorPatient patient;
+  final CallVideoFeed? video;
 
   @override
   Widget build(BuildContext context) {
+    final feed = video;
+    if (feed == null) {
+      return SizedBox.fromSize(
+        size: CallMetrics.selfViewSize,
+        child: DoctorPhoto(seed: patient.id, borderRadius: AppRadius.allLg),
+      );
+    }
     return SizedBox.fromSize(
       size: CallMetrics.selfViewSize,
-      child: DoctorPhoto(seed: patient.id, borderRadius: AppRadius.allLg),
+      child: ClipRRect(
+        borderRadius: AppRadius.allLg,
+        child: feed.view(mirror: true),
+      ),
     );
   }
 }

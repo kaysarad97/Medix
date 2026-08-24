@@ -20,12 +20,20 @@ class CallControls extends StatelessWidget {
     required this.isVideo,
     required this.onHangUp,
     this.onChat,
+    this.cameraEnabled,
+    this.microphoneEnabled = true,
+    this.onToggleCamera,
+    this.onToggleMicrophone,
     this.hangUpColor = AppColors.callDecline,
   });
 
   final bool isVideo;
   final VoidCallback onHangUp;
   final VoidCallback? onChat;
+  final bool? cameraEnabled;
+  final bool microphoneEnabled;
+  final VoidCallback? onToggleCamera;
+  final VoidCallback? onToggleMicrophone;
   final Color hangUpColor;
 
   static const double _radius = CallMetrics.controlSize / 2;
@@ -40,13 +48,23 @@ class CallControls extends StatelessWidget {
             left: CallMetrics.controlsClusterSize.width / 2 - _radius,
             top: 0,
             child: _ControlButton(
-              icon: isVideo ? MedixIcon.videoCall : MedixIcon.videoOff,
+              icon: (cameraEnabled ?? isVideo)
+                  ? MedixIcon.videoCall
+                  : MedixIcon.videoOff,
+              onTap: onToggleCamera,
             ),
           ),
-          const Positioned(
+          Positioned(
             left: 0,
             top: CallMetrics.controlsSideTop,
-            child: _ControlButton(icon: null, isPause: true),
+            child: _ControlButton(
+              icon: null,
+              isPause: true,
+              color: microphoneEnabled
+                  ? AppColors.primary
+                  : AppColors.textMuted,
+              onTap: onToggleMicrophone,
+            ),
           ),
           Positioned(
             right: 0,

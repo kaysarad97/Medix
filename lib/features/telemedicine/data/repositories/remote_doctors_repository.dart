@@ -362,6 +362,7 @@ class RemoteDoctorsRepository implements DoctorsRepository {
       endsAt: DateTime.tryParse(json['ends_at'] as String? ?? '')?.toLocal(),
       doctorId: doctor['id'] as String?,
       doctorName: (doctor['full_name'] as String?)?.trim(),
+      consultationId: json['consultation_id'] as String?,
       familyMemberId: json['family_member_id'] as String?,
       status: _statusFrom(json['status'] as String?),
       basePrice: price,

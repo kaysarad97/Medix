@@ -20,6 +20,7 @@ class Appointment {
     required this.startsAt,
     this.doctorId,
     this.doctorName,
+    this.consultationId,
     this.endsAt,
     this.status = AppointmentStatus.unknown,
     this.familyMemberId,
@@ -35,6 +36,7 @@ class Appointment {
   /// Врач, к которому запись. У моков главной пусто.
   final String? doctorId;
   final String? doctorName;
+  final String? consultationId;
   final DateTime? endsAt;
   final AppointmentStatus status;
   final String? familyMemberId;
