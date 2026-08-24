@@ -15,13 +15,13 @@ void main() {
   Future<void> pumpScreen(
     WidgetTester tester, {
     bool showAdminRequests = true,
+    FakeDoctorCabinetRepository repository =
+        const FakeDoctorCabinetRepository(),
   }) {
     return tester.pumpWidget(
       ProviderScope(
         overrides: [
-          doctorCabinetRepositoryProvider.overrideWithValue(
-            const FakeDoctorCabinetRepository(),
-          ),
+          doctorCabinetRepositoryProvider.overrideWithValue(repository),
         ],
         child: MaterialApp(
           theme: AppTheme.light,
@@ -59,5 +59,21 @@ void main() {
     await tester.pump();
 
     expect(find.text('Запросы в администрацию'), findsNothing);
+  });
+
+  testWidgets('показывает фотографию из профиля врача', (tester) async {
+    await pumpScreen(
+      tester,
+      repository: const FakeDoctorCabinetRepository(
+        photoUrl: 'https://cdn.example/doctor.jpg',
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+
+    final image = tester.widget<Image>(
+      find.byKey(const Key('doctor-profile-photo')),
+    );
+    expect((image.image as NetworkImage).url, 'https://cdn.example/doctor.jpg');
   });
 }

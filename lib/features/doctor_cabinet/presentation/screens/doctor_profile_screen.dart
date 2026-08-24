@@ -63,6 +63,7 @@ class _DoctorOwnProfileScreenState
             bytes: file.bytes,
           );
       if (!mounted) return;
+      ref.invalidate(doctorOwnProfileProvider);
       messenger.showSnackBar(
         SnackBar(content: Text(l10n.doctorPhotoUploadSuccess)),
       );

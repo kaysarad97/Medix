@@ -15,6 +15,7 @@ class DoctorOwnProfile {
     required this.onlineConsultations,
     required this.phone,
     required this.email,
+    this.photoUrl,
   });
 
   final String fullName;
@@ -39,6 +40,7 @@ class DoctorOwnProfile {
 
   final String phone;
   final String email;
+  final String? photoUrl;
 
   String get ratingLabel => rating.toStringAsFixed(1);
 }

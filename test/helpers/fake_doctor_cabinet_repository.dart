@@ -19,7 +19,9 @@ import 'package:medix/shared/models/medix_avatars.dart';
 /// Задержка в заглушке сделана через `Future.delayed`, а таймер вне
 /// `runAsync` роняет виджет-тест на «timersPending».
 class FakeDoctorCabinetRepository implements DoctorCabinetRepository {
-  const FakeDoctorCabinetRepository();
+  const FakeDoctorCabinetRepository({this.photoUrl});
+
+  final String? photoUrl;
 
   @override
   Future<List<DoctorAppointment>> upcomingAppointments() async => [
@@ -72,7 +74,7 @@ class FakeDoctorCabinetRepository implements DoctorCabinetRepository {
   ];
 
   @override
-  Future<DoctorOwnProfile> ownProfile() async => const DoctorOwnProfile(
+  Future<DoctorOwnProfile> ownProfile() async => DoctorOwnProfile(
     fullName: 'Имя Фамилия',
     doctorId: '11233МК',
     status: 'активен',
@@ -84,6 +86,7 @@ class FakeDoctorCabinetRepository implements DoctorCabinetRepository {
     onlineConsultations: true,
     phone: '+7 700 000 0000',
     email: 'abcefg@mail.com',
+    photoUrl: photoUrl,
   );
 
   @override

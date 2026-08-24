@@ -44,9 +44,10 @@ class DoctorProfileHeader extends StatelessWidget {
               onTap: isUploadingPhoto ? null : onChangePhoto!,
               isUploading: isUploadingPhoto,
               caption: l10n.doctorChangePhotoAction,
+              photoUrl: profile.photoUrl,
             )
           else
-            const _Photo(),
+            _Photo(photoUrl: profile.photoUrl),
           const SizedBox(width: DoctorProfileMetrics.photoToInfo),
           Expanded(
             child: Column(
@@ -82,7 +83,9 @@ class DoctorProfileHeader extends StatelessWidget {
 }
 
 class _Photo extends StatelessWidget {
-  const _Photo();
+  const _Photo({this.photoUrl});
+
+  final String? photoUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -91,9 +94,21 @@ class _Photo extends StatelessWidget {
         color: AppColors.accentSoft.withValues(alpha: 0.5),
         borderRadius: AppRadius.allLg,
       ),
-      child: const SizedBox(
+      child: SizedBox(
         width: DoctorProfileMetrics.photoWidth,
         height: DoctorProfileMetrics.photoHeight,
+        child: photoUrl == null
+            ? null
+            : ClipRRect(
+                borderRadius: AppRadius.allLg,
+                child: Image.network(
+                  photoUrl!,
+                  key: const Key('doctor-profile-photo'),
+                  fit: BoxFit.cover,
+                  alignment: Alignment.topCenter,
+                  errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                ),
+              ),
       ),
     );
   }
@@ -107,11 +122,13 @@ class _TappablePhoto extends StatelessWidget {
     required this.onTap,
     required this.isUploading,
     required this.caption,
+    required this.photoUrl,
   });
 
   final VoidCallback? onTap;
   final bool isUploading;
   final String caption;
+  final String? photoUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -120,24 +137,17 @@ class _TappablePhoto extends StatelessWidget {
       children: [
         GestureDetector(
           onTap: onTap,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: AppColors.accentSoft.withValues(alpha: 0.5),
-              borderRadius: AppRadius.allLg,
-            ),
-            child: SizedBox(
-              width: DoctorProfileMetrics.photoWidth,
-              height: DoctorProfileMetrics.photoHeight,
-              child: isUploading
-                  ? const Center(
-                      child: SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                    )
-                  : null,
-            ),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              _Photo(photoUrl: photoUrl),
+              if (isUploading)
+                const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+            ],
           ),
         ),
         const SizedBox(height: 6),

@@ -90,6 +90,7 @@ void main() {
     expect(profile.experience, '10 лет');
     expect(profile.address, 'MedIx Clinic, Алматы');
     expect(profile.phone, '+77010000000');
+    expect(profile.photoUrl, 'https://cdn.example/doctor.jpg');
     expect(adapter.requests.single.path, '/doctors/me');
   });
 
@@ -533,5 +534,6 @@ extension on DoctorOwnProfile {
     onlineConsultations: onlineConsultations,
     phone: phone,
     email: email,
+    photoUrl: photoUrl,
   );
 }

@@ -68,6 +68,7 @@ class _DoctorProfileSettingsScreenState
             bytes: file.bytes,
           );
       if (!mounted) return;
+      ref.invalidate(doctorOwnProfileProvider);
       messenger.showSnackBar(
         SnackBar(content: Text(l10n.doctorPhotoUploadSuccess)),
       );
@@ -113,6 +114,7 @@ class _DoctorProfileSettingsScreenState
               onlineConsultations: profile.onlineConsultations,
               phone: profile.phone,
               email: profile.email,
+              photoUrl: profile.photoUrl,
             ),
           );
     } catch (_) {
@@ -161,7 +163,12 @@ class _DoctorProfileSettingsScreenState
               const SizedBox(height: 30),
               GestureDetector(
                 onTap: _changePhoto,
-                child: Center(child: _Photo(isUploading: _uploadingPhoto)),
+                child: Center(
+                  child: _Photo(
+                    isUploading: _uploadingPhoto,
+                    photoUrl: profile?.photoUrl,
+                  ),
+                ),
               ),
               const SizedBox(height: 8),
               GestureDetector(
@@ -220,9 +227,10 @@ class _DoctorProfileSettingsScreenState
 }
 
 class _Photo extends StatelessWidget {
-  const _Photo({required this.isUploading});
+  const _Photo({required this.isUploading, this.photoUrl});
 
   final bool isUploading;
+  final String? photoUrl;
 
   static const double _size = 130;
 
@@ -236,15 +244,28 @@ class _Photo extends StatelessWidget {
       child: SizedBox(
         width: _size,
         height: _size,
-        child: isUploading
-            ? const Center(
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            if (photoUrl != null)
+              ClipOval(
+                child: Image.network(
+                  photoUrl!,
+                  fit: BoxFit.cover,
+                  alignment: Alignment.topCenter,
+                  errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                ),
+              ),
+            if (isUploading)
+              const Center(
                 child: SizedBox(
                   width: 24,
                   height: 24,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 ),
-              )
-            : null,
+              ),
+          ],
+        ),
       ),
     );
   }

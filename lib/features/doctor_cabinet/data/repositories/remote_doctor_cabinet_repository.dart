@@ -498,6 +498,7 @@ class RemoteDoctorCabinetRepository implements DoctorCabinetRepository {
 
   static DoctorOwnProfile _profile(Map<String, dynamic> json) {
     final experience = (json['experience_years'] as num?)?.round();
+    final rawPhotoUrl = (json['photo_url'] as String?)?.trim();
     final clinic = json['clinic'] as Map<String, dynamic>?;
     final address = [
       clinic?['name'] as String?,
@@ -521,6 +522,7 @@ class RemoteDoctorCabinetRepository implements DoctorCabinetRepository {
       onlineConsultations: true,
       phone: json['phone'] as String? ?? '',
       email: json['email'] as String? ?? '',
+      photoUrl: rawPhotoUrl == null || rawPhotoUrl.isEmpty ? null : rawPhotoUrl,
     );
   }
 
