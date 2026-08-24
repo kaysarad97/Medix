@@ -9,6 +9,7 @@ import '../../data/repositories/consultation_socket.dart';
 import '../../data/repositories/consultations_repository.dart';
 import '../../data/repositories/doctors_repository.dart';
 import '../../data/repositories/remote_doctors_repository.dart';
+import '../../data/services/consultation_file_picker.dart';
 import '../../domain/entities/consultation.dart';
 import '../../domain/entities/doctor.dart';
 import '../../domain/entities/doctor_review.dart';
@@ -22,6 +23,10 @@ final doctorsRepositoryProvider = Provider<DoctorsRepository>((ref) {
 
 final consultationsRepositoryProvider = Provider<ConsultationsRepository>(
   (ref) => ConsultationsRepository(ref.watch(dioClientProvider)),
+);
+
+final consultationFilePickerProvider = Provider<ConsultationFilePicker>(
+  (ref) => const PlatformConsultationFilePicker(),
 );
 
 final consultationMessagesProvider = FutureProvider.autoDispose

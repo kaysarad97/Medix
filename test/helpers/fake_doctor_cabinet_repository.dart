@@ -8,6 +8,8 @@ import 'package:medix/features/doctor_cabinet/domain/entities/doctor_patient.dar
 import 'package:medix/features/doctor_cabinet/domain/entities/patient_chat.dart';
 import 'package:medix/features/doctor_cabinet/domain/entities/regular_patient.dart';
 import 'package:medix/features/doctor_cabinet/domain/entities/work_analytics.dart';
+import 'package:medix/features/telemedicine/data/services/consultation_file_picker.dart';
+import 'package:medix/features/telemedicine/domain/entities/consultation.dart';
 import 'package:medix/shared/models/analysis_result.dart';
 import 'package:medix/shared/models/appointment.dart';
 import 'package:medix/shared/models/medix_avatars.dart';
@@ -275,6 +277,30 @@ class FakeDoctorCabinetRepository implements DoctorCabinetRepository {
     text: text,
     isMine: true,
     sentAt: DateTime(2026, 7, 21, 13, 45),
+  );
+
+  @override
+  Future<List<ConsultationFile>> patientChatFiles(String threadId) async =>
+      const [];
+
+  @override
+  Future<ConsultationFile> uploadPatientChatFile(
+    String threadId,
+    PickedConsultationFile file,
+  ) async => ConsultationFile(
+    id: 'file',
+    consultationId: threadId,
+    uploadedBy: 'doctor',
+    createdAt: DateTime(2026, 8, 24),
+  );
+
+  @override
+  Future<ConsultationFileDownload> patientChatFileDownload(
+    String threadId,
+    String fileId,
+  ) async => ConsultationFileDownload(
+    url: 'https://example.com/$fileId',
+    expiresAt: DateTime(2026, 8, 24, 12),
   );
 
   @override

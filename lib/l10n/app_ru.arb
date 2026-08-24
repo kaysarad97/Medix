@@ -1423,5 +1423,10 @@
   "labResultsLoadError": "Не удалось загрузить результаты анализов",
   "labResultsRetryAction": "Попробовать снова",
   "labResultOpenError": "Не удалось открыть файл результата",
-  "labResultsOpenFilesHint": "Откройте готовые файлы результатов"
+  "labResultsOpenFilesHint": "Откройте готовые файлы результатов",
+  "consultationAttachmentLabel": "Вложение {number}",
+  "@consultationAttachmentLabel": { "placeholders": { "number": { "type": "int" } } },
+  "consultationAttachmentUploadSuccess": "Файл прикреплён",
+  "consultationAttachmentUploadError": "Не удалось прикрепить файл",
+  "consultationAttachmentOpenError": "Не удалось открыть вложение"
 }

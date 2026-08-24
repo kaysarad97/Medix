@@ -3,12 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/platform/external_url_opener.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/chat_bubble.dart';
 import '../../../../core/widgets/chat_input_bar.dart';
+import '../../../../core/widgets/form_error_snack_bar.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../telemedicine/domain/entities/consultation.dart';
+import '../../../telemedicine/presentation/providers/telemedicine_providers.dart';
+import '../../../telemedicine/presentation/widgets/consultation_file_strip.dart';
 import '../providers/chats_providers.dart';
 
 /// Переписка с врачом по `design/Чат с врачом.png`.
@@ -34,6 +39,8 @@ class DoctorChatScreen extends ConsumerStatefulWidget {
 }
 
 class _DoctorChatScreenState extends ConsumerState<DoctorChatScreen> {
+  String? _openingFileId;
+
   @override
   void initState() {
     super.initState();
@@ -98,14 +105,22 @@ class _DoctorChatScreenState extends ConsumerState<DoctorChatScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: DoctorChatScreen._cardToInput),
+              if (state.files.isEmpty)
+                const SizedBox(height: DoctorChatScreen._cardToInput)
+              else ...[
+                const SizedBox(height: 10),
+                ConsultationFileStrip(
+                  files: state.files,
+                  openingFileId: _openingFileId,
+                  labelBuilder: l10n.consultationAttachmentLabel,
+                  onOpen: _openFile,
+                ),
+                const SizedBox(height: 10),
+              ],
               ChatInputBar(
                 onSend: controller.send,
-                enabled: !state.isSending,
-                onAttach: () {
-                  // TODO(chats): вложения в переписке с врачом, когда
-                  // появится загрузка файлов.
-                },
+                enabled: !state.isSending && !state.isUploading,
+                onAttach: state.isUploading ? null : _attachFile,
               ),
               const SizedBox(height: 20),
             ],
@@ -113,5 +128,47 @@ class _DoctorChatScreenState extends ConsumerState<DoctorChatScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _attachFile() async {
+    final file = await ref.read(consultationFilePickerProvider).pick();
+    if (file == null || !mounted) return;
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      await ref.read(doctorChatControllerProvider.notifier).uploadFile(file);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.consultationAttachmentUploadSuccess)),
+        );
+      }
+    } catch (_) {
+      if (mounted) {
+        showFormErrorSnackBar(context, l10n.consultationAttachmentUploadError);
+      }
+    }
+  }
+
+  Future<void> _openFile(ConsultationFile file) async {
+    setState(() => _openingFileId = file.id);
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      final download = await ref
+          .read(doctorChatControllerProvider.notifier)
+          .fileDownload(file.id);
+      final uri = Uri.tryParse(download.url);
+      if (uri == null ||
+          !uri.hasAuthority ||
+          (uri.scheme != 'https' && uri.scheme != 'http')) {
+        throw const FormatException('Invalid attachment URL');
+      }
+      final opened = await ref.read(externalUrlOpenerProvider)(uri);
+      if (!opened) throw const FormatException('Could not open attachment');
+    } catch (_) {
+      if (mounted) {
+        showFormErrorSnackBar(context, l10n.consultationAttachmentOpenError);
+      }
+    } finally {
+      if (mounted) setState(() => _openingFileId = null);
+    }
   }
 }

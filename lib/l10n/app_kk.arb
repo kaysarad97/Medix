@@ -369,5 +369,10 @@
   "labResultsLoadError": "Талдау нәтижелерін жүктеу мүмкін болмады",
   "labResultsRetryAction": "Қайталап көру",
   "labResultOpenError": "Нәтиже файлын ашу мүмкін болмады",
-  "labResultsOpenFilesHint": "Дайын нәтиже файлдарын ашыңыз"
+  "labResultsOpenFilesHint": "Дайын нәтиже файлдарын ашыңыз",
+  "consultationAttachmentLabel": "Тіркеме {number}",
+  "@consultationAttachmentLabel": { "placeholders": { "number": { "type": "int" } } },
+  "consultationAttachmentUploadSuccess": "Файл тіркелді",
+  "consultationAttachmentUploadError": "Файлды тіркеу мүмкін болмады",
+  "consultationAttachmentOpenError": "Тіркемені ашу мүмкін болмады"
 }

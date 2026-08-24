@@ -4,6 +4,8 @@ import '../../../../core/network/api_endpoints.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../../telemedicine/data/repositories/consultation_live_chat.dart';
 import '../../../telemedicine/data/repositories/consultations_repository.dart';
+import '../../../telemedicine/data/services/consultation_file_picker.dart';
+import '../../../telemedicine/data/services/consultation_files_service.dart';
 import '../../../telemedicine/domain/entities/consultation.dart';
 import '../../domain/entities/chat_thread.dart';
 import 'chats_repository.dart';
@@ -20,11 +22,13 @@ class RemoteChatsRepository implements ChatsRepository {
   }) : _consultations =
            consultationsRepository ?? ConsultationsRepository(_dio) {
     _liveChat = ConsultationLiveChat(_consultations);
+    _files = RemoteConsultationFilesService(_consultations);
   }
 
   final Dio _dio;
   final ConsultationsRepository _consultations;
   late final ConsultationLiveChat _liveChat;
+  late final ConsultationFilesService _files;
 
   @override
   Future<List<ChatThread>> threads() async {
@@ -104,6 +108,22 @@ class RemoteChatsRepository implements ChatsRepository {
       sentAt: message.createdAt,
     );
   }
+
+  @override
+  Future<List<ConsultationFile>> files(String threadId) =>
+      _files.files(threadId);
+
+  @override
+  Future<ConsultationFile> uploadFile(
+    String threadId,
+    PickedConsultationFile file,
+  ) => _files.upload(threadId, file);
+
+  @override
+  Future<ConsultationFileDownload> fileDownload(
+    String threadId,
+    String fileId,
+  ) => _files.download(threadId, fileId);
 
   @override
   Future<void> closeChat(String threadId) => _liveChat.close(threadId);

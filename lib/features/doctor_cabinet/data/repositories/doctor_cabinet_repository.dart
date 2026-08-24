@@ -1,5 +1,7 @@
 import '../../../../shared/models/analysis_result.dart';
 import '../../../../shared/models/appointment.dart';
+import '../../../telemedicine/data/services/consultation_file_picker.dart';
+import '../../../telemedicine/domain/entities/consultation.dart';
 import '../../../../shared/models/medix_avatars.dart';
 import '../../domain/entities/admin_request.dart';
 import '../../domain/entities/certificate.dart';
@@ -60,6 +62,18 @@ abstract interface class DoctorCabinetRepository {
   /// Отправка реплики. Возвращает то, что реально ушло, — с сервера у
   /// сообщения будет свой идентификатор и время.
   Future<PatientMessage> sendPatientMessage(String threadId, String text);
+
+  Future<List<ConsultationFile>> patientChatFiles(String threadId);
+
+  Future<ConsultationFile> uploadPatientChatFile(
+    String threadId,
+    PickedConsultationFile file,
+  );
+
+  Future<ConsultationFileDownload> patientChatFileDownload(
+    String threadId,
+    String fileId,
+  );
 
   Future<void> closePatientChat(String threadId);
 
@@ -437,6 +451,30 @@ class MockDoctorCabinetRepository implements DoctorCabinetRepository {
       sentAt: now,
     );
   }
+
+  @override
+  Future<List<ConsultationFile>> patientChatFiles(String threadId) async =>
+      const [];
+
+  @override
+  Future<ConsultationFile> uploadPatientChatFile(
+    String threadId,
+    PickedConsultationFile file,
+  ) async => ConsultationFile(
+    id: 'mock-file-${DateTime.now().microsecondsSinceEpoch}',
+    consultationId: threadId,
+    uploadedBy: 'mock-doctor',
+    createdAt: DateTime.now(),
+  );
+
+  @override
+  Future<ConsultationFileDownload> patientChatFileDownload(
+    String threadId,
+    String fileId,
+  ) async => ConsultationFileDownload(
+    url: 'https://example.com/$fileId',
+    expiresAt: DateTime.now().add(const Duration(minutes: 5)),
+  );
 
   @override
   Future<void> closePatientChat(String threadId) async {}

@@ -1,4 +1,6 @@
 import '../../domain/entities/chat_thread.dart';
+import '../../../telemedicine/data/services/consultation_file_picker.dart';
+import '../../../telemedicine/domain/entities/consultation.dart';
 
 abstract interface class ChatsRepository {
   Future<List<ChatThread>> threads();
@@ -8,6 +10,15 @@ abstract interface class ChatsRepository {
   Stream<DoctorMessage> watchMessages(String threadId);
 
   Future<DoctorMessage> send(String threadId, String text);
+
+  Future<List<ConsultationFile>> files(String threadId);
+
+  Future<ConsultationFile> uploadFile(
+    String threadId,
+    PickedConsultationFile file,
+  );
+
+  Future<ConsultationFileDownload> fileDownload(String threadId, String fileId);
 
   Future<void> closeChat(String threadId);
 }
@@ -96,6 +107,29 @@ class MockChatsRepository implements ChatsRepository {
       sentAt: DateTime.now(),
     );
   }
+
+  @override
+  Future<List<ConsultationFile>> files(String threadId) async => const [];
+
+  @override
+  Future<ConsultationFile> uploadFile(
+    String threadId,
+    PickedConsultationFile file,
+  ) async => ConsultationFile(
+    id: 'mock-file-${DateTime.now().microsecondsSinceEpoch}',
+    consultationId: threadId,
+    uploadedBy: 'mock-user',
+    createdAt: DateTime.now(),
+  );
+
+  @override
+  Future<ConsultationFileDownload> fileDownload(
+    String threadId,
+    String fileId,
+  ) async => ConsultationFileDownload(
+    url: 'https://example.com/$fileId',
+    expiresAt: DateTime.now().add(const Duration(minutes: 5)),
+  );
 
   @override
   Future<void> closeChat(String threadId) async {}

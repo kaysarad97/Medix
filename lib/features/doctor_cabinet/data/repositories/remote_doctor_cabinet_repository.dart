@@ -5,6 +5,8 @@ import '../../../../core/network/api_exception.dart';
 import '../../../../shared/models/appointment.dart';
 import '../../../telemedicine/data/repositories/consultation_live_chat.dart';
 import '../../../telemedicine/data/repositories/consultations_repository.dart';
+import '../../../telemedicine/data/services/consultation_file_picker.dart';
+import '../../../telemedicine/data/services/consultation_files_service.dart';
 import '../../../telemedicine/domain/entities/consultation.dart';
 import '../../domain/entities/admin_request.dart';
 import '../../domain/entities/certificate.dart';
@@ -25,11 +27,14 @@ import 'doctor_cabinet_repository.dart';
 /// реальных данных.
 class RemoteDoctorCabinetRepository implements DoctorCabinetRepository {
   RemoteDoctorCabinetRepository(this._dio) {
-    _liveChat = ConsultationLiveChat(ConsultationsRepository(_dio));
+    final consultations = ConsultationsRepository(_dio);
+    _liveChat = ConsultationLiveChat(consultations);
+    _files = RemoteConsultationFilesService(consultations);
   }
 
   final Dio _dio;
   late final ConsultationLiveChat _liveChat;
+  late final ConsultationFilesService _files;
 
   static const _fallback = MockDoctorCabinetRepository();
   static const _pageLimit = 100;
@@ -298,6 +303,22 @@ class RemoteDoctorCabinetRepository implements DoctorCabinetRepository {
       sentAt: message.createdAt,
     );
   }
+
+  @override
+  Future<List<ConsultationFile>> patientChatFiles(String threadId) =>
+      _files.files(threadId);
+
+  @override
+  Future<ConsultationFile> uploadPatientChatFile(
+    String threadId,
+    PickedConsultationFile file,
+  ) => _files.upload(threadId, file);
+
+  @override
+  Future<ConsultationFileDownload> patientChatFileDownload(
+    String threadId,
+    String fileId,
+  ) => _files.download(threadId, fileId);
 
   @override
   Future<void> closePatientChat(String threadId) => _liveChat.close(threadId);

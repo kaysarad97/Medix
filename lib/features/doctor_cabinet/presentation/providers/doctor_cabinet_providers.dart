@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../telemedicine/data/services/consultation_file_picker.dart';
+import '../../../telemedicine/domain/entities/consultation.dart';
+
 import '../../../../core/network/api_mode.dart';
 import '../../../../core/network/dio_client.dart';
 import '../../data/repositories/doctor_cabinet_repository.dart';
@@ -290,15 +293,29 @@ final visibleDoctorChatsProvider = Provider<List<PatientChatThread>>((ref) {
 
 @immutable
 class PatientChatState {
-  const PatientChatState({this.messages = const [], this.isSending = false});
+  const PatientChatState({
+    this.messages = const [],
+    this.files = const [],
+    this.isSending = false,
+    this.isUploading = false,
+  });
 
   final List<PatientMessage> messages;
+  final List<ConsultationFile> files;
   final bool isSending;
+  final bool isUploading;
 
-  PatientChatState copyWith({List<PatientMessage>? messages, bool? isSending}) {
+  PatientChatState copyWith({
+    List<PatientMessage>? messages,
+    List<ConsultationFile>? files,
+    bool? isSending,
+    bool? isUploading,
+  }) {
     return PatientChatState(
       messages: messages ?? this.messages,
+      files: files ?? this.files,
       isSending: isSending ?? this.isSending,
+      isUploading: isUploading ?? this.isUploading,
     );
   }
 }
@@ -339,6 +356,46 @@ class PatientChatController extends Notifier<PatientChatState> {
     // Пока грузили, могли открыть другой чат — тогда ответ уже не нужен.
     if (_threadId != threadId) return;
     _merge(loaded);
+    try {
+      final files = await repository.patientChatFiles(threadId);
+      if (_threadId == threadId && files.isNotEmpty) {
+        state = state.copyWith(files: files);
+      }
+    } catch (_) {
+      // Недоступный список вложений не должен ломать текстовую переписку.
+    }
+  }
+
+  Future<void> uploadFile(PickedConsultationFile file) async {
+    final threadId = _threadId;
+    if (threadId == null || state.isUploading) return;
+
+    state = state.copyWith(isUploading: true);
+    try {
+      final uploaded = await ref
+          .read(doctorCabinetRepositoryProvider)
+          .uploadPatientChatFile(threadId, file);
+      if (_threadId == threadId) {
+        state = state.copyWith(
+          files: [
+            ...state.files.where((item) => item.id != uploaded.id),
+            uploaded,
+          ],
+        );
+      }
+    } finally {
+      if (_threadId == threadId) state = state.copyWith(isUploading: false);
+    }
+  }
+
+  Future<ConsultationFileDownload> fileDownload(String fileId) {
+    final threadId = _threadId;
+    if (threadId == null) {
+      throw StateError('Chat is not open');
+    }
+    return ref
+        .read(doctorCabinetRepositoryProvider)
+        .patientChatFileDownload(threadId, fileId);
   }
 
   Future<void> send(String text) async {

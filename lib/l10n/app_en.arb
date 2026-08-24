@@ -369,5 +369,10 @@
   "labResultsLoadError": "Test results could not be loaded",
   "labResultsRetryAction": "Try again",
   "labResultOpenError": "The result file could not be opened",
-  "labResultsOpenFilesHint": "Open completed result files"
+  "labResultsOpenFilesHint": "Open completed result files",
+  "consultationAttachmentLabel": "Attachment {number}",
+  "@consultationAttachmentLabel": { "placeholders": { "number": { "type": "int" } } },
+  "consultationAttachmentUploadSuccess": "File attached",
+  "consultationAttachmentUploadError": "The file could not be attached",
+  "consultationAttachmentOpenError": "The attachment could not be opened"
 }
