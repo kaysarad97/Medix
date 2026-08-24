@@ -119,6 +119,8 @@ void main() {
       FakeDoctorsRepository.rescheduled.single.slot.startsAt,
       DateTime(2026, 7, 20, 12, 30),
     );
+    expect(find.text('20.07, 12:30'), findsOneWidget);
+    expect(find.text('10.07, 13:30'), findsNothing);
   });
 
   final freeProfile = UserProfile(

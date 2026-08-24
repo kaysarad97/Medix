@@ -133,6 +133,7 @@ class _WaitlistScreenState extends ConsumerState<WaitlistScreen> {
           .read(doctorsRepositoryProvider)
           .claimWaitlistOffer(slotId: slotId, kind: AppointmentKind.videoCall);
       ref.invalidate(waitlistEntriesProvider);
+      ref.read(appointmentRevisionProvider.notifier).markChanged();
       widget.onAppointmentClaimed?.call(appointment);
     } catch (_) {
       if (mounted) {

@@ -28,15 +28,33 @@ import '../widgets/schedule_card.dart';
 /// Оформленная запись: как связаться с врачом и как перенести приём.
 ///
 /// Свёрстан по `design/Ваша Запись.png` (440×978).
-class AppointmentScreen extends ConsumerWidget {
+class AppointmentScreen extends ConsumerStatefulWidget {
   const AppointmentScreen({super.key, required this.appointmentId});
 
   final String appointmentId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final appointment = ref.watch(appointmentProvider(appointmentId));
-    final doctorId = appointment.value?.doctorId;
+  ConsumerState<AppointmentScreen> createState() => _AppointmentScreenState();
+}
+
+class _AppointmentScreenState extends ConsumerState<AppointmentScreen> {
+  Appointment? _updatedAppointment;
+
+  @override
+  void didUpdateWidget(covariant AppointmentScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.appointmentId != widget.appointmentId) {
+      _updatedAppointment = null;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final remoteAppointment = ref.watch(
+      appointmentProvider(widget.appointmentId),
+    );
+    final appointment = _updatedAppointment ?? remoteAppointment.value;
+    final doctorId = appointment?.doctorId;
 
     final doctor = doctorId == null
         ? null
@@ -49,12 +67,15 @@ class AppointmentScreen extends ConsumerWidget {
       background: AppBackgroundStyle.main,
       child: SafeArea(
         bottom: false,
-        child: appointment.value == null || doctor == null
+        child: appointment == null || doctor == null
             ? const Center(child: CircularProgressIndicator())
             : _Content(
-                appointment: appointment.value!,
+                appointment: appointment,
                 doctor: doctor,
                 schedule: schedule,
+                onRescheduled: (value) {
+                  if (mounted) setState(() => _updatedAppointment = value);
+                },
               ),
       ),
     );
@@ -66,11 +87,13 @@ class _Content extends ConsumerWidget {
     required this.appointment,
     required this.doctor,
     required this.schedule,
+    required this.onRescheduled,
   });
 
   final Appointment appointment;
   final Doctor doctor;
   final DoctorSchedule? schedule;
+  final ValueChanged<Appointment> onRescheduled;
 
   static String _labelFor(AppointmentKind kind, AppLocalizations l10n) =>
       switch (kind) {
@@ -177,10 +200,19 @@ class _Content extends ConsumerWidget {
                         ? null
                         : () async {
                             final slot = selected!.slot!;
+                            late final Appointment updated;
                             try {
-                              await ref
+                              updated = await ref
                                   .read(doctorsRepositoryProvider)
                                   .reschedule(appointment.id, slot);
+                              onRescheduled(updated);
+                              ref
+                                  .read(appointmentRevisionProvider.notifier)
+                                  .markChanged();
+                              ref
+                                  .read(scheduleSelectionProvider.notifier)
+                                  .reset();
+                              ref.invalidate(doctorScheduleProvider(doctor.id));
                             } catch (error) {
                               if (!context.mounted) return;
                               ScaffoldMessenger.of(context)
@@ -197,8 +229,8 @@ class _Content extends ConsumerWidget {
                                 SnackBar(
                                   content: Text(
                                     l10n.appointmentRescheduledSnackbar(
-                                      RuDates.dayMonth(slot.startsAt),
-                                      slot.timeLabel,
+                                      RuDates.dayMonth(updated.startsAt),
+                                      RuDates.time(updated.startsAt),
                                     ),
                                     style: AppTypography.bodyMd.copyWith(
                                       color: AppColors.textOnPrimary,

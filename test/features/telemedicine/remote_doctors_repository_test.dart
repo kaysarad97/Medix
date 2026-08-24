@@ -437,14 +437,21 @@ void main() {
       final (:dio, :adapter) = cannedDio({
         'PATCH /appointments/ap-1': (
           statusCode: 200,
-          body: appointmentJson(status: 'cancelled'),
+          body: appointmentJson(
+            id: 'ap-2',
+            type: 'in_person',
+            status: 'confirmed',
+            startsAt: '2026-08-20T12:30:00',
+          ),
         ),
       });
       final repository = RemoteDoctorsRepository(dio);
 
-      await repository.reschedule('ap-1', slot);
+      final moved = await repository.reschedule('ap-1', slot);
       await repository.cancel('ap-1');
 
+      expect(moved.id, 'ap-2');
+      expect(moved.startsAt, DateTime(2026, 8, 20, 12, 30));
       expect(adapter.requests[0].data, {
         'action': 'reschedule',
         'new_slot_id': 's-first',

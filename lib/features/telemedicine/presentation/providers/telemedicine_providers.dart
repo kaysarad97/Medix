@@ -109,9 +109,30 @@ final doctorReviewsProvider = FutureProvider.autoDispose
       (ref, doctorId) => ref.watch(doctorsRepositoryProvider).reviews(doctorId),
     );
 
-final appointmentProvider = FutureProvider.family<Appointment, String>(
-  (ref, id) => ref.watch(doctorsRepositoryProvider).appointment(id),
+/// Версия списка записей пользователя.
+///
+/// Любое успешное бронирование или изменение увеличивает её. Так экраны,
+/// которые остаются смонтированными под новым маршрутом (в первую очередь
+/// главная в `StatefulShellRoute`), перечитывают сервер вместо показа старой
+/// записи до перезапуска приложения.
+class AppointmentRevision extends Notifier<int> {
+  @override
+  int build() => 0;
+
+  void markChanged() => state = state + 1;
+}
+
+final appointmentRevisionProvider = NotifierProvider<AppointmentRevision, int>(
+  AppointmentRevision.new,
 );
+
+final appointmentProvider = FutureProvider.family<Appointment, String>((
+  ref,
+  id,
+) {
+  ref.watch(appointmentRevisionProvider);
+  return ref.watch(doctorsRepositoryProvider).appointment(id);
+});
 
 /// Активные записи пользователя в листе ожидания.
 ///

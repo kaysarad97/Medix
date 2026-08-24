@@ -212,6 +212,9 @@ Future<void> _book(
     final appointment = await ref
         .read(doctorsRepositoryProvider)
         .book(doctor: doctor, slot: slot, kind: AppointmentKind.videoCall);
+    ref.read(appointmentRevisionProvider.notifier).markChanged();
+    ref.invalidate(doctorScheduleProvider(doctor.id));
+    ref.read(scheduleSelectionProvider.notifier).reset();
     if (context.mounted) {
       context.push(Routes.appointmentOf(appointment.id));
     }

@@ -13,6 +13,7 @@ final specialtiesProvider = FutureProvider<List<DoctorSpecialty>>(
   (ref) => ref.watch(homeRepositoryProvider).specialties(),
 );
 
-final upcomingAppointmentsProvider = FutureProvider<List<Appointment>>(
-  (ref) => ref.watch(homeRepositoryProvider).upcomingAppointments(),
-);
+final upcomingAppointmentsProvider = FutureProvider<List<Appointment>>((ref) {
+  ref.watch(appointmentRevisionProvider);
+  return ref.watch(homeRepositoryProvider).upcomingAppointments();
+});
