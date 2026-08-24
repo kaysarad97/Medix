@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:medix/core/router/routes.dart';
 import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/features/profile/domain/entities/user_profile.dart';
 import 'package:medix/features/profile/presentation/providers/profile_providers.dart';
 import 'package:medix/features/telemedicine/presentation/providers/telemedicine_providers.dart';
 import 'package:medix/features/telemedicine/presentation/screens/appointment_screen.dart';
+import 'package:medix/features/telemedicine/domain/entities/consultation.dart';
 import 'package:medix/l10n/app_localizations.dart';
 import 'package:medix/shared/models/appointment.dart';
 import 'package:medix/shared/models/subscription_tier.dart';
@@ -40,6 +43,9 @@ void main() {
             ),
           ),
           profileRepositoryProvider.overrideWithValue(FakeProfileRepository()),
+          consultationForAppointmentProvider(
+            'a1',
+          ).overrideWith((ref) async => null),
           if (profile != null)
             profileProvider.overrideWith((ref) async => profile),
         ],
@@ -121,6 +127,56 @@ void main() {
     );
     expect(find.text('20.07, 12:30'), findsOneWidget);
     expect(find.text('10.07, 13:30'), findsNothing);
+  });
+
+  testWidgets('чат находит консультацию по appointment id', (tester) async {
+    final router = GoRouter(
+      initialLocation: Routes.appointmentOf('a1'),
+      routes: [
+        GoRoute(
+          path: Routes.appointment,
+          builder: (_, state) =>
+              AppointmentScreen(appointmentId: state.pathParameters['id']!),
+        ),
+        GoRoute(
+          path: Routes.chat,
+          builder: (_, state) =>
+              Scaffold(body: Text('chat:${state.pathParameters['id']}')),
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          doctorsRepositoryProvider.overrideWithValue(
+            const FakeDoctorsRepository(),
+          ),
+          profileRepositoryProvider.overrideWithValue(FakeProfileRepository()),
+          consultationForAppointmentProvider('a1').overrideWith(
+            (ref) async => const Consultation(
+              id: 'c1',
+              appointmentId: 'a1',
+              status: ConsultationStatus.scheduled,
+            ),
+          ),
+        ],
+        child: MaterialApp.router(
+          routerConfig: router,
+          theme: AppTheme.light,
+          locale: const Locale('ru'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Сообщение').first);
+    await tester.pumpAndSettle();
+
+    expect(find.text('chat:c1'), findsOneWidget);
   });
 
   final freeProfile = UserProfile(

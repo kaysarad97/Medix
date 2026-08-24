@@ -71,8 +71,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     if (mounted) setState(() {});
   }
 
-  void _ensureCall(Appointment appointment) {
-    final consultationId = appointment.consultationId;
+  void _ensureCall(Appointment appointment, String? consultationId) {
     if (consultationId == null || _callConsultationId == consultationId) {
       return;
     }
@@ -134,7 +133,15 @@ class _CallScreenState extends ConsumerState<CallScreen> {
         : ref.watch(doctorProvider(doctorId)).value;
     final selfAvatar = ref.watch(profileProvider).value?.avatarAsset;
     final value = appointment.value;
-    if (value != null) _ensureCall(value);
+    final consultationId =
+        value?.consultationId ??
+        (value == null
+            ? null
+            : ref
+                  .watch(consultationForAppointmentProvider(value.id))
+                  .value
+                  ?.id);
+    if (value != null) _ensureCall(value, consultationId);
     final call = _call?.state ?? const CallSessionState();
 
     return AppScaffold(
@@ -147,7 +154,7 @@ class _CallScreenState extends ConsumerState<CallScreen> {
                 kind: value.kind,
                 doctor: doctor,
                 selfAvatar: selfAvatar,
-                consultationId: value.consultationId,
+                consultationId: consultationId,
                 call: call,
                 elapsed: _elapsed,
                 ended: _ended || call.status == CallSessionStatus.ended,
@@ -156,9 +163,9 @@ class _CallScreenState extends ConsumerState<CallScreen> {
                 onToggleMicrophone: _call?.toggleMicrophone,
                 disputeSubmitted: _disputeSubmitted,
                 disputeSubmitting: _disputeSubmitting,
-                onDispute: value.consultationId == null
+                onDispute: consultationId == null
                     ? null
-                    : () => _openDispute(value.consultationId!),
+                    : () => _openDispute(consultationId),
               ),
       ),
     );

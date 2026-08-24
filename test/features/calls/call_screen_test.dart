@@ -39,6 +39,10 @@ void main() {
             const FakeDoctorsRepository(),
           ),
           profileRepositoryProvider.overrideWithValue(FakeProfileRepository()),
+          if (consultations == null)
+            consultationForAppointmentProvider(
+              'a1',
+            ).overrideWith((ref) async => null),
           if (consultations != null) ...[
             consultationsRepositoryProvider.overrideWithValue(consultations),
             callSessionControllerFactoryProvider.overrideWithValue(
@@ -163,6 +167,20 @@ void main() {
     expect(repository.disputeReason, 'Связь прервалась');
     expect(find.text('Обращение отправлено'), findsOneWidget);
   });
+
+  testWidgets('находит консультацию по appointment id и подключает звонок', (
+    tester,
+  ) async {
+    final repository = _DisputeRepository();
+    await pumpCall(tester, consultations: repository);
+    await tester.pump();
+    await tester.pump();
+
+    expect(repository.lookedUpAppointmentId, 'a1');
+    expect(repository.joinedConsultationId, 'c1');
+
+    await tester.pumpWidget(const SizedBox());
+  });
 }
 
 class _DisputeRepository extends ConsultationsRepository {
@@ -170,17 +188,31 @@ class _DisputeRepository extends ConsultationsRepository {
 
   String? disputedConsultationId;
   String? disputeReason;
+  String? lookedUpAppointmentId;
+  String? joinedConsultationId;
 
   @override
-  Future<ConsultationJoin> join(String consultationId) async =>
-      ConsultationJoin(
-        roomId: 'room',
-        webSocketTicket: 'ws',
-        videoToken: 'video',
-        videoServerUrl: 'wss://livekit.example',
-        mode: ConsultationMode.audio,
-        expiresAt: DateTime(2026, 8, 24, 12),
-      );
+  Future<Consultation?> consultationForAppointment(String appointmentId) async {
+    lookedUpAppointmentId = appointmentId;
+    return const Consultation(
+      id: 'c1',
+      appointmentId: 'a1',
+      status: ConsultationStatus.scheduled,
+    );
+  }
+
+  @override
+  Future<ConsultationJoin> join(String consultationId) async {
+    joinedConsultationId = consultationId;
+    return ConsultationJoin(
+      roomId: 'room',
+      webSocketTicket: 'ws',
+      videoToken: 'video',
+      videoServerUrl: 'wss://livekit.example',
+      mode: ConsultationMode.audio,
+      expiresAt: DateTime(2026, 8, 24, 12),
+    );
+  }
 
   @override
   Future<ConsultationDispute> dispute(

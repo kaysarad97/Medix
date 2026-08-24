@@ -158,7 +158,7 @@ class _Content extends ConsumerWidget {
                   icon: MedixIcon.chat,
                   title: l10n.messageActionTitle,
                   subtitle: l10n.doctorChatTitle,
-                  onTap: () => _openChat(context, appointment.consultationId),
+                  onTap: () => _openChat(context, ref, appointment),
                 ),
               ),
             ),
@@ -247,7 +247,7 @@ class _Content extends ConsumerWidget {
                     icon: MedixIcon.mail,
                     title: l10n.messageActionTitle,
                     subtitle: l10n.doctorChatTitle,
-                    onTap: () => _openChat(context, appointment.consultationId),
+                    onTap: () => _openChat(context, ref, appointment),
                   ),
                 ),
               ),
@@ -259,7 +259,22 @@ class _Content extends ConsumerWidget {
   }
 }
 
-void _openChat(BuildContext context, String? consultationId) {
+Future<void> _openChat(
+  BuildContext context,
+  WidgetRef ref,
+  Appointment appointment,
+) async {
+  var consultationId = appointment.consultationId;
+  if (consultationId == null) {
+    try {
+      consultationId = (await ref.read(
+        consultationForAppointmentProvider(appointment.id).future,
+      ))?.id;
+    } on Object {
+      consultationId = null;
+    }
+  }
+  if (!context.mounted) return;
   if (consultationId == null) {
     showFormErrorSnackBar(
       context,

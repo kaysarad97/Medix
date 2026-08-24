@@ -45,6 +45,9 @@ void main() {
             const FakeDoctorsRepository(),
           ),
           profileRepositoryProvider.overrideWithValue(FakeProfileRepository()),
+          consultationForAppointmentProvider(
+            'a1',
+          ).overrideWith((ref) async => null),
           if (video)
             appointmentProvider('a1').overrideWith(
               (ref) async => Appointment(

@@ -40,6 +40,22 @@ class ConsultationsRepository {
     }
   }
 
+  /// Находит консультацию по записи, когда `AppointmentOut` не содержит
+  /// `consultation_id`. Серверный список пагинируется, поэтому поиск не
+  /// ограничивается первыми ста элементами.
+  Future<Consultation?> consultationForAppointment(String appointmentId) async {
+    const limit = 100;
+    var offset = 0;
+    while (true) {
+      final page = await consultations(limit: limit, offset: offset);
+      for (final consultation in page) {
+        if (consultation.appointmentId == appointmentId) return consultation;
+      }
+      if (page.length < limit) return null;
+      offset += page.length;
+    }
+  }
+
   Future<ConsultationJoin> join(String consultationId) async {
     try {
       final response = await _dio.post<Map<String, dynamic>>(

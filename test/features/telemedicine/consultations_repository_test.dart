@@ -39,6 +39,33 @@ void main() {
     });
   });
 
+  test('находит консультацию по appointment id', () async {
+    final (:dio, :adapter) = cannedDio({
+      '/consultations': (
+        statusCode: 200,
+        body: [
+          {
+            'id': 'c1',
+            'appointment_id': 'a1',
+            'status': 'scheduled',
+            'started_at': null,
+            'ended_at': null,
+          },
+        ],
+      ),
+    });
+
+    final result = await ConsultationsRepository(
+      dio,
+    ).consultationForAppointment('a1');
+
+    expect(result?.id, 'c1');
+    expect(adapter.requests.single.queryParameters, {
+      'limit': 100,
+      'offset': 0,
+    });
+  });
+
   test('вход возвращает реквизиты чата и видеокомнаты', () async {
     final (:dio, :adapter) = cannedDio({
       'POST /consultations/c1/join': (

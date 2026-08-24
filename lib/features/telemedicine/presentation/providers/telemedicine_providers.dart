@@ -25,6 +25,14 @@ final consultationsRepositoryProvider = Provider<ConsultationsRepository>(
   (ref) => ConsultationsRepository(ref.watch(dioClientProvider)),
 );
 
+final consultationForAppointmentProvider = FutureProvider.autoDispose
+    .family<Consultation?, String>((ref, appointmentId) {
+      if (useMocks) return null;
+      return ref
+          .watch(consultationsRepositoryProvider)
+          .consultationForAppointment(appointmentId);
+    });
+
 final consultationFilePickerProvider = Provider<ConsultationFilePicker>(
   (ref) => const PlatformConsultationFilePicker(),
 );
