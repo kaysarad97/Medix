@@ -540,6 +540,7 @@ class RemoteDoctorCabinetRepository implements DoctorCabinetRepository {
       patientId: patient['id'] as String?,
       patientName: patient['full_name'] as String? ?? '',
       consultationId: json['consultation_id'] as String?,
+      patientPhone: (json['patient_phone'] as String?)?.trim(),
       kind: switch (json['type']) {
         'audio' => AppointmentKind.audioCall,
         'in_person' => AppointmentKind.inPerson,

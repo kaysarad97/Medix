@@ -458,6 +458,9 @@
   "@startCallTitle": {
     "description": "Кнопка начала звонка на экране записи."
   },
+  "doctorCallPatientTitle": "Позвонить пациенту",
+  "doctorPatientPhoneUnavailable": "Номер пациента недоступен",
+  "doctorPatientPhoneOpenError": "Не удалось открыть набор номера",
   "messageActionTitle": "Сообщение",
   "@messageActionTitle": {
     "description": "Кнопка перехода в чат с врачом. Подпись под ней — тот же текст, что и заголовок экрана переписки, см. doctorChatTitle."

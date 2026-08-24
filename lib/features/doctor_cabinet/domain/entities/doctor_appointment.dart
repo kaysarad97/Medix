@@ -33,6 +33,7 @@ class DoctorAppointment {
     required this.startsAt,
     this.patientId,
     this.consultationId,
+    this.patientPhone,
     this.endsAt,
     this.status = AppointmentStatus.unknown,
     this.patientAvatarAsset,
@@ -44,6 +45,9 @@ class DoctorAppointment {
   final String patientName;
   final String? patientId;
   final String? consultationId;
+
+  /// Телефон пациента доступен врачу только в детальной записи очного приёма.
+  final String? patientPhone;
   final AppointmentKind kind;
   final DateTime startsAt;
 
@@ -84,6 +88,7 @@ class DoctorAppointment {
     patientName: patientName,
     patientId: patientId,
     consultationId: consultationId,
+    patientPhone: patientPhone,
     kind: kind,
     startsAt: startsAt,
     endsAt: endsAt,

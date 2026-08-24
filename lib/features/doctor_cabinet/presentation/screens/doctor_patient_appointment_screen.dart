@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/platform/external_url_opener.dart';
 import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
@@ -12,6 +13,7 @@ import '../../../../core/widgets/form_error_snack_bar.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../shared/models/appointment.dart';
 import '../../domain/entities/doctor_appointment.dart';
 import '../providers/doctor_cabinet_providers.dart';
 import '../widgets/doctor_appointment_files_card.dart';
@@ -38,6 +40,7 @@ class DoctorPatientAppointmentScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final patient = ref.watch(doctorPatientProvider(patientId)).value;
     final appointment = patient?.appointment;
+    final isInPerson = appointment?.kind == AppointmentKind.inPerson;
 
     return AppScaffold(
       background: AppBackgroundStyle.main,
@@ -71,13 +74,22 @@ class DoctorPatientAppointmentScreen extends ConsumerWidget {
                         secondaryFlex: 1,
                         primary: ActionButtonData(
                           icon: MedixIcon.audioCall,
-                          title: l10n.startCallTitle,
+                          title: isInPerson
+                              ? l10n.doctorCallPatientTitle
+                              : l10n.startCallTitle,
                           subtitle: DoctorHistoryRow.kindLabel(
                             appointment.kind,
                             l10n,
                           ),
-                          onTap: () =>
-                              context.push(Routes.doctorCallOf(patientId)),
+                          onTap: isInPerson
+                              ? () => _callPatient(
+                                  context,
+                                  ref,
+                                  appointment.patientPhone,
+                                )
+                              : () => context.push(
+                                  Routes.doctorCallOf(patientId),
+                                ),
                         ),
                         secondary: ActionButtonData(
                           icon: MedixIcon.mail,
@@ -118,6 +130,40 @@ class DoctorPatientAppointmentScreen extends ConsumerWidget {
               ),
       ),
     );
+  }
+}
+
+Future<void> _callPatient(
+  BuildContext context,
+  WidgetRef ref,
+  String? patientPhone,
+) async {
+  final phone = patientPhone?.trim();
+  if (phone == null || phone.isEmpty) {
+    showFormErrorSnackBar(
+      context,
+      AppLocalizations.of(context)!.doctorPatientPhoneUnavailable,
+    );
+    return;
+  }
+
+  try {
+    final opened = await ref.read(externalUrlOpenerProvider)(
+      Uri(scheme: 'tel', path: phone),
+    );
+    if (!opened && context.mounted) {
+      showFormErrorSnackBar(
+        context,
+        AppLocalizations.of(context)!.doctorPatientPhoneOpenError,
+      );
+    }
+  } on Object {
+    if (context.mounted) {
+      showFormErrorSnackBar(
+        context,
+        AppLocalizations.of(context)!.doctorPatientPhoneOpenError,
+      );
+    }
   }
 }
 

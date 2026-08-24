@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:medix/core/platform/external_url_opener.dart';
 import 'package:medix/core/theme/app_theme.dart';
+import 'package:medix/features/doctor_cabinet/domain/entities/doctor_appointment.dart';
+import 'package:medix/features/doctor_cabinet/domain/entities/doctor_patient.dart';
 import 'package:medix/features/doctor_cabinet/presentation/providers/doctor_cabinet_providers.dart';
 import 'package:medix/features/doctor_cabinet/presentation/screens/doctor_patient_appointment_screen.dart';
 import 'package:medix/features/doctor_cabinet/presentation/screens/doctor_patient_screen.dart';
 import 'package:medix/l10n/app_localizations.dart';
+import 'package:medix/shared/models/appointment.dart';
 
 import '../../helpers/fake_doctor_cabinet_repository.dart';
 import '../../helpers/test_fonts.dart';
@@ -13,7 +17,13 @@ import '../../helpers/test_fonts.dart';
 void main() {
   setUpAll(loadAppFonts);
 
-  Future<void> pumpScreen(WidgetTester tester, Widget screen) async {
+  Future<void> pumpScreen(
+    WidgetTester tester,
+    Widget screen, {
+    FakeDoctorCabinetRepository repository =
+        const FakeDoctorCabinetRepository(),
+    ExternalUrlOpener? urlOpener,
+  }) async {
     // Оба экрана длиннее телефона по умолчанию — иначе нижние карточки не
     // строятся и проверять нечего.
     tester.view.physicalSize = const Size(440, 1440);
@@ -23,8 +33,9 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          doctorCabinetRepositoryProvider.overrideWithValue(
-            const FakeDoctorCabinetRepository(),
+          doctorCabinetRepositoryProvider.overrideWithValue(repository),
+          externalUrlOpenerProvider.overrideWithValue(
+            urlOpener ?? (_) async => true,
           ),
         ],
         child: MaterialApp(
@@ -83,5 +94,48 @@ void main() {
       expect(find.text('Чат с пациентом'), findsOneWidget);
       expect(find.text('21.07, 10:30'), findsOneWidget);
     });
+
+    testWidgets('очный приём открывает системный набор номера пациента', (
+      tester,
+    ) async {
+      final opened = <Uri>[];
+      await pumpScreen(
+        tester,
+        const DoctorPatientAppointmentScreen(patientId: 'p1'),
+        repository: const _InPersonDoctorCabinetRepository(),
+        urlOpener: (uri) async {
+          opened.add(uri);
+          return true;
+        },
+      );
+
+      await tester.tap(find.text('Позвонить пациенту'));
+      await tester.pump();
+
+      expect(opened, hasLength(1));
+      expect(opened.single.scheme, 'tel');
+      expect(opened.single.path, '+77010000000');
+    });
   });
+}
+
+class _InPersonDoctorCabinetRepository extends FakeDoctorCabinetRepository {
+  const _InPersonDoctorCabinetRepository();
+
+  @override
+  Future<DoctorPatient> patient(String id) async => DoctorPatient(
+    id: id,
+    fullName: 'Имя Фамилия',
+    heightCm: 170,
+    weightKg: 77,
+    age: 30,
+    appointment: DoctorAppointment(
+      id: 'p-$id',
+      patientName: 'Имя Фамилия',
+      patientId: id,
+      patientPhone: '+77010000000',
+      kind: AppointmentKind.inPerson,
+      startsAt: DateTime(2026, 7, 21, 10, 30),
+    ),
+  );
 }

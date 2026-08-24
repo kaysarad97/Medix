@@ -42,6 +42,7 @@ void main() {
     String startsAt = '2026-08-24T07:30:00Z',
     String type = 'video',
     bool detailed = false,
+    String? patientPhone,
   }) => {
     'id': id,
     'type': type,
@@ -59,7 +60,7 @@ void main() {
       'price': 12000,
       'cancellation_reason': null,
       'consultation_id': consultationId,
-      'patient_phone': null,
+      'patient_phone': patientPhone,
       'files': <Object>[],
       'conclusion': {
         'id': 'conclusion-1',
@@ -207,6 +208,26 @@ void main() {
       result.files.single.createdAt.toUtc(),
       DateTime.utc(2026, 8, 24, 8, 10),
     );
+  });
+
+  test('читает телефон пациента из детали очного приёма', () async {
+    final (:dio, adapter: _) = cannedDio({
+      '/doctors/me/appointments/$appointmentId': (
+        statusCode: 200,
+        body: appointment(
+          type: 'in_person',
+          detailed: true,
+          patientPhone: '  +77010000000  ',
+        ),
+      ),
+    });
+
+    final result = await RemoteDoctorCabinetRepository(
+      dio,
+    ).pastAppointment(appointmentId);
+
+    expect(result.kind, AppointmentKind.inPerson);
+    expect(result.patientPhone, '+77010000000');
   });
 
   test('сохраняет заключение завершением записи врача', () async {
