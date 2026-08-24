@@ -397,7 +397,10 @@ void main() {
 
     test('список записей приходит развёрнутым', () async {
       final (:dio, :adapter) = cannedDio({
-        'GET /appointments': (statusCode: 200, body: [appointmentJson()]),
+        'GET /appointments': (
+          statusCode: 200,
+          body: [appointmentJson(status: 'no_show')],
+        ),
       });
 
       final result = await RemoteDoctorsRepository(
@@ -405,6 +408,7 @@ void main() {
       ).appointments(upcoming: true);
 
       expect(result.single.doctorId, 'd1');
+      expect(result.single.status, AppointmentStatus.noShow);
       expect(adapter.requests.single.queryParameters['upcoming'], isTrue);
     });
 

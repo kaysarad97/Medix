@@ -34,6 +34,7 @@ class DoctorAppointment {
     this.patientId,
     this.consultationId,
     this.endsAt,
+    this.status = AppointmentStatus.unknown,
     this.patientAvatarAsset,
     this.conclusion,
   });
@@ -49,6 +50,7 @@ class DoctorAppointment {
   /// время подписано промежутком («13:30-14:47»), а в календаре будущих
   /// записей одной точкой начала.
   final DateTime? endsAt;
+  final AppointmentStatus status;
 
   /// Аватар пациента в строке календаря. На главной не используется.
   final String? patientAvatarAsset;
@@ -81,6 +83,7 @@ class DoctorAppointment {
     kind: kind,
     startsAt: startsAt,
     endsAt: endsAt,
+    status: status,
     patientAvatarAsset: patientAvatarAsset,
     conclusion: value,
   );

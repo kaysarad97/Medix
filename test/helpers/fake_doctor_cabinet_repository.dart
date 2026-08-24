@@ -134,6 +134,19 @@ class FakeDoctorCabinetRepository implements DoctorCabinetRepository {
   ) async =>
       (await pastAppointment(appointmentId)).copyWithConclusion(text.trim());
 
+  @override
+  Future<DoctorAppointment> completeAppointment(String appointmentId) =>
+      pastAppointment(appointmentId);
+
+  @override
+  Future<DoctorAppointment> cancelAppointment(
+    String appointmentId,
+    String reason,
+  ) => pastAppointment(appointmentId);
+
+  @override
+  Future<void> markAppointmentNoShow(String appointmentId) async {}
+
   static DoctorAppointment _past(String id, DateTime day) {
     final start = DateTime(day.year, day.month, day.day, 13, 30);
     return DoctorAppointment(

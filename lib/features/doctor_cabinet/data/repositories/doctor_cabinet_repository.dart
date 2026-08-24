@@ -47,6 +47,19 @@ abstract interface class DoctorCabinetRepository {
   /// Добавляет или исправляет текст заключения после приёма.
   Future<DoctorAppointment> saveConclusion(String appointmentId, String text);
 
+  /// Завершает состоявшийся приём. Для видео/аудио backend заодно завершает
+  /// консультацию и освобождает выплату из escrow.
+  Future<DoctorAppointment> completeAppointment(String appointmentId);
+
+  /// Отменяет запись со стороны врача; причина будет видна пациенту.
+  Future<DoctorAppointment> cancelAppointment(
+    String appointmentId,
+    String reason,
+  );
+
+  /// Отмечает неявку после начала приёма.
+  Future<void> markAppointmentNoShow(String appointmentId);
+
   /// «Аналитика Работы» — неделя и месяц разом.
   Future<DoctorWorkAnalytics> workAnalytics();
 
@@ -276,6 +289,21 @@ class MockDoctorCabinetRepository implements DoctorCabinetRepository {
     await Future<void>.delayed(_latency);
     final appointment = await pastAppointment(appointmentId);
     return appointment.copyWithConclusion(text.trim());
+  }
+
+  @override
+  Future<DoctorAppointment> completeAppointment(String appointmentId) =>
+      pastAppointment(appointmentId);
+
+  @override
+  Future<DoctorAppointment> cancelAppointment(
+    String appointmentId,
+    String reason,
+  ) => pastAppointment(appointmentId);
+
+  @override
+  Future<void> markAppointmentNoShow(String appointmentId) async {
+    await Future<void>.delayed(_latency);
   }
 
   /// Строка записи из макета: аудио-звонок, «Имя Фамилия», приём почти

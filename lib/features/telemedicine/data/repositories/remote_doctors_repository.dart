@@ -399,6 +399,7 @@ class RemoteDoctorsRepository implements DoctorsRepository {
     'confirmed' => AppointmentStatus.confirmed,
     'completed' => AppointmentStatus.completed,
     'cancelled' => AppointmentStatus.cancelled,
+    'no_show' => AppointmentStatus.noShow,
     _ => AppointmentStatus.unknown,
   };
 }

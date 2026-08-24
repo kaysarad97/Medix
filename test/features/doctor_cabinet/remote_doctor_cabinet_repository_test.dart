@@ -204,6 +204,64 @@ void main() {
     });
   });
 
+  test('завершает приём через doctor-facing action', () async {
+    final (:dio, :adapter) = cannedDio({
+      'PATCH /doctors/me/appointments/$appointmentId': (
+        statusCode: 200,
+        body: {...appointment(detailed: true), 'status': 'completed'},
+      ),
+    });
+
+    final result = await RemoteDoctorCabinetRepository(
+      dio,
+    ).completeAppointment(appointmentId);
+
+    expect(result.status, AppointmentStatus.completed);
+    expect(adapter.requests.single.data, {'action': 'complete'});
+  });
+
+  test('отменяет запись врача с причиной для пациента', () async {
+    final (:dio, :adapter) = cannedDio({
+      'PATCH /doctors/me/appointments/$appointmentId': (
+        statusCode: 200,
+        body: {
+          ...appointment(detailed: true),
+          'status': 'cancelled',
+          'cancellation_reason': 'Врач заболел',
+        },
+      ),
+    });
+
+    final result = await RemoteDoctorCabinetRepository(
+      dio,
+    ).cancelAppointment(appointmentId, '  Врач заболел  ');
+
+    expect(result.status, AppointmentStatus.cancelled);
+    expect(adapter.requests.single.data, {
+      'action': 'cancel',
+      'reason': 'Врач заболел',
+    });
+  });
+
+  test('отмечает неявку отдельным endpoint записи', () async {
+    final (:dio, :adapter) = cannedDio({
+      'PATCH /doctors/me/appointments/$appointmentId/no-show': (
+        statusCode: 200,
+        body: {...appointment(), 'status': 'no_show', 'doctor': doctorMe()},
+      ),
+    });
+
+    await RemoteDoctorCabinetRepository(
+      dio,
+    ).markAppointmentNoShow(appointmentId);
+
+    expect(
+      adapter.requests.single.path,
+      '/doctors/me/appointments/$appointmentId/no-show',
+    );
+    expect(adapter.requests.single.method, 'PATCH');
+  });
+
   test('собирает карточку пациента из детали и свежих замеров', () async {
     final (:dio, :adapter) = cannedDio({
       '/doctors/me/appointments/$appointmentId': (

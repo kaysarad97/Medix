@@ -180,6 +180,30 @@ class RemoteDoctorCabinetRepository implements DoctorCabinetRepository {
   }
 
   @override
+  Future<DoctorAppointment> completeAppointment(String appointmentId) =>
+      _patchAppointmentAction(appointmentId, {'action': 'complete'});
+
+  @override
+  Future<DoctorAppointment> cancelAppointment(
+    String appointmentId,
+    String reason,
+  ) => _patchAppointmentAction(appointmentId, {
+    'action': 'cancel',
+    'reason': reason.trim(),
+  });
+
+  @override
+  Future<void> markAppointmentNoShow(String appointmentId) async {
+    try {
+      await _dio.patch<Map<String, dynamic>>(
+        ApiEndpoints.myDoctorAppointmentNoShow(appointmentId),
+      );
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
+
+  @override
   Future<DoctorPatient> patient(String id) async {
     try {
       Map<String, dynamic> detail;
@@ -366,6 +390,21 @@ class RemoteDoctorCabinetRepository implements DoctorCabinetRepository {
     return result;
   }
 
+  Future<DoctorAppointment> _patchAppointmentAction(
+    String appointmentId,
+    Map<String, dynamic> data,
+  ) async {
+    try {
+      final response = await _dio.patch<Map<String, dynamic>>(
+        ApiEndpoints.myDoctorAppointment(appointmentId),
+        data: data,
+      );
+      return _appointment(response.data!);
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
+
   Future<List<DoctorAppointment>> _activeAppointments({
     required DateTime from,
     required DateTime to,
@@ -508,9 +547,19 @@ class RemoteDoctorCabinetRepository implements DoctorCabinetRepository {
       },
       startsAt: DateTime.parse(json['starts_at'] as String).toLocal(),
       endsAt: DateTime.tryParse(json['ends_at'] as String? ?? '')?.toLocal(),
+      status: _appointmentStatus(json['status'] as String?),
       conclusion: payload?['text'] as String?,
     );
   }
+
+  static AppointmentStatus _appointmentStatus(String? value) => switch (value) {
+    'pending' => AppointmentStatus.pending,
+    'confirmed' => AppointmentStatus.confirmed,
+    'completed' => AppointmentStatus.completed,
+    'cancelled' => AppointmentStatus.cancelled,
+    'no_show' => AppointmentStatus.noShow,
+    _ => AppointmentStatus.unknown,
+  };
 
   static Map<String, dynamic> _nearestAppointment(
     Map<String, dynamic> a,

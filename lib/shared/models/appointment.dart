@@ -6,7 +6,14 @@ import '../../core/utils/ru_money.dart';
 /// Формат приёма.
 enum AppointmentKind { videoCall, audioCall, chat, inPerson }
 
-enum AppointmentStatus { pending, confirmed, completed, cancelled, unknown }
+enum AppointmentStatus {
+  pending,
+  confirmed,
+  completed,
+  cancelled,
+  noShow,
+  unknown,
+}
 
 /// Запись к врачу.
 ///
