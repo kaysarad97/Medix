@@ -287,6 +287,47 @@ void main() {
     expect(reviews.single.text, 'Всё отлично');
     expect(adapter.requests.last.path, '/doctors/$doctorId/reviews');
   });
+
+  test('собирает врачебный чат из консультации, записи и сообщений', () async {
+    final (:dio, adapter: _) = cannedDio({
+      '/users/me': (statusCode: 200, body: {'id': doctorId}),
+      '/consultations': (
+        statusCode: 200,
+        body: [
+          {
+            'id': consultationId,
+            'appointment_id': appointmentId,
+            'status': 'in_progress',
+            'started_at': '2026-08-24T07:30:00Z',
+            'ended_at': null,
+          },
+        ],
+      ),
+      '/doctors/me/appointments/$appointmentId': (
+        statusCode: 200,
+        body: appointment(detailed: true),
+      ),
+      '/consultations/$consultationId/messages': (
+        statusCode: 200,
+        body: [
+          {
+            'id': 'message-1',
+            'consultation_id': consultationId,
+            'sender_id': patientId,
+            'body': 'Добрый день',
+            'created_at': '2026-08-24T07:35:00Z',
+          },
+        ],
+      ),
+    });
+
+    final threads = await RemoteDoctorCabinetRepository(dio).patientChats();
+
+    expect(threads.single.id, consultationId);
+    expect(threads.single.patientName, 'Дархан Аркалыков');
+    expect(threads.single.lastMessage, 'Добрый день');
+    expect(threads.single.lastMessageIsMine, isFalse);
+  });
 }
 
 Map<String, Object?> measurement(String kind, num value, String createdAt) => {

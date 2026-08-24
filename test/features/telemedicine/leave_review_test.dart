@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/features/profile/presentation/providers/profile_providers.dart';
 import 'package:medix/features/telemedicine/presentation/providers/telemedicine_providers.dart';
 import 'package:medix/features/telemedicine/presentation/screens/leave_review_screen.dart';
+import 'package:medix/features/telemedicine/data/repositories/consultations_repository.dart';
+import 'package:medix/features/telemedicine/domain/entities/doctor_review.dart';
 import 'package:medix/core/widgets/rating_stars.dart';
 import 'package:medix/l10n/app_localizations.dart';
 
@@ -30,6 +33,9 @@ void main() {
           ),
           // Отсюда берётся имя, которым подписывается отзыв.
           profileRepositoryProvider.overrideWithValue(FakeProfileRepository()),
+          consultationsRepositoryProvider.overrideWithValue(
+            _FakeConsultationsRepository(),
+          ),
         ],
         child: MaterialApp(
           theme: AppTheme.light,
@@ -96,4 +102,21 @@ void main() {
 
     expect(container.read(composedReviewsProvider), isEmpty);
   });
+}
+
+class _FakeConsultationsRepository extends ConsultationsRepository {
+  _FakeConsultationsRepository() : super(Dio());
+
+  @override
+  Future<DoctorReview> reviewDoctor(
+    String doctorId, {
+    required int rating,
+    String? body,
+  }) async => DoctorReview(
+    id: 'review-1',
+    authorName: 'Имя Фамилия',
+    rating: rating.toDouble(),
+    text: body ?? '',
+    createdAt: DateTime(2026, 8, 10),
+  );
 }

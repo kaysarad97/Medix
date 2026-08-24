@@ -1,14 +1,44 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 
 import '../../../../core/network/api_endpoints.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../domain/entities/consultation.dart';
 import '../../domain/entities/doctor_review.dart';
+import 'consultation_socket.dart';
 
 class ConsultationsRepository {
-  const ConsultationsRepository(this._dio);
+  ConsultationsRepository(
+    this._dio, {
+    ConsultationSocket Function()? socketFactory,
+  }) : _socketFactory = socketFactory ?? ConsultationSocket.new;
 
   final Dio _dio;
+  final ConsultationSocket Function() _socketFactory;
+
+  Future<List<Consultation>> consultations({
+    ConsultationStatus? status,
+    int limit = 100,
+    int offset = 0,
+  }) async {
+    try {
+      final response = await _dio.get<List<dynamic>>(
+        ApiEndpoints.consultations,
+        queryParameters: {
+          if (status != null) 'status': _statusValue(status),
+          'limit': limit,
+          'offset': offset,
+        },
+      );
+      return [
+        for (final item in response.data ?? const [])
+          _consultation(item as Map<String, dynamic>),
+      ];
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
 
   Future<ConsultationJoin> join(String consultationId) async {
     try {
@@ -53,6 +83,66 @@ class ConsultationsRepository {
       ];
     } on DioException catch (e) {
       throw ApiException.fromDio(e);
+    }
+  }
+
+  /// WebSocket — единственный серверный транспорт отправки сообщения.
+  /// Короткоживущий ticket получается непосредственно перед соединением;
+  /// возвращаем подтверждённую сервером реплику, а не оптимистичный локальный
+  /// объект без настоящего id.
+  Future<ConsultationMessage> sendMessage(
+    String consultationId, {
+    required String senderId,
+    required String body,
+  }) async {
+    final joinInfo = await join(consultationId);
+    final socket = _socketFactory();
+    final result = Completer<ConsultationMessage>();
+    late final StreamSubscription<ConsultationSocketEvent> subscription;
+    subscription = socket
+        .connect(
+          consultationId: consultationId,
+          ticket: joinInfo.webSocketTicket,
+        )
+        .listen(
+          (event) {
+            switch (event) {
+              case ConsultationMessageEvent(:final message)
+                  when message.senderId == senderId && message.body == body:
+                if (!result.isCompleted) {
+                  result.complete(message);
+                }
+              case ConsultationSocketErrorEvent(:final detail):
+                if (!result.isCompleted) {
+                  result.completeError(ApiException(detail));
+                }
+              case ConsultationHistoryEvent():
+              case ConsultationMessageEvent():
+                break;
+            }
+          },
+          onError: (Object error, StackTrace stackTrace) {
+            if (!result.isCompleted) result.completeError(error, stackTrace);
+          },
+          onDone: () {
+            if (!result.isCompleted) {
+              result.completeError(
+                const ApiException('Соединение с чатом закрыто'),
+              );
+            }
+          },
+        );
+    socket.send(body);
+
+    try {
+      return await result.future.timeout(
+        const Duration(seconds: 15),
+        onTimeout: () =>
+            throw const ApiException('Сервер не подтвердил отправку сообщения'),
+      );
+    } finally {
+      await subscription.cancel();
+      await socket.close();
     }
   }
 
@@ -165,6 +255,41 @@ class ConsultationsRepository {
     }
   }
 
+  /// На экране отзыв маршрутизируется по doctor id, тогда как сервер
+  /// принимает consultation id. Связываем их через завершённые консультации
+  /// и пациентские записи, выбирая последнюю консультацию с этим врачом.
+  Future<DoctorReview> reviewDoctor(
+    String doctorId, {
+    required int rating,
+    String? body,
+  }) async {
+    final completed = await consultations(status: ConsultationStatus.completed);
+    final matches = <Consultation>[];
+    for (final consultation in completed) {
+      try {
+        final response = await _dio.get<Map<String, dynamic>>(
+          ApiEndpoints.appointment(consultation.appointmentId),
+        );
+        final doctor = response.data?['doctor'] as Map<String, dynamic>?;
+        if (doctor?['id'] == doctorId) matches.add(consultation);
+      } on DioException catch (e) {
+        throw ApiException.fromDio(e);
+      }
+    }
+    if (matches.isEmpty) {
+      throw const ApiException(
+        'Нет завершённой консультации с этим врачом',
+        statusCode: 404,
+      );
+    }
+    matches.sort(
+      (a, b) => (b.endedAt ?? DateTime.fromMillisecondsSinceEpoch(0)).compareTo(
+        a.endedAt ?? DateTime.fromMillisecondsSinceEpoch(0),
+      ),
+    );
+    return review(matches.first.id, rating: rating, body: body);
+  }
+
   static Consultation _consultation(Map<String, dynamic> json) => Consultation(
     id: json['id'] as String,
     appointmentId: json['appointment_id'] as String,
@@ -215,4 +340,12 @@ class ConsultationsRepository {
         )?.toLocal(),
         createdAt: DateTime.parse(json['created_at'] as String).toLocal(),
       );
+
+  static String _statusValue(ConsultationStatus status) => switch (status) {
+    ConsultationStatus.scheduled => 'scheduled',
+    ConsultationStatus.inProgress => 'in_progress',
+    ConsultationStatus.completed => 'completed',
+    ConsultationStatus.cancelled => 'cancelled',
+    ConsultationStatus.unknown => 'unknown',
+  };
 }

@@ -1,12 +1,16 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/network/api_mode.dart';
+import '../../../../core/network/dio_client.dart';
 import '../../data/repositories/chats_repository.dart';
+import '../../data/repositories/remote_chats_repository.dart';
 import '../../domain/entities/chat_thread.dart';
 
-final chatsRepositoryProvider = Provider<ChatsRepository>(
-  (ref) => const MockChatsRepository(),
-);
+final chatsRepositoryProvider = Provider<ChatsRepository>((ref) {
+  if (useMocks) return const MockChatsRepository();
+  return RemoteChatsRepository(ref.watch(dioClientProvider));
+});
 
 final chatThreadsProvider = FutureProvider<List<ChatThread>>(
   (ref) => ref.watch(chatsRepositoryProvider).threads(),

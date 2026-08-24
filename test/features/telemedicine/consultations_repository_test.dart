@@ -1,4 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:medix/features/telemedicine/data/repositories/'
+    'consultation_socket.dart';
 import 'package:medix/features/telemedicine/data/repositories/'
     'consultations_repository.dart';
 import 'package:medix/features/telemedicine/domain/entities/consultation.dart';
@@ -6,6 +10,35 @@ import 'package:medix/features/telemedicine/domain/entities/consultation.dart';
 import '../../helpers/canned_dio.dart';
 
 void main() {
+  test('читает список собственных консультаций с фильтром', () async {
+    final (:dio, :adapter) = cannedDio({
+      '/consultations': (
+        statusCode: 200,
+        body: [
+          {
+            'id': 'c1',
+            'appointment_id': 'a1',
+            'status': 'completed',
+            'started_at': '2026-08-21T10:00:00Z',
+            'ended_at': '2026-08-21T10:30:00Z',
+          },
+        ],
+      ),
+    });
+
+    final result = await ConsultationsRepository(
+      dio,
+    ).consultations(status: ConsultationStatus.completed);
+
+    expect(result.single.appointmentId, 'a1');
+    expect(result.single.status, ConsultationStatus.completed);
+    expect(adapter.requests.single.queryParameters, {
+      'status': 'completed',
+      'limit': 100,
+      'offset': 0,
+    });
+  });
+
   test('вход возвращает реквизиты чата и видеокомнаты', () async {
     final (:dio, :adapter) = cannedDio({
       'POST /consultations/c1/join': (
@@ -70,6 +103,39 @@ void main() {
     expect(result.single.senderId, 'u1');
     expect(result.single.body, 'Здравствуйте');
     expect(adapter.requests.single.path, '/consultations/c1/messages');
+  });
+
+  test('отправка получает ticket и ждёт серверное подтверждение', () async {
+    final socket = _FakeSocket();
+    final (:dio, :adapter) = cannedDio({
+      'POST /consultations/c1/join': (
+        statusCode: 200,
+        body: {
+          'room_id': 'consultation-c1',
+          'ws_ticket': 'short-ticket',
+          'video_token': 'video-token',
+          'video_server_url': 'wss://video.medix.kz',
+          'mode': 'video',
+          'expires_at': '2026-08-21T12:00:00Z',
+        },
+      ),
+    });
+    final repository = ConsultationsRepository(
+      dio,
+      socketFactory: () => socket,
+    );
+
+    final result = await repository.sendMessage(
+      'c1',
+      senderId: 'u1',
+      body: 'Здравствуйте',
+    );
+
+    expect(result.id, 'server-message');
+    expect(socket.ticket, 'short-ticket');
+    expect(socket.sent, 'Здравствуйте');
+    expect(socket.closed, isTrue);
+    expect(adapter.requests.single.path, '/consultations/c1/join');
   });
 
   test('вложение проходит выдачу URL, подтверждение и скачивание', () async {
@@ -160,6 +226,50 @@ void main() {
     expect(review.rating, 5);
     expect(adapter.requests.single.data, {'rating': 5, 'body': 'Спасибо'});
   });
+
+  test('находит consultation_id для отзыва по doctor id', () async {
+    final (:dio, :adapter) = cannedDio({
+      '/consultations': (
+        statusCode: 200,
+        body: [
+          {
+            'id': 'c1',
+            'appointment_id': 'a1',
+            'status': 'completed',
+            'started_at': '2026-08-21T10:00:00Z',
+            'ended_at': '2026-08-21T10:30:00Z',
+          },
+        ],
+      ),
+      '/appointments/a1': (
+        statusCode: 200,
+        body: {
+          'id': 'a1',
+          'doctor': {'id': 'd1'},
+        },
+      ),
+      'POST /consultations/c1/review': (
+        statusCode: 201,
+        body: {
+          'id': 'r1',
+          'doctor_id': 'd1',
+          'author_id': 'u1',
+          'author_name': 'Алия',
+          'consultation_id': 'c1',
+          'rating': 4,
+          'body': 'Понятная консультация',
+          'created_at': '2026-08-21T11:00:00Z',
+        },
+      ),
+    });
+
+    final review = await ConsultationsRepository(
+      dio,
+    ).reviewDoctor('d1', rating: 4, body: 'Понятная консультация');
+
+    expect(review.id, 'r1');
+    expect(adapter.requests.last.path, '/consultations/c1/review');
+  });
 }
 
 const _fileJson = {
@@ -168,3 +278,41 @@ const _fileJson = {
   'uploaded_by': 'u1',
   'created_at': '2026-08-21T10:30:00Z',
 };
+
+class _FakeSocket extends ConsultationSocket {
+  final _events = StreamController<ConsultationSocketEvent>();
+  String? ticket;
+  String? sent;
+  bool closed = false;
+
+  @override
+  Stream<ConsultationSocketEvent> connect({
+    required String consultationId,
+    required String ticket,
+  }) {
+    this.ticket = ticket;
+    return _events.stream;
+  }
+
+  @override
+  void send(String body) {
+    sent = body;
+    _events.add(
+      ConsultationMessageEvent(
+        ConsultationMessage(
+          id: 'server-message',
+          consultationId: 'c1',
+          senderId: 'u1',
+          body: body,
+          createdAt: DateTime.utc(2026, 8, 21, 10, 1),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Future<void> close() async {
+    closed = true;
+    await _events.close();
+  }
+}

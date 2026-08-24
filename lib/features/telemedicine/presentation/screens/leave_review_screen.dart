@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/network/api_exception.dart';
+import '../../../../core/network/api_mode.dart';
 import '../../../../core/utils/ru_dates.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_scaffold.dart';
@@ -25,9 +27,9 @@ import '../../../../core/widgets/rating_stars.dart';
 /// профиле врача не было ничего для оценки, и написанный отзыв уходил с
 /// зашитыми пятью звёздами. Теперь оценку спрашивают здесь.
 ///
-/// Отправлять по-прежнему некуда: эндпоинта отзывов у бэкенда нет, приходит
-/// только рейтинг числом. Отзыв встаёт первым в карусели профиля и живёт до
-/// перезапуска — см. [ComposedReviews].
+/// В production экран находит последнюю завершённую консультацию с этим
+/// врачом и отправляет `POST /consultations/{id}/review`. В mock-режиме
+/// отзыв остаётся локальным — см. [ComposedReviews].
 class LeaveReviewScreen extends ConsumerStatefulWidget {
   const LeaveReviewScreen({super.key, required this.doctorId, this.now});
 
@@ -66,6 +68,7 @@ class _LeaveReviewScreenState extends ConsumerState<LeaveReviewScreen> {
   /// Оценка, которую поставил пользователь. В макете начинается с нуля —
   /// «Ваша оценка: 0.0» и пять контурных звёзд.
   double _rating = 0;
+  var _submitting = false;
 
   @override
   void dispose() {
@@ -122,7 +125,7 @@ class _LeaveReviewScreenState extends ConsumerState<LeaveReviewScreen> {
                         child: _SubmitButton(
                           // Пока профиль не загрузился, отзыв нечем
                           // подписать; без оценки и текста отправлять нечего.
-                          onTap: profile == null
+                          onTap: profile == null || _submitting
                               ? null
                               : () => _submit(profile.fullName),
                         ),
@@ -136,11 +139,32 @@ class _LeaveReviewScreenState extends ConsumerState<LeaveReviewScreen> {
     );
   }
 
-  void _submit(String authorName) {
-    ref
-        .read(composedReviewsProvider.notifier)
-        .add(text: _controller.text, authorName: authorName, rating: _rating);
-    Navigator.of(context).maybePop();
+  Future<void> _submit(String authorName) async {
+    final text = _controller.text.trim();
+    if (text.isEmpty || _rating < 1) return;
+
+    if (useMocks) {
+      ref
+          .read(composedReviewsProvider.notifier)
+          .add(text: text, authorName: authorName, rating: _rating);
+      await Navigator.of(context).maybePop();
+      return;
+    }
+
+    setState(() => _submitting = true);
+    try {
+      final review = await ref
+          .read(consultationsRepositoryProvider)
+          .reviewDoctor(widget.doctorId, rating: _rating.round(), body: text);
+      ref.read(composedReviewsProvider.notifier).addReview(review);
+      if (mounted) await Navigator.of(context).maybePop();
+    } on ApiException catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(error.message)));
+      setState(() => _submitting = false);
+    }
   }
 }
 

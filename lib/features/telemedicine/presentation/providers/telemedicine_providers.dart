@@ -118,14 +118,9 @@ final waitlistEntriesProvider = FutureProvider.autoDispose<List<WaitlistEntry>>(
 
 /// Отзывы, написанные пользователем на экране врача.
 ///
-/// ОТПРАВЛЯТЬ ПО-ПРЕЖНЕМУ НЕКУДА, но причина сменилась. Читать отзывы уже
-/// есть откуда (`GET /doctors/{id}/reviews`), а вот пишутся они не врачу, а
-/// консультации: `POST /consultations/{id}/review`. Оценить можно только ту
-/// консультацию, которая состоялась, а консультации в приложении пока нет
-/// вовсе — ни созвона, ни идентификатора. Пока её не будет, написанное
-/// встаёт первым в карусели, как своя реплика в переписке, и живёт до
-/// перезапуска. Отдельно от [doctorReviewsProvider], чтобы не подменять
-/// собой то, что придёт с сервера.
+/// В production отзыв отправляется через последнюю завершённую консультацию
+/// выбранного врача, а сюда добавляется серверный ответ для немедленного
+/// отображения в карусели. В mock-режиме список остаётся локальным.
 class ComposedReviews extends Notifier<List<DoctorReview>> {
   @override
   List<DoctorReview> build() => const [];
@@ -149,6 +144,10 @@ class ComposedReviews extends Notifier<List<DoctorReview>> {
       ),
       ...state,
     ];
+  }
+
+  void addReview(DoctorReview review) {
+    state = [review, ...state.where((item) => item.id != review.id)];
   }
 }
 

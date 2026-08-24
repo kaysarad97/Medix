@@ -3,6 +3,8 @@ import 'package:dio/dio.dart';
 import '../../../../core/network/api_endpoints.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../../../shared/models/appointment.dart';
+import '../../../telemedicine/data/repositories/consultations_repository.dart';
+import '../../../telemedicine/domain/entities/consultation.dart';
 import '../../domain/entities/admin_request.dart';
 import '../../domain/entities/certificate.dart';
 import '../../domain/entities/doctor_appointment.dart';
@@ -16,9 +18,9 @@ import 'doctor_cabinet_repository.dart';
 
 /// Кабинет текущего врача поверх doctor-facing API.
 ///
-/// Backend пока не предоставляет заявки к администрации клиники и данные,
-/// необходимые старому UI чатов. Эти методы временно делегируются макету;
-/// профиль, записи, пациенты, отзывы, сертификат и аналитика уже читаются из
+/// Backend пока не предоставляет заявки к администрации клиники — только
+/// эти методы временно делегируются макету. Профиль, записи, пациенты,
+/// отзывы, сертификат, аналитика и консультационные чаты читаются из
 /// реальных данных.
 class RemoteDoctorCabinetRepository implements DoctorCabinetRepository {
   const RemoteDoctorCabinetRepository(this._dio);
@@ -237,18 +239,50 @@ class RemoteDoctorCabinetRepository implements DoctorCabinetRepository {
     );
   }
 
-  /// Пока сервер не возвращает участника и последнюю реплику в списке
-  /// консультаций. Этот блок будет заменён следующим интеграционным срезом.
   @override
-  Future<List<PatientChatThread>> patientChats() => _fallback.patientChats();
+  Future<List<PatientChatThread>> patientChats() async {
+    final userId = await _currentUserId();
+    final consultationsRepository = ConsultationsRepository(_dio);
+    final consultations = await consultationsRepository.consultations();
+    final threads = await Future.wait([
+      for (final consultation in consultations)
+        _patientThread(consultation, userId, consultationsRepository),
+    ]);
+    threads.sort((a, b) => b.lastMessageAt.compareTo(a.lastMessageAt));
+    return threads;
+  }
 
   @override
-  Future<List<PatientMessage>> patientMessages(String threadId) =>
-      _fallback.patientMessages(threadId);
+  Future<List<PatientMessage>> patientMessages(String threadId) async {
+    final userId = await _currentUserId();
+    final messages = await ConsultationsRepository(_dio).messages(threadId);
+    return [
+      for (final message in messages)
+        PatientMessage(
+          id: message.id,
+          text: message.body,
+          isMine: message.senderId == userId,
+          sentAt: message.createdAt,
+        ),
+    ];
+  }
 
   @override
-  Future<PatientMessage> sendPatientMessage(String threadId, String text) =>
-      _fallback.sendPatientMessage(threadId, text);
+  Future<PatientMessage> sendPatientMessage(
+    String threadId,
+    String text,
+  ) async {
+    final userId = await _currentUserId();
+    final message = await ConsultationsRepository(
+      _dio,
+    ).sendMessage(threadId, senderId: userId, body: text);
+    return PatientMessage(
+      id: message.id,
+      text: message.body,
+      isMine: true,
+      sentAt: message.createdAt,
+    );
+  }
 
   /// Doctor-to-admin API на сервере отсутствует.
   @override
@@ -312,6 +346,48 @@ class RemoteDoctorCabinetRepository implements DoctorCabinetRepository {
         for (final item in response.data ?? const [])
           item as Map<String, dynamic>,
       ];
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
+
+  Future<PatientChatThread> _patientThread(
+    Consultation consultation,
+    String userId,
+    ConsultationsRepository consultationsRepository,
+  ) async {
+    try {
+      final results = await Future.wait<Object>([
+        _dio.get<Map<String, dynamic>>(
+          ApiEndpoints.myDoctorAppointment(consultation.appointmentId),
+        ),
+        consultationsRepository.messages(consultation.id),
+      ]);
+      final appointment = (results[0] as Response<Map<String, dynamic>>).data!;
+      final messages = results[1] as List<ConsultationMessage>;
+      final patient =
+          appointment['patient'] as Map<String, dynamic>? ?? const {};
+      final last = messages.isEmpty ? null : messages.last;
+      return PatientChatThread(
+        id: consultation.id,
+        patientName: patient['full_name'] as String? ?? '',
+        lastMessage: last?.body ?? '',
+        lastMessageAt:
+            last?.createdAt ??
+            DateTime.parse(appointment['starts_at'] as String).toLocal(),
+        lastMessageIsMine: last?.senderId == userId,
+        // Backend пока не хранит прочтение сообщений.
+        isRead: true,
+      );
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
+
+  Future<String> _currentUserId() async {
+    try {
+      final response = await _dio.get<Map<String, dynamic>>(ApiEndpoints.me);
+      return response.data!['id'] as String;
     } on DioException catch (e) {
       throw ApiException.fromDio(e);
     }
