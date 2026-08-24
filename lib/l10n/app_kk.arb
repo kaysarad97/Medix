@@ -374,5 +374,14 @@
   "@consultationAttachmentLabel": { "placeholders": { "number": { "type": "int" } } },
   "consultationAttachmentUploadSuccess": "Файл тіркелді",
   "consultationAttachmentUploadError": "Файлды тіркеу мүмкін болмады",
-  "consultationAttachmentOpenError": "Тіркемені ашу мүмкін болмады"
+  "consultationAttachmentOpenError": "Тіркемені ашу мүмкін болмады",
+  "doctorChatUnavailable": "Чат консультация жасалғаннан кейін қолжетімді болады",
+  "doctorPatientChatUnavailable": "Емделушімен чат консультация жасалғаннан кейін қолжетімді болады",
+  "consultationDisputeAction": "Мәселе туралы хабарлау",
+  "consultationDisputeTitle": "Консультация мәселесі",
+  "consultationDisputePrompt": "Консультация кезінде не дұрыс болмағанын сипаттаңыз. Қолдау қызметі өтінішіңізді қарайды.",
+  "consultationDisputeHint": "Мәселені сипаттаңыз",
+  "consultationDisputeSubmit": "Жіберу",
+  "consultationDisputeSuccess": "Өтінішіңіз жіберілді",
+  "consultationDisputeError": "Өтінішті жіберу мүмкін болмады"
 }

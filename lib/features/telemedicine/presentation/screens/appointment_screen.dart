@@ -7,6 +7,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/ru_dates.dart';
 import '../../../../core/widgets/app_scaffold.dart';
+import '../../../../core/widgets/form_error_snack_bar.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -123,7 +124,7 @@ class _Content extends ConsumerWidget {
                 icon: MedixIcon.chat,
                 title: l10n.messageActionTitle,
                 subtitle: l10n.doctorChatTitle,
-                onTap: () => context.push(Routes.chatOf('t1')),
+                onTap: () => _openChat(context, appointment.consultationId),
               ),
             ),
           ),
@@ -203,7 +204,7 @@ class _Content extends ConsumerWidget {
                   icon: MedixIcon.mail,
                   title: l10n.messageActionTitle,
                   subtitle: l10n.doctorChatTitle,
-                  onTap: () => context.push(Routes.chatOf('t1')),
+                  onTap: () => _openChat(context, appointment.consultationId),
                 ),
               ),
             ),
@@ -212,6 +213,17 @@ class _Content extends ConsumerWidget {
       ),
     );
   }
+}
+
+void _openChat(BuildContext context, String? consultationId) {
+  if (consultationId == null) {
+    showFormErrorSnackBar(
+      context,
+      AppLocalizations.of(context)!.doctorChatUnavailable,
+    );
+    return;
+  }
+  context.push(Routes.chatOf(consultationId));
 }
 
 class _Section extends StatelessWidget {

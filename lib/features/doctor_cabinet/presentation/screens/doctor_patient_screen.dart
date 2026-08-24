@@ -9,6 +9,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/ru_dates.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_scaffold.dart';
+import '../../../../core/widgets/form_error_snack_bar.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -136,15 +137,23 @@ class _ConfirmCard extends StatelessWidget {
           _MessageRow(
             title: l10n.doctorWritePatientTitle,
             subtitle: l10n.doctorWritePatientSubtitle,
-            // Переписка в заглушке заведена на тот же идентификатор, что и
-            // пациент: своих идентификаторов у веток пока нет.
-            onTap: () =>
-                context.push(Routes.doctorPatientChatOf(appointment.id)),
+            onTap: () => _openPatientChat(context, appointment.consultationId),
           ),
         ],
       ),
     );
   }
+}
+
+void _openPatientChat(BuildContext context, String? consultationId) {
+  if (consultationId == null) {
+    showFormErrorSnackBar(
+      context,
+      AppLocalizations.of(context)!.doctorPatientChatUnavailable,
+    );
+    return;
+  }
+  context.push(Routes.doctorPatientChatOf(consultationId));
 }
 
 class _TimePill extends StatelessWidget {

@@ -10,6 +10,7 @@ import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/appointment.dart';
+import '../../../chats/presentation/providers/chats_providers.dart';
 import '../../domain/entities/doctor.dart';
 import '../../domain/entities/doctor_review.dart';
 import '../../domain/entities/doctor_schedule.dart';
@@ -131,9 +132,7 @@ class _Content extends ConsumerWidget {
                   // копию оболочки с теми же глобальными ключами. Навигатор
                   // на этом падает.
                   //
-                  // Связи «врач → переписка» в заглушке нет, поэтому id
-                  // временный — как и мок-приём в кнопке рядом.
-                  onTap: () => context.push(Routes.chatOf('t1')),
+                  onTap: () => _openDoctorChat(context, ref, doctor.id),
                 ),
               ),
             ),
@@ -159,6 +158,29 @@ class _Content extends ConsumerWidget {
         ],
       ),
     );
+  }
+}
+
+Future<void> _openDoctorChat(
+  BuildContext context,
+  WidgetRef ref,
+  String doctorId,
+) async {
+  try {
+    final threads = await ref.read(chatsRepositoryProvider).threads();
+    final matches = threads.where((item) => item.doctorId == doctorId);
+    final thread = matches.isEmpty ? null : matches.first;
+    if (!context.mounted) return;
+    if (thread == null) {
+      showFormErrorSnackBar(
+        context,
+        AppLocalizations.of(context)!.doctorChatUnavailable,
+      );
+      return;
+    }
+    context.push(Routes.chatOf(thread.id));
+  } on ApiException catch (e) {
+    if (context.mounted) showFormErrorSnackBar(context, e.message);
   }
 }
 

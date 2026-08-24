@@ -10,6 +10,7 @@ import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/doctor_photo.dart';
+import '../../../../core/widgets/form_error_snack_bar.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../core/widgets/user_avatar.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -19,6 +20,7 @@ import '../../data/call_media_session.dart';
 import '../providers/call_session_controller.dart';
 import '../../../telemedicine/domain/entities/doctor.dart';
 import '../../../telemedicine/presentation/providers/telemedicine_providers.dart';
+import '../../../telemedicine/presentation/widgets/consultation_dispute_dialog.dart';
 import '../../../../core/widgets/call_controls.dart';
 import '../../../../core/widgets/call_metrics.dart';
 
@@ -46,6 +48,8 @@ class _CallScreenState extends ConsumerState<CallScreen> {
   String? _callConsultationId;
   Duration _elapsed = Duration.zero;
   var _ended = false;
+  var _disputeSubmitting = false;
+  var _disputeSubmitted = false;
 
   @override
   void initState() {
@@ -97,6 +101,30 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     setState(() => _ended = true);
   }
 
+  Future<void> _openDispute(String consultationId) async {
+    final reason = await showConsultationDisputeDialog(context);
+    if (reason == null || !mounted) return;
+
+    setState(() => _disputeSubmitting = true);
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      await ref
+          .read(consultationsRepositoryProvider)
+          .dispute(consultationId, reason);
+      if (!mounted) return;
+      setState(() => _disputeSubmitted = true);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.consultationDisputeSuccess)));
+    } catch (_) {
+      if (mounted) {
+        showFormErrorSnackBar(context, l10n.consultationDisputeError);
+      }
+    } finally {
+      if (mounted) setState(() => _disputeSubmitting = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final appointment = ref.watch(appointmentProvider(widget.appointmentId));
@@ -126,6 +154,11 @@ class _CallScreenState extends ConsumerState<CallScreen> {
                 onHangUp: _handleHangUp,
                 onToggleCamera: _call?.toggleCamera,
                 onToggleMicrophone: _call?.toggleMicrophone,
+                disputeSubmitted: _disputeSubmitted,
+                disputeSubmitting: _disputeSubmitting,
+                onDispute: value.consultationId == null
+                    ? null
+                    : () => _openDispute(value.consultationId!),
               ),
       ),
     );
@@ -144,6 +177,9 @@ class _Content extends StatelessWidget {
     required this.onHangUp,
     required this.onToggleCamera,
     required this.onToggleMicrophone,
+    required this.disputeSubmitted,
+    required this.disputeSubmitting,
+    required this.onDispute,
   });
 
   final AppointmentKind kind;
@@ -156,6 +192,9 @@ class _Content extends StatelessWidget {
   final VoidCallback onHangUp;
   final VoidCallback? onToggleCamera;
   final VoidCallback? onToggleMicrophone;
+  final bool disputeSubmitted;
+  final bool disputeSubmitting;
+  final VoidCallback? onDispute;
 
   bool get _isVideo => kind == AppointmentKind.videoCall;
 
@@ -226,6 +265,22 @@ class _Content extends StatelessWidget {
                     onToggleMicrophone: onToggleMicrophone,
                   ),
           ),
+          if (ended && !disputeSubmitted && onDispute != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 10, 24, 24),
+              child: Center(
+                child: TextButton(
+                  key: const ValueKey('consultation-dispute-action'),
+                  onPressed: disputeSubmitting ? null : onDispute,
+                  child: disputeSubmitting
+                      ? const SizedBox.square(
+                          dimension: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(l10n.consultationDisputeAction),
+                ),
+              ),
+            ),
         ],
       ),
     );

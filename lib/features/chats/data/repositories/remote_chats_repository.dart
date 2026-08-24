@@ -55,6 +55,7 @@ class RemoteChatsRepository implements ChatsRepository {
       final last = messages.isEmpty ? null : messages.last;
       return ChatThread(
         id: consultation.id,
+        doctorId: doctor['id'] as String?,
         doctorName: doctor['full_name'] as String? ?? '',
         doctorPhotoUrl: doctor['photo_url'] as String?,
         lastMessage: last?.body ?? '',

@@ -8,6 +8,7 @@ import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/action_button_row.dart';
 import '../../../../core/widgets/app_scaffold.dart';
+import '../../../../core/widgets/form_error_snack_bar.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -81,8 +82,9 @@ class DoctorPatientAppointmentScreen extends ConsumerWidget {
                           icon: MedixIcon.mail,
                           title: l10n.doctorWritePatientTitle,
                           subtitle: l10n.doctorPatientChatSubtitle,
-                          onTap: () => context.push(
-                            Routes.doctorPatientChatOf(appointment.id),
+                          onTap: () => _openPatientChat(
+                            context,
+                            appointment.consultationId,
                           ),
                         ),
                       ),
@@ -108,6 +110,17 @@ class DoctorPatientAppointmentScreen extends ConsumerWidget {
       ),
     );
   }
+}
+
+void _openPatientChat(BuildContext context, String? consultationId) {
+  if (consultationId == null) {
+    showFormErrorSnackBar(
+      context,
+      AppLocalizations.of(context)!.doctorPatientChatUnavailable,
+    );
+    return;
+  }
+  context.push(Routes.doctorPatientChatOf(consultationId));
 }
 
 /// Белая строка с видом записи и её временем.

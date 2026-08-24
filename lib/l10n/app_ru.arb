@@ -1428,5 +1428,14 @@
   "@consultationAttachmentLabel": { "placeholders": { "number": { "type": "int" } } },
   "consultationAttachmentUploadSuccess": "Файл прикреплён",
   "consultationAttachmentUploadError": "Не удалось прикрепить файл",
-  "consultationAttachmentOpenError": "Не удалось открыть вложение"
+  "consultationAttachmentOpenError": "Не удалось открыть вложение",
+  "doctorChatUnavailable": "Чат будет доступен после создания консультации",
+  "doctorPatientChatUnavailable": "Чат с пациентом будет доступен после создания консультации",
+  "consultationDisputeAction": "Сообщить о проблеме",
+  "consultationDisputeTitle": "Проблема с консультацией",
+  "consultationDisputePrompt": "Опишите, что произошло во время консультации. Служба поддержки рассмотрит обращение.",
+  "consultationDisputeHint": "Опишите проблему",
+  "consultationDisputeSubmit": "Отправить",
+  "consultationDisputeSuccess": "Обращение отправлено",
+  "consultationDisputeError": "Не удалось отправить обращение"
 }

@@ -35,6 +35,7 @@ class MockChatsRepository implements ChatsRepository {
   static List<ChatThread> get sampleThreads => [
     ChatThread(
       id: 't1',
+      doctorId: 'd1',
       doctorName: 'Имя Фамилия',
       lastMessage: 'Здравствуйте! Какие анализы мне стоит сдать?',
       lastMessageAt: _sentAt,
@@ -43,6 +44,7 @@ class MockChatsRepository implements ChatsRepository {
     ),
     ChatThread(
       id: 't2',
+      doctorId: 'd2',
       doctorName: 'Имя Фамилия',
       lastMessage: 'Спасибо за обращение, на здоровье!',
       lastMessageAt: _sentAt,
@@ -50,6 +52,7 @@ class MockChatsRepository implements ChatsRepository {
     ),
     ChatThread(
       id: 't3',
+      doctorId: 'd3',
       doctorName: 'Имя Фамилия',
       lastMessage: 'Какой можно улучшить результаты для следующего приёма?',
       lastMessageAt: _sentAt,
@@ -57,6 +60,7 @@ class MockChatsRepository implements ChatsRepository {
     ),
     ChatThread(
       id: 't4',
+      doctorId: 'd4',
       doctorName: 'Имя Фамилия',
       lastMessage: 'Запись подтверждена, спасибо!',
       lastMessageAt: _sentAt,

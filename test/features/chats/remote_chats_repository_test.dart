@@ -52,6 +52,7 @@ void main() {
       final threads = await RemoteChatsRepository(dio).threads();
 
       expect(threads.single.id, 'consultation-1');
+      expect(threads.single.doctorId, 'doctor-1');
       expect(threads.single.doctorName, 'Айжан Садыкова');
       expect(threads.single.doctorPhotoUrl, endsWith('doctor.jpg'));
       expect(threads.single.lastMessage, 'Здравствуйте');

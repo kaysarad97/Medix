@@ -7,6 +7,7 @@ class ChatThread {
     required this.lastMessageAt,
     required this.lastMessageIsMine,
     this.isRead = true,
+    this.doctorId,
     this.doctorPhotoUrl,
   });
 
@@ -21,6 +22,7 @@ class ChatThread {
   /// Непрочитанная строка в макете подсвечена голубым.
   final bool isRead;
 
+  final String? doctorId;
   final String? doctorPhotoUrl;
 
   /// «21.07, 13:44».
