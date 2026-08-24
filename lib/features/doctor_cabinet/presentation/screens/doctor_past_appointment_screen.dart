@@ -9,12 +9,14 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/ru_dates.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/app_scaffold.dart';
+import '../../../../core/widgets/form_error_snack_bar.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../core/widgets/user_avatar.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/doctor_appointment.dart';
 import '../providers/doctor_cabinet_providers.dart';
 import '../widgets/doctor_conclusion_card.dart';
+import '../widgets/doctor_conclusion_dialog.dart';
 import '../widgets/doctor_history_metrics.dart';
 import '../widgets/doctor_history_row.dart';
 
@@ -76,6 +78,8 @@ class DoctorPastAppointmentScreen extends ConsumerWidget {
                         // На этом макете у строки загрузки шеврона нет, в
                         // отличие от «Профиля пациента».
                         showUploadChevron: false,
+                        onUpload: () =>
+                            _saveConclusion(context, ref, appointment),
                       ),
                     ),
                     SizedBox(
@@ -88,6 +92,38 @@ class DoctorPastAppointmentScreen extends ConsumerWidget {
               ),
       ),
     );
+  }
+
+  Future<void> _saveConclusion(
+    BuildContext context,
+    WidgetRef ref,
+    DoctorAppointment appointment,
+  ) async {
+    final text = await showDoctorConclusionDialog(
+      context,
+      initialText: appointment.conclusion,
+    );
+    if (text == null || !context.mounted) return;
+
+    try {
+      await ref
+          .read(doctorCabinetRepositoryProvider)
+          .saveConclusion(appointment.id, text);
+      ref.invalidate(doctorPastAppointmentProvider(appointment.id));
+      ref.invalidate(doctorPastAppointmentsProvider);
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.doctorConclusionSaved),
+        ),
+      );
+    } catch (_) {
+      if (!context.mounted) return;
+      showFormErrorSnackBar(
+        context,
+        AppLocalizations.of(context)!.doctorConclusionSaveError,
+      );
+    }
   }
 }
 

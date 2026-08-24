@@ -1145,6 +1145,10 @@
   "@doctorPastUploadConclusion": {
     "description": "Кнопка загрузки заключения под текстом."
   },
+  "doctorConclusionDialogTitle": "Заключение о пациенте",
+  "doctorConclusionTextHint": "Опишите состояние пациента и результаты консультации",
+  "doctorConclusionSaved": "Заключение сохранено",
+  "doctorConclusionSaveError": "Не удалось сохранить заключение",
   "doctorAnalyticsTitle": "Аналитика Работы",
   "@doctorAnalyticsTitle": {
     "description": "Заголовок экрана аналитики в кабинете врача."

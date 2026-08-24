@@ -44,6 +44,9 @@ abstract interface class DoctorCabinetRepository {
   /// Одна прошедшая запись с заключением — «О прошлой записи».
   Future<DoctorAppointment> pastAppointment(String id);
 
+  /// Добавляет или исправляет текст заключения после приёма.
+  Future<DoctorAppointment> saveConclusion(String appointmentId, String text);
+
   /// «Аналитика Работы» — неделя и месяц разом.
   Future<DoctorWorkAnalytics> workAnalytics();
 
@@ -263,6 +266,16 @@ class MockDoctorCabinetRepository implements DoctorCabinetRepository {
     // Заключения нет: в макете на его месте стоит объяснение, почему поле
     // пустое, — значит, это и есть состояние по умолчанию.
     return _past(id, today.subtract(const Duration(days: 7)), 0);
+  }
+
+  @override
+  Future<DoctorAppointment> saveConclusion(
+    String appointmentId,
+    String text,
+  ) async {
+    await Future<void>.delayed(_latency);
+    final appointment = await pastAppointment(appointmentId);
+    return appointment.copyWithConclusion(text.trim());
   }
 
   /// Строка записи из макета: аудио-звонок, «Имя Фамилия», приём почти

@@ -177,6 +177,33 @@ void main() {
     expect(adapter.requests.single.queryParameters['status'], 'completed');
   });
 
+  test('сохраняет заключение завершением записи врача', () async {
+    final (:dio, :adapter) = cannedDio({
+      'PATCH /doctors/me/appointments/$appointmentId': (
+        statusCode: 200,
+        body: {
+          ...appointment(detailed: true),
+          'status': 'completed',
+          'conclusion': {
+            'id': 'conclusion-2',
+            'record_type': 'conclusion',
+            'payload': {'text': 'Пациент здоров'},
+          },
+        },
+      ),
+    });
+
+    final result = await RemoteDoctorCabinetRepository(
+      dio,
+    ).saveConclusion(appointmentId, '  Пациент здоров  ');
+
+    expect(result.conclusion, 'Пациент здоров');
+    expect(adapter.requests.single.data, {
+      'action': 'complete',
+      'conclusion': {'text': 'Пациент здоров'},
+    });
+  });
+
   test('собирает карточку пациента из детали и свежих замеров', () async {
     final (:dio, :adapter) = cannedDio({
       '/doctors/me/appointments/$appointmentId': (

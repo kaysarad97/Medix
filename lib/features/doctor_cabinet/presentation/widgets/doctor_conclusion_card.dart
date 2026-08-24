@@ -92,8 +92,9 @@ class DoctorConclusionCard extends StatelessWidget {
               borderRadius: AppRadius.allMd,
               clipBehavior: Clip.antiAlias,
               child: InkWell(
-                // Загружать пока некуда: файлового хранилища у кабинета
-                // врача нет, как и самого бэкенда под него.
+                // На прошедшей записи callback открывает текстовую форму и
+                // сохраняет заключение в doctor-facing API. На будущей
+                // записи callback не передаётся, чтобы не завершить её рано.
                 onTap: onUpload,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 14),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/theme/app_theme.dart';
+import 'package:medix/features/doctor_cabinet/domain/entities/doctor_appointment.dart';
 import 'package:medix/features/doctor_cabinet/presentation/providers/doctor_cabinet_providers.dart';
 import 'package:medix/features/doctor_cabinet/presentation/screens/doctor_past_appointment_screen.dart';
 import 'package:medix/l10n/app_localizations.dart';
@@ -12,13 +13,15 @@ import '../../helpers/test_fonts.dart';
 void main() {
   setUpAll(loadAppFonts);
 
-  Future<void> pumpScreen(WidgetTester tester) async {
+  Future<void> pumpScreen(
+    WidgetTester tester, {
+    FakeDoctorCabinetRepository repository =
+        const FakeDoctorCabinetRepository(),
+  }) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          doctorCabinetRepositoryProvider.overrideWithValue(
-            const FakeDoctorCabinetRepository(),
-          ),
+          doctorCabinetRepositoryProvider.overrideWithValue(repository),
         ],
         child: MaterialApp(
           theme: AppTheme.light,
@@ -55,4 +58,38 @@ void main() {
       findsOneWidget,
     );
   });
+
+  testWidgets('вводит и сохраняет заключение прошедшей записи', (tester) async {
+    final repository = _ConclusionRepository();
+    await pumpScreen(tester, repository: repository);
+
+    await tester.tap(find.text('Загрузить заключение'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const ValueKey('doctor-conclusion-text')),
+      'Пациент здоров',
+    );
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('doctor-conclusion-save')));
+    await tester.pumpAndSettle();
+
+    expect(repository.savedAppointmentId, 'h1');
+    expect(repository.savedText, 'Пациент здоров');
+    expect(find.text('Заключение сохранено'), findsOneWidget);
+  });
+}
+
+class _ConclusionRepository extends FakeDoctorCabinetRepository {
+  String? savedAppointmentId;
+  String? savedText;
+
+  @override
+  Future<DoctorAppointment> saveConclusion(
+    String appointmentId,
+    String text,
+  ) async {
+    savedAppointmentId = appointmentId;
+    savedText = text;
+    return (await pastAppointment(appointmentId)).copyWithConclusion(text);
+  }
 }

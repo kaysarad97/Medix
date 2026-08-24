@@ -161,6 +161,25 @@ class RemoteDoctorCabinetRepository implements DoctorCabinetRepository {
   }
 
   @override
+  Future<DoctorAppointment> saveConclusion(
+    String appointmentId,
+    String text,
+  ) async {
+    try {
+      final response = await _dio.patch<Map<String, dynamic>>(
+        ApiEndpoints.myDoctorAppointment(appointmentId),
+        data: {
+          'action': 'complete',
+          'conclusion': {'text': text.trim()},
+        },
+      );
+      return _appointment(response.data!);
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);
+    }
+  }
+
+  @override
   Future<DoctorPatient> patient(String id) async {
     try {
       Map<String, dynamic> detail;

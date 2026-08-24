@@ -72,4 +72,16 @@ class DoctorAppointment {
   }
 
   DoctorDayPeriod get period => DoctorDayPeriod.of(startsAt);
+
+  DoctorAppointment copyWithConclusion(String value) => DoctorAppointment(
+    id: id,
+    patientName: patientName,
+    patientId: patientId,
+    consultationId: consultationId,
+    kind: kind,
+    startsAt: startsAt,
+    endsAt: endsAt,
+    patientAvatarAsset: patientAvatarAsset,
+    conclusion: value,
+  );
 }
