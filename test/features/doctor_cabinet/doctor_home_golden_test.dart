@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/features/doctor_cabinet/domain/entities/doctor_appointment.dart';
+import 'package:medix/features/doctor_cabinet/domain/entities/doctor_own_profile.dart';
 import 'package:medix/features/doctor_cabinet/domain/entities/regular_patient.dart';
 import 'package:medix/features/doctor_cabinet/presentation/providers/doctor_cabinet_providers.dart';
 import 'package:medix/features/doctor_cabinet/presentation/screens/doctor_home_screen.dart';
@@ -31,6 +32,25 @@ void main() {
       ProviderScope(
         overrides: [
           unreadNotificationsCountProvider.overrideWith((ref) => 2),
+          // Синхронно (async без await, без Future.delayed): реальный
+          // репозиторий шлёт Dio-запрос и заводит таймер вне runAsync,
+          // тест падает на «timersPending». Имя пустое, чтобы не менять
+          // видимое приветствие («Имя Отчество» — заглушка по умолчанию).
+          doctorOwnProfileProvider.overrideWith(
+            (ref) async => const DoctorOwnProfile(
+              fullName: '',
+              doctorId: 'd1',
+              status: '',
+              rating: 0,
+              specialization: '',
+              experience: '',
+              category: '',
+              address: '',
+              onlineConsultations: false,
+              phone: '',
+              email: '',
+            ),
+          ),
           doctorUpcomingAppointmentsProvider.overrideWith(
             (ref) => [
               DoctorAppointment(
@@ -61,7 +81,7 @@ void main() {
           locale: const Locale('ru'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          home: const DoctorHomeScreen(),
+          home: const DoctorHomeScreen(showAdminTile: true),
         ),
       ),
     );
