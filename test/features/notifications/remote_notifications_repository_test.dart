@@ -88,6 +88,20 @@ void main() {
     expect(notifications.last.isRead, isTrue);
   });
 
+  test('исходный вид сохраняет действие предложения листа ожидания', () async {
+    final (:dio, adapter: _) = cannedDio({
+      '/notifications': feed([item(id: 'n1', kind: 'waitlist_offer')]),
+    });
+
+    final notification = (await RemoteNotificationsRepository(
+      dio,
+    ).notifications()).single;
+
+    expect(notification.kind, NotificationKind.schedule);
+    expect(notification.apiKind, 'waitlist_offer');
+    expect(notification.opensWaitlist, isTrue);
+  });
+
   test('уведомление отмечается прочитанным через PATCH', () async {
     final (:dio, :adapter) = cannedDio({
       'PATCH /notifications/n1': (

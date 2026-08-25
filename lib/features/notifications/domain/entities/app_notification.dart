@@ -38,6 +38,7 @@ class AppNotification {
     required this.title,
     required this.body,
     required this.createdAt,
+    this.apiKind,
     this.isRead = false,
   });
 
@@ -46,12 +47,18 @@ class AppNotification {
   final String title;
   final String body;
 
+  /// Исходный `kind` сервера нужен для действий, которые нельзя выразить
+  /// двумя визуальными вкладками экрана уведомлений.
+  final String? apiKind;
+
   /// Когда пришло: время в правом верхнем углу строки.
   final DateTime createdAt;
 
   /// В макете непрочитанные ничем не выделены — поле есть, но экран его
   /// пока не показывает.
   final bool isRead;
+
+  bool get opensWaitlist => apiKind == 'waitlist_offer';
 
   /// «21.07, 13:44» — как в списке чатов.
   String get timeLabel =>

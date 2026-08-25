@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -29,9 +31,15 @@ import '../providers/notifications_providers.dart';
 /// вкладка не значит ничего, а первая дублирует список целиком. Если
 /// задумано было «Расписание = всё», это правится одной строкой в
 /// `visibleNotificationsProvider`.
-class NotificationsScreen extends ConsumerWidget {
+class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
 
+  @override
+  ConsumerState<NotificationsScreen> createState() =>
+      _NotificationsScreenState();
+}
+
+class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
   static const double _screenH = 21;
   static const double _topBarTop = 34;
 
@@ -48,7 +56,15 @@ class NotificationsScreen extends ConsumerWidget {
   static const double _rowGap = 18;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      if (mounted) ref.invalidate(notificationsProvider);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final notifications = ref.watch(visibleNotificationsProvider);
     final filter = ref.watch(notificationsFilterProvider);
     final l10n = AppLocalizations.of(context)!;
@@ -97,11 +113,22 @@ class NotificationsScreen extends ConsumerWidget {
                   itemBuilder: (context, index) => _NotificationRow(
                     notification: notifications[index],
                     height: _rowHeight,
-                    onTap: notifications[index].isRead
+                    onTap:
+                        notifications[index].isRead &&
+                            !notifications[index].opensWaitlist
                         ? null
-                        : () => ref
-                              .read(notificationsRepositoryProvider)
-                              .setRead(notifications[index].id, read: true),
+                        : () async {
+                            final notification = notifications[index];
+                            if (notification.opensWaitlist) {
+                              context.push(Routes.waitlist);
+                            }
+                            if (!notification.isRead) {
+                              await ref
+                                  .read(notificationsRepositoryProvider)
+                                  .setRead(notification.id, read: true);
+                              ref.invalidate(notificationsProvider);
+                            }
+                          },
                   ),
                 ),
               ),

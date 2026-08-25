@@ -98,6 +98,7 @@ class RemoteNotificationsRepository implements NotificationsRepository {
       AppNotification(
         id: json['id'] as String,
         kind: NotificationKind.fromApi(json['kind'] as String?),
+        apiKind: json['kind'] as String?,
         title: (json['title'] as String? ?? '').trim(),
         body: (json['body'] as String? ?? '').trim(),
         createdAt:
@@ -130,6 +131,7 @@ class MockNotificationsRepository implements NotificationsRepository {
       title: current.title,
       body: current.body,
       createdAt: current.createdAt,
+      apiKind: current.apiKind,
       isRead: read,
     );
   }

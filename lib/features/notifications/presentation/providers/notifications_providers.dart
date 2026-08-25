@@ -13,12 +13,12 @@ final notificationsRepositoryProvider = Provider<NotificationsRepository>((
   return RemoteNotificationsRepository(ref.watch(dioClientProvider));
 });
 
-/// Лента перечитывается каждый раз, когда экран открывают заново.
+/// Экран ленты явно перечитывает данные при каждом открытии.
 ///
-/// `autoDispose` здесь не оптимизация памяти, а исправление: без него список
-/// читался один раз за запуск приложения. Уведомления приходят на сервере
-/// сами по себе (напоминание о приёме, сообщение врача), и пришедшее после
-/// первого открытия не появлялось до перезапуска — поймано на живом API.
+/// `autoDispose` само по себе недостаточно: шапка главной постоянно слушает
+/// этот provider ради счётчика и удерживает старый результат. Поэтому
+/// `NotificationsScreen.initState` делает `invalidate`, а `autoDispose`
+/// освобождает ленту, когда её больше не использует ни экран, ни шапка.
 final notificationsProvider = FutureProvider.autoDispose<List<AppNotification>>(
   (ref) => ref.watch(notificationsRepositoryProvider).notifications(),
 );
