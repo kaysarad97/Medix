@@ -62,7 +62,11 @@ class _AvatarPickerScreenState extends ConsumerState<AvatarPickerScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final selected = ref.watch(userAvatarProvider) ?? MedixAvatars.fallback;
+    final profile = ref.watch(profileProvider).value;
+    final selectedAsset = ref.watch(userAvatarProvider);
+    final selected =
+        selectedAsset ??
+        (profile?.avatarUrl == null ? MedixAvatars.fallback : null);
 
     return AppScaffold(
       background: AppBackgroundStyle.main,
@@ -119,6 +123,7 @@ class _AvatarPickerScreenState extends ConsumerState<AvatarPickerScreen> {
                 itemBuilder: (context, index) {
                   final asset = MedixAvatars.all[index];
                   return _AvatarTile(
+                    key: ValueKey('avatar-tile-$asset'),
                     asset: asset,
                     selected: asset == selected,
                     onTap: () => ref
@@ -137,6 +142,7 @@ class _AvatarPickerScreenState extends ConsumerState<AvatarPickerScreen> {
 
 class _AvatarTile extends StatelessWidget {
   const _AvatarTile({
+    super.key,
     required this.asset,
     required this.selected,
     required this.onTap,

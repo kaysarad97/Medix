@@ -10,6 +10,7 @@ import 'package:medix/features/profile/domain/entities/user_profile.dart';
 import 'package:medix/features/profile/presentation/providers/profile_providers.dart';
 import 'package:medix/features/profile/presentation/screens/avatar_picker_screen.dart';
 import 'package:medix/l10n/app_localizations.dart';
+import 'package:medix/shared/models/medix_avatars.dart';
 import 'package:medix/shared/models/subscription_tier.dart';
 
 import '../../helpers/fake_profile_repository.dart';
@@ -46,6 +47,46 @@ void main() {
     expect(picker.calls, 1);
     expect(upload.file?.name, 'avatar.png');
     expect(find.text('Фотография профиля обновлена'), findsOneWidget);
+  });
+
+  testWidgets('собственное фото не помечает встроенный аватар выбранным', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          profileProvider.overrideWith(
+            (ref) async => const UserProfile(
+              id: 'u1',
+              firstName: 'Имя',
+              lastName: 'Фамилия',
+              subscription: SubscriptionTier.silver,
+              avatarUrl: 'https://storage.example/avatar.png',
+            ),
+          ),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.light,
+          locale: const Locale('ru'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const AvatarPickerScreen(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final fallbackTile = find.byKey(
+      const ValueKey('avatar-tile-${MedixAvatars.fallback}'),
+    );
+    final decoratedBox = tester.widget<DecoratedBox>(
+      find
+          .descendant(of: fallbackTile, matching: find.byType(DecoratedBox))
+          .first,
+    );
+    final border = (decoratedBox.decoration as BoxDecoration).border! as Border;
+
+    expect(border.top.color, Colors.transparent);
   });
 }
 
