@@ -9,6 +9,7 @@ import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../core/widgets/user_avatar.dart';
+import '../../../../features/auth/presentation/providers/auth_providers.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/app_language.dart';
 import '../../../../shared/models/subscription_tier.dart';
@@ -17,6 +18,10 @@ import '../providers/profile_providers.dart';
 import '../widgets/profile_metrics.dart';
 
 /// «Настройки» — свёрстан по `design/Настройки Клиента.png`.
+///
+/// Кнопка «Выйти» в макете не нарисована — она закрывает `/auth/logout`,
+/// который до этого был подключён только в `AuthRepository` без точки
+/// входа в UI (см. HANDOFF.md, аудит API-интеграции от 24 августа 2026).
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({
     super.key,
@@ -24,12 +29,49 @@ class SettingsScreen extends ConsumerWidget {
     this.onOpenPaymentDetails,
     this.onOpenContacts,
     this.onCancelSubscription,
+    this.onLoggedOut,
   });
 
   final VoidCallback? onOpenProfileSettings;
   final VoidCallback? onOpenPaymentDetails;
   final VoidCallback? onOpenContacts;
   final VoidCallback? onCancelSubscription;
+
+  /// Вызывается после того, как `AuthRepository.logout()` завершился и
+  /// локальная сессия очищена. Сама навигация на логин остаётся за
+  /// вызывающим (роутером), как и у остальных переходов этого экрана.
+  final VoidCallback? onLoggedOut;
+
+  Future<void> _confirmLogout(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.surfaceWhite,
+        shape: const RoundedRectangleBorder(borderRadius: AppRadius.allLg),
+        title: Text(l10n.logoutConfirmTitle, style: AppTypography.titleMd),
+        content: Text(l10n.logoutConfirmMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.cancelButtonLabel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(
+              l10n.logoutTitle,
+              style: const TextStyle(color: AppColors.error),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+
+    await ref.read(authRepositoryProvider).logout();
+    if (!context.mounted) return;
+    onLoggedOut?.call();
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -117,6 +159,13 @@ class SettingsScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: ProfileMetrics.settingsGap),
+              _Section(
+                child: _LogoutButton(
+                  title: l10n.logoutTitle,
+                  onTap: () => _confirmLogout(context, ref),
+                ),
+              ),
+              const SizedBox(height: ProfileMetrics.settingsGap),
             ],
           ),
         ),
@@ -162,6 +211,36 @@ class _RowCard extends StatelessWidget {
                   color: AppColors.primary,
                 ),
               ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Красная кнопка выхода из аккаунта — той же формы, что и `_RowCard`, но
+/// без шеврона и с текстом по центру: это действие, а не переход.
+class _LogoutButton extends StatelessWidget {
+  const _LogoutButton({required this.title, required this.onTap});
+
+  final String title;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.surfaceWhite,
+      borderRadius: ProfileMetrics.allRadius,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: SizedBox(
+          height: ProfileMetrics.settingsRowHeight,
+          child: Center(
+            child: Text(
+              title,
+              style: AppTypography.tileTitle.copyWith(color: AppColors.error),
             ),
           ),
         ),

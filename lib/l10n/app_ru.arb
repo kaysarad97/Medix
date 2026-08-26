@@ -838,6 +838,18 @@
   "@contactUsTitle": {
     "description": "Строка-переход в настройках и заголовок экрана контактов."
   },
+  "logoutTitle": "Выйти",
+  "@logoutTitle": {
+    "description": "Кнопка выхода из аккаунта в настройках и подтверждающем диалоге."
+  },
+  "logoutConfirmTitle": "Выйти из аккаунта?",
+  "@logoutConfirmTitle": {
+    "description": "Заголовок диалога подтверждения выхода из аккаунта."
+  },
+  "logoutConfirmMessage": "Чтобы продолжить пользоваться приложением, нужно будет войти заново.",
+  "@logoutConfirmMessage": {
+    "description": "Текст диалога подтверждения выхода из аккаунта."
+  },
   "notificationsLabel": "Уведомления",
   "@notificationsLabel": {
     "description": "Подпись переключателя уведомлений в настройках."
