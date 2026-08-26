@@ -1,0 +1,14 @@
+# Конфигурация package:test.
+tags:
+  golden:
+    # Сверка отрисованных экранов с макетами из design/.
+    #
+    # Вынесены в отдельный тег, потому что растеризация текста и теней
+    # зависит от платформы: эталоны сняты на Windows и на ubuntu-раннере
+    # разойдутся на уровне сглаживания. В CI гоняются отдельной джобой на
+    # windows-latest — см. .github/workflows/ci.yml.
+    #
+    # Локально:  flutter test --tags golden
+    # Без них:   flutter test --exclude-tags golden
+    # Обновить:  flutter test --tags golden --update-goldens
+    description: Пиксельная сверка с макетами; зависит от платформы

@@ -1,0 +1,300 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../core/router/routes.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_typography.dart';
+import '../../../../core/utils/ru_dates.dart';
+import '../../../../core/widgets/app_scaffold.dart';
+import '../../../../core/widgets/form_error_snack_bar.dart';
+import '../../../../core/widgets/icon_chip.dart';
+import '../../../../core/widgets/screen_top_bar.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../../../shared/models/subscription_tier.dart';
+import '../../../profile/presentation/providers/profile_providers.dart';
+import '../../../../shared/models/appointment.dart';
+import '../../domain/entities/doctor.dart';
+import '../../domain/entities/doctor_schedule.dart';
+import '../providers/telemedicine_providers.dart';
+import '../../../../core/widgets/action_button_row.dart';
+import '../widgets/appointment_summary_card.dart';
+import '../widgets/appointment_status_card.dart';
+import '../widgets/doctor_header.dart';
+import '../widgets/doctor_metrics.dart';
+import '../widgets/prepayment_card.dart';
+import '../widgets/schedule_card.dart';
+
+/// Оформленная запись: как связаться с врачом и как перенести приём.
+///
+/// Свёрстан по `design/Ваша Запись.png` (440×978).
+class AppointmentScreen extends ConsumerStatefulWidget {
+  const AppointmentScreen({super.key, required this.appointmentId});
+
+  final String appointmentId;
+
+  @override
+  ConsumerState<AppointmentScreen> createState() => _AppointmentScreenState();
+}
+
+class _AppointmentScreenState extends ConsumerState<AppointmentScreen> {
+  Appointment? _updatedAppointment;
+
+  @override
+  void didUpdateWidget(covariant AppointmentScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.appointmentId != widget.appointmentId) {
+      _updatedAppointment = null;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final remoteAppointment = ref.watch(
+      appointmentProvider(widget.appointmentId),
+    );
+    final appointment = _updatedAppointment ?? remoteAppointment.value;
+    final doctorId = appointment?.doctorId;
+
+    final doctor = doctorId == null
+        ? null
+        : ref.watch(doctorProvider(doctorId)).value;
+    final schedule = doctorId == null
+        ? null
+        : ref.watch(doctorScheduleProvider(doctorId)).value;
+
+    return AppScaffold(
+      background: AppBackgroundStyle.main,
+      child: SafeArea(
+        bottom: false,
+        child: appointment == null || doctor == null
+            ? const Center(child: CircularProgressIndicator())
+            : _Content(
+                appointment: appointment,
+                doctor: doctor,
+                schedule: schedule,
+                onRescheduled: (value) {
+                  if (mounted) setState(() => _updatedAppointment = value);
+                },
+              ),
+      ),
+    );
+  }
+}
+
+class _Content extends ConsumerWidget {
+  const _Content({
+    required this.appointment,
+    required this.doctor,
+    required this.schedule,
+    required this.onRescheduled,
+  });
+
+  final Appointment appointment;
+  final Doctor doctor;
+  final DoctorSchedule? schedule;
+  final ValueChanged<Appointment> onRescheduled;
+
+  static String _labelFor(AppointmentKind kind, AppLocalizations l10n) =>
+      switch (kind) {
+        AppointmentKind.videoCall => l10n.videoCallSubtitle,
+        AppointmentKind.audioCall => l10n.audioCallLabel,
+        AppointmentKind.chat => l10n.chatAppointmentLabel,
+        AppointmentKind.inPerson => l10n.inPersonAppointmentLabel,
+      };
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final notifier = ref.read(scheduleSelectionProvider.notifier);
+    final selected = schedule == null
+        ? null
+        : ref.watch(scheduleSelectionProvider).resolve(schedule!);
+    // Скидку на конкретную запись считает сервер, и её может не быть даже у
+    // подписчика — тариф даёт её не на всё. Тариф нужен здесь только затем,
+    // чтобы не предлагать оформить подписку тому, кто её уже оформил.
+    final subscription = ref.watch(profileProvider).value?.subscription;
+    final hasSubscription =
+        subscription != null && subscription != SubscriptionTier.free;
+    final l10n = AppLocalizations.of(context)!;
+    final isClosed = switch (appointment.status) {
+      AppointmentStatus.completed ||
+      AppointmentStatus.cancelled ||
+      AppointmentStatus.noShow => true,
+      _ => false,
+    };
+
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const SizedBox(height: DoctorMetrics.topBarTop),
+          ScreenTopBar(
+            title: l10n.appointmentTitle,
+            onBack: () => Navigator.of(context).maybePop(),
+          ),
+          const SizedBox(height: DoctorMetrics.topBarToHeader),
+          DoctorHeader(doctor: doctor),
+          const SizedBox(height: DoctorMetrics.photoToSummary),
+          _Section(child: AppointmentSummaryCard(appointment: appointment)),
+          if (isClosed) ...[
+            const SizedBox(height: DoctorMetrics.summaryToActions),
+            _Section(child: AppointmentStatusCard(appointment: appointment)),
+          ] else ...[
+            const SizedBox(height: DoctorMetrics.summaryToActions),
+            _Section(
+              child: ActionButtonRow(
+                height: DoctorMetrics.callActionHeight,
+                // На этом экране кнопки равной ширины, в отличие от карточки
+                // расписания.
+                primaryFlex: 1,
+                secondaryFlex: 1,
+                primary: ActionButtonData(
+                  icon: MedixIcon.audioCall,
+                  title: l10n.startCallTitle,
+                  subtitle: _labelFor(appointment.kind, l10n),
+                  onTap: () => context.push(Routes.callOf(appointment.id)),
+                ),
+                secondary: ActionButtonData(
+                  icon: MedixIcon.chat,
+                  title: l10n.messageActionTitle,
+                  subtitle: l10n.doctorChatTitle,
+                  onTap: () => _openChat(context, ref, appointment),
+                ),
+              ),
+            ),
+            if (appointment.basePriceLabel != null) ...[
+              const SizedBox(height: DoctorMetrics.summaryToActions),
+              _Section(
+                child: PrepaymentCard(
+                  appointment: appointment,
+                  hasSubscription: hasSubscription,
+                  // Kaspi и Apple Pay проводят оплату своим интерфейсом — SDK
+                  // ещё нет, поэтому оба ведут в один и тот же мок-результат,
+                  // как кнопки на PaymentMethodScreen.
+                  onPay: (method) =>
+                      context.push(Routes.paymentResultOf('success')),
+                  onSubscribe: () => context.push(Routes.subscription),
+                ),
+              ),
+            ],
+            const SizedBox(height: DoctorMetrics.actionsToReschedule),
+            if (schedule != null)
+              _Section(
+                child: ScheduleCard(
+                  title: l10n.rescheduleTitle,
+                  schedule: schedule!,
+                  // Стрелок перелистывания месяца на этом макете нет.
+                  showMonthArrows: false,
+                  selectedDay: selected?.day,
+                  selectedSlot: selected?.slot,
+                  onDaySelected: notifier.selectDay,
+                  onSlotSelected: notifier.selectSlot,
+                  primaryAction: ActionButtonData(
+                    // В макете здесь трубка, а не камера, хотя подпись
+                    // «Видео-звонок» — так на обоих экранах.
+                    icon: MedixIcon.audioCall,
+                    title: l10n.createAppointmentTitle,
+                    subtitle: l10n.videoCallSubtitle,
+                    // Активна только после выбора нового дня и времени.
+                    onTap: selected?.slot == null
+                        ? null
+                        : () async {
+                            final slot = selected!.slot!;
+                            late final Appointment updated;
+                            try {
+                              updated = await ref
+                                  .read(doctorsRepositoryProvider)
+                                  .reschedule(appointment.id, slot);
+                              onRescheduled(updated);
+                              ref
+                                  .read(appointmentRevisionProvider.notifier)
+                                  .markChanged();
+                              ref
+                                  .read(scheduleSelectionProvider.notifier)
+                                  .reset();
+                              ref.invalidate(doctorScheduleProvider(doctor.id));
+                            } catch (error) {
+                              if (!context.mounted) return;
+                              ScaffoldMessenger.of(context)
+                                ..hideCurrentSnackBar()
+                                ..showSnackBar(
+                                  SnackBar(content: Text(error.toString())),
+                                );
+                              return;
+                            }
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context)
+                              ..hideCurrentSnackBar()
+                              ..showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    l10n.appointmentRescheduledSnackbar(
+                                      RuDates.dayMonth(updated.startsAt),
+                                      RuDates.time(updated.startsAt),
+                                    ),
+                                    style: AppTypography.bodyMd.copyWith(
+                                      color: AppColors.textOnPrimary,
+                                    ),
+                                  ),
+                                  backgroundColor: AppColors.primary,
+                                  behavior: SnackBarBehavior.floating,
+                                ),
+                              );
+                            Navigator.of(context).maybePop();
+                          },
+                  ),
+                  secondaryAction: ActionButtonData(
+                    icon: MedixIcon.mail,
+                    title: l10n.messageActionTitle,
+                    subtitle: l10n.doctorChatTitle,
+                    onTap: () => _openChat(context, ref, appointment),
+                  ),
+                ),
+              ),
+          ],
+          const SizedBox(height: DoctorMetrics.screenH),
+        ],
+      ),
+    );
+  }
+}
+
+Future<void> _openChat(
+  BuildContext context,
+  WidgetRef ref,
+  Appointment appointment,
+) async {
+  var consultationId = appointment.consultationId;
+  if (consultationId == null) {
+    try {
+      consultationId = (await ref.read(
+        consultationForAppointmentProvider(appointment.id).future,
+      ))?.id;
+    } on Object {
+      consultationId = null;
+    }
+  }
+  if (!context.mounted) return;
+  if (consultationId == null) {
+    showFormErrorSnackBar(
+      context,
+      AppLocalizations.of(context)!.doctorChatUnavailable,
+    );
+    return;
+  }
+  context.push(Routes.chatOf(consultationId));
+}
+
+class _Section extends StatelessWidget {
+  const _Section({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: DoctorMetrics.screenH),
+      child: child,
+    );
+  }
+}

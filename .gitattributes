@@ -1,0 +1,22 @@
+# В репозитории всегда LF. Разработка идёт на Windows, а CI на ubuntu —
+# без этого каждый файл выглядел бы изменённым при смене платформы.
+* text=auto eol=lf
+
+# Батники Windows ломаются без CRLF.
+*.bat text eol=crlf
+
+# Бинарники не нормализуем и не пытаемся показывать построчно.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.ttf binary
+*.otf binary
+*.jar binary
+*.keystore binary
+*.jks binary
+
+# Макеты и эталоны golden-тестов — картинки. Полезно, чтобы GitHub
+# показывал их как изображения, а не пытался склеивать построчно.
+design/*.png binary
+test/**/goldens/*.png binary

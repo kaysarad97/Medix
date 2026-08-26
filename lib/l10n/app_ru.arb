@@ -1,0 +1,1469 @@
+{
+  "@@locale": "ru",
+  "homeGreeting": "Как Ваше здоровье сегодня?",
+  "@homeGreeting": {
+    "description": "Приветствие под шапкой главного экрана."
+  },
+  "symptomSearchHint": "Опишите Ваши симптомы...",
+  "@symptomSearchHint": {
+    "description": "Плейсхолдер поля поиска симптомов на главной — ведёт в чат-бота."
+  },
+  "uploadAnalysesTitle": "Загрузить анализы",
+  "@uploadAnalysesTitle": {
+    "description": "Заголовок карточки загрузки анализов на главной."
+  },
+  "uploadAnalysesSubtitle": "ИИ-интерпретация",
+  "@uploadAnalysesSubtitle": {
+    "description": "Подзаголовок карточки загрузки анализов на главной."
+  },
+  "quickActionLabTestsTitle": "Сдать\nанализы",
+  "@quickActionLabTestsTitle": {
+    "description": "Заголовок плитки «Сдать анализы» в карточке быстрых действий."
+  },
+  "quickActionLabTestsSubtitle": "в партнерских лабораториях",
+  "@quickActionLabTestsSubtitle": {
+    "description": "Подзаголовок плитки «Сдать анализы»."
+  },
+  "quickActionMessagesTitle": "Мои\nсообщения",
+  "@quickActionMessagesTitle": {
+    "description": "Заголовок плитки «Мои сообщения» в карточке быстрых действий."
+  },
+  "quickActionMessagesSubtitle": "чаты с врачами",
+  "@quickActionMessagesSubtitle": {
+    "description": "Подзаголовок плитки «Мои сообщения»."
+  },
+  "quickActionDoctorTitle": "Запись\nк врачу",
+  "@quickActionDoctorTitle": {
+    "description": "Заголовок плитки «Запись к врачу» в карточке быстрых действий."
+  },
+  "quickActionDoctorSubtitle": "в удобное для Вас время",
+  "@quickActionDoctorSubtitle": {
+    "description": "Подзаголовок плитки «Запись к врачу»."
+  },
+  "quickActionFacilityTitle": "Найти лабораторию или\nбольницу",
+  "@quickActionFacilityTitle": {
+    "description": "Заголовок широкой плитки поиска лаборатории/больницы."
+  },
+  "quickActionFacilitySubtitle": "карта и сравнение цен",
+  "@quickActionFacilitySubtitle": {
+    "description": "Подзаголовок широкой плитки поиска лаборатории/больницы."
+  },
+  "doctorsCardTitle": "Врачи",
+  "@doctorsCardTitle": {
+    "description": "Заголовок карточки специальностей врачей на главной."
+  },
+  "viewAllLabel": "Все",
+  "@viewAllLabel": {
+    "description": "Ссылка «показать всё» рядом с заголовком списка (врачи, и т.п.)."
+  },
+  "specialtyDoctorCount": "{count} врачей",
+  "@specialtyDoctorCount": {
+    "description": "Число врачей у специальности в карусели на главной. Склонение по числу (1 врач / 2 врача / 5 врачей) не реализовано — форма всегда множественного числа, как было в захардкоженном варианте.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "upcomingAppointmentsTitle": "Предстоящие записи",
+  "@upcomingAppointmentsTitle": {
+    "description": "Заголовок карточки предстоящих записей на главной."
+  },
+  "attachFileTooltip": "Прикрепить файл",
+  "@attachFileTooltip": {
+    "description": "Подсказка на кнопке-скрепке в строке ввода чата (бот и врач)."
+  },
+  "chatbotFaqTitle": "Часто задаваемые вопросы:",
+  "@chatbotFaqTitle": {
+    "description": "Заголовок над пилюлями быстрых вопросов в пустой переписке с ботом."
+  },
+  "chatbotDisclaimer": "Бот не ставит диагнозы. Окончательное решение всегда за врачом.",
+  "@chatbotDisclaimer": {
+    "description": "Медицинский дисклеймер под быстрыми вопросами бота. Требование ТЗ, в макете его нет."
+  },
+  "allChatsTitle": "Все чаты",
+  "@allChatsTitle": {
+    "description": "Заголовок экрана списка переписок."
+  },
+  "chatSearchHint": "Поиск чата",
+  "@chatSearchHint": {
+    "description": "Плейсхолдер поля поиска на экране «Все чаты»."
+  },
+  "botThreadTitle": "Чат с Medi-Bot",
+  "@botThreadTitle": {
+    "description": "Заголовок закреплённой строки бота на экране «Все чаты»."
+  },
+  "messageReadLabel": "прочитано",
+  "@messageReadLabel": {
+    "description": "Статус переписки — прочитана."
+  },
+  "messageUnreadLabel": "не прочитано",
+  "@messageUnreadLabel": {
+    "description": "Статус переписки — не прочитана."
+  },
+  "myMessagePrefix": "Вы: {message}",
+  "@myMessagePrefix": {
+    "description": "Превью последней реплики в списке чатов, когда она своя.",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "doctorChatTitle": "Чат с врачом",
+  "@doctorChatTitle": {
+    "description": "Заголовок экрана переписки с врачом."
+  },
+  "familyScreenTitle": "Моя Семья",
+  "@familyScreenTitle": {
+    "description": "Заголовок карточки члена семьи."
+  },
+  "relationshipPlaceholder": "Родство с Вами",
+  "@relationshipPlaceholder": {
+    "description": "Плейсхолдер поля родства в мед-карте члена семьи."
+  },
+  "genderLabel": "пол",
+  "@genderLabel": {
+    "description": "Подпись под значением пола в шапке профиля/члена семьи."
+  },
+  "birthDateLabel": "дата рождения",
+  "@birthDateLabel": {
+    "description": "Подпись под датой рождения в шапке профиля/члена семьи."
+  },
+  "cartTitle": "Моя Корзина",
+  "@cartTitle": {
+    "description": "Заголовок шторки корзины в «Перечне услуг»."
+  },
+  "cartPriceLabel": "Цена",
+  "@cartPriceLabel": {
+    "description": "Подпись слева от цены позиции в корзине."
+  },
+  "cartTotalLabel": "Итого",
+  "@cartTotalLabel": {
+    "description": "Подпись итоговой суммы корзины."
+  },
+  "cartPlaceOrder": "Сделать\nзаказ",
+  "@cartPlaceOrder": {
+    "description": "Кнопка оформления заказа под корзиной, в две строки."
+  },
+  "cartComparePrices": "Сравнить\nцены",
+  "@cartComparePrices": {
+    "description": "Кнопка перехода к ценам партнёров, в две строки."
+  },
+  "partnerLabsTitle": "Партнерские лаборатории",
+  "@partnerLabsTitle": {
+    "description": "Заголовок экрана сравнения цен."
+  },
+  "cartAtLabTitle": "Ваша Корзина в {lab}",
+  "@cartAtLabTitle": {
+    "description": "Заголовок карточки своей корзины на экране сравнения.",
+    "placeholders": {
+      "lab": {
+        "type": "String"
+      }
+    }
+  },
+  "otherOffersTitle": "Другие предложения",
+  "@otherOffersTitle": {
+    "description": "Заголовок списка предложений партнёров."
+  },
+  "priceAtLab": "Цена в «{lab}»",
+  "@priceAtLab": {
+    "description": "Строка цены партнёра на тот же набор анализов.",
+    "placeholders": {
+      "lab": {
+        "type": "String"
+      }
+    }
+  },
+  "identicalTestsHint": "расчет цены на идентичные анализы",
+  "@identicalTestsHint": {
+    "description": "Пояснение под ценой партнёра."
+  },
+  "orderAtLab": "Сдать анализы в «{lab}»",
+  "@orderAtLab": {
+    "description": "Кнопка записи в лабораторию партнёра.",
+    "placeholders": {
+      "lab": {
+        "type": "String"
+      }
+    }
+  },
+  "labServicesTitle": "Перечень услуг",
+  "@labServicesTitle": {
+    "description": "Заголовок экрана каталога анализов."
+  },
+  "labServiceSearchHint": "Какой анализ Вам нужен?",
+  "@labServiceSearchHint": {
+    "description": "Плейсхолдер поиска в перечне услуг."
+  },
+  "labServiceIndividualTab": "отдельные анализы",
+  "@labServiceIndividualTab": {
+    "description": "Вкладка отдельных анализов в перечне услуг."
+  },
+  "labServiceBundleTab": "комплексы анализов",
+  "@labServiceBundleTab": {
+    "description": "Вкладка комплексов анализов в перечне услуг."
+  },
+  "emptyResultsLabel": "Ничего не нашлось",
+  "@emptyResultsLabel": {
+    "description": "Пустое состояние поиска: перечень услуг, предыдущие процедуры."
+  },
+  "waitingTitle": "подождите...",
+  "@waitingTitle": {
+    "description": "Заголовок экрана ожидания при оплате картой."
+  },
+  "waitingCardSubtitle": "проверяем данные карты...",
+  "@waitingCardSubtitle": {
+    "description": "Подзаголовок экрана ожидания при оплате картой."
+  },
+  "choosePaymentMethodTitle": "Выберите метод оплаты",
+  "@choosePaymentMethodTitle": {
+    "description": "Заголовок экрана выбора способа оплаты и формы ввода карты."
+  },
+  "bankDetailsTitle": "Банковские данные",
+  "@bankDetailsTitle": {
+    "description": "Строка-переход к банковским данным в настройках."
+  },
+  "cardNumberLabel": "Номер карты",
+  "@cardNumberLabel": {
+    "description": "Подпись поля номера карты."
+  },
+  "cardHolderLabel": "ФИО на карте",
+  "@cardHolderLabel": {
+    "description": "Подпись поля имени держателя карты."
+  },
+  "cardExpiryLabel": "Срок действия",
+  "@cardExpiryLabel": {
+    "description": "Подпись поля срока действия карты."
+  },
+  "cardCvvLabel": "CVV-код",
+  "@cardCvvLabel": {
+    "description": "Подпись поля CVV-кода карты."
+  },
+  "nextButtonLabel": "Далее",
+  "@nextButtonLabel": {
+    "description": "Надпись на кнопке «Далее» — общая для форм регистрации и оплаты."
+  },
+  "subscriptionPlansTitle": "Варианты подписки",
+  "@subscriptionPlansTitle": {
+    "description": "Заголовок экрана выбора тарифа."
+  },
+  "subscriptionHeroTitle": "Оформите подписку",
+  "@subscriptionHeroTitle": {
+    "description": "Крупный заголовок над таблицей сравнения тарифов."
+  },
+  "subscriptionHeroSubtitle": "и забота о себе станет проще и быстрее!",
+  "@subscriptionHeroSubtitle": {
+    "description": "Подзаголовок под заголовком экрана подписки."
+  },
+  "continueWithoutSubscription": "или продолжить без подписки",
+  "@continueWithoutSubscription": {
+    "description": "Ссылка пропуска подписки внизу экрана тарифов."
+  },
+  "subscriptionPriceUnit": "₸/в месяц",
+  "@subscriptionPriceUnit": {
+    "description": "Единица цены на карточке тарифа."
+  },
+  "subscriptionCallToAction": "Оформить подписку в 1 клик",
+  "@subscriptionCallToAction": {
+    "description": "Подпись снизу карточки тарифа."
+  },
+  "savedCardsLabel": "Сохраненные карты",
+  "@savedCardsLabel": {
+    "description": "Строка перехода к сохранённым картам на экране выбора оплаты."
+  },
+  "paymentSuccessMessage": "Карта успешно сохранена!",
+  "@paymentSuccessMessage": {
+    "description": "Заголовок экрана успешной оплаты."
+  },
+  "paymentFailureMessage": "Неверные данные карты",
+  "@paymentFailureMessage": {
+    "description": "Заголовок экрана неуспешной оплаты."
+  },
+  "paymentSuccessAction": "На главную страницу",
+  "@paymentSuccessAction": {
+    "description": "Кнопка на экране успешной оплаты."
+  },
+  "paymentFailureAction": "Попробовать еще раз",
+  "@paymentFailureAction": {
+    "description": "Кнопка на экране неуспешной оплаты."
+  },
+  "paymentMethodKaspi": "Оплата через Kaspi.kz",
+  "@paymentMethodKaspi": {
+    "description": "Строка способа оплаты Kaspi."
+  },
+  "paymentMethodHalyk": "Оплата через Halyk Bank",
+  "@paymentMethodHalyk": {
+    "description": "Строка способа оплаты Halyk Bank."
+  },
+  "paymentMethodApplePay": "Оплата через Apple Pay",
+  "@paymentMethodApplePay": {
+    "description": "Строка способа оплаты Apple Pay."
+  },
+  "paymentMethodOtherBank": "Оплата через другие банки",
+  "@paymentMethodOtherBank": {
+    "description": "Строка способа оплаты картой другого банка."
+  },
+  "mapScreenTitle": "Больницы и\nлаборатории рядом",
+  "@mapScreenTitle": {
+    "description": "Заголовок экрана карты."
+  },
+  "branchesNotReadySnackbar": "Список филиалов ещё не готов",
+  "@branchesNotReadySnackbar": {
+    "description": "Снек-бар «Показать все филиалы» — экрана списка ещё нет."
+  },
+  "placeHospitalTab": "Больницы",
+  "@placeHospitalTab": {
+    "description": "Вкладка-фильтр больниц на карте."
+  },
+  "placeLaboratoryTab": "Лаборатории",
+  "@placeLaboratoryTab": {
+    "description": "Вкладка-фильтр лабораторий на карте."
+  },
+  "placeOpenStatus": "Открыто",
+  "@placeOpenStatus": {
+    "description": "Статус учреждения — сейчас открыто."
+  },
+  "placeClosedStatus": "Закрыто",
+  "@placeClosedStatus": {
+    "description": "Статус учреждения — сейчас закрыто."
+  },
+  "minutesLabel": "{minutes} мин",
+  "@minutesLabel": {
+    "description": "Время в пути на машине/пешком в карточке места.",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "contactsTitle": "Контакты",
+  "@contactsTitle": {
+    "description": "Заголовок блока контактов в карточке места."
+  },
+  "websiteLabel": "Веб-сайт",
+  "@websiteLabel": {
+    "description": "Ссылка на сайт учреждения в карточке места."
+  },
+  "showAllBranchesLabel": "Показать все филиалы ({count})",
+  "@showAllBranchesLabel": {
+    "description": "Строка перехода к списку филиалов сети.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "orderTestsAtLab": "Сдать анализы в КДЛ «{name}»",
+  "@orderTestsAtLab": {
+    "description": "Кнопка заказа анализов в конкретной лаборатории.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "todayHoursPrefix": "Сегодня: ",
+  "@todayHoursPrefix": {
+    "description": "Префикс перед часами работы сегодня в карточке места."
+  },
+  "loginTitle": "Логин",
+  "@loginTitle": {
+    "description": "Заголовок экрана входа."
+  },
+  "loginButtonLabel": "Войти",
+  "sendCodeButtonLabel": "Получить код",
+  "@sendCodeButtonLabel": {
+    "description": "Кнопка первого шага входа: просит выслать код."
+  },
+  "@loginButtonLabel": {
+    "description": "Кнопка входа на экране логина."
+  },
+  "createProfileLink": "или создать профиль",
+  "@createProfileLink": {
+    "description": "Ссылка на регистрацию под кнопкой входа."
+  },
+  "emailLabel": "Ваш E-mail:",
+  "@emailLabel": {
+    "description": "Подпись поля почты на экране входа."
+  },
+  "createProfileTitle": "Создайте профиль",
+  "@createProfileTitle": {
+    "description": "Заголовок шага 1 регистрации."
+  },
+  "emailHint": "Введите Вашу почту",
+  "@emailHint": {
+    "description": "Плейсхолдер поля почты при регистрации."
+  },
+  "personalDataTitle": "Ваши данные",
+  "@personalDataTitle": {
+    "description": "Заголовок шага 2 регистрации."
+  },
+  "fullNameHint": "ФИО",
+  "birthDateHint": "Дата рождения",
+  "@birthDateHint": {
+    "description": "Плейсхолдер поля даты рождения при регистрации."
+  },
+  "@fullNameHint": {
+    "description": "Плейсхолдер поля ФИО."
+  },
+  "verifyCodeTitle": "Введите код",
+  "@verifyCodeTitle": {
+    "description": "Заголовок шага 3 регистрации."
+  },
+  "verifyCodeSubtitle": "Мы отправили код на {email}",
+  "@verifyCodeSubtitle": {
+    "description": "Подзаголовок шага ввода кода: куда ушло письмо.",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "resendCodeNow": "выслать письмо с кодом ещё раз",
+  "@resendCodeNow": {
+    "description": "Ссылка повторной отправки кода, когда таймер истёк."
+  },
+  "resendCodeCountdown": "выслать письмо с кодом ещё раз через {time}",
+  "@resendCodeCountdown": {
+    "description": "Обратный отсчёт до повторной отправки кода, «мм:сс».",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "appSettingsTitle": "Настройки приложения",
+  "@appSettingsTitle": {
+    "description": "Заголовок шага 4 регистрации."
+  },
+  "pushConsentText": "Я согласен(-на) на получение Push-уведомлений, СМС-сообщений, и электронных писем",
+  "@pushConsentText": {
+    "description": "Текст согласия на рассылки на шаге настроек приложения."
+  },
+  "policyTitle": "Политика Конфиденциальности и Условия Обработки Персональных Данных",
+  "@policyTitle": {
+    "description": "Заголовок шага 5 регистрации."
+  },
+  "policyConsentText": "Я даю согласие на обработку моих персональных данных, включая данные о состоянии здоровья, на условиях, изложенных в Политике конфиденциальности.",
+  "@policyConsentText": {
+    "description": "Текст согласия на обработку персональных данных."
+  },
+  "appointmentTitle": "Ваша запись",
+  "@appointmentTitle": {
+    "description": "Заголовок экрана записи и подпись под форматом приёма в карточке записи."
+  },
+  "startCallTitle": "Начать звонок",
+  "@startCallTitle": {
+    "description": "Кнопка начала звонка на экране записи."
+  },
+  "doctorCallPatientTitle": "Позвонить пациенту",
+  "doctorPatientPhoneUnavailable": "Номер пациента недоступен",
+  "doctorPatientPhoneOpenError": "Не удалось открыть набор номера",
+  "messageActionTitle": "Сообщение",
+  "@messageActionTitle": {
+    "description": "Кнопка перехода в чат с врачом. Подпись под ней — тот же текст, что и заголовок экрана переписки, см. doctorChatTitle."
+  },
+  "rescheduleTitle": "Перенести запись",
+  "@rescheduleTitle": {
+    "description": "Заголовок карточки переноса записи."
+  },
+  "createAppointmentTitle": "Создать запись",
+  "@createAppointmentTitle": {
+    "description": "Кнопка создания/переноса записи на экранах врача."
+  },
+  "videoCallSubtitle": "Видео-звонок",
+  "@videoCallSubtitle": {
+    "description": "Подпись под кнопкой «Создать запись»."
+  },
+  "appointmentRescheduledSnackbar": "Приём перенесён на {date}, {time}",
+  "@appointmentRescheduledSnackbar": {
+    "description": "Снек-бар подтверждения переноса записи.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "appointmentCancelledTitle": "Запись отменена",
+  "appointmentCancellationReason": "Причина: {reason}",
+  "@appointmentCancellationReason": {
+    "description": "Причина отмены записи со стороны врача.",
+    "placeholders": { "reason": { "type": "String" } }
+  },
+  "appointmentCancelledNoReason": "Причина отмены не указана.",
+  "appointmentNoShowTitle": "Приём не состоялся",
+  "appointmentNoShowMessage": "В записи отмечена неявка пациента.",
+  "appointmentCompletedTitle": "Приём завершён",
+  "appointmentCompletedMessage": "Эта консультация уже завершена.",
+  "doctorSearchTitle": "Поиск врача",
+  "@doctorSearchTitle": {
+    "description": "Заголовок экранов поиска врача и результатов поиска."
+  },
+  "myDoctorsTitle": "Мои Врачи",
+  "@myDoctorsTitle": {
+    "description": "Заголовок карусели «Мои Врачи» — на поиске врача и в мед-карте."
+  },
+  "allDoctorsTitle": "Все Врачи",
+  "@allDoctorsTitle": {
+    "description": "Заголовок грида специальностей на поиске врача."
+  },
+  "doctorSearchHint": "Какой врач Вам нужен?",
+  "@doctorSearchHint": {
+    "description": "Плейсхолдер поиска врача."
+  },
+  "topReviewsTitle": "Топ отзывов",
+  "@topReviewsTitle": {
+    "description": "Заголовок карусели отзывов на профиле врача."
+  },
+  "writeReviewPlaceholder": "Оставьте свой отзыв...",
+  "@writeReviewPlaceholder": {
+    "description": "Плейсхолдер поля написания отзыва."
+  },
+  "yourRatingLabel": "Ваша оценка: {rating}",
+  "@yourRatingLabel": {
+    "description": "Подпись на плашке оценки экрана «Оставьте отзыв».",
+    "placeholders": {
+      "rating": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewDateLabel": "от {date}",
+  "@reviewDateLabel": {
+    "description": "Дата под текстом отзыва: «от 10.08.26».",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "leaveReviewButton": "Оставить отзыв",
+  "@leaveReviewButton": {
+    "description": "Кнопка отправки отзыва о враче."
+  },
+  "aboutDoctorTitle": "О враче",
+  "@aboutDoctorTitle": {
+    "description": "Заголовок экрана профиля врача."
+  },
+  "scheduleTitle": "Расписание",
+  "@scheduleTitle": {
+    "description": "Заголовок карточки расписания на профиле врача."
+  },
+  "searchResultsCount": "Было найдено {count} врачей по Вашему запросу",
+  "@searchResultsCount": {
+    "description": "Счётчик результатов поиска врача.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sortByRating": "Рейтинг",
+  "@sortByRating": {
+    "description": "Фильтр сортировки результатов поиска по рейтингу."
+  },
+  "sortByExperience": "Стаж",
+  "@sortByExperience": {
+    "description": "Фильтр сортировки результатов поиска по стажу."
+  },
+  "sortByPrice": "Доступная цена",
+  "@sortByPrice": {
+    "description": "Фильтр сортировки результатов поиска по цене."
+  },
+  "nearbyFilterChip": "Близко к Вам",
+  "@nearbyFilterChip": {
+    "description": "Косметический фильтр «рядом» — не сортирует, геоданных нет."
+  },
+  "reviewsCountLabel": "{count} отзывов",
+  "@reviewsCountLabel": {
+    "description": "Число отзывов у врача в результатах поиска.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "topMatchLabel": "Топ рейтинга",
+  "@topMatchLabel": {
+    "description": "Метка лучшей карточки в результатах поиска."
+  },
+  "perConsultationLabel": "за консультацию",
+  "@perConsultationLabel": {
+    "description": "Подпись под ценой врача в результатах поиска."
+  },
+  "forSubscribersLabel": "для пользователей Silver",
+  "@forSubscribersLabel": {
+    "description": "Подпись скидочной цены для подписчиков Silver."
+  },
+  "prepaymentCardTitle": "Предоплата записи",
+  "@prepaymentCardTitle": {
+    "description": "Заголовок блока предоплаты на экране записи."
+  },
+  "prepaymentDiscountPrompt": "или оформите подписку и получите скидку",
+  "@prepaymentDiscountPrompt": {
+    "description": "Текст-приглашение оформить подписку в блоке предоплаты."
+  },
+  "subscribeButtonLabel": "Оформить подписку",
+  "@subscribeButtonLabel": {
+    "description": "Кнопка подписки в блоке предоплаты."
+  },
+  "subscriberPricePillLabel": "Цена с подпиской Silver",
+  "@subscriberPricePillLabel": {
+    "description": "Пилюля под ценой со скидкой в блоке предоплаты."
+  },
+  "yourMedicalCardTitle": "Ваша Мед-Карта",
+  "@yourMedicalCardTitle": {
+    "description": "Заголовок экрана мед-карты пользователя и её формы."
+  },
+  "previousProceduresTitle": "Предыдущие процедуры",
+  "@previousProceduresTitle": {
+    "description": "Заголовок карточки-ссылки и экрана истории процедур."
+  },
+  "myFamilyTitle": "Моя семья",
+  "@myFamilyTitle": {
+    "description": "Заголовок переключателя членов семьи на «Ваша Мед-Карта»."
+  },
+  "medicalCardSectionTitle": "Мед-карта",
+  "@medicalCardSectionTitle": {
+    "description": "Заголовок карточки-сводки мед-карты (рост/вес/возраст)."
+  },
+  "heightFieldLabel": "Рост",
+  "@heightFieldLabel": {
+    "description": "Подпись поля/плитки роста."
+  },
+  "weightFieldLabel": "Вес",
+  "@weightFieldLabel": {
+    "description": "Подпись поля/плитки веса."
+  },
+  "ageFieldLabel": "Возраст",
+  "@ageFieldLabel": {
+    "description": "Подпись плитки возраста в сводке мед-карты."
+  },
+  "registrationAddressPlaceholder": "Место прописки",
+  "@registrationAddressPlaceholder": {
+    "description": "Подсказка пустого поля прописки в сводке мед-карты."
+  },
+  "yourAnalysesTitle": "Ваши анализы",
+  "@yourAnalysesTitle": {
+    "description": "Заголовок карточки анализов пользователя по умолчанию."
+  },
+  "familyProfileChild": "Профиль для ребенка",
+  "@familyProfileChild": {
+    "description": "Строка «Моя Семья» на главной: вход в профиль ребёнка."
+  },
+  "familyProfileSenior": "Профиль для старшего поколения",
+  "@familyProfileSenior": {
+    "description": "Строка «Моя Семья» на главной: вход в профиль старшего."
+  },
+  "familyProfileHint": "мед-карта и процедуры",
+  "@familyProfileHint": {
+    "description": "Подпись под строкой «Моя Семья» на главной: что внутри."
+  },
+  "familyRoleChild": "профиль ребенка",
+  "@familyRoleChild": {
+    "description": "Подпись под именем в карточке «Моя Семья»: профиль ребёнка."
+  },
+  "familyRoleSenior": "профиль для старшего поколения",
+  "@familyRoleSenior": {
+    "description": "Подпись под именем в карточке «Моя Семья»: профиль старшего."
+  },
+  "familyRelationSpouse": "Супруг(а)",
+  "@familyRelationSpouse": {
+    "description": "Степень родства члена семьи: супруг или супруга."
+  },
+  "familyRelationChild": "Ребёнок",
+  "@familyRelationChild": {
+    "description": "Степень родства члена семьи: ребёнок."
+  },
+  "familyRelationParent": "Родитель",
+  "@familyRelationParent": {
+    "description": "Степень родства члена семьи: родитель."
+  },
+  "familyRelationSibling": "Брат или сестра",
+  "@familyRelationSibling": {
+    "description": "Степень родства члена семьи: брат или сестра."
+  },
+  "familyRelationOther": "Другое",
+  "@familyRelationOther": {
+    "description": "Степень родства члена семьи: всё остальное."
+  },
+  "familyMemberTitleRelative": "Профиль близкого",
+  "@familyMemberTitleRelative": {
+    "description": "Заголовок карточки члена семьи, который не ребёнок и не родитель."
+  },
+  "familyDoctorsCardTitleRelative": "Врачи близкого",
+  "@familyDoctorsCardTitleRelative": {
+    "description": "Заголовок карточки врачей у члена семьи, который не ребёнок и не родитель."
+  },
+  "familyRoleRelative": "профиль близкого",
+  "@familyRoleRelative": {
+    "description": "Подпись под именем в карточке «Моя Семья» для остальных степеней родства."
+  },
+  "familyProfileRelative": "Профиль близкого",
+  "@familyProfileRelative": {
+    "description": "Строка «Моя Семья» на главной: вход в профиль близкого."
+  },
+  "familyMemberTitleChild": "Профиль ребёнка",
+  "@familyMemberTitleChild": {
+    "description": "Заголовок верхней строки на карточке члена семьи-ребёнка."
+  },
+  "familyMemberTitleSenior": "Профиль родителя",
+  "@familyMemberTitleSenior": {
+    "description": "Заголовок верхней строки на карточке члена семьи-старшего."
+  },
+  "familyDoctorsCardTitleChild": "Врачи моего ребёнка",
+  "@familyDoctorsCardTitleChild": {
+    "description": "Заголовок карточки врачей на карточке члена семьи-ребёнка."
+  },
+  "familyDoctorsCardTitleSenior": "Врачи для старших",
+  "@familyDoctorsCardTitleSenior": {
+    "description": "Заголовок карточки врачей на карточке члена семьи-старшего."
+  },
+  "familyAnalysesCardTitleChild": "Анализы ребёнка",
+  "@familyAnalysesCardTitleChild": {
+    "description": "Заголовок карточки анализов на карточке члена семьи-ребёнка."
+  },
+  "familyAnalysesCardTitleSenior": "Анализы {name}",
+  "@familyAnalysesCardTitleSenior": {
+    "description": "Заголовок карточки анализов на карточке члена семьи-старшего.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "analysesFilterChanged": "Анализы с изменениями",
+  "@analysesFilterChanged": {
+    "description": "Вкладка фильтра анализов с отклонением от нормы."
+  },
+  "analysesFilterAll": "Все результаты",
+  "@analysesFilterAll": {
+    "description": "Вкладка фильтра всех результатов анализов."
+  },
+  "familyScopeSelf": "Мои процедуры",
+  "@familyScopeSelf": {
+    "description": "Вкладка «Предыдущих процедур» — процедуры самого пользователя."
+  },
+  "familyScopeChild": "Процедуры ребёнка",
+  "@familyScopeChild": {
+    "description": "Вкладка «Предыдущих процедур» — процедуры ребёнка."
+  },
+  "familyScopeSenior": "Процедуры старших",
+  "@familyScopeSenior": {
+    "description": "Вкладка «Предыдущих процедур» — процедуры старших членов семьи."
+  },
+  "proceduresSearchHint": "Название процедуры",
+  "@proceduresSearchHint": {
+    "description": "Подсказка поля поиска на экране «Предыдущие процедуры»."
+  },
+  "proceduresResultsCount": "Было найдено {count} процедур в Вашей мед-карте",
+  "@proceduresResultsCount": {
+    "description": "Счётчик результатов на экране «Предыдущие процедуры».",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "procedureResultsNotReadySnackbar": "Экран с результатами процедуры ещё не готов",
+  "@procedureResultsNotReadySnackbar": {
+    "description": "Снек-бар при нажатии на процедуру без связанного идентификатора консультации."
+  },
+  "consultationWithLabel": "Консультация с",
+  "@consultationWithLabel": {
+    "description": "Подпись над именем врача в карточке процедуры."
+  },
+  "viewResultsLinkLabel": "посмотреть результаты",
+  "@viewResultsLinkLabel": {
+    "description": "Ссылка в карточке процедуры."
+  },
+  "bloodGroupLabel": "Группа крови:",
+  "@bloodGroupLabel": {
+    "description": "Подпись поля группы крови в форме мед-карты."
+  },
+  "rhesusFactorLabel": "Резус-фактор:",
+  "@rhesusFactorLabel": {
+    "description": "Подпись поля резус-фактора в форме мед-карты."
+  },
+  "chronicDiseasesLabel": "Хронические заболевания",
+  "@chronicDiseasesLabel": {
+    "description": "Подпись поля хронических заболеваний в форме мед-карты."
+  },
+  "chronicDiseasesDetailPrompt": "Если ответили “Да”, укажите их",
+  "@chronicDiseasesDetailPrompt": {
+    "description": "Подсказка над полем расшифровки хронических заболеваний."
+  },
+  "allergiesLabel": "Аллергии (пищевые, лекарственные, прочие)",
+  "@allergiesLabel": {
+    "description": "Подпись поля аллергий в форме мед-карты."
+  },
+  "surgeriesLabel": "Перенесенные операции",
+  "@surgeriesLabel": {
+    "description": "Подпись поля операций в форме мед-карты."
+  },
+  "badHabitsLabel": "Вредные привычки (курение, алкоголь)",
+  "@badHabitsLabel": {
+    "description": "Подпись поля вредных привычек в форме мед-карты."
+  },
+  "saveButtonLabel": "Сохранить",
+  "@saveButtonLabel": {
+    "description": "Кнопка сохранения формы мед-карты."
+  },
+  "yesLabel": "Да",
+  "@yesLabel": {
+    "description": "Кнопка «Да» в форме мед-карты."
+  },
+  "noLabel": "Нет",
+  "@noLabel": {
+    "description": "Кнопка «Нет» в форме мед-карты."
+  },
+  "settingsTitle": "Настройки",
+  "@settingsTitle": {
+    "description": "Заголовок экрана настроек."
+  },
+  "profileSettingsTitle": "Настройки профиля",
+  "@profileSettingsTitle": {
+    "description": "Заголовок строки-перехода и экрана настроек профиля."
+  },
+  "appLanguageLabel": "Язык приложения",
+  "@appLanguageLabel": {
+    "description": "Подпись переключателя языка приложения в настройках."
+  },
+  "contactUsTitle": "Свяжитесь с нами",
+  "@contactUsTitle": {
+    "description": "Строка-переход в настройках и заголовок экрана контактов."
+  },
+  "notificationsLabel": "Уведомления",
+  "@notificationsLabel": {
+    "description": "Подпись переключателя уведомлений в настройках."
+  },
+  "supportPhonesTitle": "Номера телефона поддержки",
+  "@supportPhonesTitle": {
+    "description": "Заголовок карточки телефонов поддержки на экране контактов."
+  },
+  "emailSectionTitle": "Электронная почта",
+  "@emailSectionTitle": {
+    "description": "Заголовок блока почты на экране контактов."
+  },
+  "socialNetworksTitle": "Социальные сети",
+  "@socialNetworksTitle": {
+    "description": "Заголовок блока соцсетей на экране контактов."
+  },
+  "avatarPickerTitle": "Выбор аватарки",
+  "@avatarPickerTitle": {
+    "description": "Заголовок экрана выбора аватарки из набора."
+  },
+  "changeAvatarLink": "изменить аватара",
+  "@changeAvatarLink": {
+    "description": "Ссылка смены аватара на экране настроек профиля."
+  },
+  "firstNameHint": "Имя",
+  "@firstNameHint": {
+    "description": "Подсказка поля имени на экране настроек профиля."
+  },
+  "lastNameHint": "Фамилия",
+  "@lastNameHint": {
+    "description": "Подсказка поля фамилии на экране настроек профиля."
+  },
+  "passwordHint": "Пароль",
+  "@passwordHint": {
+    "description": "Подсказка поля пароля на «Настройках профиля» врача-фрилансера. Поле — ради формы макета: паролей в MedIx нет, вход по одноразовому коду, значение не сохраняется."
+  },
+  "audioCallLabel": "Аудио-звонок",
+  "@audioCallLabel": {
+    "description": "Формат приёма: аудио-звонок. Заголовок экрана звонка."
+  },
+  "chatAppointmentLabel": "Чат",
+  "@chatAppointmentLabel": {
+    "description": "Формат приёма: чат."
+  },
+  "inPersonAppointmentLabel": "Очный приём",
+  "@inPersonAppointmentLabel": {
+    "description": "Формат приёма: очный приём."
+  },
+  "callEndedLabel": "Вызов завершен",
+  "@callEndedLabel": {
+    "description": "Статус экрана звонка после завершения."
+  },
+  "relativeDataTitle": "Данные родственника",
+  "@relativeDataTitle": {
+    "description": "Заголовок формы нового члена семьи."
+  },
+  "familyEditTitle": "Изменить данные",
+  "@familyEditTitle": {
+    "description": "Заголовок той же формы при правке существующего члена семьи."
+  },
+  "relativeNameHint": "Имя Фамилия",
+  "@relativeNameHint": {
+    "description": "Подсказка поля имени в форме родственника. Порядок обратный «ФИО» на регистрации — так подписано в макете."
+  },
+  "relativeBirthDateHint": "Дата рождения (dd/mm/yyyy)",
+  "@relativeBirthDateHint": {
+    "description": "Подсказка поля даты рождения в форме родственника: формат значения, а не приглашение набирать руками — дата выбирается календарём."
+  },
+  "addProfileButton": "Добавить профиль",
+  "@addProfileButton": {
+    "description": "Подпись плитки добавления на экране «Моя Семья»."
+  },
+  "familyDeleteButton": "Удалить профиль",
+  "@familyDeleteButton": {
+    "description": "Кнопка удаления члена семьи внизу его карточки."
+  },
+  "familyDeleteConfirmTitle": "Удалить члена семьи?",
+  "@familyDeleteConfirmTitle": {
+    "description": "Заголовок подтверждения удаления."
+  },
+  "familyDeleteConfirmMessage": "Карточка и доступ к его мед-карте пропадут из приложения.",
+  "@familyDeleteConfirmMessage": {
+    "description": "Пояснение в подтверждении удаления члена семьи."
+  },
+  "cancelButtonLabel": "Отмена",
+  "@cancelButtonLabel": {
+    "description": "Отказ в диалоге подтверждения."
+  },
+  "deleteButtonLabel": "Удалить",
+  "@deleteButtonLabel": {
+    "description": "Согласие в диалоге подтверждения удаления."
+  },
+  "notificationsTitle": "Уведомления",
+  "@notificationsTitle": {
+    "description": "Заголовок экрана уведомлений."
+  },
+  "notificationsFilterSchedule": "Расписание",
+  "@notificationsFilterSchedule": {
+    "description": "Вкладка уведомлений о записях к врачу."
+  },
+  "notificationsFilterMessages": "Сообщения от врачей",
+  "@notificationsFilterMessages": {
+    "description": "Вкладка уведомлений о сообщениях врачей."
+  },
+  "doctorHomeGreeting": "Здравствуйте, {name}!",
+  "@doctorHomeGreeting": {
+    "description": "Приветствие под шапкой главного экрана кабинета врача.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "doctorScheduleTileTitle": "График\nработы",
+  "@doctorScheduleTileTitle": {
+    "description": "Заголовок плитки перехода в календарь на главной кабинета врача."
+  },
+  "doctorScheduleTileSubtitle": "все записи и пациенты",
+  "@doctorScheduleTileSubtitle": {
+    "description": "Подзаголовок плитки «График работы»."
+  },
+  "doctorHistoryTileTitle": "История\nзаписей",
+  "@doctorHistoryTileTitle": {
+    "description": "Заголовок плитки истории записей на главной кабинета врача."
+  },
+  "doctorHistoryTileSubtitle": "прошедшие записи",
+  "@doctorHistoryTileSubtitle": {
+    "description": "Подзаголовок плитки «История записей»."
+  },
+  "doctorAnalyticsTileTitle": "Аналитика активности",
+  "@doctorAnalyticsTileTitle": {
+    "description": "Заголовок плитки аналитики на главной кабинета врача."
+  },
+  "doctorAnalyticsTileSubtitle": "график заработка",
+  "@doctorAnalyticsTileSubtitle": {
+    "description": "Подзаголовок плитки «Аналитика активности»."
+  },
+  "doctorMessagesTileTitle": "Мои сообщения",
+  "@doctorMessagesTileTitle": {
+    "description": "Заголовок плитки чатов на главной кабинета врача."
+  },
+  "doctorMessagesTileSubtitle": "чаты с пациентами",
+  "@doctorMessagesTileSubtitle": {
+    "description": "Подзаголовок плитки «Мои сообщения»."
+  },
+  "doctorMediBotHint": "Напишите Medi-bot...",
+  "@doctorMediBotHint": {
+    "description": "Плейсхолдер поля Medi-bot на главной кабинета врача."
+  },
+  "doctorRegularPatientsTitle": "Постоянные пациенты",
+  "@doctorRegularPatientsTitle": {
+    "description": "Заголовок секции постоянных пациентов на главной кабинета врача."
+  },
+  "doctorAdminTileTitle": "Администрация",
+  "@doctorAdminTileTitle": {
+    "description": "Заголовок плитки администрации — только у врача от клиники."
+  },
+  "doctorAdminTileSubtitle": "смена расписания, отпуски, и т.д.",
+  "@doctorAdminTileSubtitle": {
+    "description": "Подзаголовок плитки «Администрация»."
+  },
+  "doctorCalendarMorningTitle": "Утренние записи",
+  "@doctorCalendarMorningTitle": {
+    "description": "Заголовок утренней корзины записей в календаре врача."
+  },
+  "doctorCalendarAfternoonTitle": "Дневные записи",
+  "@doctorCalendarAfternoonTitle": {
+    "description": "Заголовок дневной корзины записей в календаре врача."
+  },
+  "doctorCalendarEveningTitle": "Вечерние записи",
+  "@doctorCalendarEveningTitle": {
+    "description": "Заголовок вечерней корзины записей в календаре врача."
+  },
+  "doctorCalendarEmptyLabel": "Записей пока нет",
+  "@doctorCalendarEmptyLabel": {
+    "description": "Плейсхолдер пустой корзины записей в календаре врача."
+  },
+  "doctorOwnProfileTitle": "Ваш Профиль",
+  "@doctorOwnProfileTitle": {
+    "description": "Заголовок экрана собственного профиля врача."
+  },
+  "doctorIdLabel": "ID врача",
+  "@doctorIdLabel": {
+    "description": "Подпись под идентификатором врача в шапке профиля."
+  },
+  "doctorStatusLabel": "статус",
+  "@doctorStatusLabel": {
+    "description": "Подпись под статусом аккаунта в шапке профиля врача."
+  },
+  "doctorRatingLabel": "рейтинг",
+  "@doctorRatingLabel": {
+    "description": "Подпись под рейтингом в шапке профиля врача."
+  },
+  "doctorInfoTitle": "Ваша Информация",
+  "@doctorInfoTitle": {
+    "description": "Заголовок карточки данных врача в профиле."
+  },
+  "doctorSpecializationHint": "Специализация",
+  "@doctorSpecializationHint": {
+    "description": "Плейсхолдер поля специализации в профиле врача."
+  },
+  "doctorExperienceHint": "Опыт работы",
+  "@doctorExperienceHint": {
+    "description": "Плейсхолдер поля опыта работы в профиле врача."
+  },
+  "doctorCategoryHint": "Категория",
+  "@doctorCategoryHint": {
+    "description": "Плейсхолдер поля категории в профиле врача."
+  },
+  "doctorAddressHint": "Адрес приема",
+  "@doctorAddressHint": {
+    "description": "Плейсхолдер поля адреса приёма в профиле врача."
+  },
+  "doctorConsultationTypesLabel": "Доступные виды приема:",
+  "@doctorConsultationTypesLabel": {
+    "description": "Подпись над переключателем видов приёма в профиле врача."
+  },
+  "doctorOnlineConsultationLabel": "Онлайн-прием",
+  "@doctorOnlineConsultationLabel": {
+    "description": "Онлайн-сегмент переключателя видов приёма."
+  },
+  "doctorOfflineConsultationLabel": "Оффлайн-прием",
+  "@doctorOfflineConsultationLabel": {
+    "description": "Оффлайн-сегмент переключателя видов приёма."
+  },
+  "doctorContactsTitle": "Ваши Контакты",
+  "@doctorContactsTitle": {
+    "description": "Заголовок карточки контактов в профиле врача."
+  },
+  "doctorCertificatesTitle": "Ваши сертификаты",
+  "@doctorCertificatesTitle": {
+    "description": "Строка-ссылка на сертификаты в профиле врача."
+  },
+  "doctorReviewsAboutYouTitle": "Отзывы о Вас",
+  "@doctorReviewsAboutYouTitle": {
+    "description": "Строка-ссылка на отзывы о враче в его профиле."
+  },
+  "doctorAdminRequestsTitle": "Запросы в администрацию",
+  "@doctorAdminRequestsTitle": {
+    "description": "Строка-ссылка на заявки в администрацию — только у врача от клиники."
+  },
+  "doctorUploadCertificateTitle": "Загрузить Сертификат",
+  "@doctorUploadCertificateTitle": {
+    "description": "Строка загрузки файла на экране «Ваши сертификаты» — только у врача-фрилансера."
+  },
+  "doctorCertificateUploadSuccess": "Сертификат загружен",
+  "doctorCertificateUploadError": "Не удалось загрузить сертификат",
+  "doctorChangePhotoAction": "изменить фото",
+  "@doctorChangePhotoAction": {
+    "description": "Подпись под фото врача на «Ваш Профиль» — тем же жестом, что у пациентской «изменить аватара»."
+  },
+  "doctorPhotoUploadSuccess": "Фото обновлено",
+  "@doctorPhotoUploadSuccess": {
+    "description": "Снек-бар после успешной загрузки фото врача."
+  },
+  "doctorPhotoUploadError": "Не удалось загрузить фото",
+  "@doctorPhotoUploadError": {
+    "description": "Снек-бар при ошибке загрузки фото врача."
+  },
+  "registerAsDoctorAction": "Я — врач",
+  "registerAsPatientAction": "Я — клиент",
+  "doctorRegistrationTitle": "Регистрация врача",
+  "doctorSpecialtyHint": "Специализация",
+  "doctorLicenseNumberHint": "Номер лицензии",
+  "doctorCityHint": "Город (необязательно)",
+  "doctorReviewsScreenTitle": "Отзывы",
+  "@doctorReviewsScreenTitle": {
+    "description": "Заголовок экрана «Отзывы о Вас» в кабинете врача."
+  },
+  "doctorOtherReviewsTitle": "Остальные отзывы",
+  "@doctorOtherReviewsTitle": {
+    "description": "Заголовок списка отзывов под каруселью «Топ отзывов»."
+  },
+  "doctorHistoryTitle": "История записей",
+  "@doctorHistoryTitle": {
+    "description": "Заголовок экрана «История записей» в кабинете врача. Тот же заголовок стоит и на «О прошлой записи» — так в макете."
+  },
+  "doctorHistorySearchHint": "Поиск по имени",
+  "@doctorHistorySearchHint": {
+    "description": "Плейсхолдер поиска по имени пациента на «Истории записей»."
+  },
+  "doctorHistoryPreviousTitle": "Предыдущая запись",
+  "@doctorHistoryPreviousTitle": {
+    "description": "Заголовок выделенной карточки с последней прошедшей записью."
+  },
+  "doctorHistoryOthersTitle": "Другие записи",
+  "@doctorHistoryOthersTitle": {
+    "description": "Заголовок списка прошедших записей за отлистанную неделю."
+  },
+  "doctorHistoryWithPatient": "с {name}",
+  "@doctorHistoryWithPatient": {
+    "description": "Подпись под видом записи в строке истории: «с Имя Фамилия».",
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "doctorPastWithPatient": "С {name}",
+  "@doctorPastWithPatient": {
+    "description": "То же на карточке «О прошлой записи», но с прописной буквы — так в макете.",
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "doctorPastPatientProfileLabel": "Профиль пациента",
+  "@doctorPastPatientProfileLabel": {
+    "description": "Подпись строки перехода в профиль пациента на «О прошлой записи»."
+  },
+  "doctorPastConclusionTitle": "Об {name}",
+  "@doctorPastConclusionTitle": {
+    "description": "Заголовок блока заключения: «Об Имя Фамилия».",
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "doctorPastConclusionDate": "Заключение от {date}",
+  "@doctorPastConclusionDate": {
+    "description": "Дата заключения справа в шапке блока.",
+    "placeholders": { "date": { "type": "String" } }
+  },
+  "doctorPastConclusionPlaceholder": "Временный текст о пациенте. Так как это первая запись, анамнез и общая информация не введена Вами. После проведения консультации, пожалуйста, загрузите заключение о пациенте и оно появится здесь.",
+  "@doctorPastConclusionPlaceholder": {
+    "description": "Текст на месте незагруженного заключения — дословно из макета «О прошлой записи»."
+  },
+  "doctorPastUploadConclusion": "Загрузить заключение",
+  "@doctorPastUploadConclusion": {
+    "description": "Кнопка загрузки заключения под текстом."
+  },
+  "doctorConclusionDialogTitle": "Заключение о пациенте",
+  "doctorConclusionTextHint": "Опишите состояние пациента и результаты консультации",
+  "doctorConclusionSaved": "Заключение сохранено",
+  "doctorConclusionSaveError": "Не удалось сохранить заключение",
+  "doctorAppointmentFilesTitle": "Файлы консультации",
+  "doctorAppointmentFileOpenError": "Не удалось открыть файл консультации",
+  "doctorAnalyticsTitle": "Аналитика Работы",
+  "@doctorAnalyticsTitle": {
+    "description": "Заголовок экрана аналитики в кабинете врача."
+  },
+  "doctorAnalyticsWeekTitle": "Записи за эту неделю",
+  "@doctorAnalyticsWeekTitle": {
+    "description": "Заголовок верхней карточки аналитики."
+  },
+  "doctorAnalyticsWeekCardTitle": "Аналитика недели",
+  "@doctorAnalyticsWeekCardTitle": {
+    "description": "Заголовок вложенной карточки с показателями недели."
+  },
+  "doctorAnalyticsMonthCardTitle": "Аналитика месяца",
+  "@doctorAnalyticsMonthCardTitle": {
+    "description": "Заголовок нижней карточки — показатели за месяц."
+  },
+  "doctorAnalyticsAppointments": "{count} записей",
+  "@doctorAnalyticsAppointments": {
+    "description": "Крупное число записей за период. Склонения нет — как и везде в приложении, см. HANDOFF.",
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "doctorAnalyticsDeltaMore": "на {count} больше\nчем обычно",
+  "@doctorAnalyticsDeltaMore": {
+    "description": "Плашка сравнения с обычным числом записей, рост.",
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "doctorAnalyticsDeltaLess": "на {count} меньше\nчем обычно",
+  "@doctorAnalyticsDeltaLess": {
+    "description": "То же при падении. В макете нарисован только рост — вариант со снижением дописан по смыслу.",
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "doctorAnalyticsMinutes": "{count} минут",
+  "@doctorAnalyticsMinutes": {
+    "description": "Средняя длина записи в плитке показателей.",
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "doctorAnalyticsAverageLabel": "средняя\nдлина записи",
+  "@doctorAnalyticsAverageLabel": {
+    "description": "Подпись плитки средней длины записи."
+  },
+  "doctorAnalyticsRatingLabel": "повышение\nрейтинга",
+  "@doctorAnalyticsRatingLabel": {
+    "description": "Подпись плитки прироста рейтинга."
+  },
+  "doctorAnalyticsEarningsLabel": "повышение\nзаработка",
+  "@doctorAnalyticsEarningsLabel": {
+    "description": "Подпись плитки прироста заработка."
+  },
+  "patientHeightMetaLabel": "рост",
+  "@patientHeightMetaLabel": {
+    "description": "Подпись под ростом в шапке пациента у врача. Строчная, как и «пол» с «датой рождения» в пациентском профиле."
+  },
+  "patientWeightMetaLabel": "вес",
+  "@patientWeightMetaLabel": {
+    "description": "Подпись под весом там же."
+  },
+  "patientAgeMetaLabel": "возраст",
+  "@patientAgeMetaLabel": {
+    "description": "Подпись под возрастом там же."
+  },
+  "doctorPatientTitle": "О пациенте",
+  "@doctorPatientTitle": {
+    "description": "Заголовок экрана «Профиль пациента» в кабинете врача."
+  },
+  "doctorConfirmAppointmentTitle": "Подтвердите запись",
+  "@doctorConfirmAppointmentTitle": {
+    "description": "Заголовок карточки с ближайшей записью на «Профиле пациента»."
+  },
+  "doctorAppointmentDateAt": "{date} в",
+  "@doctorAppointmentDateAt": {
+    "description": "«21 Июля, Четверг в» — строка перед пилюлей со временем.",
+    "placeholders": { "date": { "type": "String" } }
+  },
+  "doctorWritePatientTitle": "Сообщение",
+  "@doctorWritePatientTitle": {
+    "description": "Заголовок строки перехода в переписку с пациентом."
+  },
+  "doctorWritePatientSubtitle": "Написать пациенту",
+  "@doctorWritePatientSubtitle": {
+    "description": "Подпись под ней на «Профиле пациента»."
+  },
+  "doctorPatientAnalysesTitle": "Анализы пациента",
+  "@doctorPatientAnalysesTitle": {
+    "description": "Заголовок карточки анализов на «Профиле пациента»."
+  },
+  "doctorAppointmentTitle": "Ваша запись",
+  "@doctorAppointmentTitle": {
+    "description": "Заголовок экрана «Запись с пациентом» в кабинете врача."
+  },
+  "doctorCancelAppointmentAlternative": "или",
+  "doctorCancelAppointmentAction": "Отменить запись",
+  "doctorCancelAppointmentDialogTitle": "Отмена записи",
+  "doctorCancelAppointmentReasonHint": "Укажите причину отмены",
+  "doctorCancelAppointmentConfirm": "Отменить запись",
+  "doctorCancelAppointmentSuccess": "Запись отменена",
+  "doctorCancelAppointmentError": "Не удалось отменить запись",
+  "doctorOwnAppointmentSubtitle": "Ваша запись",
+  "@doctorOwnAppointmentSubtitle": {
+    "description": "Подпись под видом записи в строке на «Записи с пациентом» — в отличие от истории, где там имя пациента."
+  },
+  "doctorPatientChatSubtitle": "Чат с пациентом",
+  "@doctorPatientChatSubtitle": {
+    "description": "Подпись кнопки «Сообщение» на «Записи с пациентом»."
+  },
+  "doctorBotThreadPreview": "Чем я могу помочь?",
+  "@doctorBotThreadPreview": {
+    "description": "Подпись строки чат-бота в списке чатов врача. У пациента там плейсхолдер про симптомы, у врача — вопрос бота."
+  },
+  "doctorPatientChatTitle": "Чат с пациентом",
+  "@doctorPatientChatTitle": {
+    "description": "Заголовок экрана переписки с пациентом в кабинете врача."
+  },
+  "doctorAdminRequestTitle": "Заявка в администрацию",
+  "@doctorAdminRequestTitle": {
+    "description": "Заголовок экрана заявки в администрацию. В макете переносится на две строки."
+  },
+  "doctorAdminFaqTitle": "Часто задаваемые вопросы:",
+  "@doctorAdminFaqTitle": {
+    "description": "Подпись над списком тем заявки."
+  },
+  "doctorAdminTopicTitle": "Тема заявки:",
+  "@doctorAdminTopicTitle": {
+    "description": "Подпись над выбранной темой заявки."
+  },
+  "doctorAdminTopicReschedule": "Нужно перенести запись",
+  "@doctorAdminTopicReschedule": {
+    "description": "Тема заявки: перенос записи."
+  },
+  "doctorAdminTopicCancel": "Нужно отменить запись",
+  "@doctorAdminTopicCancel": {
+    "description": "Тема заявки: отмена записи."
+  },
+  "doctorAdminTopicVacation": "Ухожу в отпуск",
+  "@doctorAdminTopicVacation": {
+    "description": "Тема заявки: отпуск."
+  },
+  "doctorAdminTopicResignation": "Ухожу с места работы",
+  "@doctorAdminTopicResignation": {
+    "description": "Тема заявки: увольнение."
+  },
+  "doctorAdminTopicOther": "Другое",
+  "@doctorAdminTopicOther": {
+    "description": "Тема заявки: всё остальное."
+  },
+  "doctorAdminComposeHint": "Опишите проблему...",
+  "@doctorAdminComposeHint": {
+    "description": "Плейсхолдер поля текста заявки."
+  },
+  "doctorAdminAttachFile": "Приложить файл",
+  "@doctorAdminAttachFile": {
+    "description": "Строка вложения под текстом заявки."
+  },
+  "doctorAdminSend": "Отправить заявку",
+  "@doctorAdminSend": {
+    "description": "Кнопка отправки заявки."
+  },
+  "doctorMyRequestsTitle": "Мои заявки",
+  "@doctorMyRequestsTitle": {
+    "description": "Заголовок списка заявок врача. Не путать с doctorAdminRequestsTitle — это строка-ссылка «Запросы в администрацию» на «Ваш Профиль»."
+  },
+  "doctorAdminCreateNew": "Создать новую заявку",
+  "@doctorAdminCreateNew": {
+    "description": "Кнопка под списком заявок."
+  },
+  "doctorAdminAnswerTitle": "Ответ администрации:",
+  "@doctorAdminAnswerTitle": {
+    "description": "Заголовок блока с ответом на заявку."
+  },
+  "doctorAdminNoAnswerYet": "Администрация пока не ответила",
+  "@doctorAdminNoAnswerYet": {
+    "description": "Плашка вместо ответа, пока его нет. В макете такого состояния нет — дописано по смыслу, потому что ответ приходит не сразу."
+  },
+  "doctorAdminDate": "от {date}",
+  "@doctorAdminDate": {
+    "description": "Дата заявки и ответа: «от 10.08.26».",
+    "placeholders": { "date": { "type": "String" } }
+  },
+  "doctorWorkScheduleTitle": "Рабочие часы",
+  "@doctorWorkScheduleTitle": {
+    "description": "Заголовок экрана управления свободными слотами — не путать с календарём записей пациентов."
+  },
+  "doctorWorkScheduleEmpty": "На этот день слотов нет",
+  "@doctorWorkScheduleEmpty": {
+    "description": "Пустое состояние, когда на выбранный день не заведено ни одного рабочего слота."
+  },
+  "doctorWorkSlotStatusOpen": "Свободно",
+  "@doctorWorkSlotStatusOpen": {
+    "description": "Статус слота: пациент ещё не записался."
+  },
+  "doctorWorkSlotStatusHeld": "Придержано",
+  "@doctorWorkSlotStatusHeld": {
+    "description": "Статус слота: временно занят на время оформления записи."
+  },
+  "doctorWorkSlotStatusBooked": "Занято",
+  "@doctorWorkSlotStatusBooked": {
+    "description": "Статус слота: пациент уже записан."
+  },
+  "doctorWorkSlotStatusCancelled": "Отменено",
+  "@doctorWorkSlotStatusCancelled": {
+    "description": "Статус слота: запись на него отменена."
+  },
+  "doctorAddSlotAction": "Добавить слот",
+  "@doctorAddSlotAction": {
+    "description": "Кнопка/шеврон открытия формы нового слота."
+  },
+  "doctorAddSlotTitle": "Новый слот",
+  "@doctorAddSlotTitle": {
+    "description": "Заголовок формы добавления слота."
+  },
+  "doctorSlotStartLabel": "Начало",
+  "@doctorSlotStartLabel": {
+    "description": "Подпись поля времени начала слота."
+  },
+  "doctorSlotEndLabel": "Окончание",
+  "@doctorSlotEndLabel": {
+    "description": "Подпись поля времени окончания слота."
+  },
+  "doctorSlotSaveAction": "Сохранить",
+  "@doctorSlotSaveAction": {
+    "description": "Кнопка сохранения нового слота."
+  },
+  "doctorSlotCreateSuccess": "Слот добавлен",
+  "@doctorSlotCreateSuccess": {
+    "description": "Снек-бар после успешного создания слота."
+  },
+  "doctorSlotCreateError": "Не удалось добавить слот",
+  "@doctorSlotCreateError": {
+    "description": "Снек-бар при ошибке создания слота."
+  },
+  "doctorSlotDeleteError": "Не удалось удалить слот",
+  "@doctorSlotDeleteError": {
+    "description": "Снек-бар при ошибке удаления слота."
+  },
+  "doctorSlotEndBeforeStartError": "Окончание должно быть позже начала",
+  "@doctorSlotEndBeforeStartError": {
+    "description": "Ошибка формы нового слота, когда конец раньше или равен началу."
+  },
+  "waitlistTitle": "Лист ожидания",
+  "waitlistEmpty": "Вы пока не ожидаете свободного времени",
+  "waitlistActiveStatus": "Ожидаем свободное время",
+  "waitlistOfferStatus": "Появилось свободное время",
+  "waitlistAcceptAction": "Записаться",
+  "waitlistLeaveAction": "Выйти из листа ожидания",
+  "waitlistActionError": "Не удалось обновить лист ожидания",
+  "cancelSubscriptionTitle": "Отмена подписки",
+  "cancelSubscriptionPrompt": "Отменить автоматическое продление подписки? Доступ сохранится до конца оплаченного периода.",
+  "cancelSubscriptionAction": "Отменить подписку",
+  "keepSubscriptionAction": "Оставить подписку",
+  "subscriptionCancelledMessage": "Подписка отменена. Доступ сохранён до {date}",
+  "@subscriptionCancelledMessage": {
+    "placeholders": { "date": { "type": "String" } }
+  },
+  "cancelSubscriptionError": "Не удалось отменить подписку",
+  "joinWaitlistAction": "Сообщить, когда появится время",
+  "joinWaitlistSuccess": "Вы добавлены в лист ожидания",
+  "uploadOwnPhotoAction": "Загрузить своё фото",
+  "avatarUploadSuccess": "Фотография профиля обновлена",
+  "avatarUploadError": "Не удалось загрузить фотографию",
+  "measurementHistoryTooShort": "Замеров пока мало, чтобы построить график",
+  "labReferralTitle": "Загрузить направление",
+  "labReferralDescription": "Выберите PDF, JPG или PNG с направлением врача. Мы распознаем анализы и сравним цены лабораторий.",
+  "labReferralChooseAction": "Выбрать направление",
+  "labReferralRecognizing": "Распознаём направление…",
+  "labReferralUploadError": "Не удалось загрузить или распознать направление",
+  "labReferralRetryAction": "Попробовать снова",
+  "labReferralRecognitionError": "Не удалось распознать анализы в направлении",
+  "labReferralRecognizedTitle": "Распознанные анализы",
+  "labReferralCompareAction": "Сравнить цены",
+  "labOffersLoadError": "Не удалось загрузить предложения лабораторий",
+  "labOffersEmpty": "Для этого направления пока нет предложений",
+  "labOrderCreated": "Заказ {id} создан",
+  "@labOrderCreated": { "placeholders": { "id": { "type": "String" } } },
+  "labOrderCreateError": "Не удалось создать заказ",
+  "labOrderAction": "Оформить заказ",
+  "labOfferDiscount": "Скидка {percent}%",
+  "@labOfferDiscount": { "placeholders": { "percent": { "type": "int" } } },
+  "labResultsTitle": "Результаты анализов",
+  "labResultFileTitle": "Результат анализа",
+  "labResultOrderPrefix": "Заказ",
+  "labResultDatePrefix": "Получен",
+  "labResultOpenAction": "Открыть",
+  "labResultsEmpty": "Готовых результатов пока нет",
+  "labResultsLoadError": "Не удалось загрузить результаты анализов",
+  "labResultsRetryAction": "Попробовать снова",
+  "labResultOpenError": "Не удалось открыть файл результата",
+  "labResultsOpenFilesHint": "Откройте готовые файлы результатов",
+  "consultationAttachmentLabel": "Вложение {number}",
+  "@consultationAttachmentLabel": { "placeholders": { "number": { "type": "int" } } },
+  "consultationAttachmentUploadSuccess": "Файл прикреплён",
+  "consultationAttachmentUploadError": "Не удалось прикрепить файл",
+  "consultationAttachmentOpenError": "Не удалось открыть вложение",
+  "consultationMessageSendError": "Не удалось отправить сообщение",
+  "doctorChatUnavailable": "Чат будет доступен после создания консультации",
+  "doctorPatientChatUnavailable": "Чат с пациентом будет доступен после создания консультации",
+  "consultationDisputeAction": "Сообщить о проблеме",
+  "consultationDisputeTitle": "Проблема с консультацией",
+  "consultationDisputePrompt": "Опишите, что произошло во время консультации. Служба поддержки рассмотрит обращение.",
+  "consultationDisputeHint": "Опишите проблему",
+  "consultationDisputeSubmit": "Отправить",
+  "consultationDisputeSuccess": "Обращение отправлено",
+  "consultationDisputeError": "Не удалось отправить обращение"
+}

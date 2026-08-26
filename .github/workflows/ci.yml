@@ -1,0 +1,192 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      update_goldens:
+        description: >-
+          Переснять эталоны вместо сверки. Нужно, когда вёрстка изменилась
+          осознанно, а машина разработчика не на Windows.
+        type: boolean
+        default: false
+      build_apk:
+        description: >-
+          Собрать отладочный APK. По галочке, а не на каждый пуш: он весит
+          86 МБ и за несколько дней забивает всю квоту хранилища.
+        type: boolean
+        default: false
+
+# Новый пуш в ту же ветку отменяет предыдущий прогон.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Версия закреплена намеренно: golden-тесты сверяют отрисовку попиксельно,
+  # и смена версии Flutter меняет растеризацию. Обновлять вместе с локальной.
+  FLUTTER_VERSION: '3.41.8'
+
+jobs:
+  analyze:
+    name: Формат, анализ, тесты
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+
+      - name: Форматирование
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Анализ
+        run: flutter analyze --fatal-infos
+
+      - name: Тесты
+        # Golden'ы исключены: их растеризация зависит от платформы,
+        # они гоняются отдельной джобой на Windows.
+        run: flutter test --exclude-tags golden
+
+  goldens:
+    name: Сверка с макетами
+    # Windows, а не ubuntu: эталоны в test/**/goldens сняты на Windows, и
+    # на Linux текст со сглаживанием отрисуется иначе. Раннер дороже, но
+    # джоба короткая, а иначе сверка с design/ теряет смысл.
+    runs-on: windows-latest
+    # При ручном запуске «переснять эталоны» сверять нечего: эталоны там и
+    # обновляются, джоба гарантированно упала бы.
+    if: ${{ !inputs.update_goldens }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+
+      - name: Golden-тесты
+        run: flutter test --tags golden
+
+      - name: Выгрузить расхождения
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: golden-failures
+          # Flutter кладёт сюда три картинки на каждый непрошедший тест:
+          # эталон, полученный результат и их разницу.
+          path: test/**/failures/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  build-android:
+    name: Сборка APK
+    needs: analyze
+    # Только по галочке. Раньше собиралась на каждый пуш, и 86 МБ артефакта
+    # за несколько дней съедали всю квоту хранилища — после чего падала
+    # выгрузка эталонов, которые весят копейки, и CI стоял красным не из-за
+    # кода. Сборка ломается редко, а поймать поломку всё равно есть чем:
+    # `flutter analyze` и тесты идут на каждый пуш.
+    if: ${{ inputs.build_apk }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          # Совпадает с sourceCompatibility в android/app/build.gradle.kts.
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+
+      - name: Debug APK
+        # Именно debug: релизная сборка сейчас подписывается debug-ключом
+        # (TODO в android/app/build.gradle.kts), выкладывать её некуда.
+        run: flutter build apk --debug
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: medix-debug-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          # Трое суток, а не 14: APK весит 80 МБ, копится с каждого пуша и
+          # за две недели забивает всю квоту хранилища — из-за этого падала
+          # выгрузка эталонов, которые весят копейки. Отладочная сборка
+          # нужна день-два, чтобы её кто-то поставил и посмотрел; кому
+          # понадобится старая — проще пересобрать.
+          retention-days: 3
+
+  refresh-goldens:
+    name: Переснять эталоны
+    # Только вручную и только по галочке: эталоны — источник истины сверки,
+    # обновлять их на каждый push нельзя, иначе поехавшая вёрстка молча
+    # станет новым эталоном.
+    #
+    # Джоба существует, потому что эталоны привязаны к растеризации Windows,
+    # а разработка идёт и с macOS. Снятые на другой системе, они разойдутся
+    # по сглаживанию и завалят сверку — см. README, «Если машина не на
+    # Windows».
+    if: ${{ inputs.update_goldens }}
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+
+      - name: Переснять эталоны
+        run: flutter test --tags golden --update-goldens
+
+      - name: Выложить эталоны в ветку
+        # Веткой, а не артефактом. Артефакты упираются в квоту хранилища
+        # ровно тогда, когда эталоны нужнее всего: место выедает APK на
+        # 86 МБ, а эталоны на 4 МБ следом не влезают — и прогон краснеет
+        # не из-за кода. Ветка не стоит ничего.
+        #
+        # Пишем в отдельную ветку, а не в main: коммит эталонов остаётся
+        # осознанным действием. Их надо глазами сверить с design/ и влить
+        # руками, а не получить побочным эффектом прогона.
+        #
+        # Даже если один тест упал: остальные эталоны к этому моменту уже
+        # переснялись, и терять их вместе с джобой незачем — иначе после
+        # каждой мелкой поломки прогон приходится повторять целиком.
+        if: always()
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git checkout -B goldens-refresh
+          # Папки failures/ лежат в .gitignore, так что сюда попадут
+          # только сами эталоны.
+          git add -A test
+          if git diff --cached --quiet; then
+            echo 'Эталоны не изменились — вливать нечего.'
+            exit 0
+          fi
+          git commit -m "Эталоны пересняты прогоном ${GITHUB_RUN_ID}"
+          git push -f origin goldens-refresh
+          echo 'Эталоны в ветке goldens-refresh. Сверить с design/ и влить.'
