@@ -251,6 +251,15 @@ class _Content extends ConsumerWidget {
                   ),
                 ),
               ),
+            const SizedBox(height: DoctorMetrics.summaryToActions),
+            _Section(
+              child: Center(
+                child: _CancelAppointmentButton(
+                  appointmentId: appointment.id,
+                  onCancelled: onRescheduled,
+                ),
+              ),
+            ),
           ],
           const SizedBox(height: DoctorMetrics.screenH),
         ],
@@ -283,6 +292,87 @@ Future<void> _openChat(
     return;
   }
   context.push(Routes.chatOf(consultationId));
+}
+
+/// Отмена записи пациентом. Своего макета нет: действие уже поддержано
+/// общим `PATCH /appointments/{id}` (`action: cancel`, тот же вызов, что и
+/// у переноса), не хватало только точки входа в UI — добавлена текстовой
+/// кнопкой, пока дизайнер не пришлёт место для неё.
+class _CancelAppointmentButton extends ConsumerStatefulWidget {
+  const _CancelAppointmentButton({
+    required this.appointmentId,
+    required this.onCancelled,
+  });
+
+  final String appointmentId;
+  final ValueChanged<Appointment> onCancelled;
+
+  @override
+  ConsumerState<_CancelAppointmentButton> createState() =>
+      _CancelAppointmentButtonState();
+}
+
+class _CancelAppointmentButtonState
+    extends ConsumerState<_CancelAppointmentButton> {
+  bool _cancelling = false;
+
+  Future<void> _confirmAndCancel() async {
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.cancelAppointmentConfirmTitle),
+        content: Text(l10n.cancelAppointmentConfirmMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.cancelButtonLabel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(
+              l10n.cancelAppointmentAction,
+              style: const TextStyle(color: AppColors.error),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    setState(() => _cancelling = true);
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final updated = await ref
+          .read(doctorsRepositoryProvider)
+          .cancel(widget.appointmentId);
+      ref.read(appointmentRevisionProvider.notifier).markChanged();
+      widget.onCancelled(updated);
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _cancelling = false);
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(error.toString())));
+      return;
+    }
+    if (mounted) setState(() => _cancelling = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return TextButton(
+      onPressed: _cancelling ? null : _confirmAndCancel,
+      child: _cancelling
+          ? const SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : Text(l10n.cancelAppointmentAction),
+    );
+  }
 }
 
 class _Section extends StatelessWidget {

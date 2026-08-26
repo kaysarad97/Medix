@@ -6,11 +6,24 @@ import '../../../../shared/models/analysis_result.dart';
 import '../../../../shared/models/family_member.dart';
 import '../../../../shared/models/my_doctor.dart';
 import '../../data/repositories/family_repository.dart';
+import '../../data/services/family_avatar_upload_service.dart';
 
 final familyRepositoryProvider = Provider<FamilyRepository>((ref) {
   if (useMocks) return MockFamilyRepository();
 
   return RemoteFamilyRepository(ref.watch(dioClientProvider));
+});
+
+/// Загрузка фото члена семьи через тот же presigned-цикл, что и у аватара
+/// пользователя (`avatar_upload_service.dart` в фиче `profile`) — endpoint'ы
+/// на бэкенде уже покрыты, не хватало только точки входа в UI.
+final familyAvatarUploadServiceProvider = Provider<FamilyAvatarUploadService>((
+  ref,
+) {
+  final repository = ref.watch(familyRepositoryProvider);
+  return useMocks
+      ? MockFamilyAvatarUploadService(repository)
+      : RemoteFamilyAvatarUploadService(repository);
 });
 
 final familyMembersProvider = FutureProvider<List<FamilyMember>>(

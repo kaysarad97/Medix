@@ -15,6 +15,9 @@ import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../core/widgets/user_avatar.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/family_member.dart';
+import '../../../profile/data/services/avatar_file_picker.dart';
+import '../../../profile/presentation/providers/profile_providers.dart'
+    show avatarFilePickerProvider;
 import '../../../profile/presentation/widgets/analyses_card.dart';
 import '../../../profile/presentation/widgets/medical_card_summary.dart';
 import '../../../profile/presentation/widgets/my_doctors_card.dart';
@@ -149,11 +152,19 @@ class _MemberHeader extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          UserAvatar(
-            asset: member.avatarAsset,
-            url: member.avatarUrl,
-            size: ProfileMetrics.avatarSize,
-            borderRadius: BorderRadius.circular(ProfileMetrics.avatarRadius),
+          Column(
+            children: [
+              UserAvatar(
+                asset: member.avatarAsset,
+                url: member.avatarUrl,
+                size: ProfileMetrics.avatarSize,
+                borderRadius: BorderRadius.circular(
+                  ProfileMetrics.avatarRadius,
+                ),
+              ),
+              const SizedBox(height: 6),
+              _ChangePhotoButton(memberId: member.id),
+            ],
           ),
           const SizedBox(width: ProfileMetrics.avatarToInfo),
           Expanded(
@@ -186,6 +197,76 @@ class _MemberHeader extends StatelessWidget {
           const SizedBox(width: ProfileMetrics.screenH),
         ],
       ),
+    );
+  }
+}
+
+/// Текстовая ссылка под аватаром — единственный вход к уже готовому
+/// presigned-циклу загрузки семейного фото (`requestAvatarUpload` +
+/// `confirmAvatar` в `FamilyRepository`): своего макета у неё нет, оба
+/// avatar endpoint'а на бэкенде просто не имели точки входа в UI.
+class _ChangePhotoButton extends ConsumerStatefulWidget {
+  const _ChangePhotoButton({required this.memberId});
+
+  final String memberId;
+
+  @override
+  ConsumerState<_ChangePhotoButton> createState() => _ChangePhotoButtonState();
+}
+
+class _ChangePhotoButtonState extends ConsumerState<_ChangePhotoButton> {
+  bool _uploading = false;
+
+  Future<void> _pickAndUpload() async {
+    if (_uploading) return;
+    final PickedAvatarFile? file = await ref
+        .read(avatarFilePickerProvider)
+        .pick();
+    if (file == null || !mounted) return;
+
+    setState(() => _uploading = true);
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      await ref
+          .read(familyAvatarUploadServiceProvider)
+          .upload(widget.memberId, file);
+      ref.invalidate(familyMemberProvider(widget.memberId));
+      ref.invalidate(familyMembersProvider);
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.familyAvatarUploadSuccess)),
+      );
+    } on Object {
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.familyAvatarUploadError)),
+      );
+    } finally {
+      if (mounted) setState(() => _uploading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return GestureDetector(
+      onTap: _uploading ? null : _pickAndUpload,
+      child: _uploading
+          ? const SizedBox(
+              width: 14,
+              height: 14,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: AppColors.textOnPrimary,
+              ),
+            )
+          : Text(
+              l10n.familyChangePhotoAction,
+              style: AppTypography.buttonSm.copyWith(
+                decoration: TextDecoration.underline,
+              ),
+            ),
     );
   }
 }
