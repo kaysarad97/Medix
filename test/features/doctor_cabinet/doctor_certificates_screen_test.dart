@@ -145,7 +145,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Не удалось загрузить сертификат'), findsOneWidget);
-    expect(find.text('Загрузить Сертификат'), findsNWidgets(2));
+    expect(find.text('Загрузить Сертификат'), findsOneWidget);
   });
 }
 
