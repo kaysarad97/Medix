@@ -8,13 +8,14 @@
 
 ## Текущий статус
 
-- Flutter frontend практически **feature-complete по текущему доступному Figma-дизайну**.
+- Flutter frontend **feature-complete по текущему доступному Figma-дизайну**.
 - В `main` реализованы основные пациентские экраны, кабинет врача, врач-фрилансер, карта, оплата, лаборатории, чаты, звонки и административные сценарии.
 - Отсутствие backend endpoint не считается фронтовым блокером: если UI по Figma готов, используется mock/fake repository и задача считается frontend-complete.
 - API transport для мобильных ролей ранее доведён до **78/78 операций**.
-- CI Windows MAX_PATH исправлен в MED-89; golden checkout и golden tests снова работают.
-- Logout и doctor no-show уже смержены.
+- CI Windows MAX_PATH исправлен в MED-89; golden checkout и golden tests работают.
+- Logout и doctor no-show смержены.
 - Три устаревших golden-эталона после logout пересняты и смержены.
+- Последний найденный Figma-пробел — отдельный шаг регистрации врача-фрилансера «Загрузите Ваши сертификаты» — исправлен и смержен в PR #5.
 
 ## Figma
 
@@ -27,28 +28,25 @@
 
 Frontend-аудит проводился по цепочке **Linear → Figma → актуальный main**.
 
-По доступному экспортированному комплекту макетов и проверенным live Figma nodes после аудита найден один подтверждённый фронтовый пробел — отдельный шаг регистрации врача-фрилансера «Загрузите Ваши сертификаты». Он исправляется в PR #5.
+По доступному экспортированному комплекту макетов и проверенным live Figma nodes после аудита был найден один подтверждённый фронтовый пробел — отдельный шаг регистрации врача-фрилансера «Загрузите Ваши сертификаты». Он закрыт PR #5.
 
-Важно: Figma View-seat во время последней проверки достиг лимита вызовов. Поэтому после восстановления лимита полезно сделать финальный live-pass только на предмет новых макетов, добавленных после текущего экспорта.
+Важно: Figma View-seat во время последней проверки достиг лимита вызовов. После восстановления лимита полезно сделать финальный live-pass только на предмет новых макетов, добавленных после текущего экспорта.
 
 ## GitHub / PR
 
-Уже смержено:
+Смежено:
 
 - PR #1 — logout;
 - PR #2 — doctor no-show;
 - PR #3 — MED-89 Windows `core.longpaths=true` до checkout;
-- PR #4 — обновление 3 stale golden-эталонов.
+- PR #4 — обновление 3 stale golden-эталонов;
+- PR #5 — отдельный Figma-state загрузки сертификатов врача-фрилансера.
 
-Текущий открытый PR:
-
-### PR #5 — шаг загрузки сертификатов врача-фрилансера
+### PR #5 — итог
 
 `https://github.com/kaysarad97/Medix/pull/5`
 
-Ветка:
-
-`kaysarad97/figma-doctor-certificate-registration`
+Squash-merge commit: `ffc3eedc54710c52b1f13f9731dd2613ab6a0bda`.
 
 Что исправлено:
 
@@ -57,19 +55,14 @@ Frontend-аудит проводился по цепочке **Linear → Figma 
 - есть progress bar, выбор файла, отображение выбранного файла, поле специализации и кнопка «Далее»;
 - существующая загрузка credentials сохранена;
 - обычный `DoctorCertificatesScreen` кабинета не меняется;
-- добавлен widget-test на registration-state.
+- widget-тесты покрывают registration-state, успешную загрузку, отмену и ошибку.
 
-### Состояние CI PR #5
+Финальный CI run PR #5: `33079871505`.
 
-Workflow run `33070365171`:
-
-- Windows golden job — **success**;
-- checkout long paths — **success**;
-- golden tests — **success**;
-- обычный job — **failure только на `dart format`**;
-- `flutter analyze` и обычные tests были skipped после format failure.
-
-Следующий шаг по PR #5: применить форматирование к изменённым Dart-файлам, запушить и дождаться полного зелёного CI, затем merge.
+- `dart format` — success;
+- `flutter analyze --fatal-infos` — success;
+- non-golden tests — success;
+- Windows golden tests — success.
 
 ## Linear — актуальный рабочий пул
 
@@ -204,13 +197,12 @@ flutter test --exclude-tags golden
 
 Порядок:
 
-1. Исправить `dart format` в PR #5, дождаться полного зелёного CI и смержить PR.
-2. После merge считать frontend по текущему утверждённому Figma закрытым.
-3. Взять MED-63 Push lifecycle как ближайшую независимую интеграционную задачу.
-4. Затем MED-66 Payment gateway после выбора/готовности provider/backend.
-5. MED-64 оставить на native review перед релизом.
-6. Параллельно проверить реальный LiveKit environment и провести двухклиентный E2E звонка.
-7. После восстановления Figma connector quota выполнить короткий финальный live-pass на новые/изменённые макеты.
+1. Frontend по текущему утверждённому Figma считать закрытым.
+2. Взять MED-63 Push lifecycle как ближайшую независимую интеграционную задачу.
+3. Затем MED-66 Payment gateway после выбора/готовности provider/backend.
+4. MED-64 оставить на native review перед релизом.
+5. Параллельно проверить реальный LiveKit environment и провести двухклиентный E2E звонка.
+6. После восстановления Figma connector quota выполнить короткий финальный live-pass на новые/изменённые макеты.
 
 ## Важные продуктовые решения
 
