@@ -57,12 +57,19 @@ void main() {
     expect(find.byType(PrimaryButton), findsNothing);
   });
 
-  testWidgets('showUploadRow добавляет строку загрузки', (tester) async {
+  testWidgets('showUploadRow рисует отдельный шаг регистрации', (tester) async {
     await pumpScreen(tester, showUploadRow: true);
     await tester.pump();
     await tester.pump();
 
+    expect(find.text('Ваши сертификаты'), findsOneWidget);
     expect(find.text('Загрузить Сертификат'), findsOneWidget);
+    expect(find.text('Специализация'), findsOneWidget);
+    expect(find.text('Документ 1.pdf'), findsNothing);
+    expect(
+      find.byKey(const ValueKey('doctor-registration-certificate-picker')),
+      findsOneWidget,
+    );
     expect(find.widgetWithText(PrimaryButton, 'Далее'), findsOneWidget);
   });
 
@@ -89,6 +96,7 @@ void main() {
 
     expect(repository.uploadedFilename, 'diploma.pdf');
     expect(repository.uploadedContentType, 'application/pdf');
+    expect(find.text('diploma.pdf'), findsOneWidget);
     expect(find.text('Сертификат загружен'), findsOneWidget);
   });
 
