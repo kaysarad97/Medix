@@ -18,10 +18,7 @@ Future<bool> showDoctorNoShowDialog(BuildContext context) async {
       return AlertDialog(
         backgroundColor: AppColors.surfaceWhite,
         shape: const RoundedRectangleBorder(borderRadius: AppRadius.allLg),
-        title: Text(
-          l10n.doctorNoShowDialogTitle,
-          style: AppTypography.titleMd,
-        ),
+        title: Text(l10n.doctorNoShowDialogTitle, style: AppTypography.titleMd),
         content: Text(l10n.doctorNoShowDialogMessage),
         actions: [
           TextButton(

@@ -246,9 +246,9 @@ class _DoctorPatientAppointmentScreenState
       ref.invalidate(doctorUpcomingAppointmentsProvider);
       ref.invalidate(doctorAppointmentsForDayProvider);
       ref.invalidate(doctorRegularPatientsProvider);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.doctorNoShowSuccess)));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.doctorNoShowSuccess)),
+      );
     } on Object {
       if (!mounted) return;
       setState(() => _markingNoShow = false);

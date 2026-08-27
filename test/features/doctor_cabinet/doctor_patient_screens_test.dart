@@ -149,38 +149,31 @@ void main() {
       );
     });
 
-    testWidgets(
-      'врач отмечает неявку после начала подтверждённого приёма',
-      (tester) async {
-        final repository = _NoShowRepository();
-        await pumpScreen(
-          tester,
-          const DoctorPatientAppointmentScreen(patientId: 'p1'),
-          repository: repository,
-        );
+    testWidgets('врач отмечает неявку после начала подтверждённого приёма', (
+      tester,
+    ) async {
+      final repository = _NoShowRepository();
+      await pumpScreen(
+        tester,
+        const DoctorPatientAppointmentScreen(patientId: 'p1'),
+        repository: repository,
+      );
 
-        // startsAt фикстуры (21 июля) в прошлом, статус confirmed — по
-        // условию markAppointmentNoShow кнопка уже должна быть видна.
-        expect(
-          find.byKey(const ValueKey('doctor-mark-no-show')),
-          findsOneWidget,
-        );
+      // startsAt фикстуры (21 июля) в прошлом, статус confirmed — по
+      // условию markAppointmentNoShow кнопка уже должна быть видна.
+      expect(find.byKey(const ValueKey('doctor-mark-no-show')), findsOneWidget);
 
-        await tester.tap(find.byKey(const ValueKey('doctor-mark-no-show')));
-        await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('doctor-mark-no-show')));
+      await tester.pumpAndSettle();
 
-        await tester.tap(find.byKey(const ValueKey('doctor-no-show-confirm')));
-        await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('doctor-no-show-confirm')));
+      await tester.pumpAndSettle();
 
-        expect(repository.noShowAppointmentId, 'p-p1');
-        // Локальный copyWithStatus(noShow) прячет кнопку без похода на
-        // сервер — markAppointmentNoShow ничего не возвращает.
-        expect(
-          find.byKey(const ValueKey('doctor-mark-no-show')),
-          findsNothing,
-        );
-      },
-    );
+      expect(repository.noShowAppointmentId, 'p-p1');
+      // Локальный copyWithStatus(noShow) прячет кнопку без похода на
+      // сервер — markAppointmentNoShow ничего не возвращает.
+      expect(find.byKey(const ValueKey('doctor-mark-no-show')), findsNothing);
+    });
   });
 }
 
