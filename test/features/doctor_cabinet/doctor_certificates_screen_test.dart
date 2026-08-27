@@ -57,9 +57,7 @@ void main() {
     expect(find.byType(PrimaryButton), findsNothing);
   });
 
-  testWidgets('showUploadRow рисует отдельный шаг регистрации', (
-    tester,
-  ) async {
+  testWidgets('showUploadRow рисует отдельный шаг регистрации', (tester) async {
     await pumpScreen(tester, showUploadRow: true);
     await tester.pump();
     await tester.pump();
