@@ -20,6 +20,7 @@ import '../widgets/doctor_appointment_files_card.dart';
 import '../widgets/doctor_cancel_appointment_dialog.dart';
 import '../widgets/doctor_conclusion_card.dart';
 import '../widgets/doctor_history_row.dart';
+import '../widgets/doctor_no_show_dialog.dart';
 import '../widgets/doctor_patient_header.dart';
 import '../widgets/doctor_patient_metrics.dart';
 
@@ -45,6 +46,7 @@ class _DoctorPatientAppointmentScreenState
     extends ConsumerState<DoctorPatientAppointmentScreen> {
   DoctorAppointment? _updatedAppointment;
   bool _cancelling = false;
+  bool _markingNoShow = false;
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +59,17 @@ class _DoctorPatientAppointmentScreenState
         profile?.isFreelancer == true &&
         (appointment?.status == AppointmentStatus.pending ||
             appointment?.status == AppointmentStatus.confirmed);
+    // Не привязано к роли, в отличие от canCancel: интерфейс репозитория
+    // (`markAppointmentNoShow`) не разделяет фрилансера и врача от
+    // клиники — неявка это факт, а не решение, которое нужно согласовать
+    // с администрацией. Доступно только после времени начала приёма
+    // (см. doc-комментарий у `markAppointmentNoShow` в
+    // `doctor_cabinet_repository.dart`) и только пока запись ещё
+    // подтверждена — иначе уже отменена/завершена/отмечена.
+    final canMarkNoShow =
+        appointment?.status == AppointmentStatus.confirmed &&
+        appointment != null &&
+        DateTime.now().isAfter(appointment.startsAt);
 
     return AppScaffold(
       background: AppBackgroundStyle.main,
@@ -140,6 +153,19 @@ class _DoctorPatientAppointmentScreenState
                         height: DoctorPatientMetrics.actionsToConclusion,
                       ),
                     ],
+                    if (canMarkNoShow) ...[
+                      _Section(
+                        child: _NoShowButton(
+                          loading: _markingNoShow,
+                          onTap: _markingNoShow
+                              ? null
+                              : () => _markNoShow(appointment),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: DoctorPatientMetrics.actionsToConclusion,
+                      ),
+                    ],
                     if (appointment.files.isNotEmpty) ...[
                       _Section(
                         child: DoctorAppointmentFilesCard(
@@ -194,6 +220,41 @@ class _DoctorPatientAppointmentScreenState
       showFormErrorSnackBar(context, l10n.doctorCancelAppointmentError);
     }
   }
+
+  Future<void> _markNoShow(DoctorAppointment appointment) async {
+    final confirmed = await showDoctorNoShowDialog(context);
+    if (!confirmed || !mounted) return;
+
+    setState(() => _markingNoShow = true);
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      // В отличие от cancelAppointment, эндпоинт `PATCH .../no-show` не
+      // возвращает обновлённую запись (см. doc-комментарий у
+      // `markAppointmentNoShow` в `doctor_cabinet_repository.dart`) —
+      // обновляем локально через уже готовый `copyWithStatus`, который
+      // раньше нигде не вызывался.
+      await ref
+          .read(doctorCabinetRepositoryProvider)
+          .markAppointmentNoShow(appointment.id);
+      if (!mounted) return;
+      setState(() {
+        _updatedAppointment = appointment.copyWithStatus(
+          AppointmentStatus.noShow,
+        );
+        _markingNoShow = false;
+      });
+      ref.invalidate(doctorUpcomingAppointmentsProvider);
+      ref.invalidate(doctorAppointmentsForDayProvider);
+      ref.invalidate(doctorRegularPatientsProvider);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.doctorNoShowSuccess)));
+    } on Object {
+      if (!mounted) return;
+      setState(() => _markingNoShow = false);
+      showFormErrorSnackBar(context, l10n.doctorNoShowError);
+    }
+  }
 }
 
 class _CancelAppointmentButton extends StatelessWidget {
@@ -242,6 +303,60 @@ class _CancelAppointmentButton extends StatelessWidget {
                   l10n.doctorCancelAppointmentAction,
                   style: AppTypography.actionTitle,
                 ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Тот же вид, что у `_CancelAppointmentButton` — разный только текст,
+/// иконка и `ValueKey` для тестов.
+class _NoShowButton extends StatelessWidget {
+  const _NoShowButton({required this.loading, this.onTap});
+
+  final bool loading;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return SizedBox(
+      height: 49,
+      child: Material(
+        color: AppColors.accentSofter,
+        borderRadius: ActionButtonRow.radius,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          key: const ValueKey('doctor-mark-no-show'),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            child: Row(
+              children: [
+                Container(
+                  width: 30,
+                  height: 30,
+                  decoration: const BoxDecoration(
+                    color: AppColors.surfaceWhite,
+                    shape: BoxShape.circle,
+                  ),
+                  alignment: Alignment.center,
+                  child: loading
+                      ? const SizedBox.square(
+                          dimension: 15,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(
+                          Icons.person_off_outlined,
+                          size: 17,
+                          color: AppColors.primaryBright,
+                        ),
+                ),
+                const SizedBox(width: 10),
+                Text(l10n.doctorNoShowAction, style: AppTypography.actionTitle),
               ],
             ),
           ),

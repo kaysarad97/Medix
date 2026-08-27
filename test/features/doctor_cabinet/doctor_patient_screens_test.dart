@@ -148,6 +148,32 @@ void main() {
         findsNothing,
       );
     });
+
+    testWidgets('врач отмечает неявку после начала подтверждённого приёма', (
+      tester,
+    ) async {
+      final repository = _NoShowRepository();
+      await pumpScreen(
+        tester,
+        const DoctorPatientAppointmentScreen(patientId: 'p1'),
+        repository: repository,
+      );
+
+      // startsAt фикстуры (21 июля) в прошлом, статус confirmed — по
+      // условию markAppointmentNoShow кнопка уже должна быть видна.
+      expect(find.byKey(const ValueKey('doctor-mark-no-show')), findsOneWidget);
+
+      await tester.tap(find.byKey(const ValueKey('doctor-mark-no-show')));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const ValueKey('doctor-no-show-confirm')));
+      await tester.pumpAndSettle();
+
+      expect(repository.noShowAppointmentId, 'p-p1');
+      // Локальный copyWithStatus(noShow) прячет кнопку без похода на
+      // сервер — markAppointmentNoShow ничего не возвращает.
+      expect(find.byKey(const ValueKey('doctor-mark-no-show')), findsNothing);
+    });
   });
 }
 
@@ -205,5 +231,38 @@ class _FreelancerCancellationRepository extends FakeDoctorCabinetRepository {
     cancelledAppointmentId = appointmentId;
     cancellationReason = reason;
     return appointment.copyWithStatus(AppointmentStatus.cancelled);
+  }
+}
+
+/// Специально без `isFreelancer: true`: markAppointmentNoShow не зависит
+/// от роли, в отличие от cancelAppointment, — см. комментарий у
+/// `canMarkNoShow` в `doctor_patient_appointment_screen.dart`.
+class _NoShowRepository extends FakeDoctorCabinetRepository {
+  _NoShowRepository();
+
+  String? noShowAppointmentId;
+
+  DoctorAppointment get appointment => DoctorAppointment(
+    id: 'p-p1',
+    patientName: 'Имя Фамилия',
+    patientId: 'p1',
+    kind: AppointmentKind.audioCall,
+    startsAt: DateTime(2026, 7, 21, 10, 30),
+    status: AppointmentStatus.confirmed,
+  );
+
+  @override
+  Future<DoctorPatient> patient(String id) async => DoctorPatient(
+    id: id,
+    fullName: 'Имя Фамилия',
+    heightCm: 170,
+    weightKg: 77,
+    age: 30,
+    appointment: appointment,
+  );
+
+  @override
+  Future<void> markAppointmentNoShow(String appointmentId) async {
+    noShowAppointmentId = appointmentId;
   }
 }

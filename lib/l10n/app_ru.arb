@@ -1261,6 +1261,12 @@
   "doctorCancelAppointmentConfirm": "Отменить запись",
   "doctorCancelAppointmentSuccess": "Запись отменена",
   "doctorCancelAppointmentError": "Не удалось отменить запись",
+  "doctorNoShowAction": "Пациент не пришёл",
+  "doctorNoShowDialogTitle": "Неявка пациента",
+  "doctorNoShowDialogMessage": "Отметить, что пациент не пришёл на приём? Запись получит статус «Неявка».",
+  "doctorNoShowConfirm": "Отметить неявку",
+  "doctorNoShowSuccess": "Неявка отмечена",
+  "doctorNoShowError": "Не удалось отметить неявку",
   "doctorOwnAppointmentSubtitle": "Ваша запись",
   "@doctorOwnAppointmentSubtitle": {
     "description": "Подпись под видом записи в строке на «Записи с пациентом» — в отличие от истории, где там имя пациента."
