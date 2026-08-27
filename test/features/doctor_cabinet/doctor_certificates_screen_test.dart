@@ -63,7 +63,7 @@ void main() {
     await tester.pump();
 
     expect(find.text('Ваши сертификаты'), findsOneWidget);
-    expect(find.text('Загрузить Сертификат'), findsOneWidget);
+    expect(find.text('Загрузить Сертификат'), findsNWidgets(2));
     expect(find.text('Специализация'), findsOneWidget);
     expect(find.text('Документ 1.pdf'), findsNothing);
     expect(
@@ -91,7 +91,9 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Загрузить Сертификат'));
+    await tester.tap(
+      find.byKey(const ValueKey('doctor-registration-certificate-picker')),
+    );
     await tester.pumpAndSettle();
 
     expect(repository.uploadedFilename, 'diploma.pdf');
@@ -110,7 +112,9 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Загрузить Сертификат'));
+    await tester.tap(
+      find.byKey(const ValueKey('doctor-registration-certificate-picker')),
+    );
     await tester.pumpAndSettle();
 
     expect(repository.uploadedFilename, isNull);
@@ -135,11 +139,13 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Загрузить Сертификат'));
+    await tester.tap(
+      find.byKey(const ValueKey('doctor-registration-certificate-picker')),
+    );
     await tester.pumpAndSettle();
 
     expect(find.text('Не удалось загрузить сертификат'), findsOneWidget);
-    expect(find.text('Загрузить Сертификат'), findsOneWidget);
+    expect(find.text('Загрузить Сертификат'), findsNWidgets(2));
   });
 }
 
