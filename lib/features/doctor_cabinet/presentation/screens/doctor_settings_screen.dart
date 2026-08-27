@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/network/api_exception.dart';
 import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
@@ -13,6 +14,7 @@ import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/app_language.dart';
 import '../../../../shared/providers/app_settings_provider.dart';
+import '../../../auth/presentation/providers/auth_providers.dart';
 import '../providers/doctor_cabinet_providers.dart';
 import '../widgets/doctor_profile_link_row.dart';
 import '../widgets/doctor_profile_metrics.dart';
@@ -33,7 +35,11 @@ import '../widgets/doctor_profile_metrics.dart';
 /// Провайдер настроек общий с пациентским экраном
 /// ([appSettingsProvider] из `shared/providers`) — язык и уведомления
 /// одни на всё приложение, а не по одному набору на роль.
-class DoctorSettingsScreen extends ConsumerWidget {
+///
+/// Строки «Выйти из аккаунта» в макете нет, добавлена по тому же поводу и
+/// с тем же оформлением, что и у пациента — см. `SettingsScreen` в
+/// `features/profile` (MED-62).
+class DoctorSettingsScreen extends ConsumerStatefulWidget {
   const DoctorSettingsScreen({super.key, this.showFreelancerRows});
 
   /// `true` у врача-фрилансера — показывает «Настройки профиля» и
@@ -42,15 +48,62 @@ class DoctorSettingsScreen extends ConsumerWidget {
   final bool? showFreelancerRows;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DoctorSettingsScreen> createState() =>
+      _DoctorSettingsScreenState();
+}
+
+class _DoctorSettingsScreenState extends ConsumerState<DoctorSettingsScreen> {
+  var _loggingOut = false;
+
+  Future<void> _confirmLogout() async {
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.logoutConfirmTitle),
+        content: Text(l10n.logoutConfirmMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.cancelButtonLabel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(
+              l10n.logoutTitle,
+              style: const TextStyle(color: AppColors.error),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    setState(() => _loggingOut = true);
+    // Те же причины, что у пациентского экрана: locally-успешный logout()
+    // не зависит от сети, а doctorOwnProfileProvider не autoDispose — без
+    // явного invalidate следующий вошедший врач увидит чужой кэш.
+    try {
+      await ref.read(authRepositoryProvider).logout();
+    } on ApiException {
+      // См. комментарий в SettingsScreen.
+    } finally {
+      ref.invalidate(doctorOwnProfileProvider);
+    }
+    if (!mounted) return;
+    context.go(Routes.login);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final settings = ref.watch(appSettingsProvider);
     final notifier = ref.read(appSettingsProvider.notifier);
     final l10n = AppLocalizations.of(context)!;
-    final profile = showFreelancerRows == null
+    final profile = widget.showFreelancerRows == null
         ? ref.watch(doctorOwnProfileProvider).value
         : null;
     final shouldShowFreelancerRows =
-        showFreelancerRows ?? (profile?.isFreelancer ?? false);
+        widget.showFreelancerRows ?? (profile?.isFreelancer ?? false);
 
     return AppScaffold(
       background: AppBackgroundStyle.main,
@@ -118,6 +171,15 @@ class DoctorSettingsScreen extends ConsumerWidget {
                 child: _RowCard(
                   title: l10n.contactUsTitle,
                   onTap: () => context.push(Routes.contacts),
+                ),
+              ),
+              const SizedBox(height: DoctorProfileMetrics.linkRowGap),
+              _Section(
+                child: _RowCard(
+                  title: l10n.logoutTitle,
+                  titleColor: AppColors.error,
+                  loading: _loggingOut,
+                  onTap: _loggingOut ? null : _confirmLogout,
                 ),
               ),
               SizedBox(
@@ -266,10 +328,24 @@ class _Mark extends StatelessWidget {
 
 /// Карточка-строка с шевроном, без иконки слева — «Свяжитесь с нами».
 class _RowCard extends StatelessWidget {
-  const _RowCard({required this.title, this.onTap});
+  const _RowCard({
+    required this.title,
+    this.onTap,
+    this.titleColor,
+    this.loading = false,
+  });
 
   final String title;
   final VoidCallback? onTap;
+
+  /// `null` — обычный цвет заголовка. Задаётся явно только для «опасных»
+  /// строк вроде выхода из аккаунта (см. `SettingsScreen` в `features/profile`).
+  final Color? titleColor;
+
+  /// Подменяет шеврон на спиннер того же размера на время асинхронного
+  /// действия — как у `_CancelAppointmentButton` в
+  /// `doctor_patient_appointment_screen.dart`.
+  final bool loading;
 
   @override
   Widget build(BuildContext context) {
@@ -288,16 +364,24 @@ class _RowCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     title,
-                    style: AppTypography.tileTitle,
+                    style: titleColor == null
+                        ? AppTypography.tileTitle
+                        : AppTypography.tileTitle.copyWith(color: titleColor),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const AppIcon(
-                  icon: MedixIcon.chevronRight,
-                  size: 14,
-                  color: AppColors.primary,
-                ),
+                if (loading)
+                  const SizedBox.square(
+                    dimension: 14,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                else
+                  const AppIcon(
+                    icon: MedixIcon.chevronRight,
+                    size: 14,
+                    color: AppColors.primary,
+                  ),
               ],
             ),
           ),

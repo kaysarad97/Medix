@@ -1418,6 +1418,9 @@
     "placeholders": { "date": { "type": "String" } }
   },
   "cancelSubscriptionError": "Не удалось отменить подписку",
+  "logoutTitle": "Выйти из аккаунта",
+  "logoutConfirmTitle": "Выйти из аккаунта?",
+  "logoutConfirmMessage": "Понадобится снова войти по коду с почты.",
   "joinWaitlistAction": "Сообщить, когда появится время",
   "joinWaitlistSuccess": "Вы добавлены в лист ожидания",
   "uploadOwnPhotoAction": "Загрузить своё фото",
