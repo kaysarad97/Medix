@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:medix/core/theme/app_theme.dart';
 import 'package:medix/features/map_search/data/repositories/places_repository.dart';
 import 'package:medix/features/map_search/domain/entities/medical_place.dart';
 import 'package:medix/features/map_search/presentation/providers/map_providers.dart';
@@ -27,6 +28,7 @@ void main() {
           ),
         ],
         child: MaterialApp(
+          theme: AppTheme.light,
           locale: const Locale('ru'),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
