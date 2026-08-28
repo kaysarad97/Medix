@@ -496,6 +496,18 @@
     "placeholders": { "reason": { "type": "String" } }
   },
   "appointmentCancelledNoReason": "Причина отмены не указана.",
+  "cancelAppointmentAction": "Отменить запись",
+  "@cancelAppointmentAction": {
+    "description": "Кнопка отмены записи пациентом на «Ваша Запись». Своего макета нет — единственное согласованное место для действия, которое уже поддержано общим PATCH /appointments/{id}."
+  },
+  "cancelAppointmentConfirmTitle": "Отменить запись?",
+  "@cancelAppointmentConfirmTitle": {
+    "description": "Заголовок подтверждения отмены записи."
+  },
+  "cancelAppointmentConfirmMessage": "Дата и время освободятся, отменить действие будет нельзя.",
+  "@cancelAppointmentConfirmMessage": {
+    "description": "Пояснение в подтверждении отмены записи."
+  },
   "appointmentNoShowTitle": "Приём не состоялся",
   "appointmentNoShowMessage": "В записи отмечена неявка пациента.",
   "appointmentCompletedTitle": "Приём завершён",
@@ -837,6 +849,18 @@
   "contactUsTitle": "Свяжитесь с нами",
   "@contactUsTitle": {
     "description": "Строка-переход в настройках и заголовок экрана контактов."
+  },
+  "logoutTitle": "Выйти",
+  "@logoutTitle": {
+    "description": "Кнопка выхода из аккаунта в настройках и подтверждающем диалоге."
+  },
+  "logoutConfirmTitle": "Выйти из аккаунта?",
+  "@logoutConfirmTitle": {
+    "description": "Заголовок диалога подтверждения выхода из аккаунта."
+  },
+  "logoutConfirmMessage": "Чтобы продолжить пользоваться приложением, нужно будет войти заново.",
+  "@logoutConfirmMessage": {
+    "description": "Текст диалога подтверждения выхода из аккаунта."
   },
   "notificationsLabel": "Уведомления",
   "@notificationsLabel": {
@@ -1424,14 +1448,17 @@
     "placeholders": { "date": { "type": "String" } }
   },
   "cancelSubscriptionError": "Не удалось отменить подписку",
-  "logoutTitle": "Выйти из аккаунта",
-  "logoutConfirmTitle": "Выйти из аккаунта?",
-  "logoutConfirmMessage": "Понадобится снова войти по коду с почты.",
   "joinWaitlistAction": "Сообщить, когда появится время",
   "joinWaitlistSuccess": "Вы добавлены в лист ожидания",
   "uploadOwnPhotoAction": "Загрузить своё фото",
   "avatarUploadSuccess": "Фотография профиля обновлена",
   "avatarUploadError": "Не удалось загрузить фотографию",
+  "familyChangePhotoAction": "Изменить фото",
+  "@familyChangePhotoAction": {
+    "description": "Текстовая ссылка под аватаром члена семьи — открывает системный picker и грузит фото через presigned-форму. Своего макета нет: оба avatar endpoint'а на бэкенде были без точки входа в UI."
+  },
+  "familyAvatarUploadSuccess": "Фотография обновлена",
+  "familyAvatarUploadError": "Не удалось загрузить фотографию",
   "measurementHistoryTooShort": "Замеров пока мало, чтобы построить график",
   "labReferralTitle": "Загрузить направление",
   "labReferralDescription": "Выберите PDF, JPG или PNG с направлением врача. Мы распознаем анализы и сравним цены лабораторий.",

@@ -21,6 +21,7 @@ import 'package:medix/shared/models/app_language.dart';
 import 'package:medix/shared/models/medix_avatars.dart';
 import 'package:medix/shared/providers/app_settings_provider.dart';
 
+import '../../helpers/auth_overrides.dart';
 import '../../helpers/fake_family_repository.dart';
 import '../../helpers/fake_profile_repository.dart';
 import '../../helpers/test_fonts.dart';
@@ -39,6 +40,7 @@ void main() {
         overrides: [
           profileRepositoryProvider.overrideWithValue(FakeProfileRepository()),
           familyRepositoryProvider.overrideWithValue(FakeFamilyRepository()),
+          ...authOverrides,
         ],
         child: MaterialApp(
           theme: AppTheme.light,
@@ -133,6 +135,7 @@ void main() {
       expect(find.text('Язык приложения'), findsOneWidget);
       expect(find.text('Банковские данные'), findsOneWidget);
       expect(find.text('Свяжитесь с нами'), findsOneWidget);
+      expect(find.text('Выйти'), findsOneWidget);
       for (final language in AppLanguage.values) {
         expect(find.text(language.label), findsOneWidget);
       }
@@ -164,6 +167,40 @@ void main() {
       await tester.pump();
 
       expect(container.read(appSettingsProvider).language, AppLanguage.kk);
+    });
+
+    testWidgets('Выйти спрашивает подтверждение и не выходит при отмене', (
+      tester,
+    ) async {
+      var loggedOut = 0;
+      await pump(tester, SettingsScreen(onLoggedOut: () => loggedOut++));
+
+      await tester.tap(find.text('Выйти'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Выйти из аккаунта?'), findsOneWidget);
+
+      await tester.tap(find.text('Отмена'));
+      await tester.pumpAndSettle();
+
+      expect(loggedOut, 0);
+    });
+
+    testWidgets('Выйти вызывает выход из аккаунта после подтверждения', (
+      tester,
+    ) async {
+      var loggedOut = 0;
+      await pump(tester, SettingsScreen(onLoggedOut: () => loggedOut++));
+
+      await tester.tap(find.text('Выйти'));
+      await tester.pumpAndSettle();
+
+      // Заголовок диалога и подпись кнопки подтверждения — оба «Выйти»,
+      // поэтому берём именно кнопку.
+      await tester.tap(find.widgetWithText(TextButton, 'Выйти'));
+      await tester.pumpAndSettle();
+
+      expect(loggedOut, 1);
     });
   });
 

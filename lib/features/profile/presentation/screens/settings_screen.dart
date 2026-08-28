@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../../../core/network/api_exception.dart';
-import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -12,28 +9,27 @@ import '../../../../core/widgets/app_scaffold.dart';
 import '../../../../core/widgets/icon_chip.dart';
 import '../../../../core/widgets/screen_top_bar.dart';
 import '../../../../core/widgets/user_avatar.dart';
+import '../../../../features/auth/presentation/providers/auth_providers.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/models/app_language.dart';
 import '../../../../shared/models/subscription_tier.dart';
 import '../../../../shared/providers/app_settings_provider.dart';
-import '../../../auth/presentation/providers/auth_providers.dart';
 import '../providers/profile_providers.dart';
 import '../widgets/profile_metrics.dart';
 
 /// «Настройки» — свёрстан по `design/Настройки Клиента.png`.
 ///
-/// Строки «Выйти из аккаунта» в макете нет — добавлена без референса:
-/// раньше `AuthRepository.logout()` был реализован, но нигде не вызывался
-/// (см. MED-62). Оформлена как обычный `_RowCard`, но красным текстом —
-/// тем же токеном `AppColors.error`, что и кнопка «Удалить» в
-/// `family_member_screen.dart`, а не новым цветом.
-class SettingsScreen extends ConsumerStatefulWidget {
+/// Кнопка «Выйти» в макете не нарисована — она закрывает `/auth/logout`,
+/// который до этого был подключён только в `AuthRepository` без точки
+/// входа в UI (см. HANDOFF.md, аудит API-интеграции от 24 августа 2026).
+class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({
     super.key,
     this.onOpenProfileSettings,
     this.onOpenPaymentDetails,
     this.onOpenContacts,
     this.onCancelSubscription,
+    this.onLoggedOut,
   });
 
   final VoidCallback? onOpenProfileSettings;
@@ -41,19 +37,19 @@ class SettingsScreen extends ConsumerStatefulWidget {
   final VoidCallback? onOpenContacts;
   final VoidCallback? onCancelSubscription;
 
-  @override
-  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
-}
+  /// Вызывается после того, как `AuthRepository.logout()` завершился и
+  /// локальная сессия очищена. Сама навигация на логин остаётся за
+  /// вызывающим (роутером), как и у остальных переходов этого экрана.
+  final VoidCallback? onLoggedOut;
 
-class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  var _loggingOut = false;
-
-  Future<void> _confirmLogout() async {
+  Future<void> _confirmLogout(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(l10n.logoutConfirmTitle),
+        backgroundColor: AppColors.surfaceWhite,
+        shape: const RoundedRectangleBorder(borderRadius: AppRadius.allLg),
+        title: Text(l10n.logoutConfirmTitle, style: AppTypography.titleMd),
         content: Text(l10n.logoutConfirmMessage),
         actions: [
           TextButton(
@@ -70,30 +66,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ],
       ),
     );
-    if (confirmed != true || !mounted) return;
+    if (confirmed != true) return;
 
-    setState(() => _loggingOut = true);
-    // logout() сам решает, что делать с ответом сервера: гасит refresh-токен
-    // на бэкенде при удаче, а локальный выход всё равно доводит до конца в
-    // `finally`, даже если сеть недоступна — исключение сюда не долетает.
-    // Кэш профиля обнуляем явно: `profileProvider` не autoDispose и иначе
-    // переживёт разлогин, показав следующему вошедшему чужие данные, если
-    // тот войдёт без перезапуска приложения.
-    try {
-      await ref.read(authRepositoryProvider).logout();
-    } on ApiException {
-      // logout() не бросает ApiException в штатной работе (см. комментарий
-      // выше), но контракт метода это не гарантирует — выходим локально в
-      // любом случае, а не зависаем на середине.
-    } finally {
-      ref.invalidate(profileProvider);
-    }
-    if (!mounted) return;
-    context.go(Routes.login);
+    await ref.read(authRepositoryProvider).logout();
+    if (!context.mounted) return;
+    onLoggedOut?.call();
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(appSettingsProvider);
     final notifier = ref.read(appSettingsProvider.notifier);
     final profile = ref.watch(profileProvider).value;
@@ -116,7 +97,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               const SizedBox(height: 40),
               _Section(
                 child: _RowCard(
-                  onTap: widget.onOpenProfileSettings,
+                  onTap: onOpenProfileSettings,
                   leading: UserAvatar(
                     asset: ref.watch(userAvatarProvider),
                     url: profile?.avatarUrl,
@@ -131,7 +112,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const SizedBox(height: ProfileMetrics.settingsGap),
                 _Section(
                   child: _RowCard(
-                    onTap: widget.onCancelSubscription,
+                    onTap: onCancelSubscription,
                     title: l10n.cancelSubscriptionTitle,
                   ),
                 ),
@@ -166,24 +147,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               const SizedBox(height: ProfileMetrics.settingsGap),
               _Section(
                 child: _RowCard(
-                  onTap: widget.onOpenPaymentDetails,
+                  onTap: onOpenPaymentDetails,
                   title: l10n.bankDetailsTitle,
                 ),
               ),
               const SizedBox(height: ProfileMetrics.settingsGap),
               _Section(
                 child: _RowCard(
-                  onTap: widget.onOpenContacts,
+                  onTap: onOpenContacts,
                   title: l10n.contactUsTitle,
                 ),
               ),
               const SizedBox(height: ProfileMetrics.settingsGap),
               _Section(
-                child: _RowCard(
-                  onTap: _loggingOut ? null : _confirmLogout,
+                child: _LogoutButton(
                   title: l10n.logoutTitle,
-                  titleColor: AppColors.error,
-                  loading: _loggingOut,
+                  onTap: () => _confirmLogout(context, ref),
                 ),
               ),
               const SizedBox(height: ProfileMetrics.settingsGap),
@@ -197,26 +176,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
 /// Карточка-строка с шевроном; необязательная картинка слева.
 class _RowCard extends StatelessWidget {
-  const _RowCard({
-    required this.title,
-    this.leading,
-    this.onTap,
-    this.titleColor,
-    this.loading = false,
-  });
+  const _RowCard({required this.title, this.leading, this.onTap});
 
   final String title;
   final Widget? leading;
   final VoidCallback? onTap;
-
-  /// `null` — обычный цвет заголовка (`AppTypography.tileTitle`). Задаётся
-  /// явно только для «опасных» строк вроде выхода из аккаунта.
-  final Color? titleColor;
-
-  /// Подменяет шеврон на спиннер того же размера, пока идёт асинхронное
-  /// действие — тот же приём, что у `_CancelAppointmentButton` в кабинете
-  /// врача (`doctor_patient_appointment_screen.dart`).
-  final bool loading;
 
   @override
   Widget build(BuildContext context) {
@@ -236,25 +200,47 @@ class _RowCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     title,
-                    style: titleColor == null
-                        ? AppTypography.tileTitle
-                        : AppTypography.tileTitle.copyWith(color: titleColor),
+                    style: AppTypography.tileTitle,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                if (loading)
-                  const SizedBox.square(
-                    dimension: ProfileMetrics.chevronSize,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                else
-                  const AppIcon(
-                    icon: MedixIcon.chevronRight,
-                    size: ProfileMetrics.chevronSize,
-                    color: AppColors.primary,
-                  ),
+                const AppIcon(
+                  icon: MedixIcon.chevronRight,
+                  size: ProfileMetrics.chevronSize,
+                  color: AppColors.primary,
+                ),
               ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Красная кнопка выхода из аккаунта — той же формы, что и `_RowCard`, но
+/// без шеврона и с текстом по центру: это действие, а не переход.
+class _LogoutButton extends StatelessWidget {
+  const _LogoutButton({required this.title, required this.onTap});
+
+  final String title;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.surfaceWhite,
+      borderRadius: ProfileMetrics.allRadius,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: SizedBox(
+          height: ProfileMetrics.settingsRowHeight,
+          child: Center(
+            child: Text(
+              title,
+              style: AppTypography.tileTitle.copyWith(color: AppColors.error),
             ),
           ),
         ),

@@ -511,6 +511,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           onOpenPaymentDetails: () => context.push(Routes.payment),
           onOpenContacts: () => context.push(Routes.contacts),
           onCancelSubscription: () => context.push(Routes.cancelSubscription),
+          onLoggedOut: () => context.go(Routes.login),
         ),
       ),
       GoRoute(
